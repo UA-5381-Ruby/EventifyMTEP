@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Brand < ApplicationRecord
   has_many :owners, dependent: :destroy
   has_many :users, through: :owners
