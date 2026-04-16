@@ -17,7 +17,7 @@ Table Users {
   email varchar
   password varchar
   created_at timestamp
-  is_admin bool
+  is_superadmin bool
 }
 
 
@@ -43,8 +43,9 @@ Table Brands {
     id integer [primary key]
     name varchar
     description  varchar
+    owner int [ref: > Users.id, not null]
 }
-Table Owners {
+Table Manages {
     id integer [primary key]
     user_id int [ref: > Users.id, not null]
     brand_id int [ref: > Brands.id, not null]
