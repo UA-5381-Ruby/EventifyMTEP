@@ -1,0 +1,17 @@
+# frozen_string_literal: true
+
+source "https://rubygems.org"
+
+gem "rails"
+group :development, :test do
+   gem 'rubocop', require: false
+   gem 'ruby-lint', require: false
+   gem 'ruby-lsp', require: false
+end
+gem "rubocop-rails", "~> 2.34"
+
+gem "rubocop-performance", "~> 1.26"
+#gem 'rails', '~> 7.1.3'
+gem "rubocop-rake", "~> 0.7.1"
+
+gem "rubocop-rspec", "~> 3.9"
