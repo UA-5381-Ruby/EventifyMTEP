@@ -22,7 +22,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4.8"
-          working-directory: ./api
           bundler-cache: true
 
       - name: Scan for common Rails security vulnerabilities using static analysis
@@ -46,7 +45,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4.8"
-          working-directory: ./api
           bundler-cache: true
 
       - name: Prepare RuboCop cache
@@ -90,7 +88,6 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: "3.4.8"
-          working-directory: ./api
           bundler-cache: true
 
       - name: Run tests
