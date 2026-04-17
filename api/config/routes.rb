@@ -15,6 +15,8 @@ Rails.application.routes.draw do
           patch :review
         end
       end
+
+      resources :categories, only: [:index, :create]
     end
   end
 

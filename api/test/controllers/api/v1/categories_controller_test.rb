@@ -1,0 +1,34 @@
+# frozen_string_literal: true
+
+require 'test_helper'
+
+module Api
+  module V1
+    class CategoriesControllerTest < ActionDispatch::IntegrationTest
+      test 'GET /api/v1/categories returns all categories' do
+        Category.create!(name: 'Music')
+        Category.create!(name: 'Tech')
+
+        get api_v1_categories_url, as: :json
+        assert_response :success
+
+        json = response.parsed_body
+        assert_kind_of Array, json
+        assert_equal 2, json.length
+
+        names = json.pluck('name')
+        assert_includes names, 'Music'
+        assert_includes names, 'Tech'
+      end
+
+      test 'POST /api/v1/categories creates a category' do
+        post api_v1_categories_url, params: { category: { name: 'Sports' } }, as: :json
+        assert_response :created
+
+        json = response.parsed_body
+        assert_equal 'Sports', json['name']
+        assert Category.exists?(name: 'Sports')
+      end
+    end
+  end
+end
