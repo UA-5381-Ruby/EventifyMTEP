@@ -23,7 +23,7 @@ jobs:
         with:
           ruby-version: "3.4.8"
           bundler-cache: true
-          working-directory: api
+          working-directory: ./api
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
@@ -47,7 +47,7 @@ jobs:
         with:
           ruby-version: "3.4.8"
           bundler-cache: true
-          working-directory: api
+          working-directory: ./api
 
       - name: Prepare RuboCop cache
         uses: actions/cache@v4
@@ -91,7 +91,7 @@ jobs:
         with:
           ruby-version: "3.4.8"
           bundler-cache: true
-          working-directory: api
+          working-directory: ./api
 
       - name: Run tests
         env:
