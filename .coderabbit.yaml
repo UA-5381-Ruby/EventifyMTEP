@@ -1,0 +1,17 @@
+# yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
+language: "en-US"
+reviews:
+  profile: "assertive"
+  high_level_summary: true
+  collapse_walkthrough: false
+  # Path-specific instructions for your monorepo structure
+  path_instructions:
+    - path: "api/**/*"
+      instructions: "This is a Ruby on Rails backend. Review for Rails best practices, security vulnerabilities (SQL injection, mass assignment), and efficient database queries."
+    - path: "web/**/*"
+      instructions: "This is a React frontend using JS/TS. Review for component performance, proper hook usage, and TypeScript type safety."
+    - path: "docs/**/*"
+      instructions: "This directory contains documentation. Review for clarity, technical accuracy, and formatting."
+
+chat:
+  auto_reply: true
