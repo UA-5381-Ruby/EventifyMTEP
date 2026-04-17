@@ -10,15 +10,21 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_17_124500) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_17_200152) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "brands", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
+    t.text "logo_url"
     t.string "name"
+    t.string "primary_color", default: "#3b82f6", null: false
+    t.string "secondary_color", default: "#1f2937", null: false
+    t.string "subdomain", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_brands_on_name"
+    t.index ["subdomain"], name: "index_brands_on_subdomain", unique: true
   end
 
   create_table "categories", force: :cascade do |t|
@@ -43,13 +49,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_17_124500) do
     t.index ["category_id"], name: "index_events_on_category_id"
   end
 
-  create_table "owners", force: :cascade do |t|
+  create_table "organizers", force: :cascade do |t|
     t.bigint "brand_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
-    t.index ["brand_id"], name: "index_owners_on_brand_id"
-    t.index ["user_id"], name: "index_owners_on_user_id"
+    t.index ["brand_id"], name: "index_organizers_on_brand_id"
+    t.index ["user_id"], name: "index_organizers_on_user_id"
   end
 
   create_table "tickets", force: :cascade do |t|
@@ -79,8 +85,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_17_124500) do
 
   add_foreign_key "events", "brands"
   add_foreign_key "events", "categories"
-  add_foreign_key "owners", "brands"
-  add_foreign_key "owners", "users"
+  add_foreign_key "organizers", "brands"
+  add_foreign_key "organizers", "users"
   add_foreign_key "tickets", "events"
   add_foreign_key "tickets", "users"
 end
