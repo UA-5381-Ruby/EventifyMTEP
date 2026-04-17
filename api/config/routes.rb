@@ -9,6 +9,8 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      resources :brands, only: [:index, :create, :show]
+
       resources :tickets, only: [:update] do
         member do
           patch :review

@@ -10,7 +10,7 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
     end
 
     @user = User.create!(username: 'testuser', email: 'test@example.com', password: 'password', is_admin: false)
-    @brand = Brand.create!(name: 'Test Brand')
+    @brand = Brand.create!(name: 'Test Brand', subdomain: 'test-brand')
     @category = Category.create!(name: 'Test Category')
     @event = Event.create!(brand: @brand, category: @category, title: 'Test Event', start_date: Time.zone.now)
     @ticket = Ticket.create!(user: @user, event: @event, is_active: true)
