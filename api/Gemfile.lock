@@ -313,5 +313,8 @@ DEPENDENCIES
   ruby-lsp
   shoulda-matchers
 
+RUBY VERSION
+   ruby 3.4.8p72
+
 BUNDLED WITH
    2.4.20
