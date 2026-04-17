@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateTickets < ActiveRecord::Migration[8.1]
   def change
     create_table :tickets do |t|
@@ -6,7 +8,7 @@ class CreateTickets < ActiveRecord::Migration[8.1]
       t.integer :rating
       t.text :comment
       t.string :qr_code
-      t.boolean :is_active
+      t.boolean :is_active, default: false, null: false
 
       t.timestamps
     end
