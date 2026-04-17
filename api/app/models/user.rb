@@ -3,8 +3,8 @@
 class User < ApplicationRecord
   has_secure_password
 
-  has_many :owners, dependent: :destroy
-  has_many :brands, through: :owners
+  has_many :organizers, dependent: :destroy
+  has_many :brands, through: :organizers
   has_many :tickets, dependent: :destroy
   has_many :attended_events, through: :tickets, source: :event
 
