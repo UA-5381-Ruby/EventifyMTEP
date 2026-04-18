@@ -31,6 +31,10 @@ Metrics/MethodLength:
 plugins:
   - rubocop-rails
 
+Metrics/BlockLength:
+  Exclude:
+    - "spec/**/*"
+
 Rails:
   StyleGuideBaseURL: https://rails.rubystyle.guide
   DocumentationBaseURL: https://docs.rubocop.org/rubocop-rails
