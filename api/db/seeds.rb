@@ -13,8 +13,9 @@
 # Populate categories
 categories = %w[Concert Workshop Conference Networking Education]
 categories.each do |category_name|
-  # find_or_create_by prevents duplicate errors if you run `rails db:seed` multiple times
-  Category.find_or_create_by!(name: category_name)
+  # Case-insensitive lookup to match existing records regardless of case
+  # but still store the canonical cased name
+  Category.where('lower(name) = ?', category_name.downcase).first_or_create!(name: category_name)
 end
 
 # Create admin user

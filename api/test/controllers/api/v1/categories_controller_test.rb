@@ -14,7 +14,7 @@ module Api
 
         json = response.parsed_body
         assert_kind_of Array, json
-        assert_equal 2, json.length
+        assert_equal Category.count, json.length
 
         names = json.pluck('name')
         assert_includes names, 'Music'
@@ -28,6 +28,18 @@ module Api
         json = response.parsed_body
         assert_equal 'Sports', json['name']
         assert Category.exists?(name: 'Sports')
+      end
+
+      test 'POST /api/v1/categories rejects case-insensitive duplicate' do
+        post api_v1_categories_url, params: { category: { name: 'Sports' } }, as: :json
+        assert_response :created
+
+        post api_v1_categories_url, params: { category: { name: 'sports' } }, as: :json
+        assert_response :unprocessable_content
+
+        json = response.parsed_body
+        assert_equal 1, Category.count
+        assert json['name'].present?
       end
     end
   end
