@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_17_200152) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_18_114957) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -18,7 +18,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_17_200152) do
     t.datetime "created_at", null: false
     t.text "description"
     t.text "logo_url"
-    t.string "name"
+    t.string "name", null: false
     t.string "primary_color", default: "#3b82f6", null: false
     t.string "secondary_color", default: "#1f2937", null: false
     t.string "subdomain", null: false
@@ -54,6 +54,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_17_200152) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["brand_id", "user_id"], name: "index_organizers_on_brand_id_and_user_id", unique: true
     t.index ["brand_id"], name: "index_organizers_on_brand_id"
     t.index ["user_id"], name: "index_organizers_on_user_id"
   end
