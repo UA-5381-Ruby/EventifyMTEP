@@ -1,11 +1,9 @@
 # frozen_string_literal: true
 
 class Event < ApplicationRecord
-  # Associations
   belongs_to :brand
   belongs_to :category
 
-  # Enum — порядок важен, совпадает с БД
   enum :status, {
     draft: 'draft',
     draft_on_review: 'draft_on_review',
@@ -18,13 +16,11 @@ class Event < ApplicationRecord
     cancelled: 'cancelled'
   }, default: :draft
 
-  # Validations
   validates :title, presence: true, length: { maximum: 120 }
   validates :location, presence: true, length: { maximum: 200 }
   validates :start_date, presence: true
   validates :status, presence: true
 
-  # Scopes
   scope :sorted_by, lambda { |field, direction|
     allowed_fields     = %w[start_date title]
     allowed_directions = %w[asc desc]
