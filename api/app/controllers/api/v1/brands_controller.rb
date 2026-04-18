@@ -23,26 +23,43 @@ module Api
 
       # POST /api/v1/brands
       def create
+        # TODO: remove guard when auth is ready
+        unless current_user
+          return render json: { error: 'Authentication not implemented yet' },
+                        status: :not_implemented
+        end
+
         brand = Brand.new(brand_params)
 
-        if brand.save
-          # TODO: when User model + auth is ready
-          # Organizer.create!(brand: brand, user: current_user)
-
-          render json: brand, status: :created
-        else
-          render json: { errors: brand.errors.full_messages },
-                 status: :unprocessable_content
+        ActiveRecord::Base.transaction do
+          brand.save!
+          Organizer.create!(brand: brand, user: current_user)
         end
+
+        render json: brand, status: :created
+      rescue ActiveRecord::RecordInvalid => e
+        render json: { errors: e.record.errors.full_messages },
+               status: :unprocessable_content
       end
 
       private
 
+      # TODO: replace with real auth when JWT is ready
+      def current_user
+        nil
+      end
+
       def set_brand
-        # TODO: later restrict by current_user.brands to enforce multi-tenant isolation
-        @brand = Brand.find(params[:id])
+        @brand = accessible_brands.find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Brand not found' }, status: :not_found
+      end
+
+      def accessible_brands
+        # TODO: scope to current_user.brands when auth is ready
+        return Brand.all if current_user.blank?
+
+        current_user.brands
       end
 
       def brand_params
