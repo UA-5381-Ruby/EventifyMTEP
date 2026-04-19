@@ -36,4 +36,4 @@ en:
             name:
               blank: "Name is required"
             subdomain:
-              invalid: "only lowercase letters, numbers, and hyphens allowed"
+              invalid: "Only lowercase letters, numbers, and hyphens are allowed"
