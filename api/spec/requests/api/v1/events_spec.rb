@@ -49,6 +49,10 @@ RSpec.describe 'Api::V1::Events', type: :request do
     end
 
     it 'sorts by start_date desc' do
+      create(:event, brand: brand, category: category, start_date: 1.day.from_now)
+      create(:event, brand: brand, category: category, start_date: 3.days.from_now)
+      create(:event, brand: brand, category: category, start_date: 2.days.from_now)
+
       get '/api/v1/events', params: { sort: 'start_date', order: 'desc' }
       expect(response).to have_http_status(:ok)
 

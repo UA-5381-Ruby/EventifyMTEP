@@ -31,12 +31,13 @@ module Api
       end
 
       def create
-        event = Event.new(event_params)
+        @event = Event.new(event_params)
+        @event.status = 'draft'
 
-        if event.save
-          render json: event, status: :created
+        if @event.save
+          render json: @event, status: :created
         else
-          render json: { errors: event.errors.messages }, status: :unprocessable_content
+          render json: { errors: @event.errors }, status: :unprocessable_content
         end
       end
 
@@ -52,7 +53,7 @@ module Api
         params.expect(
           event: %i[title description location
                     start_date end_date
-                    brand_id category_id status]
+                    brand_id category_id]
         )
       end
 

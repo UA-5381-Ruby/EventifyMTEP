@@ -10,6 +10,12 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 
+User.find_or_create_by!(username: 'admin') do |u|
+  u.email = 'admin@test.com',
+            u.password = 'password123',
+            u.is_admin = true
+end
+
 user = User.find_by(username: 'admin') || User.create!(
   username: 'admin',
   email: 'admin@test.com',
@@ -17,7 +23,9 @@ user = User.find_by(username: 'admin') || User.create!(
   is_admin: true
 )
 
-brand = Brand.find_by(name: 'Tech Corp') || Brand.create!(name: 'Tech Corp', description: 'Main tech brand')
+brand = Brand.find_or_create_by!(name: 'Tech Corp') do |b|
+  b.description = 'Main tech brand'
+end
 
 category = Category.find_or_create_by!(name: 'Education')
 
