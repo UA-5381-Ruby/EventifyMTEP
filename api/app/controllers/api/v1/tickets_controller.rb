@@ -3,7 +3,23 @@
 module Api
   module V1
     class TicketsController < ApplicationController
-      before_action :authenticate_user!, only: [:review]
+      before_action :authenticate_user!
+
+
+      def create
+        ticket = current_user.tickets.build(create_params)
+
+        if ticket.save
+          render json: { qr_code: ticket.qr_code, ticket: ticket }, status: :created
+        else
+          render json: { errors: ticket.errors.full_messages }, status: :unprocessable_entity
+        end
+      end
+
+      def index
+        tickets = current_user.tickets.includes(:event)
+        render json: tickets, status: :ok
+      end
 
       def review
         # TODO: Limit access to tickets owned by the current user
@@ -18,6 +34,11 @@ module Api
       end
 
       private
+
+      def create_params
+        params.require(:ticket).permit(:event_id)
+      end
+
 
       def review_params
         # support both wrapped and unwrapped params

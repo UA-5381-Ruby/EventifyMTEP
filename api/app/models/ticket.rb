@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'rqrcode'
 
 class Ticket < ApplicationRecord
   belongs_to :user
@@ -15,4 +16,25 @@ class Ticket < ApplicationRecord
 
   # If qr_code should be unique per ticket
   validates :qr_code, uniqueness: true, allow_nil: true
+  validates :user_id, uniqueness: { scope: :event_id, message: 'can only register once per event' }
+
+  before_validation :generate_qr_code, on: :create
+
+  def qr_code_svg
+    return nil unless qr_code
+    qrcode = RQRCode::QRCode.new(qr_code)
+    qrcode.as_svg(
+      color: "000",
+      shape_rendering: "crispEdges",
+      module_size: 6,
+      standalone: true,
+      use_path: true
+    )
+  end
+
+  private
+
+  def generate_qr_code
+    self.qr_code ||= SecureRandom.hex(12)
+  end
 end

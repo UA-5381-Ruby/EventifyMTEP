@@ -9,7 +9,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :tickets, only: [:update] do
+      resources :tickets, only: [:create, :index, :update] do
         member do
           patch :review
         end

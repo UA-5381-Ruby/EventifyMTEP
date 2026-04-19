@@ -10,6 +10,7 @@ group :development, :test do
   gem 'rubocop', require: false
   gem 'ruby-lint', require: false
   gem 'ruby-lsp', require: false
+  gem 'dotenv-rails'
 end
 gem 'rubocop-rails', '~> 2.34'
 
@@ -21,7 +22,12 @@ gem 'rubocop-rspec', '~> 3.9'
 
 gem 'bcrypt', '~> 3.1.7'
 
+gem 'rqrcode', '~> 3.2'
+
 gem 'puma', '~> 8.0'
+
+# Windows timezone data
+gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'brakeman', '~> 8.0', groups: %i[development test]
 gem 'bundler-audit', '~> 0.9.3', groups: %i[development test]

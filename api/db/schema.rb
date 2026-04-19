@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_17_124500) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_19_220500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -56,13 +56,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_17_124500) do
     t.text "comment"
     t.datetime "created_at", null: false
     t.bigint "event_id", null: false
-    t.boolean "is_active", default: false, null: false
+    t.boolean "is_active", default: true, null: false
     t.string "qr_code"
     t.integer "rating"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["event_id"], name: "index_tickets_on_event_id"
     t.index ["qr_code"], name: "index_tickets_on_qr_code", unique: true, where: "(qr_code IS NOT NULL)"
+    t.index ["user_id", "event_id"], name: "index_tickets_on_user_id_and_event_id", unique: true
     t.index ["user_id"], name: "index_tickets_on_user_id"
   end
 
