@@ -14,13 +14,7 @@ module Api
         event = Event.find_by(id: create_params[:event_id])
         return render json: { errors: [t('errors.event_not_found')] }, status: :not_found unless event
 
-        ticket = current_user.tickets.build(create_params)
-
-        if ticket.save
-          render json: { qr_code: ticket.qr_code, ticket: ticket }, status: :created
-        else
-          render json: { errors: ticket.errors.full_messages }, status: :unprocessable_content
-        end
+        save_ticket(event)
       rescue ActiveRecord::RecordNotUnique
         render json: { errors: [t('errors.duplicate_ticket')] }, status: :unprocessable_content
       end
@@ -38,6 +32,16 @@ module Api
       end
 
       private
+
+      def save_ticket(event)
+        ticket = current_user.tickets.build(create_params)
+
+        if ticket.save
+          render json: { qr_code: ticket.qr_code, ticket: ticket }, status: :created
+        else
+          render json: { errors: ticket.errors.full_messages }, status: :unprocessable_content
+        end
+      end
 
       def create_params
         params.expect(ticket: [:event_id])

@@ -17,7 +17,7 @@ class Ticket < ApplicationRecord
 
   # If qr_code should be unique per ticket
   validates :qr_code, uniqueness: true, allow_nil: true
-  validates :user_id, uniqueness: { scope: :event_id, message: 'can only register once per event' }
+  validates :user_id, uniqueness: { scope: :event_id, message: :duplicate_ticket }
 
   before_validation :generate_qr_code, on: :create
 
