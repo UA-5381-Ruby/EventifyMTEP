@@ -41,6 +41,6 @@ class Ticket < ApplicationRecord
   private
 
   def generate_qr_code
-    self.qr_code ||= SecureRandom.hex(12)
+    self.qr_code = SecureRandom.hex(12) if qr_code.blank?
   end
 end
