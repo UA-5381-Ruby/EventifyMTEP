@@ -33,7 +33,7 @@ module Api
 
       private
 
-      def save_ticket(event)
+      def save_ticket(_event)
         ticket = current_user.tickets.build(create_params)
 
         if ticket.save
