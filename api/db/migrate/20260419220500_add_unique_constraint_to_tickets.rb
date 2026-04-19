@@ -3,12 +3,12 @@
 class AddUniqueConstraintToTickets < ActiveRecord::Migration[8.1]
   def change
     # Remove duplicates keeping only the most recent ticket per user/event
-    execute <<-SQL.squish
+    execute <<~SQL.squish
       DELETE FROM tickets
       WHERE id NOT IN (
         SELECT MAX(id) FROM tickets GROUP BY user_id, event_id
       )
     SQL
-    add_index :tickets, [:user_id, :event_id], unique: true
+    add_index :tickets, %i[user_id event_id], unique: true
   end
 end

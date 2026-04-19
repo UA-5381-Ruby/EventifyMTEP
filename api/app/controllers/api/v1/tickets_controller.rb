@@ -6,26 +6,24 @@ module Api
       before_action :authenticate_user!
 
 
+      def index
+        tickets = current_user.tickets.includes(:event)
+        render json: tickets, status: :ok
+      end
+
       def create
         event = Event.find_by(id: create_params[:event_id])
-        unless event
-          return render json: { errors: ['Event not found'] }, status: :not_found
-        end
+        return render json: { errors: ['Event not found'] }, status: :not_found unless event
 
         ticket = current_user.tickets.build(create_params)
 
         if ticket.save
           render json: { qr_code: ticket.qr_code, ticket: ticket }, status: :created
         else
-          render json: { errors: ticket.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: ticket.errors.full_messages }, status: :unprocessable_content
         end
       rescue ActiveRecord::RecordNotUnique
-        render json: { errors: ['User can only register once per event'] }, status: :unprocessable_entity
-      end
-
-      def index
-        tickets = current_user.tickets.includes(:event)
-        render json: tickets, status: :ok
+        render json: { errors: ['User can only register once per event'] }, status: :unprocessable_content
       end
 
       def review
@@ -43,9 +41,8 @@ module Api
       private
 
       def create_params
-        params.require(:ticket).permit(:event_id)
+        params.expect(ticket: [:event_id])
       end
-
 
       def review_params
         # support both wrapped and unwrapped params
