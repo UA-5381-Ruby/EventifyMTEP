@@ -20,15 +20,24 @@ module Api
           primary_color: '#FF0000',
           secondary_color: '#00FF00'
         )
-
         Organizer.create!(brand: @brand, user: @user)
+
+        @category = Category.create!(name: 'Test Category')
+
+        @event = Event.create!(
+          brand: @brand,
+          category: @category,
+          title: 'Test Event',
+          start_date: Time.current
+        )
 
         user = @user
         Api::V1::BrandsController.define_method(:current_user) { user }
       end
 
       teardown do
-        Api::V1::BrandsController.remove_method(:current_user)
+        controller = Api::V1::BrandsController
+        controller.remove_method(:current_user) if controller.method_defined?(:current_user)
       end
 
       # GET /api/v1/brands
@@ -54,6 +63,7 @@ module Api
         assert_equal @brand.name, body['name']
         assert_includes body.keys, 'events'
         assert_kind_of Array, body['events']
+        assert(body['events'].any? { |e| e['id'] == @event.id })
       end
 
       # GET /api/v1/brands/:id — 404
