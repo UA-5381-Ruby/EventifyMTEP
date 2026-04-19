@@ -29,7 +29,7 @@ class Event < ApplicationRecord
     order("#{field} #{direction}")
   }
 
-  scope :from_date,     ->(from) { where(start_date: from..) if from.present? }
-  scope :to_date,       ->(to)   { where(start_date: ..to)   if to.present? }
-  scope :search_title,  ->(q)    { where('title ILIKE ?', "%#{q}%") if q.present? }
+  scope :from_date,    ->(from) { from.present? ? where(start_date: from..) : all }
+  scope :to_date,      ->(to)   { to.present? ? where(start_date: ..to) : all }
+  scope :search_title, ->(q)    { q.present? ? where('title ILIKE ?', "%#{q}%") : all }
 end

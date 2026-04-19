@@ -10,7 +10,7 @@ module Api
 
         total = events.count
         per_page = params.fetch(:per_page, 20).to_i.clamp(1, 100)
-        page = params.fetch(:page, 1).to_i.at_least(1)
+        page = [params.fetch(:page, 1).to_i, 1].max
 
         events = events.offset((page - 1) * per_page).limit(per_page)
 

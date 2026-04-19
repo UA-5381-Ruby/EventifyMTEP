@@ -16,8 +16,8 @@ RSpec.describe Event, type: :model do
     it { is_expected.to validate_length_of(:location).is_at_most(200) }
     it { is_expected.to validate_presence_of(:status) }
 
-    it { is_expected.to validate_presence_of(:brand) }
-    it { is_expected.to validate_presence_of(:category) }
+    it { is_expected.to belong_to(:brand) }
+    it { is_expected.to belong_to(:category) }
   end
 
   describe 'associations' do

@@ -45,7 +45,7 @@ RSpec.describe 'Api::V1::Events', type: :request do
       expect(response).to have_http_status(:ok)
       body = response.parsed_body
       expect(body['data'].length).to eq(3)
-      expect(body['meta']['total']).to eq(5)
+      expect(body['meta']['total']).to eq(Event.count)
     end
 
     it 'sorts by start_date desc' do
