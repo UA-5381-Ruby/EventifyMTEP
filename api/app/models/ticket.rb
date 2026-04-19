@@ -22,14 +22,20 @@ class Ticket < ApplicationRecord
 
   def qr_code_svg
     return nil unless qr_code
-    qrcode = RQRCode::QRCode.new(qr_code)
-    qrcode.as_svg(
-      color: "000",
-      shape_rendering: "crispEdges",
-      module_size: 6,
-      standalone: true,
-      use_path: true
-    )
+
+    begin
+      qrcode = RQRCode::QRCode.new(qr_code)
+      qrcode.as_svg(
+        color: "000",
+        shape_rendering: "crispEdges",
+        module_size: 6,
+        standalone: true,
+        use_path: true
+      )
+    rescue RQRCode::QRCodeRunTimeError => e
+      Rails.logger.error("QR code generation failed for ticket #{id}: #{e.message}")
+      nil
+    end
   end
 
   private
