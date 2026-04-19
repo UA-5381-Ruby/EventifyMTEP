@@ -29,3 +29,6 @@
 
 en:
   hello: "Hello world"
+  errors:
+    event_not_found: "Event not found"
+    duplicate_ticket: "User can only register once per event"

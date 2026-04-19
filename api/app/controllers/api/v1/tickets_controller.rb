@@ -5,7 +5,6 @@ module Api
     class TicketsController < ApplicationController
       before_action :authenticate_user!
 
-
       def index
         tickets = current_user.tickets.includes(:event)
         render json: tickets, status: :ok
@@ -13,7 +12,7 @@ module Api
 
       def create
         event = Event.find_by(id: create_params[:event_id])
-        return render json: { errors: ['Event not found'] }, status: :not_found unless event
+        return render json: { errors: [t('errors.event_not_found')] }, status: :not_found unless event
 
         ticket = current_user.tickets.build(create_params)
 
@@ -23,7 +22,7 @@ module Api
           render json: { errors: ticket.errors.full_messages }, status: :unprocessable_content
         end
       rescue ActiveRecord::RecordNotUnique
-        render json: { errors: ['User can only register once per event'] }, status: :unprocessable_content
+        render json: { errors: [t('errors.duplicate_ticket')] }, status: :unprocessable_content
       end
 
       def review

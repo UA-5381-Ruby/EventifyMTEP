@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class AddUniqueConstraintToTickets < ActiveRecord::Migration[8.1]
-  def change
+  def up
     # Remove duplicates keeping only the most recent ticket per user/event
     execute <<~SQL.squish
       DELETE FROM tickets
@@ -10,5 +10,9 @@ class AddUniqueConstraintToTickets < ActiveRecord::Migration[8.1]
       )
     SQL
     add_index :tickets, %i[user_id event_id], unique: true
+  end
+
+  def down
+    remove_index :tickets, %i[user_id event_id], unique: true
   end
 end
