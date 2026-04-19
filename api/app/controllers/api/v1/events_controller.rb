@@ -15,7 +15,10 @@ module Api
         events = events.offset((page - 1) * per_page).limit(per_page)
 
         render json: {
-          data: events.as_json(include: { brand: { only: %i[id name] } }),
+          data: events.as_json(include: {
+                                 brand: { only: %i[id name] },
+                                 category: { only: %i[id name] }
+                               }),
           meta: { page: page, per_page: per_page, total: total }
         }, status: :ok
       end
@@ -27,7 +30,6 @@ module Api
         ), status: :ok
       end
 
-      # POST /api/v1/events
       def create
         event = Event.new(event_params)
 

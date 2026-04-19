@@ -1,6 +1,6 @@
 AllCops:
   NewCops: enable
-  TargetRubyVersion: 3.3.0
+  TargetRubyVersion: 3.4.8
   Exclude:
     - "vendor/**/*"
     - "spec/fixtures/**/*"
@@ -36,7 +36,6 @@ Metrics/BlockLength:
     - "spec/**/*"
 
 Rails:
-  StyleGuideBaseURL: https://rails.rubystyle.guide
   DocumentationBaseURL: https://docs.rubocop.org/rubocop-rails
 Rails/TimeZone:
   StyleGuide: "#time"

@@ -50,7 +50,9 @@ RSpec.describe 'Api::V1::Events', type: :request do
 
     it 'sorts by start_date desc' do
       get '/api/v1/events', params: { sort: 'start_date', order: 'desc' }
-      dates = response.parsed_body['data'].pluck('start_date')
+      expect(response).to have_http_status(:ok)
+
+      dates = response.parsed_body['data'].map { |d| Time.iso8601(d['start_date']) }
       expect(dates).to eq(dates.sort.reverse)
     end
   end
