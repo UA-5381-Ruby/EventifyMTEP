@@ -7,6 +7,11 @@ module Api
 
 
       def create
+        event = Event.find_by(id: create_params[:event_id])
+        unless event
+          return render json: { errors: ['Event not found'] }, status: :not_found
+        end
+
         ticket = current_user.tickets.build(create_params)
 
         if ticket.save
@@ -14,6 +19,8 @@ module Api
         else
           render json: { errors: ticket.errors.full_messages }, status: :unprocessable_entity
         end
+      rescue ActiveRecord::RecordNotUnique
+        render json: { errors: ['User can only register once per event'] }, status: :unprocessable_entity
       end
 
       def index

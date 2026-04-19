@@ -157,7 +157,6 @@ GEM
       stringio
     puma (8.0.0)
       nio4r (~> 2.0)
-    qrcode (0.2.1)
     racc (1.8.1)
     rack (3.2.6)
     rack-session (2.1.2)
@@ -286,7 +285,6 @@ DEPENDENCIES
   dotenv-rails
   pg (~> 1.1)
   puma (~> 8.0)
-  qrcode (~> 0.2.1)
   rails
   rqrcode (~> 3.2)
   rubocop
