@@ -28,6 +28,7 @@ module Api
           brand: @brand,
           category: @category,
           title: 'Test Event',
+          location: 'Test location',
           start_date: Time.current
         )
 

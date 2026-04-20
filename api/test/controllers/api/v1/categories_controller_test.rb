@@ -31,12 +31,20 @@ module Api
       end
 
       test 'POST /api/v1/categories rejects case-insensitive duplicate' do
-        post api_v1_categories_url, params: { category: { name: 'Sports' } }, as: :json
+        post api_v1_categories_url, params: { category: {
+          name: 'Sports',
+          primary_color: '#000000',
+          secondary_color: '#999999'
+        } }, as: :json
         assert_response :created
 
         initial_count = Category.count
 
-        post api_v1_categories_url, params: { category: { name: 'sports' } }, as: :json
+        post api_v1_categories_url, params: { category: {
+          name: 'Sports',
+          primary_color: '#000000',
+          secondary_color: '#999999'
+        } }, as: :json
         assert_response :unprocessable_content
 
         json = response.parsed_body

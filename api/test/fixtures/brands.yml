@@ -1,3 +1,5 @@
 one:
   name: "Test Brand"
   description: "Description"
+  primary_color: "#FFFFFF"
+  secondary_color: "#FFFFFF"

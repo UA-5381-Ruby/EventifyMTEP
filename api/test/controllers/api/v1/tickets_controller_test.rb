@@ -12,9 +12,14 @@ module Api
         end
 
         @user = User.create!(username: 'testuser', email: 'test@example.com', password: 'password', is_admin: false)
-        @brand = Brand.create!(name: 'Test Brand', subdomain: 'test-brand')
+        @brand = Brand.create!(
+          name: 'Sports',
+          subdomain: 'ss',
+          primary_color: '#000000',
+          secondary_color: '#999999'
+        )
         @category = Category.create!(name: 'Test Category')
-        @event = Event.create!(brand: @brand, category: @category, title: 'Test Event', start_date: Time.zone.now)
+        @event = Event.create!(brand: @brand, category: @category, title: 'Test Event', location: 'Ukraine', start_date: Time.zone.now)
         @ticket = Ticket.create!(user: @user, event: @event, is_active: true)
       end
 

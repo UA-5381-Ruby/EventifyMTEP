@@ -28,7 +28,9 @@ user = User.find_by(username: 'admin') || User.create!(
 
 # Create brand
 brand = Brand.find_or_create_by!(name: 'Tech Corp') do |b|
-  b.description = 'Main tech brand'
+  b.description = 'Main tech brand',
+  b.primary_color = '#FF0000',
+  b.secondary_color = '#FF0000'
 end
 
 # Create owner relationship
