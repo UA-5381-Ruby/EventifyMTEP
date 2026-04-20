@@ -18,10 +18,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_120554) do
     t.datetime "created_at", null: false
     t.text "description"
     t.string "name", null: false
-    t.string "primary_color", null: false
-    t.string "secondary_color", null: false
+    t.string "primary_color", default: "#3b82f6", null: false
+    t.string "secondary_color", default: "#1f2937", null: false
     t.string "subdomain"
     t.datetime "updated_at", null: false
+    t.index ["subdomain"], name: "index_brands_on_subdomain", unique: true
   end
 
   create_table "categories", force: :cascade do |t|

@@ -6,9 +6,10 @@ class Brand < ApplicationRecord
   has_many :events, dependent: :destroy
 
   validates :name, presence: true, length: { maximum: 100 }
-  validates :subdomain, presence: true,
-                        uniqueness: true,
-                        format: { with: /\A[a-z0-9-]+\z/ }
+  validates :subdomain,
+            presence: true,
+            uniqueness: { case_sensitive: false },
+            format: { with: /\A[a-z0-9-]+\z/ }
 
   validates :primary_color,
             presence: true,
