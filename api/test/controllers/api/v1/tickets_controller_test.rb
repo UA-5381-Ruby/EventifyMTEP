@@ -19,7 +19,8 @@ module Api
           secondary_color: '#999999'
         )
         @category = Category.create!(name: 'Test Category')
-        @event = Event.create!(brand: @brand, category: @category, title: 'Test Event', location: 'Ukraine', start_date: Time.zone.now)
+        @event = Event.create!(brand: @brand, category: @category, title: 'Test Event', location: 'Ukraine',
+                               start_date: Time.zone.now)
         @ticket = Ticket.create!(user: @user, event: @event, is_active: true)
       end
 
