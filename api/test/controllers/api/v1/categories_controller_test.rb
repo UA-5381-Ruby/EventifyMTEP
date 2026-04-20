@@ -34,11 +34,13 @@ module Api
         post api_v1_categories_url, params: { category: { name: 'Sports' } }, as: :json
         assert_response :created
 
+        initial_count = Category.count
+
         post api_v1_categories_url, params: { category: { name: 'sports' } }, as: :json
         assert_response :unprocessable_content
 
         json = response.parsed_body
-        assert_equal 1, Category.count
+        assert_equal initial_count, Category.count
         assert json['name'].present?
       end
     end
