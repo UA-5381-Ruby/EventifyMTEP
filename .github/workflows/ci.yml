@@ -99,4 +99,5 @@ jobs:
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/api_test
         run: |
           bin/rails db:test:prepare
+          bin/rails test
           bundle exec rspec
