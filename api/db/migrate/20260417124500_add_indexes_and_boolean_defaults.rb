@@ -3,7 +3,7 @@
 class AddIndexesAndBooleanDefaults < ActiveRecord::Migration[8.1]
   def change
     # Add unique indexes to match uniqueness validations
-    add_index :categories, :name, unique: true unless index_exists?(:categories, :name, unique: true)
+    # Case-insensitive index for categories added in separate migration
     add_index :users, :username, unique: true unless index_exists?(:users, :username, unique: true)
     add_index :users, :email, unique: true unless index_exists?(:users, :email, unique: true)
 
