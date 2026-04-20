@@ -16,13 +16,14 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          working-directory: ./api # Tells setup-ruby where to find .ruby-version and Gemfile
+          ruby-version: "3.4.8"
           bundler-cache: true
+          working-directory: ./api
 
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
@@ -39,13 +40,14 @@ jobs:
       RUBOCOP_CACHE_ROOT: tmp/rubocop
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          working-directory: ./api
+          ruby-version: "3.4.8"
           bundler-cache: true
+          working-directory: ./api
 
       - name: Prepare RuboCop cache
         uses: actions/cache@v4
@@ -79,7 +81,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Install packages
         run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libpq-dev libvips
@@ -87,11 +89,15 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          working-directory: ./api
+          ruby-version: "3.4.8"
           bundler-cache: true
+          working-directory: ./api
 
       - name: Run tests
         env:
           RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432
-        run: bin/rails db:test:prepare test
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/api_test
+        run: |
+          bin/rails db:test:prepare
+          bin/rails test
+          bundle exec rspec

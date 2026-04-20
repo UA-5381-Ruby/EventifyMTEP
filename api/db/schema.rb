@@ -17,21 +17,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_18_114957) do
   create_table "brands", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
-    t.text "logo_url"
     t.string "name", null: false
-    t.string "primary_color", default: "#3b82f6", null: false
-    t.string "secondary_color", default: "#1f2937", null: false
-    t.string "subdomain", null: false
     t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_brands_on_name"
-    t.index ["subdomain"], name: "index_brands_on_subdomain", unique: true
   end
 
   create_table "categories", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "name"
     t.datetime "updated_at", null: false
-    t.index ["name"], name: "index_categories_on_name", unique: true
+    t.index "lower((name)::text)", name: "index_categories_on_lower_name", unique: true
   end
 
   create_table "events", force: :cascade do |t|

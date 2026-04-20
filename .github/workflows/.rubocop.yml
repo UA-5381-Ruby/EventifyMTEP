@@ -1,11 +1,10 @@
-inherit_from: .rubocop_todo.yml
 name: Lint Ruby Code
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   rubocop:
@@ -19,48 +18,10 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.3.0'
-          bundler-cache: true 
+          ruby-version: "3.4.8"
+          bundler-cache: true
+          working-directory: ./api
 
       - name: Run RuboCop
+        working-directory: ./api
         run: bundle exec rubocop --color
-AllCops:
-
-  NewCops: enable
-  TargetRubyVersion: 3.3.0
-  Exclude:
-    - 'vendor/**/*'
-    - 'spec/fixtures/**/*'
-    - 'tmp/**/*'
-    - '.git/**/*'
-    - 'bin/*'
-  Exclude:
-  <% `git status --ignored --porcelain`.lines.grep(/^!! /).each do |path| %>
-    - <%= path.sub(/^!! /, '').sub(/\/$/, '/**/*') %>
-  <% end %>
-Layout/IndentationWidth:
-  Width: 2
-
-Style/Documentation:
-  Enabled: false
-
-Layout/LineLength:
-  Max: 120
-Style/StringLiterals:
-  EnforcedStyle: single_quotes
-Style/FrozenStringLiteralComment:
-  Enabled: true
-
-Style/IfUnlessModifier:
-  Enabled: true
-Metrics/MethodLength:
-  Max: 20
-require:
-  - rubocop-rails
-
-Rails:
-  StyleGuideBaseURL: https://rails.rubystyle.guide
-  DocumentationBaseURL: https://docs.rubocop.org/rubocop-rails
-Rails/TimeZone:
-  StyleGuide: '#time'
-  
