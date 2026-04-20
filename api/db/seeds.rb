@@ -1,45 +1,41 @@
 # frozen_string_literal: true
 
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
-
 # Populate categories
 categories = %w[Concert Workshop Conference Networking Education]
 categories.each do |category_name|
-  # Case-insensitive lookup to match existing records regardless of case
-  # but still store the canonical cased name
-  Category.where('lower(name) = ?', category_name.downcase).first_or_create!(name: category_name)
+  Category.find_or_create_by!(name: category_name)
 end
 
 # Create admin user
-user = User.find_by(username: 'admin') || User.create!(
-  username: 'admin',
-  email: 'admin@test.com',
-  password: 'password123',
-  is_admin: true
-)
+# CHANGED: 'username' -> 'name', 'is_admin' -> 'is_superadmin', relying on email for uniqueness
+user = User.find_or_create_by!(email: 'admin@test.com') do |u|
+  u.name = 'admin'
+  u.password = 'password123'
+  u.is_superadmin = true
+end
 
 # Create brand
-brand = Brand.find_or_create_by!(name: 'Tech Corp') do |b|
+# CHANGED: Added required 'subdomain' column to the lookup block
+brand = Brand.find_or_create_by!(subdomain: 'tech-corp') do |b|
+  b.name = 'Tech Corp'
   b.description = 'Main tech brand'
+  b.primary_color = '#000000'
+  b.secondary_color = '#FFFFFF'
 end
 
 # Create owner relationship
-Owner.find_or_create_by!(user: user, brand: brand)
+# CHANGED: Replaced the old 'Owner' model with the new polymorphic 'BrandMembership'
+BrandMembership.find_or_create_by!(user: user, brand: brand) do |m|
+  m.role = 'owner'
+end
 
 # Seed events
 Rails.logger.debug 'Seeding events...'
 
-education_category = Category.find_by(name: 'Education')
-conference_category = Category.find_by(name: 'Conference')
-workshop_category = Category.find_by(name: 'Workshop')
+education_category = Category.find_by!(name: 'Education')
+conference_category = Category.find_by!(name: 'Conference')
+workshop_category = Category.find_by!(name: 'Workshop')
+networking_category = Category.find_by!(name: 'Networking')
 
 events_data = [
   {
@@ -48,7 +44,8 @@ events_data = [
     end_date: 1.month.from_now + 2.hours,
     location: 'Kyiv',
     brand: brand,
-    category: conference_category,
+    # CHANGED: 'category' -> 'categories' (accepts an array of objects)
+    categories: [conference_category, networking_category],
     status: :published
   },
   {
@@ -57,7 +54,7 @@ events_data = [
     end_date: 1.month.ago + 3.hours,
     location: 'Lviv',
     brand: brand,
-    category: education_category,
+    categories: [education_category],
     status: :archived
   },
   {
@@ -66,7 +63,7 @@ events_data = [
     end_date: 1.hour.from_now,
     location: 'Online',
     brand: brand,
-    category: workshop_category,
+    categories: [workshop_category],
     status: :published
   }
 ]

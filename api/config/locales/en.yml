@@ -29,3 +29,10 @@
 
 en:
   hello: "Hello world"
+  activerecord:
+    errors:
+      models:
+        brand_membership:
+          attributes:
+            user_id:
+              uniqueness: "is already a member of this brand"
