@@ -55,7 +55,7 @@ module Api
           event: [
             :title, :description, :location,
             :start_date, :end_date, :brand_id,
-            category_ids: []
+            { category_ids: [] }
           ]
         )
       end

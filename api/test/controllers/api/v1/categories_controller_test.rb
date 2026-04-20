@@ -15,7 +15,7 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
   test 'should get index' do
     get '/api/v1/categories', as: :json
     assert_response :success
-    assert_includes response.parsed_body.map { |c| c['name'] }, 'Test Category'
+    assert_includes response.parsed_body.pluck('name'), 'Test Category'
   end
 
   test 'should create category' do

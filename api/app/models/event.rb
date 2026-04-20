@@ -24,16 +24,16 @@ class Event < ApplicationRecord
   validates :start_date, presence: true
   validates :status, presence: true
 
-  scope :from_date, ->(date) { where('start_date >= ?', date) if date.present? }
-  scope :to_date, ->(date) { where('start_date <= ?', date) if date.present? }
+  scope :from_date, ->(date) { where(start_date: date..) if date.present? }
+  scope :to_date, ->(date) { where(start_date: ..date) if date.present? }
 
   # Uses ILIKE for case-insensitive search in Postgres
   scope :search_title, ->(query) { where('title ILIKE ?', "%#{query}%") if query.present? }
 
-  scope :sorted_by, ->(column, direction) {
+  scope :sorted_by, lambda { |column, direction|
     # Sanitize inputs to prevent SQL injection, defaulting to created_at DESC
-    sort_column = column.present? ? column : 'created_at'
-    sort_direction = direction.present? ? direction : 'desc'
+    sort_column = column.presence || 'created_at'
+    sort_direction = direction.presence || 'desc'
     order(sort_column => sort_direction)
   }
 end
