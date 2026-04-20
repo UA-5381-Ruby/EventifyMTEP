@@ -30,10 +30,11 @@ class Event < ApplicationRecord
   # Uses ILIKE for case-insensitive search in Postgres
   scope :search_title, ->(query) { where('title ILIKE ?', "%#{query}%") if query.present? }
 
+  ALLOWED_SORT_COLUMNS = %w[created_at updated_at title start_date status].freeze
+
   scope :sorted_by, lambda { |column, direction|
-    # Sanitize inputs to prevent SQL injection, defaulting to created_at DESC
-    sort_column = column.presence || 'created_at'
-    sort_direction = direction.presence || 'desc'
+    sort_column = ALLOWED_SORT_COLUMNS.include?(column) ? column : 'created_at'
+    sort_direction = %w[asc desc].include?(direction) ? direction : 'desc'
     order(sort_column => sort_direction)
   }
 end
