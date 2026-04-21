@@ -1,6 +1,16 @@
 # frozen_string_literal: true
 
 class CreateMembershipsAndEvents < ActiveRecord::Migration[8.1]
+  ##
+  # Creates database structures for brand memberships and events.
+  #
+  # Defines a join table `brand_memberships` with required `user` and `brand`
+  # foreign keys, a required `role` string, timestamps, and a unique composite
+  # index on `[user_id, brand_id]`. Creates a native Postgres enum type
+  # `event_status` with predefined statuses. Creates an `events` table with
+  # `title`, optional `description`, a required `brand` foreign key, optional
+  # `location`, `start_date`, `end_date`, a `status` column backed by the
+  # `event_status` enum (default `draft`), and timestamps.
   def change
     # The Join Table
     create_table :brand_memberships do |t|
