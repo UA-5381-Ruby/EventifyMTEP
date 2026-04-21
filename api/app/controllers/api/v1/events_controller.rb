@@ -56,7 +56,8 @@ module Api
       # On success, renders the created event as JSON with HTTP status :created.
       # On failure, renders the validation errors as JSON with HTTP status :unprocessable_content.
       def create
-        @event = Event.new(event_params)
+        @event = Event.new(event_params.except(:category_ids))
+        @event.category_ids = event_params[:category_ids] if event_params[:category_ids].present?
 
         @event.status = 'draft'
 
@@ -75,7 +76,7 @@ module Api
       def set_event
         @event = Event.includes(:brand, :categories).find(params[:id])
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Event not found' }, status: :not_found
+        render(json: { error: 'Event not found' }, status: :not_found) and return
       end
 
       ##
@@ -83,13 +84,10 @@ module Api
       # @return [ActionController::Parameters] The permitted `event` parameters including:
       #   :title, :description, :location, :start_date, :end_date, :brand_id, and :category_ids (array)
       def event_params
-        params.expect(
-          event: [
-            :title, :description, :location,
-            :start_date, :end_date, :brand_id,
-            { category_ids: [] }
-          ]
-        )
+        params.expect(event: [
+                        :title, :description, :location, :start_date,
+                        :end_date, :status, :brand_id, { category_ids: [] }
+                      ])
       end
 
       ##
@@ -99,11 +97,28 @@ module Api
       # @return [ActiveRecord::Relation] Relation of matching Event records
       #   with associated brand and categories eager-loaded.
       def filtered_events
+        events = base_events
+        events = events.where(exact_match_params) if exact_match_params.any?
+        filter_by_category(events)
+      end
+
+      def base_events
         Event.includes(:brand, :categories)
              .from_date(params[:from])
              .to_date(params[:to])
              .search_title(params[:q])
              .sorted_by(params[:sort], params[:order])
+      end
+
+      def exact_match_params
+        # Беремо тільки потрібні параметри і відкидаємо порожні
+        params.permit(:brand_id, :status).to_h.compact_blank
+      end
+
+      def filter_by_category(events)
+        return events if params[:category_id].blank?
+
+        events.joins(:categories).where(categories: { id: params[:category_id] })
       end
     end
   end
