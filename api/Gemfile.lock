@@ -113,6 +113,8 @@ GEM
       rdoc (>= 4.0.0)
       reline (>= 0.4.2)
     json (2.19.3)
+    jwt (3.1.2)
+      base64
     language_server-protocol (3.17.0.5)
     lint_roller (1.1.0)
     logger (1.7.0)
@@ -308,6 +310,7 @@ DEPENDENCIES
   bundler-audit (~> 0.9.3)
   factory_bot_rails
   faker
+  jwt
   pg (~> 1.1)
   puma (~> 8.0)
   pundit
