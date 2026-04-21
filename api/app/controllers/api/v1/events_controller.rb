@@ -81,8 +81,6 @@ module Api
 
         event.joins(:categories).where(categories: { id: params[:category_id] })
       end
-
-      
     end
   end
 end
