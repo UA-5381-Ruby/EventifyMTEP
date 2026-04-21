@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_20_165339) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_21_165309) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -42,13 +42,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_165339) do
   end
 
   create_table "categories", force: :cascade do |t|
+    t.datetime "created_at", null: false
     t.string "name", null: false
+    t.datetime "updated_at", null: false
     t.index ["name"], name: "index_categories_on_name", unique: true
   end
 
   create_table "event_categories", force: :cascade do |t|
     t.bigint "category_id", null: false
+    t.datetime "created_at", null: false
     t.bigint "event_id", null: false
+    t.datetime "updated_at", null: false
     t.index ["category_id"], name: "index_event_categories_on_category_id"
     t.index ["event_id", "category_id"], name: "index_event_categories_on_event_id_and_category_id", unique: true
     t.index ["event_id"], name: "index_event_categories_on_event_id"
@@ -74,6 +78,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_20_165339) do
     t.string "title", null: false
     t.datetime "updated_at", null: false
     t.index ["brand_id"], name: "index_events_on_brand_id"
+    t.index ["start_date"], name: "index_events_on_start_date"
+    t.index ["status"], name: "index_events_on_status"
+    t.index ["title"], name: "index_events_on_title"
   end
 
   create_table "tickets", force: :cascade do |t|
