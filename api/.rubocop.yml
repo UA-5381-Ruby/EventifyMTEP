@@ -10,6 +10,11 @@ AllCops:
     - "db/schema.rb"
     - "db/queue_schema.rb"
     - "config/routes.rb"
+  Plugins:
+    - rubocop-rails
+    - rubocop-performance
+    - rubocop-rake
+    - rubocop-rspec
 
 Layout/IndentationWidth:
   Width: 2
@@ -28,14 +33,7 @@ Style/IfUnlessModifier:
   Enabled: true
 Metrics/MethodLength:
   Max: 20
-plugins:
-  - rubocop-rails
 
 Metrics/BlockLength:
   Exclude:
     - "spec/**/*"
-
-Rails:
-  DocumentationBaseURL: https://docs.rubocop.org/rubocop-rails
-Rails/TimeZone:
-  StyleGuide: "#time"
