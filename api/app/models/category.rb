@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 class Category < ApplicationRecord
-  has_many :events, dependent: :nullify
+  has_many :event_categories, dependent: :destroy
+  has_many :events, through: :event_categories
 
-  validates :name, presence: true, uniqueness: { case_sensitive: false }
+  validates :name, presence: true, uniqueness: true
 end

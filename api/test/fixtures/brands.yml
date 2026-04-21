@@ -1,3 +1,6 @@
 one:
   name: "Test Brand"
+  subdomain: "testbrand"
   description: "Description"
+  primary_color: "#00FF00"
+  secondary_color: "#00FF00"

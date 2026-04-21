@@ -9,6 +9,11 @@ FactoryBot.define do
     location   { 'Kyiv, Ukraine' }
     status     { :draft }
     association :brand
-    association :category
+
+    after(:build) do |event|
+      # This ensures we only attach a default category if the test
+      # didn't already provide one explicitly (like in your controller specs)
+      event.categories << build(:category) if event.categories.empty?
+    end
   end
 end

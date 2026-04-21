@@ -2,6 +2,6 @@
 
 FactoryBot.define do
   factory :category do
-    name { Faker::Commerce.department } # Например: "Electronics" или "Books"
+    sequence(:name) { |n| "Category #{n}" }
   end
 end
