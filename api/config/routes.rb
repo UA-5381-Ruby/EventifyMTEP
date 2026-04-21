@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  if Rails.env.development? || Rails.env.test?
+    mount Rswag::Ui::Engine => '/api-docs'
+    mount Rswag::Api::Engine => '/api-docs'
+  end
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
@@ -11,6 +15,8 @@ Rails.application.routes.draw do
     namespace :v1 do
       #resources :events, only: [:index, :create]
       resources :events, only: [:index, :show, :create]
+      resources :brands, only: [:index, :create, :show]
+
       resources :tickets, only: [:update] do
         member do
           patch :review
