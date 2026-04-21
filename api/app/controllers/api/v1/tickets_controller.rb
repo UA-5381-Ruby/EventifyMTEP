@@ -3,7 +3,7 @@
 module Api
   module V1
     class TicketsController < ApplicationController
-      before_action :authenticate_user!, only: [:review]
+      # before_action :authenticate_user!, only: [:review]
 
       ##
       # Updates or creates the event feedback for a ticket and renders the result as JSON.
