@@ -6,7 +6,8 @@ module Api
       before_action :set_event, only: [:show]
 
       ##
-      # Lists events applying filtering, sorting and pagination, and renders them as JSON including associated brand and categories.
+      # Lists events applying filtering, sorting and pagination,
+      # and renders them as JSON including associated brand and categories.
       #
       # The JSON response contains:
       # - `data`: an array of events with `brand` and `categories` included (each with `id` and `name`).
@@ -17,7 +18,8 @@ module Api
       # - `page` is taken from `params[:page]`, converted to integer and floored at 1 (default 1).
       #
       # Filtering and sorting are applied via `filtered_events` (accepts `:from`, `:to`, `:q`, `:sort`, `:order`).
-      # @param [Hash] params - Request parameters (supports `:per_page`, `:page`, `:from`, `:to`, `:q`, `:sort`, `:order`).
+      # @param [Hash] params - Request parameters (supports `:per_page`, `:page`, `:from`, `:to`, `:q`).
+      #   Also supports `:sort` and `:order`.
       def index
         events = filtered_events
 
@@ -50,7 +52,9 @@ module Api
 
       ##
       # Create a new Event from request parameters and persist it.
-      # Sets the event's status to 'draft' before saving. On success renders the created event as JSON with HTTP status :created; on failure renders the validation errors as JSON with HTTP status :unprocessable_content.
+      # Sets the event's status to 'draft' before saving.
+      # On success, renders the created event as JSON with HTTP status :created.
+      # On failure, renders the validation errors as JSON with HTTP status :unprocessable_content.
       def create
         @event = Event.new(event_params)
 
@@ -89,8 +93,11 @@ module Api
       end
 
       ##
-      # Builds an Event relation eager-loading brand and categories, filtered by optional from/to dates and title query, and sorted per request parameters.
-      # @return [ActiveRecord::Relation] Relation of matching Event records with associated brand and categories eager-loaded.
+      # Builds an Event relation eager-loading brand and categories,
+      # filtered by optional from/to dates and title query, and
+      # sorted per request parameters.
+      # @return [ActiveRecord::Relation] Relation of matching Event records
+      #   with associated brand and categories eager-loaded.
       def filtered_events
         Event.includes(:brand, :categories)
              .from_date(params[:from])

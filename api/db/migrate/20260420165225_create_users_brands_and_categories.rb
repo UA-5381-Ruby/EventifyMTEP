@@ -13,8 +13,10 @@ class CreateUsersBrandsAndCategories < ActiveRecord::Migration[8.1]
 
   ##
   # Creates the `users` database table.
-  # 
-  # The table includes: `name` (string); `email` (string, not null) with a unique index; `password_digest` (string, not null); `is_superadmin` (boolean, default `false`, not null); and standard Rails timestamp columns.
+  #
+  # The table includes: `name` (string); `email` (string, not null) with a unique
+  # index; `password_digest` (string, not null); `is_superadmin` (boolean, default
+  # `false`, not null); and standard Rails timestamp columns.
   def create_users_table
     create_table :users do |t|
       t.string :name
@@ -52,7 +54,8 @@ class CreateUsersBrandsAndCategories < ActiveRecord::Migration[8.1]
 
   ##
   # Creates the `categories` database table with a required unique `name` column and Rails timestamp columns.
-  # The `name` column is a non-null string with a unique index; standard `created_at` and `updated_at` timestamps are added.
+  # The `name` column is a non-null string with a unique index;
+  # standard `created_at` and `updated_at` timestamps are added.
   def create_categories_table
     create_table :categories do |t|
       t.string :name, null: false, index: { unique: true }
