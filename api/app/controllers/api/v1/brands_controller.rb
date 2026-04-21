@@ -37,13 +37,9 @@ module Api
         end
 
         render json: brand, status: :created
-       rescue ActiveRecord::RecordInvalid => e
-         render json: { errors: e.record.errors.full_messages },
-                status: :unprocessable_content
-+      rescue ActiveRecord::RecordNotUnique
-+        render json: { errors: ['Subdomain has already been taken'] },
-+               status: :unprocessable_content
-       end
+      rescue ActiveRecord::RecordInvalid => e
+        render json: { errors: e.record.errors.full_messages },
+               status: :unprocessable_content
       end
 
       private
