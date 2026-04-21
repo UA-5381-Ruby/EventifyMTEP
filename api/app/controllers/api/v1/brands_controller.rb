@@ -49,7 +49,10 @@ module Api
 
       # TODO: replace with real auth when JWT is ready
       def current_user
-        nil
+        @current_user ||= User.first || User.create!(
+          email: 'temp_organizer@example.com',
+          password: 'password123'
+        )
       end
 
       def set_brand
