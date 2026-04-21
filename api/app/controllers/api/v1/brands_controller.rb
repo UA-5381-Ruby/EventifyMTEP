@@ -3,6 +3,9 @@
 module Api
   module V1
     class BrandsController < ApplicationController
+      rescue_from ActionController::ParameterMissing do |e|
+        render json: { error: e.message }, status: :bad_request
+      end
       # TODO: authentication will be added later by team (JWT-based)
       # before_action :authenticate_user!
 
