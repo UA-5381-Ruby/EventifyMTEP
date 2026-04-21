@@ -47,7 +47,7 @@ module Api
       def set_event
         @event = Event.includes(:brand, :categories).find(params[:id])
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Event not found' }, status: :not_found
+        render(json: { error: 'Event not found' }, status: :not_found) and return
       end
 
       def event_params
