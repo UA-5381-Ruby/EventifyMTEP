@@ -56,7 +56,8 @@ module Api
       # On success, renders the created event as JSON with HTTP status :created.
       # On failure, renders the validation errors as JSON with HTTP status :unprocessable_content.
       def create
-        @event = Event.new(event_params)
+        @event = Event.new(event_params.except(:category_ids))
+        @event.category_ids = event_params[:category_ids] if event_params[:category_ids].present?
 
         @event.status = 'draft'
 
@@ -83,10 +84,10 @@ module Api
       # @return [ActionController::Parameters] The permitted `event` parameters including:
       #   :title, :description, :location, :start_date, :end_date, :brand_id, and :category_ids (array)
       def event_params
-        params.require(:event).permit(
+        params.expect(event: [
           :title, :description, :location, :start_date,
-          :end_date, :status, :brand_id, :category_id
-        )
+          :end_date, :status, :brand_id, category_ids: []
+        ])
       end
 
       ##
@@ -117,7 +118,7 @@ module Api
       def filter_by_category(events)
         return events if params[:category_id].blank?
 
-        event.joins(:categories).where(categories: { id: params[:category_id] })
+        events.joins(:categories).where(categories: { id: params[:category_id] })
       end
     end
   end

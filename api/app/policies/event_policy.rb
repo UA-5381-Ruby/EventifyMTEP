@@ -6,7 +6,7 @@ class EventPolicy < ApplicationPolicy
   end
 
   def create?
-    user.is_superadmin
+    user&.is_superadmin
   end
 
   def update?
