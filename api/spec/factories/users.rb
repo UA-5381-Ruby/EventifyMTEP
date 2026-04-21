@@ -2,9 +2,9 @@
 
 FactoryBot.define do
   factory :user do
-    username { Faker::Internet.username }
-    email { Faker::Internet.email }
-    password { 'password123' }
-    is_admin { false }
+    name { Faker::Name.name }
+    sequence(:email) { |n| "user#{n}@example.com" }
+    password { 'SecurePassword123!' }
+    is_superadmin { false }
   end
 end

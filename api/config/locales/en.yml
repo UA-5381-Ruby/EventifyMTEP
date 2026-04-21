@@ -28,12 +28,11 @@
 #       enabled: "ON"
 
 en:
+  hello: "Hello world"
   activerecord:
     errors:
       models:
-        brand:
+        brand_membership:
           attributes:
-            name:
-              blank: "Name is required"
-            subdomain:
-              invalid: "Only lowercase letters, numbers, and hyphens are allowed"
+            user_id:
+              uniqueness: "is already a member of this brand"

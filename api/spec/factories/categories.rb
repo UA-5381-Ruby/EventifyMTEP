@@ -2,6 +2,6 @@
 
 FactoryBot.define do
   factory :category do
-    name { Faker::Commerce.department } # Например: "Electronics" или "Books"
+    name { 'MyString' }
   end
 end

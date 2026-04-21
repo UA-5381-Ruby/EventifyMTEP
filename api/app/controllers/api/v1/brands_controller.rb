@@ -33,7 +33,7 @@ module Api
 
         ActiveRecord::Base.transaction do
           brand.save!
-          Organizer.create!(brand: brand, user: current_user)
+          BrandMembership.create!(brand: brand, user: current_user, role: 'owner')
         end
 
         render json: brand, status: :created

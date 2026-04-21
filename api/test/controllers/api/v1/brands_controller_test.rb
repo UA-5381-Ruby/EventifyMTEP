@@ -8,9 +8,9 @@ module Api
       setup do
         @user = User.find_by(email: 'test@example.com') ||
                 User.create!(
+                  name: 'testuser',
                   email: 'test@example.com',
-                  password: 'password',
-                  username: 'testuser'
+                  password: 'password'
                 )
 
         @brand = Brand.create!(
@@ -20,13 +20,12 @@ module Api
           primary_color: '#FF0000',
           secondary_color: '#00FF00'
         )
-        Organizer.create!(brand: @brand, user: @user)
-
+        BrandMembership.create!(brand: @brand, user: @user, role: 'owner')
         @category = Category.create!(name: 'Test Category')
 
         @event = Event.create!(
           brand: @brand,
-          category: @category,
+          categories: [@category],
           title: 'Test Event',
           location: 'Test location',
           start_date: Time.current

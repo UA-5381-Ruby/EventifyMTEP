@@ -10,10 +10,14 @@ module Api
         # ticket = current_user.tickets.find(params[:id])
         ticket = Ticket.find(params[:id])
 
-        if ticket.update(review_params)
-          render json: ticket, status: :ok
+        # 1. Initialize or find the existing feedback record attached to this ticket
+        feedback = ticket.event_feedback || ticket.build_event_feedback
+
+        # 2. Update the feedback model instead of the ticket model
+        if feedback.update(review_params)
+          render json: feedback, status: :ok
         else
-          render json: { errors: ticket.errors.full_messages }, status: :unprocessable_content
+          render json: { errors: feedback.errors.full_messages }, status: :unprocessable_content
         end
       end
 

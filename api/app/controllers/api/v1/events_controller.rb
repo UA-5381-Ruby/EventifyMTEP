@@ -17,7 +17,7 @@ module Api
         render json: {
           data: events.as_json(include: {
                                  brand: { only: %i[id name] },
-                                 category: { only: %i[id name] }
+                                 categories: { only: %i[id name] } # 1. Changed to plural
                                }),
           meta: { page: page, per_page: per_page, total: total }
         }, status: :ok
@@ -26,12 +26,13 @@ module Api
       def show
         render json: @event.as_json(
           include: { brand: { only: %i[id name] },
-                     category: { only: %i[id name] } }
+                     categories: { only: %i[id name] } }
         ), status: :ok
       end
 
       def create
         @event = Event.new(event_params)
+
         @event.status = 'draft'
 
         if @event.save
@@ -44,21 +45,23 @@ module Api
       private
 
       def set_event
-        @event = Event.includes(:brand, :category).find(params[:id])
+        @event = Event.includes(:brand, :categories).find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Event not found' }, status: :not_found
       end
 
       def event_params
         params.expect(
-          event: %i[title description location
-                    start_date end_date
-                    brand_id category_id]
+          event: [
+            :title, :description, :location,
+            :start_date, :end_date, :brand_id,
+            { category_ids: [] }
+          ]
         )
       end
 
       def filtered_events
-        Event.includes(:brand, :category)
+        Event.includes(:brand, :categories)
              .from_date(params[:from])
              .to_date(params[:to])
              .search_title(params[:q])

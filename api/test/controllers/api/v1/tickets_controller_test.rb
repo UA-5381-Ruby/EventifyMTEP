@@ -2,37 +2,67 @@
 
 require 'test_helper'
 
-module Api
-  module V1
-    class TicketsControllerTest < ActionDispatch::IntegrationTest
-      setup do
-        # Bypass authentication for controller tests
-        Api::V1::TicketsController.class_eval do
-          def authenticate_user!; end
-        end
-
-        @user = User.create!(username: 'testuser', email: 'test@example.com', password: 'password', is_admin: false)
-        @brand = Brand.create!(
-          name: 'Sports',
-          subdomain: 'ss',
-          primary_color: '#000000',
-          secondary_color: '#999999'
-        )
-        @category = Category.create!(name: 'Test Category')
-        @event = Event.create!(brand: @brand, category: @category, title: 'Test Event', location: 'Ukraine',
-                               start_date: Time.zone.now)
-        @ticket = Ticket.create!(user: @user, event: @event, is_active: true)
-      end
-
-      test 'should allow review and update rating and comment' do
-        patch "/api/v1/tickets/#{@ticket.id}/review", params: { ticket: { rating: 5, comment: 'Great event' } },
-                                                      as: :json
-        assert_response :ok
-
-        @ticket.reload
-        assert_equal 5, @ticket.rating
-        assert_equal 'Great event', @ticket.comment
-      end
+class TicketsControllerTest < ActionDispatch::IntegrationTest
+  setup do
+    # Bypass authentication for controller tests
+    Api::V1::TicketsController.class_eval do
+      def authenticate_user!; end
     end
+
+    @ticket = create_ticket
+  end
+
+  test 'should allow review and update rating and comment' do
+    patch "/api/v1/tickets/#{@ticket.id}/review", params: { ticket: { rating: 5, comment: 'Great event' } }, as: :json
+    assert_response :ok
+
+    @ticket.reload
+
+    feedback = @ticket.event_feedback
+
+    assert_not_nil feedback, 'EventFeedback record should have been created'
+    assert_equal 5, feedback.rating
+    assert_equal 'Great event', feedback.comment
+  end
+
+  private
+
+  def create_user
+    User.create!(
+      name: 'testuser',
+      email: 'test@example.com',
+      password: 'password',
+      is_superadmin: false
+    )
+  end
+
+  def create_brand
+    Brand.create!(
+      name: 'Test Brand',
+      subdomain: 'test-brand'
+    )
+  end
+
+  def create_category
+    Category.create!(name: 'Test Category')
+  end
+
+  def create_event
+    Event.create!(
+      brand: create_brand,
+      categories: [create_category],
+      title: 'Test Event',
+      location: 'Test Location',
+      start_date: Time.current
+    )
+  end
+
+  def create_ticket
+    Ticket.create!(
+      user: create_user,
+      event: create_event,
+      qr_code: 'test-qr-123',
+      is_active: true
+    )
   end
 end
