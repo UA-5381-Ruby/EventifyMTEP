@@ -51,22 +51,38 @@ module Api
       end
 
       def event_params
-        params.expect(
-          event: [
-            :title, :description, :location,
-            :start_date, :end_date, :brand_id,
-            { category_ids: [] }
-          ]
+        params.require(:event).permit(
+          :title, :description, :location, :start_date,
+          :end_date, :status, :brand_id, :category_id
         )
       end
 
       def filtered_events
+        events = base_events
+        events = events.where(exact_match_params) if exact_match_params.any?
+        filter_by_category(events)
+      end
+
+      def base_events
         Event.includes(:brand, :categories)
              .from_date(params[:from])
              .to_date(params[:to])
              .search_title(params[:q])
              .sorted_by(params[:sort], params[:order])
       end
+
+      def exact_match_params
+        # Беремо тільки потрібні параметри і відкидаємо порожні
+        params.permit(:brand_id, :status).to_h.compact_blank
+      end
+
+      def filter_by_category(events)
+        return events if params[:category_id].blank?
+
+        event.joins(:categories).where(categories: { id: params[:category_id] })
+      end
+
+      
     end
   end
 end
