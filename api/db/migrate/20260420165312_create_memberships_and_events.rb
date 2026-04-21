@@ -39,5 +39,8 @@ class CreateMembershipsAndEvents < ActiveRecord::Migration[8.1]
 
       t.timestamps
     end
+    add_index :events, :start_date
+    add_index :events, :status
+    add_index :events, :title
   end
 end
