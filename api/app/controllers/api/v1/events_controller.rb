@@ -85,9 +85,9 @@ module Api
       #   :title, :description, :location, :start_date, :end_date, :brand_id, and :category_ids (array)
       def event_params
         params.expect(event: [
-          :title, :description, :location, :start_date,
-          :end_date, :status, :brand_id, category_ids: []
-        ])
+                        :title, :description, :location, :start_date,
+                        :end_date, :status, :brand_id, { category_ids: [] }
+                      ])
       end
 
       ##
