@@ -13,6 +13,10 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      post 'auth/password/reset', to: 'passwords#update',
+                                  constraints: ->(req) { req.params['token'].present? }
+      post 'auth/password/reset', to: 'passwords#create'
+
       #resources :events, only: [:index, :create]
       resources :events, only: [:index, :show, :create]
       resources :brands, only: [:index, :create, :show]
