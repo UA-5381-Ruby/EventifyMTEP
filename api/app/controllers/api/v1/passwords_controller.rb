@@ -26,7 +26,7 @@ module Api
 
         render json: { message: 'Password has been reset successfully.' }, status: :ok
       rescue ActiveRecord::RecordInvalid => e
-        render json: { errors: e.record.errors.full_messages }, status: :unprocessable_content
+        render json: { error: e.record.errors.full_messages.join(', ') }, status: :unprocessable_content
       end
 
       private
