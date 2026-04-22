@@ -48,6 +48,7 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
     body = response.parsed_body
     assert body.key?('errors')
+    assert_includes body['errors'].to_s, 'already registered for this event'
   end
 
   test 'should return my tickets' do

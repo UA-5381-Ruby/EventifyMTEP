@@ -14,6 +14,10 @@ module Api
         else
           render json: { errors: ticket.errors.full_messages }, status: :unprocessable_content
         end
+      rescue ActiveRecord::RecordNotUnique
+        # Handle the race condition where two requests pass validation at the same time,
+        # but the second one hits the DB unique index constraint.
+        render json: { errors: ['Ticket already exists for this user and event'] }, status: :unprocessable_content
       end
 
       # GET /api/v1/my_tickets
