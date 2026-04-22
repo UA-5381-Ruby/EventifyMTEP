@@ -8,7 +8,6 @@ RSpec.describe Event, type: :model do
   let(:brand) { create(:brand) }
   let(:category) { create(:category) }
 
-
   describe 'validations' do
     it { is_expected.to validate_presence_of(:title) }
     it { is_expected.to validate_presence_of(:start_date) }
