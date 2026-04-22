@@ -91,5 +91,15 @@ RSpec.describe 'Api::V1::Passwords', type: :request do
       expect(response).to have_http_status(:bad_request)
       expect(response.parsed_body['error']).to eq('Invalid or expired token')
     end
+
+    it 'returns validation error for too-short password' do
+      token = user.signed_id(purpose: :password_reset, expires_in: 2.days)
+
+      post "/api/v1/auth/password/reset?token=#{CGI.escape(token)}",
+           params: { new_password: 'short' }, as: :json
+
+      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response.parsed_body['error']).to include('Password is too short')
+    end
   end
 end
