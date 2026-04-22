@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class JwtService
   SECRET_KEY = Rails.application.secret_key_base.to_s
 
