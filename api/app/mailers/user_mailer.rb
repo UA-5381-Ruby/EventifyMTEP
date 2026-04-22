@@ -19,7 +19,8 @@ class UserMailer < ApplicationMailer
     default_url_options = Rails.application.config.action_mailer.default_url_options || {}
     host = default_url_options[:host]
     if host.blank?
-      raise 'Configuration error: Set FRONTEND_URL environment variable (preferred) or configure action_mailer.default_url_options[:host] for password reset emails.'
+      raise ArgumentError,
+            'Configuration error: Set FRONTEND_URL environment variable (preferred) or configure action_mailer.default_url_options[:host] for password reset emails.'
     end
 
     protocol = default_url_options[:protocol] || (Rails.env.production? ? 'https' : 'http')

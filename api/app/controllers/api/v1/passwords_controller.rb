@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'uri/mailto'
+
 module Api
   module V1
     class PasswordsController < ApplicationController
@@ -7,7 +9,8 @@ module Api
 
       # POST /api/v1/auth/password/reset
       def create
-        user = User.find_by(email: params.require(:email))
+        email = params.require(:email).to_s
+        user = valid_email_format?(email) ? User.find_by(email: email) : nil
 
         if user
           token = user.signed_id(purpose: :password_reset, expires_in: 2.days)
@@ -33,6 +36,10 @@ module Api
 
       def render_bad_request(error)
         render json: { error: error.message }, status: :bad_request
+      end
+
+      def valid_email_format?(email)
+        email.match?(URI::MailTo::EMAIL_REGEXP)
       end
     end
   end
