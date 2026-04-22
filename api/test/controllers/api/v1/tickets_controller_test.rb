@@ -52,6 +52,8 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should return my tickets' do
+    other_ticket = create_ticket(user: create_user(email: "other-#{SecureRandom.hex(4)}@example.com"))
+
     user = @user
     Api::V1::TicketsController.class_eval do
       define_method(:current_user) { user }
@@ -63,14 +65,15 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
     body = response.parsed_body
     assert_kind_of Array, body
     assert(body.any? { |t| t['id'] == @ticket.id })
+    refute(body.any? { |t| t['id'] == other_ticket.id })
   end
 
   private
 
-  def create_user
+  def create_user(email: 'test@example.com')
     User.create!(
       name: 'testuser',
-      email: 'test@example.com',
+      email: email,
       password: 'password',
       is_superadmin: false
     )
