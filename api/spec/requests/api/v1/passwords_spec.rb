@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'cgi'
 
 RSpec.describe 'Api::V1::Passwords', type: :request do
   include ActiveJob::TestHelper

@@ -13,6 +13,17 @@ class UserMailer < ApplicationMailer
   private
 
   def frontend_reset_url
-    "#{ENV.fetch('FRONTEND_URL', 'https://app.com')}/reset"
+    frontend_url = ENV['FRONTEND_URL']
+    return "#{frontend_url.chomp('/')}/reset" if frontend_url.present?
+
+    default_url_options = Rails.application.config.action_mailer.default_url_options || {}
+    host = default_url_options[:host]
+    protocol = default_url_options[:protocol] || (Rails.env.production? ? 'https' : 'http')
+    port = default_url_options[:port]
+
+    base_url = "#{protocol}://#{host}"
+    base_url = "#{base_url}:#{port}" if port.present?
+
+    "#{base_url}/reset"
   end
 end
