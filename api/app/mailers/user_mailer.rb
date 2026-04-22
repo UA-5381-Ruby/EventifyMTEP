@@ -18,6 +18,8 @@ class UserMailer < ApplicationMailer
 
     default_url_options = Rails.application.config.action_mailer.default_url_options || {}
     host = default_url_options[:host]
+    raise 'Missing FRONTEND_URL or action_mailer.default_url_options[:host]' if host.blank?
+
     protocol = default_url_options[:protocol] || (Rails.env.production? ? 'https' : 'http')
     port = default_url_options[:port]
 
