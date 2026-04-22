@@ -33,6 +33,30 @@ RSpec.describe 'Api::V1::Passwords', type: :request do
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body['message']).to include('If the account exists')
     end
+
+    it 'returns the same generic success message for invalid email format' do
+      expect do
+        post '/api/v1/auth/password/reset', params: { email: 'notanemail' }, as: :json
+      end.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body['message']).to include('If the account exists')
+    end
+
+    it 'delivers reset email with tokenized reset link' do
+      perform_enqueued_jobs do
+        post '/api/v1/auth/password/reset', params: { email: user.email }, as: :json
+      end
+
+      email = ActionMailer::Base.deliveries.last
+      expect(email.to).to include(user.email)
+
+      reset_link = email.body.encoded[%r{https?://\S+/reset\?token=\S+}]
+      expect(reset_link).to be_present
+
+      token = CGI.unescape(reset_link.split('token=').last)
+      expect(User.find_signed(token, purpose: :password_reset)).to eq(user)
+    end
   end
 
   describe 'POST /api/v1/auth/password/reset?token=...' do
