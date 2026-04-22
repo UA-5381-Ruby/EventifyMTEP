@@ -8,13 +8,13 @@ module Api
       # GET /api/v1/users
       def index
         users = User.all
-        authorize users # Pundit перевірить метод index?
+        authorize users
         render json: users, only: %i[id name email is_superadmin], status: :ok
       end
 
       # GET /api/v1/users/:id
       def show
-        authorize @user # Pundit перевірить метод show?
+        authorize @user
         render json: @user, only: %i[id name email is_superadmin], status: :ok
       end
 

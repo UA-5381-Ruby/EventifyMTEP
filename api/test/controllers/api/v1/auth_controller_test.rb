@@ -6,7 +6,7 @@ module Api
   module V1
     class AuthControllerTest < ActionDispatch::IntegrationTest
       def setup
-        @existing_user = User.create(name: 'Existing User', email: 'exist@test.com', password: 'password123')
+        @existing_user = User.create!(name: 'Existing User', email: 'exist@test.com', password: 'password123')
       end
 
       test 'should register a new user and return JWT' do
@@ -49,6 +49,18 @@ module Api
         }, as: :json
 
         assert_response :success # 200
+
+        json_response = JSON.parse(response.body)
+        assert_not_nil json_response['token'], 'JWT token should be present in response'
+      end
+
+      test 'should login successfully with email case variance' do
+        post '/api/v1/auth/login', params: {
+          email: @existing_user.email.upcase,
+          password: 'password123'
+        }, as: :json
+
+        assert_response :success #  200
 
         json_response = JSON.parse(response.body)
         assert_not_nil json_response['token'], 'JWT token should be present in response'

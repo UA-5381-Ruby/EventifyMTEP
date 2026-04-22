@@ -75,7 +75,7 @@ module Api
 
       test 'superadmin CAN destroy other user profile' do
         assert_difference('User.count', -1) do
-          delete "/api/v1/users/#{@other_user.id}", headers: auth_headers(@admin) # Заходимо як @admin
+          delete "/api/v1/users/#{@other_user.id}", headers: auth_headers(@admin)
         end
 
         assert_response :no_content
