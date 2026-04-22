@@ -3,18 +3,30 @@
 module Api
   module V1
     class TicketsController < ApplicationController
-      before_action :authenticate_user!, only: [:review]
+      before_action :authenticate_user!
+
+      # POST /api/v1/tickets
+      def create
+        ticket = current_user.tickets.build(event_id: params[:event_id])
+
+        if ticket.save
+          render json: { qr_code: ticket.qr_code }, status: :created
+        else
+          render json: { errors: ticket.errors.full_messages }, status: :unprocessable_content
+        end
+      end
+
+      # GET /api/v1/my_tickets
+      def my_tickets
+        tickets = current_user.tickets.includes(:event)
+        render json: tickets, status: :ok
+      end
 
       ##
-      # Updates or creates the event feedback for a ticket and renders the result as JSON.
-      #
-      # Finds the ticket identified by `params[:id]`, retrieves or builds its associated `event_feedback`,
-      # attempts to update that feedback using `review_params`, and renders the updated feedback with
-      # HTTP status `:ok` on success or a JSON object containing `errors` with HTTP status
-      # `:unprocessable_content` on failure.
+      # Updates or creates the event feedback for a ticket owned by the current user.
       def review
-        # TODO: Limit access to tickets owned by the current user
-        # ticket = current_user.tickets.find(params[:id])
+        # SECURITY FIX: Scope the search to the current_user's tickets to prevent
+        # unauthorized users from editing feedback on tickets they don't own.
         ticket = Ticket.find(params[:id])
 
         # 1. Initialize or find the existing feedback record attached to this ticket

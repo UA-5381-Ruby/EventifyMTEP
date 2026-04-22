@@ -3,10 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe Event, type: :model do
+  subject { build(:event, brand: brand, categories: [category]) }
+
   let(:brand) { create(:brand) }
   let(:category) { create(:category) }
 
-  subject { build(:event, brand: brand, categories: [category]) }
 
   describe 'validations' do
     it { is_expected.to validate_presence_of(:title) }
@@ -28,7 +29,7 @@ RSpec.describe Event, type: :model do
   end
 
   it do
-    is_expected.to define_enum_for(:status).with_values(
+    expect(subject).to define_enum_for(:status).with_values(
       draft: 'draft',
       draft_on_review: 'draft_on_review',
       published: 'published',
