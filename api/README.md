@@ -1,8 +1,8 @@
 # EventifyMTEP (Rails API)
+
 Eventify — Multi-Tenant Event Platform
 
-
-## DB 
+## DB
 
 Use DBML to define your database structure
 
@@ -90,7 +90,7 @@ Table EventCategories {
   id integer [primary key]
   event_id integer [ref: > Events.id, not null]
   category_id integer [ref: > Categories.id, not null]
-  
+
   indexes {
     (event_id, category_id) [unique, name: 'index_event_categories_on_event_and_category']
   }
@@ -116,4 +116,35 @@ Table EventFeedback {
   comment text
   created_at timestamp
 }
+```
+
+## API Documentation
+
+Interactive Swagger UI is available at `/api-docs`.
+
+| Environment | URL                            |
+| ----------- | ------------------------------ |
+| Local       | http://localhost:3000/api-docs |
+
+### Endpoints
+
+| Method | Path                       | Description         |
+| ------ | -------------------------- | ------------------- |
+| POST   | /auth/register             | Register (Sprint 2) |
+| POST   | /auth/login                | Login (Sprint 2)    |
+| GET    | /api/v1/events             | List events         |
+| POST   | /api/v1/events             | Create event        |
+| GET    | /api/v1/events/:id         | Show event          |
+| GET    | /api/v1/brands             | List brands         |
+| POST   | /api/v1/brands             | Create brand        |
+| GET    | /api/v1/brands/:id         | Show brand          |
+| GET    | /api/v1/categories         | List categories     |
+| POST   | /api/v1/categories         | Create category     |
+| PATCH  | /api/v1/tickets/:id/review | Leave review        |
+
+### Update docs after changes
+
+```bash
+cd api
+RAILS_ENV=test bundle exec rake rswag:specs:swaggerize
 ```

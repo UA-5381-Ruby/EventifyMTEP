@@ -23,6 +23,7 @@ group :development, :test do
   gem 'factory_bot_rails'
   gem 'faker'
   gem 'rspec-rails'
+  gem 'rswag-specs'
   gem 'rubocop', require: false
   gem 'ruby-lint', require: false
   gem 'ruby-lsp', require: false
