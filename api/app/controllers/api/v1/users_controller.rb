@@ -25,7 +25,7 @@ module Api
         if @user.update(user_params)
           render json: @user, only: %i[id name email is_superadmin], status: :ok
         else
-          render json: { errors: @user.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: @user.errors.full_messages }, status: :unprocessable_content
         end
       end
 
@@ -46,7 +46,13 @@ module Api
       end
 
       def user_params
-        params.permit(:name, :email, :password, :password_confirmation)
+        permitted_attributes = %i[name email password]
+
+        if params[:user].present?
+          params.expect(user: permitted_attributes)
+        else
+          params.permit(*permitted_attributes)
+        end
       end
     end
   end

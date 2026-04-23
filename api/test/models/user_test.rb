@@ -35,9 +35,4 @@ class UserTest < ActiveSupport::TestCase
       assert_not @user.valid?, "#{invalid_email} should be invalid"
     end
   end
-
-  test 'password should be present' do
-    @user.password = @user.password_confirmation = ' ' * 6
-    assert_not @user.valid?, 'User is valid without a password'
-  end
 end

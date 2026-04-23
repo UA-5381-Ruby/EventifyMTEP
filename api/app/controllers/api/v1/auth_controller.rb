@@ -13,7 +13,7 @@ module Api
           token = JwtService.encode(user_id: user.id)
           render json: { token: token, user: user_as_json(user) }, status: :created
         else
-          render json: { errors: user.errors.full_messages }, status: :unprocessable_entity
+          render json: { errors: user.errors.full_messages }, status: :unprocessable_content
         end
       end
 
@@ -33,7 +33,13 @@ module Api
       private
 
       def user_params
-        params.permit(:name, :email, :password, :password_confirmation)
+        attributes = %i[name email password]
+
+        if params[:user].present?
+          params.expect(user: attributes)
+        else
+          ActionController::Parameters.new(user: params.to_unsafe_h).expect(user: attributes)
+        end
       end
 
       def user_as_json(user)

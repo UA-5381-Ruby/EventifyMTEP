@@ -14,8 +14,7 @@ module Api
           post '/api/v1/auth/register', params: {
             name: 'New User',
             email: 'new@test.com',
-            password: 'password123',
-            password_confirmation: 'password123'
+            password: 'password123'
           }, as: :json
         end
 
@@ -31,8 +30,7 @@ module Api
           post '/api/v1/auth/register', params: {
             name: 'Another User',
             email: @existing_user.email,
-            password: 'password123',
-            password_confirmation: 'password123'
+            password: 'password123'
           }, as: :json
         end
 
