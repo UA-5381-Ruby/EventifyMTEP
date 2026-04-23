@@ -31,12 +31,31 @@ module Api
           return render json: { error: 'Authentication not implemented yet' },
                         status: :not_implemented
         end
+# PATCH /api/v1/brands/:id
+      def update
+        authorize @brand
 
+        if @brand.update(brand_params)
+          render json: @brand, status: :ok
+        else
+          render json: { errors: @brand.errors.full_messages }, status: :unprocessable_entity
+        end
+      rescue ActiveRecord::RecordNotUnique
+        # Catches database-level unique constraint violations for subdomain
+        render json: { errors: ["Subdomain is already taken"] }, status: :unprocessable_entity
+      end
+      # DELETE /api/v1/brands/:id
+      def destroy
+        authorize @brand
+        
+        @brand.destroy
+        head :no_content
+      end
         brand = Brand.new(brand_params)
 
         ActiveRecord::Base.transaction do
           brand.save!
-          BrandMembership.create!(brand: brand, user: current_user, role: 'owner')
+          Brandbrand_membership.create!(brand: brand, user: current_user, role: 'owner')
         end
 
         render json: brand, status: :created

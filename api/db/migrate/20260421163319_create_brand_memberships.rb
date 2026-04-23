@@ -2,7 +2,7 @@
 
 class CreateBrandMemberships < ActiveRecord::Migration[8.1]
   ##
-  # Creates the `brand_memberships` join table with required `user` and `brand`
+  # Creates the `bbrand_memberships` join table with required `user` and `brand`
   # foreign keys, a required `role` string, timestamps, and a unique composite
   # index on `[user_id, brand_id]`.
   def change

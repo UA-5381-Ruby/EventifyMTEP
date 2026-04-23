@@ -20,7 +20,7 @@ module Api
           primary_color: '#FF0000',
           secondary_color: '#00FF00'
         )
-        BrandMembership.create!(brand: @brand, user: @user, role: 'owner')
+        Brandbrand_membership.create!(brand: @brand, user: @user, role: 'owner')
         @category = Category.create!(name: 'Test Category')
 
         @event = Event.create!(

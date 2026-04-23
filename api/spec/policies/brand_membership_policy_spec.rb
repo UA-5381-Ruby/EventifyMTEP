@@ -1,0 +1,106 @@
+# spec/policies/brand_membership_policy_spec.rb
+require 'rails_helper'
+
+RSpec.describe BrandMembershipPolicy, type: :policy do
+  subject { described_class }
+
+  let(:brand) { create(:brand) }
+  let(:owner) { create(:user) }
+  let(:manager) { create(:user) }
+  let(:regular_user) { create(:user) }
+  let(:new_user) { create(:user) }
+
+  before do
+    create(:brand_membership, brand: brand, user: owner, role: 'owner')
+    create(:brand_membership, brand: brand, user: manager, role: 'manager')
+    create(:brand_membership, brand: brand, user: regular_user, role: 'user')
+  end
+
+  permissions :create? do
+    context "when current user is a manager" do
+      it "permits inviting users with 'user' role" do
+        new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'user')
+        expect(subject).to permit(manager, new_brand_membership)
+      end
+
+      it "does not permit inviting users as 'owner'" do
+        new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'owner')
+        expect(subject).not_to permit(manager, new_brand_membership)
+      end
+    end
+
+    context "when current user is an owner" do
+      it "permits inviting users with 'owner' role" do
+        new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'owner')
+        expect(subject).to permit(owner, new_brand_membership)
+      end
+
+      it "permits inviting users with 'user' role" do
+        new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'user')
+        expect(subject).to permit(owner, new_brand_membership)
+      end
+    end
+
+    context "when current user is a regular user" do
+      it "does not permit inviting anyone" do
+        new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'user')
+        expect(subject).not_to permit(regular_user, new_brand_membership)
+      end
+    end
+  end
+
+  permissions :update? do
+    context "when current user is a manager" do
+      it "permits updating a 'user' role" do
+        membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
+        expect(subject).to permit(manager, membership)
+      end
+
+      it "does not permit updating someone to 'owner' role" do
+        membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
+        membership.role = 'owner'
+        expect(subject).not_to permit(manager, membership)
+      end
+    end
+
+    context "when current user is an owner" do
+      it "permits updating any role" do
+        membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
+        membership.role = 'owner'
+        expect(subject).to permit(owner, membership)
+      end
+    end
+  end
+
+  permissions :destroy? do
+    context "when current user is a manager" do
+      it "permits destroying a 'user' membership" do
+        membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
+        expect(subject).to permit(manager, membership)
+      end
+
+      it "does not permit destroying an 'owner' membership" do
+        expect(subject).not_to permit(manager, create(:brand_membership, brand: brand, user: new_user, role: 'owner'))
+      end
+
+      it "does not permit destroying a 'manager' membership" do
+        another_manager = create(:user)
+        expect(subject).not_to permit(manager, create(:brand_membership, brand: brand, user: another_manager, role: 'manager'))
+      end
+    end
+
+    context "when current user is an owner" do
+      it "permits destroying any membership" do
+        membership = create(:brand_membership, brand: brand, user: new_user, role: 'manager')
+        expect(subject).to permit(owner, membership)
+      end
+    end
+
+    context "when current user is a regular user" do
+      it "does not permit destroying any membership" do
+        membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
+        expect(subject).not_to permit(regular_user, membership)
+      end
+    end
+  end
+end

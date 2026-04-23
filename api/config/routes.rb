@@ -20,8 +20,9 @@ Rails.application.routes.draw do
       resources :users, except: [:create]
       #resources :events, only: [:index, :create]
       resources :events, only: [:index, :show, :create]
-      resources :brands, only: [:index, :create, :show]
-
+      resources :brands, only: [:index, :create, :show] do
+      resources :memberships, controller: 'brand_memberships', only: [:index, :create, :update, :destroy]
+      end
       resources :tickets, only: [:update] do
         member do
           patch :review

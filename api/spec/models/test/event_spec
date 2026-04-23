@@ -1,0 +1,38 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+RSpec.describe Event, type: :model do
+  let(:brand) { create(:brand) }
+
+  subject(:event) { build(:event, brand: brand) }
+
+  describe 'validations' do
+    it { is_expected.to validate_presence_of(:title) }
+    it { is_expected.to validate_presence_of(:start_date) }
+    it { is_expected.to validate_presence_of(:location) }
+    it { is_expected.to validate_length_of(:title).is_at_most(120) }
+    it { is_expected.to validate_length_of(:location).is_at_most(200) }
+    it { is_expected.to validate_presence_of(:status) }
+  end
+
+  describe 'associations' do
+    it { is_expected.to belong_to(:brand) }
+  end
+
+  describe 'enum status' do
+    it do
+      expect(event).to define_enum_for(:status).with_values(
+        draft: 'draft',
+        draft_on_review: 'draft_on_review',
+        published: 'published',
+        rejected: 'rejected',
+        published_unverified: 'published_unverified',
+        published_on_review: 'published_on_review',
+        published_rejected: 'published_rejected',
+        archived: 'archived',
+        cancelled: 'cancelled'
+      ).backed_by_column_of_type(:string)
+    end
+  end
+end
