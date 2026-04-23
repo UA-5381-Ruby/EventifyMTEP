@@ -73,4 +73,10 @@ events_data.each do |attrs|
   event.update!(attrs)
 end
 
+first_event = Event.first
+
+Ticket.find_or_create_by!(user: user, event: first_event) do |t|
+  t.qr_code = "QR-#{SecureRandom.hex(6)}"
+end
+
 Rails.logger.debug { "Done! #{Event.count} events seeded." }
