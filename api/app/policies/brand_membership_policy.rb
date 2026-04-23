@@ -1,23 +1,23 @@
+# frozen_string_literal: true
+
 class BrandMembershipPolicy < ApplicationPolicy
   def create?
     return false unless user
     # Superadmins can do anything
     return true if user.is_superadmin?
-    
+
     # Owners can invite anyone
     return true if current_user_role == 'owner'
-    
+
     # Managers can invite, but CANNOT invite someone as an owner
-    if current_user_role == 'manager'
-      return record.role != 'owner'
-    end
+    return record.role != 'owner' if current_user_role == 'manager'
 
     false
   end
 
   def update?
     # Same rules apply for updating an existing member's role
-    create? 
+    create?
   end
 
   def destroy?
@@ -25,9 +25,8 @@ class BrandMembershipPolicy < ApplicationPolicy
     return true if user.is_superadmin? || current_user_role == 'owner'
 
     # Managers can remove 'users', but cannot remove 'owners' or other 'managers'
-    if current_user_role == 'manager'
-      return record.role == 'user'
-    end
+    return record.role == 'user' if current_user_role == 'manager'
+
     false
   end
 

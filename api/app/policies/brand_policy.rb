@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class BrandPolicy < ApplicationPolicy
   def update?
     user.is_superadmin? || user_has_role?('owner')
