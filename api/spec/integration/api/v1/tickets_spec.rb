@@ -11,7 +11,7 @@ RSpec.describe 'api/v1/tickets', type: :request do
       consumes    'application/json'
       produces    'application/json'
       description 'Creates or updates feedback (rating + comment) for a ticket.'
-      security    [{ Bearer: [] }]
+      security    [{ bearer_auth: [] }]
 
       parameter name: :body, in: :body, required: true,
                 schema: { '$ref' => '#/components/schemas/ReviewInput' }
@@ -19,13 +19,13 @@ RSpec.describe 'api/v1/tickets', type: :request do
       response '200', 'review saved' do
         schema '$ref' => '#/components/schemas/EventFeedback'
 
-        let(:Authorization) { 'Bearer dummy_test_token' }
-        let(:user)   { create(:user) }
-        let(:brand)  { create(:brand) }
-        let(:event)  { create(:event, brand: brand) }
-        let(:ticket) { create(:ticket, user: user, event: event) }
-        let(:id)     { ticket.id }
-        let(:body)   { { ticket: { rating: 5, comment: 'Amazing!' } } }
+        let(:user)          { create(:user) }
+        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        let(:brand)         { create(:brand) }
+        let(:event)         { create(:event, brand: brand) }
+        let(:ticket)        { create(:ticket, user: user, event: event) }
+        let(:id)            { ticket.id }
+        let(:body)          { { ticket: { rating: 5, comment: 'Amazing!' } } }
 
         run_test!
       end
@@ -33,13 +33,13 @@ RSpec.describe 'api/v1/tickets', type: :request do
       response '422', 'invalid rating' do
         schema '$ref' => '#/components/schemas/ErrorMessages'
 
-        let(:Authorization) { 'Bearer dummy_test_token' }
-        let(:user)   { create(:user) }
-        let(:brand)  { create(:brand) }
-        let(:event)  { create(:event, brand: brand) }
-        let(:ticket) { create(:ticket, user: user, event: event) }
-        let(:id)     { ticket.id }
-        let(:body)   { { ticket: { rating: 10 } } }
+        let(:user)          { create(:user) }
+        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        let(:brand)         { create(:brand) }
+        let(:event)         { create(:event, brand: brand) }
+        let(:ticket)        { create(:ticket, user: user, event: event) }
+        let(:id)            { ticket.id }
+        let(:body)          { { ticket: { rating: 10 } } }
 
         run_test!
       end
@@ -47,9 +47,10 @@ RSpec.describe 'api/v1/tickets', type: :request do
       response '404', 'ticket not found' do
         schema '$ref' => '#/components/schemas/NotFound'
 
-        let(:Authorization) { 'Bearer dummy_test_token' }
-        let(:id)   { 0 }
-        let(:body) { { ticket: { rating: 5 } } }
+        let(:user)          { create(:user) }
+        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        let(:id)            { 0 }
+        let(:body)          { { ticket: { rating: 5 } } }
 
         run_test!
       end

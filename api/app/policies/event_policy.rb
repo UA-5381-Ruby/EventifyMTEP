@@ -17,6 +17,36 @@ class EventPolicy < ApplicationPolicy
     create? && record.draft?
   end
 
+  def submit?
+    return true if user&.is_superadmin
+
+    user&.brand_memberships&.exists?(
+      brand_id: record.brand_id,
+      role: %w[owner manager]
+    )
+  end
+
+  def cancel?
+    submit?
+  end
+
+  def approve?
+    user&.is_superadmin
+  end
+
+  def reject?
+    approve?
+  end
+
+  def manage_categories?
+    return true if user&.is_superadmin
+
+    user&.brand_memberships&.exists?(
+      brand_id: record.brand_id,
+      role: %w[owner manager]
+    )
+  end
+
   class Scope < Scope
     def resolve
       # if user.is_superadmin

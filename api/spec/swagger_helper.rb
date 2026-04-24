@@ -3,9 +3,11 @@
 require 'rails_helper'
 
 RSpec.configure do |config|
-  config.swagger_root = Rails.root.join('swagger').to_s
+  # ОНОВЛЕНО: swagger_root -> openapi_root
+  config.openapi_root = Rails.root.join('swagger').to_s
 
-  config.swagger_docs = {
+  # ОНОВЛЕНО: swagger_docs -> openapi_specs
+  config.openapi_specs = {
     'v1/swagger.yaml' => {
       openapi: '3.0.1',
       info: {
@@ -18,11 +20,11 @@ RSpec.configure do |config|
       ],
       components: {
         securitySchemes: {
-          Bearer: {
+          bearer_auth: {
             type: :http,
             scheme: :bearer,
             bearerFormat: 'JWT',
-            description: 'JWT token (будет добавлен в Sprint 2)'
+            description: 'Provide your JWT token. Prefix with "Bearer " is handled automatically by Swagger UI.'
           }
         },
         schemas: {
@@ -185,5 +187,5 @@ RSpec.configure do |config|
     }
   }
 
-  config.swagger_format = :yaml
+  config.openapi_format = :yaml
 end

@@ -18,8 +18,21 @@ Rails.application.routes.draw do
       post '/auth/register', to: 'auth#register'
       post '/auth/login', to: 'auth#login'
       resources :users, except: [:create]
-      #resources :events, only: [:index, :create]
-      resources :events, only: [:index, :show, :create]
+
+      resources :events, only: [:index, :show, :create] do
+        member do
+          post :submit,  to: 'events/transitions#submit'
+          post :cancel,  to: 'events/transitions#cancel'
+          post :approve, to: 'events/transitions#approve'
+          post :reject,  to: 'events/transitions#reject'
+        end
+
+        resources :categories,
+                  only:       [:index, :create, :destroy],
+                  param:       :category_id,
+                  controller: 'event_categories'
+      end
+
       resources :brands, only: [:index, :create, :show]
 
       resources :tickets, only: [:update] do

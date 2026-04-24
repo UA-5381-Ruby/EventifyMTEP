@@ -4,16 +4,15 @@ require 'test_helper'
 
 class TicketsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    # Bypass authentication for controller tests
-    Api::V1::TicketsController.class_eval do
-      def authenticate_user!; end
-    end
-
     @ticket = create_ticket
+
+    token = JwtService.encode(user_id: @ticket.user_id)
+    @headers = { 'Authorization' => "Bearer #{token}" }
   end
 
   test 'should allow review and update rating and comment' do
-    patch "/api/v1/tickets/#{@ticket.id}/review", params: { ticket: { rating: 5, comment: 'Great event' } }, as: :json
+    patch "/api/v1/tickets/#{@ticket.id}/review", params: { ticket: { rating: 5, comment: 'Great event' } },
+                                                  headers: @headers, as: :json
     assert_response :ok
 
     @ticket.reload

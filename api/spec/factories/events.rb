@@ -10,10 +10,12 @@ FactoryBot.define do
     status     { :draft }
     association :brand
 
-    after(:build) do |event|
-      # This ensures we only attach a default category if the test
-      # didn't already provide one explicitly (like in your controller specs)
-      event.categories << build(:category) if event.categories.empty?
+    after(:create) do |event, evaluator|
+      if evaluator.categories.any?
+        evaluator.categories.each do |category|
+          EventCategory.find_or_create_by!(event: event, category: category)
+        end
+      end
     end
   end
 end
