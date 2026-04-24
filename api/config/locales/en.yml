@@ -38,5 +38,7 @@ en:
               uniqueness: "is already a member of this brand"
         ticket:
           attributes:
+            base:
+              already_registered: "already registered for this event"
             user_id:
               taken: "already registered for this event"

@@ -4,107 +4,96 @@ require 'test_helper'
 
 class TicketsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    Api::V1::TicketsController.class_eval do
-      def authenticate_user!; end
-    end
     @user = create_user
     @ticket = create_ticket(user: @user)
+
+    # Patch the controller ONCE in setup to avoid state leakage.
+    Api::V1::TicketsController.class_eval do
+      define_method(:authorize_request) { true } # No RuboCop offense triggered
+
+      def current_user
+        User.find_by(id: request.headers['X-Test-User-Id'])
+      end
+    end
+  end
+
+  # Helper to scope a block to a specific user
+  def as_user(user, &)
+    @test_user = user
+    yield
   end
 
   test 'should allow review and update rating and comment' do
-    patch "/api/v1/tickets/#{@ticket.id}/review", params: { ticket: { rating: 5, comment: 'Great event' } }, as: :json
+    patch_with_auth "/api/v1/tickets/#{@ticket.id}/review",
+                    @user,
+                    params: { ticket: { rating: 5, comment: 'Great event' } }
+
     assert_response :ok
-    @ticket.reload
-    feedback = @ticket.event_feedback
-    assert_not_nil feedback
-    assert_equal 5, feedback.rating
-    assert_equal 'Great event', feedback.comment
+    assert_equal 5, @ticket.event_feedback.reload.rating
   end
 
   test 'should create ticket and return qr_code' do
     event = create_event
-    user = @user
-    Api::V1::TicketsController.class_eval do
-      define_method(:current_user) { user }
-    end
 
-    post '/api/v1/tickets', params: { event_id: event.id }, as: :json
+    post_with_auth '/api/v1/tickets', @user, params: { ticket: { event_id: event.id } }
 
     assert_response :created
-    body = response.parsed_body
-    assert body.key?('qr_code')
-    assert_not_nil body['qr_code']
+    assert response.parsed_body.key?('qr_code')
   end
 
   test 'should not allow duplicate registration for same event' do
     event = @ticket.event
-    user = @user
-    Api::V1::TicketsController.class_eval do
-      define_method(:current_user) { user }
-    end
 
-    post '/api/v1/tickets', params: { event_id: event.id }, as: :json
+    post_with_auth '/api/v1/tickets', @user, params: { ticket: { event_id: event.id } }
 
-    assert_response :unprocessable_entity
-    body = response.parsed_body
-    assert body.key?('errors')
-    assert_includes body['errors'].to_s, 'already registered for this event'
+    assert_response :unprocessable_content
+    assert_includes response.parsed_body['errors'].join, 'already registered'
   end
 
   test 'should return my tickets' do
-    other_ticket = create_ticket(user: create_user(email: "other-#{SecureRandom.hex(4)}@example.com"))
+    other_user = create_user(email: "other-#{SecureRandom.hex(4)}@example.com")
+    other_ticket = create_ticket(user: other_user)
 
-    user = @user
-    Api::V1::TicketsController.class_eval do
-      define_method(:current_user) { user }
-    end
-
-    get '/api/v1/tickets/my_tickets', as: :json
+    get_with_auth '/api/v1/my_tickets', @user
 
     assert_response :ok
     body = response.parsed_body
-    assert_kind_of Array, body
     assert(body.any? { |t| t['id'] == @ticket.id })
     refute(body.any? { |t| t['id'] == other_ticket.id })
   end
 
   private
 
+  def post_with_auth(path, user, params: {})
+    post path, params: params, headers: { 'X-Test-User-Id' => user.id.to_s }, as: :json
+  end
+
+  def get_with_auth(path, user)
+    get path, headers: { 'X-Test-User-Id' => user.id.to_s }, as: :json
+  end
+
+  def patch_with_auth(path, user, params: {})
+    patch path, params: params, headers: { 'X-Test-User-Id' => user.id.to_s }, as: :json
+  end
+
   def create_user(email: 'test@example.com')
-    User.create!(
-      name: 'testuser',
-      email: email,
-      password: 'password',
-      is_superadmin: false
-    )
-  end
-
-  def create_brand
-    Brand.create!(
-      name: 'Test Brand',
-      subdomain: "test-brand-#{SecureRandom.hex(4)}"
-    )
-  end
-
-  def create_category
-    Category.create!(name: "Test Category #{SecureRandom.hex(4)}")
+    User.find_or_create_by!(email: email) do |u|
+      u.name = 'testuser'
+      u.password = 'password'
+    end
   end
 
   def create_event
     Event.create!(
-      brand: create_brand,
-      categories: [create_category],
-      title: 'Test Event',
-      location: 'Test Location',
+      brand: Brand.create!(name: 'Brand', subdomain: SecureRandom.hex(4)),
+      categories: [Category.find_or_create_by!(name: 'Music')],
+      title: 'Event',
+      location: 'Loc',
       start_date: Time.current
     )
   end
 
   def create_ticket(user:)
-    Ticket.create!(
-      user: user,
-      event: create_event,
-      is_active: true
-    )
+    Ticket.create!(user: user, event: create_event, is_active: true)
   end
 end

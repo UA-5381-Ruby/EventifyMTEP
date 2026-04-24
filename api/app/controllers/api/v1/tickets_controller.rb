@@ -3,12 +3,11 @@
 module Api
   module V1
     class TicketsController < ApplicationController
-      before_action :authenticate_user!
+      before_action :authorize_request
 
       # POST /api/v1/tickets
       def create
-        ticket = current_user.tickets.build(event_id: params[:event_id])
-
+        ticket = current_user.tickets.build(ticket_params)
         if ticket.save
           render json: { qr_code: ticket.qr_code }, status: :created
         else
@@ -17,7 +16,8 @@ module Api
       rescue ActiveRecord::RecordNotUnique
         # Handle the race condition where two requests pass validation at the same time,
         # but the second one hits the DB unique index constraint.
-        render json: { errors: ['Ticket already exists for this user and event'] }, status: :unprocessable_content
+        ticket.errors.add(:base, :already_registered, message: 'already registered for this event')
+        render json: { errors: ticket.errors.full_messages }, status: :unprocessable_content
       end
 
       # GET /api/v1/my_tickets
@@ -26,17 +26,12 @@ module Api
         render json: tickets, status: :ok
       end
 
-      ##
-      # Updates or creates the event feedback for a ticket owned by the current user.
+      # PUT/PATCH /api/v1/tickets/:id/review
       def review
-        # SECURITY FIX: Scope the search to the current_user's tickets to prevent
-        # unauthorized users from editing feedback on tickets they don't own.
-        ticket = Ticket.find(params[:id])
+        # Scope to current_user's tickets to prevent unauthorized access
+        ticket = current_user.tickets.find(params[:id])
 
-        # 1. Initialize or find the existing feedback record attached to this ticket
         feedback = ticket.event_feedback || ticket.build_event_feedback
-
-        # 2. Update the feedback model instead of the ticket model
         if feedback.update(review_params)
           render json: feedback, status: :ok
         else
@@ -46,8 +41,11 @@ module Api
 
       private
 
+      def ticket_params
+        params.expect(ticket: [:event_id])
+      end
+
       def review_params
-        # support both wrapped and unwrapped params
         params.expect(ticket: %i[rating comment])
       rescue ActionController::ParameterMissing
         params.permit(:rating, :comment)

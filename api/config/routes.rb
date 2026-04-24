@@ -22,12 +22,11 @@ Rails.application.routes.draw do
       resources :events, only: [:index, :show, :create]
       resources :brands, only: [:index, :create, :show]
 
+      get 'my_tickets', to: 'tickets#my_tickets'
+
       resources :tickets, only: [:create] do
         member do
           patch :review
-        end
-        collection do
-          get :my_tickets
         end
       end
 
