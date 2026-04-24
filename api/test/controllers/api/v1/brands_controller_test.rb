@@ -20,7 +20,7 @@ module Api
           primary_color: '#FF0000',
           secondary_color: '#00FF00'
         )
-        Brandbrand_membership.create!(brand: @brand, user: @user, role: 'owner')
+        BrandMembership.create!(brand: @brand, user: @user, role: 'owner')
         @category = Category.create!(name: 'Test Category')
 
         @event = Event.create!(
@@ -40,9 +40,16 @@ module Api
         controller.remove_method(:current_user) if controller.method_defined?(:current_user)
       end
 
+      private
+
+      def auth_headers(user)
+        token = JwtService.encode(user_id: user.id)
+        { 'Authorization' => "Bearer #{token}" }
+      end
+
       # GET /api/v1/brands
       test 'should get index' do
-        get '/api/v1/brands', as: :json
+        get '/api/v1/brands', headers: auth_headers(@user), as: :json
 
         assert_response :ok
 
@@ -54,7 +61,7 @@ module Api
 
       # GET /api/v1/brands/:id
       test 'should show brand with events' do
-        get "/api/v1/brands/#{@brand.id}", as: :json
+        get "/api/v1/brands/#{@brand.id}", headers: auth_headers(@user), as: :json
 
         assert_response :ok
 
@@ -68,7 +75,7 @@ module Api
 
       # GET /api/v1/brands/:id — 404
       test 'should return 404 when brand not found' do
-        get '/api/v1/brands/999999', as: :json
+        get '/api/v1/brands/999999', headers: auth_headers(@user), as: :json
 
         assert_response :not_found
 
@@ -89,6 +96,7 @@ module Api
                    secondary_color: '#654321'
                  }
                },
+               headers: auth_headers(@user),
                as: :json
         end
 
@@ -113,6 +121,7 @@ module Api
                    secondary_color: 'blue'
                  }
                },
+               headers: auth_headers(@user),
                as: :json
         end
 

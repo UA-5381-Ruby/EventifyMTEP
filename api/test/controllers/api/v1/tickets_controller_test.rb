@@ -3,6 +3,7 @@
 require 'test_helper'
 
 class TicketsControllerTest < ActionDispatch::IntegrationTest
+  # include AuthHelper
   setup do
     # Bypass authentication for controller tests
     Api::V1::TicketsController.class_eval do
@@ -11,9 +12,12 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
 
     @ticket = create_ticket
   end
-
   test 'should allow review and update rating and comment' do
-    patch "/api/v1/tickets/#{@ticket.id}/review", params: { ticket: { rating: 5, comment: 'Great event' } }, as: :json
+    patch "/api/v1/tickets/#{@ticket.id}/review",
+          params: { ticket: { rating: 5, comment: 'Great event' } },
+          headers: auth_headers(@ticket.user),
+          as: :json
+
     assert_response :ok
 
     @ticket.reload
@@ -26,6 +30,11 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
   end
 
   private
+
+  def auth_headers(user)
+    token = JwtService.encode(user_id: user.id)
+    { 'Authorization' => "Bearer #{token}" }
+  end
 
   def create_user
     User.create!(

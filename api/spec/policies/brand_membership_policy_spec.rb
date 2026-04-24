@@ -4,8 +4,6 @@
 require 'rails_helper'
 
 RSpec.describe BrandMembershipPolicy, type: :policy do
-  subject { described_class }
-
   let(:brand) { create(:brand) }
   let(:owner) { create(:user) }
   let(:manager) { create(:user) }
@@ -18,50 +16,50 @@ RSpec.describe BrandMembershipPolicy, type: :policy do
     create(:brand_membership, brand: brand, user: regular_user, role: 'user')
   end
 
-  permissions :create? do
+  describe '#create?' do
     context 'when current user is a manager' do
       it "permits inviting users with 'user' role" do
         new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'user')
-        expect(subject).to permit(manager, new_brand_membership)
+        expect(BrandMembershipPolicy.new(manager, new_brand_membership)).to permit_action(:create)
       end
 
       it "does not permit inviting users as 'owner'" do
         new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'owner')
-        expect(subject).not_to permit(manager, new_brand_membership)
+        expect(BrandMembershipPolicy.new(manager, new_brand_membership)).not_to permit_action(:create)
       end
     end
 
     context 'when current user is an owner' do
       it "permits inviting users with 'owner' role" do
         new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'owner')
-        expect(subject).to permit(owner, new_brand_membership)
+        expect(BrandMembershipPolicy.new(owner, new_brand_membership)).to permit_action(:create)
       end
 
       it "permits inviting users with 'user' role" do
         new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'user')
-        expect(subject).to permit(owner, new_brand_membership)
+        expect(BrandMembershipPolicy.new(owner, new_brand_membership)).to permit_action(:create)
       end
     end
 
     context 'when current user is a regular user' do
       it 'does not permit inviting anyone' do
         new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'user')
-        expect(subject).not_to permit(regular_user, new_brand_membership)
+        expect(BrandMembershipPolicy.new(regular_user, new_brand_membership)).not_to permit_action(:create)
       end
     end
   end
 
-  permissions :update? do
+  describe '#update?' do
     context 'when current user is a manager' do
       it "permits updating a 'user' role" do
         membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
-        expect(subject).to permit(manager, membership)
+        expect(BrandMembershipPolicy.new(manager, membership)).to permit_action(:update)
       end
 
       it "does not permit updating someone to 'owner' role" do
         membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
         membership.role = 'owner'
-        expect(subject).not_to permit(manager, membership)
+        expect(BrandMembershipPolicy.new(manager, membership)).not_to permit_action(:update)
       end
     end
 
@@ -69,40 +67,41 @@ RSpec.describe BrandMembershipPolicy, type: :policy do
       it 'permits updating any role' do
         membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
         membership.role = 'owner'
-        expect(subject).to permit(owner, membership)
+        expect(BrandMembershipPolicy.new(owner, membership)).to permit_action(:update)
       end
     end
   end
 
-  permissions :destroy? do
+  describe '#destroy?' do
     context 'when current user is a manager' do
       it "permits destroying a 'user' membership" do
         membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
-        expect(subject).to permit(manager, membership)
+        expect(BrandMembershipPolicy.new(manager, membership)).to permit_action(:destroy)
       end
 
       it "does not permit destroying an 'owner' membership" do
-        expect(subject).not_to permit(manager, create(:brand_membership, brand: brand, user: new_user, role: 'owner'))
+        membership = create(:brand_membership, brand: brand, user: new_user, role: 'owner')
+        expect(BrandMembershipPolicy.new(manager, membership)).not_to permit_action(:destroy)
       end
 
       it "does not permit destroying a 'manager' membership" do
         another_manager = create(:user)
-        expect(subject).not_to permit(manager,
-                                      create(:brand_membership, brand: brand, user: another_manager, role: 'manager'))
+        membership = create(:brand_membership, brand: brand, user: another_manager, role: 'manager')
+        expect(BrandMembershipPolicy.new(manager, membership)).not_to permit_action(:destroy)
       end
     end
 
     context 'when current user is an owner' do
       it 'permits destroying any membership' do
         membership = create(:brand_membership, brand: brand, user: new_user, role: 'manager')
-        expect(subject).to permit(owner, membership)
+        expect(BrandMembershipPolicy.new(owner, membership)).to permit_action(:destroy)
       end
     end
 
     context 'when current user is a regular user' do
       it 'does not permit destroying any membership' do
         membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
-        expect(subject).not_to permit(regular_user, membership)
+        expect(BrandMembershipPolicy.new(regular_user, membership)).not_to permit_action(:destroy)
       end
     end
   end
