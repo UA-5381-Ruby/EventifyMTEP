@@ -3,7 +3,6 @@
 # spec/requests/api/v1/brand_memberships_spec.rb
 require 'rails_helper'
 
-# Змінено опис на множину з великої літери, щоб відповідати назві контролера
 RSpec.describe 'Api::V1::BrandMemberships', type: :request do
   let(:brand) { create(:brand) }
   let(:owner_user) { create(:user) }
@@ -11,15 +10,16 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
 
   let!(:owner_brand_membership) { create(:brand_membership, brand: brand, user: owner_user, role: 'owner') }
 
-  before do
-    sign_in(owner_user, scope: :user)
-  end
+  # Генеруємо заголовки з JWT токеном замість старого sign_in
+  let(:headers) { auth_headers(owner_user) }
 
   describe 'PATCH /api/v1/brands/:brand_id/memberships/:id' do
     context 'when the user is the last owner' do
       it 'does not allow downgrading the role to manager' do
         patch "/api/v1/brands/#{brand.id}/memberships/#{owner_brand_membership.id}",
-              params: { membership: { role: 'manager' } }
+              params: { membership: { role: 'manager' } },
+              headers: headers, # Додано заголовки
+              as: :json         # Додано формат
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['errors']['base']).to include('Cannot downgrade the last owner of a brand')
@@ -32,7 +32,9 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
 
       it 'allows downgrading one of the owners' do
         patch "/api/v1/brands/#{brand.id}/memberships/#{owner_brand_membership.id}",
-              params: { membership: { role: 'manager' } }
+              params: { membership: { role: 'manager' } },
+              headers: headers, # Додано заголовки
+              as: :json         # Додано формат
 
         expect(response).to have_http_status(:ok)
         expect(owner_brand_membership.reload.role).to eq('manager')
@@ -43,7 +45,9 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
   describe 'DELETE /api/v1/brands/:brand_id/memberships/:id' do
     context 'when the user is the last owner' do
       it 'does not allow deleting the brand_membership' do
-        delete "/api/v1/brands/#{brand.id}/memberships/#{owner_brand_membership.id}"
+        # Додано заголовки
+        delete "/api/v1/brands/#{brand.id}/memberships/#{owner_brand_membership.id}",
+               headers: headers
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['errors']['base']).to include('Cannot remove the last owner of a brand')
@@ -59,7 +63,9 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
 
       it 'returns 422 instead of 500' do
         post "/api/v1/brands/#{brand.id}/memberships",
-             params: { membership: { user_id: other_user.id, role: 'manager' } }
+             params: { membership: { user_id: other_user.id, role: 'manager' } },
+             headers: headers, # Додано заголовки
+             as: :json         # Додано формат
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['errors']['base']).to include('User is already a member of this brand')

@@ -18,9 +18,8 @@ Rails.application.routes.draw do
       post '/auth/register', to: 'auth#register'
       post '/auth/login', to: 'auth#login'
       resources :users, except: [:create]
-      #resources :events, only: [:index, :create]
       resources :events, only: [:index, :show, :create]
-      resources :brands, only: [:index, :create, :show] do
+      resources :brands, only: [:index, :create, :show, :update, :destroy] do
       resources :memberships, controller: 'brand_memberships', only: [:index, :create, :update, :destroy]
       end
       resources :tickets, only: [:update] do
