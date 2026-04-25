@@ -21,9 +21,9 @@ RSpec.describe 'api/v1/tickets', type: :request do
       response '200', 'review saved' do
         schema '$ref' => '#/components/schemas/EventFeedback'
 
-        let(:user)   { create(:user) }
-        let(:Authorization) { auth_headers(user)['Authorization'] } 
-        
+        let(:user) { create(:user) }
+        let(:Authorization) { auth_headers(user)['Authorization'] }
+
         let(:brand)  { create(:brand) }
         let(:event)  { create(:event, brand: brand) }
         let(:ticket) { create(:ticket, user: user, event: event) }
@@ -36,9 +36,9 @@ RSpec.describe 'api/v1/tickets', type: :request do
       response '422', 'invalid rating' do
         schema '$ref' => '#/components/schemas/ErrorMessages'
 
-        let(:user)   { create(:user) }
+        let(:user) { create(:user) }
         let(:Authorization) { auth_headers(user)['Authorization'] }
-        
+
         let(:brand)  { create(:brand) }
         let(:event)  { create(:event, brand: brand) }
         let(:ticket) { create(:ticket, user: user, event: event) }
@@ -53,7 +53,7 @@ RSpec.describe 'api/v1/tickets', type: :request do
 
         let(:user) { create(:user) }
         let(:Authorization) { auth_headers(user)['Authorization'] }
-        
+
         let(:id)   { 0 }
         let(:body) { { ticket: { rating: 5 } } }
 

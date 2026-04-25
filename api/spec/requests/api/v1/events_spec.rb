@@ -29,11 +29,11 @@ RSpec.describe 'Api::V1::Events', type: :request do
     context 'with valid params' do
       it 'returns 201 and creates event' do
         # 3. Додаємо headers: auth_headers(user)
-        post '/api/v1/events', 
-             params: valid_params, 
-             headers: auth_headers(user), 
+        post '/api/v1/events',
+             params: valid_params,
+             headers: auth_headers(user),
              as: :json
-             
+
         expect(response).to have_http_status(:created)
         expect(response.parsed_body['title']).to eq('New Event')
       end
@@ -41,11 +41,11 @@ RSpec.describe 'Api::V1::Events', type: :request do
 
     context 'with invalid params' do
       it 'returns 422 with errors' do
-        post '/api/v1/events', 
-             params: { event: { title: '' } }, 
-             headers: auth_headers(user), 
+        post '/api/v1/events',
+             params: { event: { title: '' } },
+             headers: auth_headers(user),
              as: :json
-             
+
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.parsed_body).to have_key('errors')
       end
@@ -57,10 +57,10 @@ RSpec.describe 'Api::V1::Events', type: :request do
 
     it 'returns 200 and paginated list' do
       # Додаємо headers
-      get '/api/v1/events', 
-          params: { page: 1, per_page: 3 }, 
+      get '/api/v1/events',
+          params: { page: 1, per_page: 3 },
           headers: auth_headers(user)
-          
+
       expect(response).to have_http_status(:ok)
       body = response.parsed_body
       expect(body['data'].length).to eq(3)
@@ -72,10 +72,10 @@ RSpec.describe 'Api::V1::Events', type: :request do
       create(:event, brand: brand, categories: [category], start_date: 3.days.from_now)
       create(:event, brand: brand, categories: [category], start_date: 2.days.from_now)
 
-      get '/api/v1/events', 
-          params: { sort: 'start_date', order: 'desc' }, 
+      get '/api/v1/events',
+          params: { sort: 'start_date', order: 'desc' },
           headers: auth_headers(user)
-          
+
       expect(response).to have_http_status(:ok)
 
       dates = response.parsed_body['data'].map { |d| Time.iso8601(d['start_date']) }

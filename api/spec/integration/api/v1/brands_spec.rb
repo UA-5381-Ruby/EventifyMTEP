@@ -31,7 +31,7 @@ RSpec.describe 'api/v1/brands', type: :request do
       tags     'Brands'
       consumes 'application/json'
       produces 'application/json'
-      security [{ Bearer: [] }] 
+      security [{ Bearer: [] }]
 
       parameter name: :body, in: :body, required: true,
                 schema: { '$ref' => '#/components/schemas/BrandInput' }
@@ -72,7 +72,7 @@ RSpec.describe 'api/v1/brands', type: :request do
     get 'Show brand' do
       tags     'Brands'
       produces 'application/json'
-      security [{ Bearer: [] }] 
+      security [{ Bearer: [] }]
 
       response '200', 'brand found' do
         schema '$ref' => '#/components/schemas/Brand'
