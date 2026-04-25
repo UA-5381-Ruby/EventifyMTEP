@@ -3,16 +3,20 @@
 require 'swagger_helper'
 
 RSpec.describe 'api/v1/brands', type: :request do
+  include AuthHelper
+
   path '/api/v1/brands' do
     get 'List brands' do
       tags     'Brands'
       produces 'application/json'
+      security [{ Bearer: [] }]
 
       response '200', 'brands listed' do
         schema type: :array, items: { '$ref' => '#/components/schemas/Brand' }
+        let(:user) { create(:user) }
+        let(:Authorization) { auth_headers(user)['Authorization'] }
 
         before do
-          user = User.first || create(:user, email: 'temp_organizer@example.com')
           brands = create_list(:brand, 2)
           brands.each do |brand|
             create(:brand_membership, brand: brand, user: user, role: 'owner')
@@ -27,12 +31,16 @@ RSpec.describe 'api/v1/brands', type: :request do
       tags     'Brands'
       consumes 'application/json'
       produces 'application/json'
+      security [{ Bearer: [] }] 
 
       parameter name: :body, in: :body, required: true,
                 schema: { '$ref' => '#/components/schemas/BrandInput' }
 
       response '201', 'brand created' do
         schema '$ref' => '#/components/schemas/Brand'
+
+        let(:user) { create(:user) }
+        let(:Authorization) { auth_headers(user)['Authorization'] }
 
         let(:body) do
           {
@@ -49,6 +57,8 @@ RSpec.describe 'api/v1/brands', type: :request do
       response '422', 'validation failed' do
         schema '$ref' => '#/components/schemas/ErrorMessages'
 
+        let(:user) { create(:user) }
+        let(:Authorization) { auth_headers(user)['Authorization'] }
         let(:body) { { brand: { name: '', subdomain: '' } } }
 
         run_test!
@@ -62,18 +72,17 @@ RSpec.describe 'api/v1/brands', type: :request do
     get 'Show brand' do
       tags     'Brands'
       produces 'application/json'
+      security [{ Bearer: [] }] 
 
       response '200', 'brand found' do
         schema '$ref' => '#/components/schemas/Brand'
 
-        let(:id) do
-          # 1. Создаем бренд
-          brand = create(:brand)
-          # 2. Берем юзера (или создаем), который станет current_user в контроллере
-          user = User.first || create(:user, email: 'temp_organizer@example.com')
-          # 3. Даем этому юзеру доступ к бренду
-          create(:brand_membership, brand: brand, user: user, role: 'owner')
+        let(:user) { create(:user) }
+        let(:Authorization) { auth_headers(user)['Authorization'] }
 
+        let(:id) do
+          brand = create(:brand)
+          create(:brand_membership, brand: brand, user: user, role: 'owner')
           brand.id
         end
 
@@ -82,7 +91,8 @@ RSpec.describe 'api/v1/brands', type: :request do
 
       response '404', 'brand not found' do
         schema '$ref' => '#/components/schemas/NotFound'
-
+        let(:user) { create(:user) }
+        let(:Authorization) { auth_headers(user)['Authorization'] }
         let(:id) { 0 }
 
         run_test!

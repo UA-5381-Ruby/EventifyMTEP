@@ -3,6 +3,8 @@
 require 'swagger_helper'
 
 RSpec.describe 'api/v1/tickets', type: :request do
+  include AuthHelper
+
   path '/api/v1/tickets/{id}/review' do
     parameter name: :id, in: :path, type: :integer, required: true, description: 'Ticket ID'
 
@@ -19,8 +21,9 @@ RSpec.describe 'api/v1/tickets', type: :request do
       response '200', 'review saved' do
         schema '$ref' => '#/components/schemas/EventFeedback'
 
-        let(:Authorization) { 'Bearer dummy_test_token' }
         let(:user)   { create(:user) }
+        let(:Authorization) { auth_headers(user)['Authorization'] } 
+        
         let(:brand)  { create(:brand) }
         let(:event)  { create(:event, brand: brand) }
         let(:ticket) { create(:ticket, user: user, event: event) }
@@ -33,8 +36,9 @@ RSpec.describe 'api/v1/tickets', type: :request do
       response '422', 'invalid rating' do
         schema '$ref' => '#/components/schemas/ErrorMessages'
 
-        let(:Authorization) { 'Bearer dummy_test_token' }
         let(:user)   { create(:user) }
+        let(:Authorization) { auth_headers(user)['Authorization'] }
+        
         let(:brand)  { create(:brand) }
         let(:event)  { create(:event, brand: brand) }
         let(:ticket) { create(:ticket, user: user, event: event) }
@@ -47,7 +51,9 @@ RSpec.describe 'api/v1/tickets', type: :request do
       response '404', 'ticket not found' do
         schema '$ref' => '#/components/schemas/NotFound'
 
-        let(:Authorization) { 'Bearer dummy_test_token' }
+        let(:user) { create(:user) }
+        let(:Authorization) { auth_headers(user)['Authorization'] }
+        
         let(:id)   { 0 }
         let(:body) { { ticket: { rating: 5 } } }
 
