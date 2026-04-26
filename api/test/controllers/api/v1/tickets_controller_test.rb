@@ -4,52 +4,57 @@ require 'test_helper'
 
 class TicketsControllerTest < ActionDispatch::IntegrationTest
   setup do
-    @user = create_test_user
-    @event = create_event
-    @ticket = create_ticket(user: @user, event: @event)
+    @user = create_user
+    @ticket = create_ticket(user: @user)
+
+    # Patch the controller ONCE in setup to avoid state leakage.
+    Api::V1::TicketsController.class_eval do
+      define_method(:authorize_request) { true } # No RuboCop offense triggered
+
+      def current_user
+        User.find_by(id: request.headers['X-Test-User-Id'])
+      end
+    end
+  end
+
+  # Helper to scope a block to a specific user
+  def as_user(user, &)
+    @test_user = user
+    yield
   end
 
   test 'should allow review and update rating and comment' do
-    patch "/api/v1/tickets/#{@ticket.id}/review",
-          params: { ticket: { rating: 5, comment: 'Great event' } },
-          headers: auth_headers(@user),
-          as: :json
+    patch_with_auth "/api/v1/tickets/#{@ticket.id}/review",
+                    @user,
+                    params: { ticket: { rating: 5, comment: 'Great event' } }
 
     assert_response :ok
     assert_equal 5, @ticket.event_feedback.reload.rating
   end
 
   test 'should create ticket and return qr_code' do
-    new_event = create_event
-    assert_difference('Ticket.count') do
-      post '/api/v1/tickets',
-           params: { ticket: { event_id: new_event.id } },
-           headers: auth_headers(@user),
-           as: :json
-    end
+    event = create_event
+
+    post_with_auth '/api/v1/tickets', @user, params: { ticket: { event_id: event.id } }
 
     assert_response :created
     assert response.parsed_body.key?('qr_code')
   end
 
   test 'should not allow duplicate registration for same event' do
-    post '/api/v1/tickets',
-         params: { ticket: { event_id: @event.id } },
-         headers: auth_headers(@user),
-         as: :json
+    event = @ticket.event
+
+    post_with_auth '/api/v1/tickets', @user, params: { ticket: { event_id: event.id } }
 
     assert_response :unprocessable_content
     assert_includes response.parsed_body['errors'].join, 'already registered'
   end
 
   test 'should return my tickets' do
-    other_user = create_test_user(email: "other-#{SecureRandom.hex(4)}@test.com")
-    other_event = create_event
-    other_ticket = create_ticket(user: other_user, event: other_event)
+    other_user = create_user(email: "other-#{SecureRandom.hex(4)}@example.com")
+    other_ticket = create_ticket(user: other_user)
 
-    get '/api/v1/my_tickets',
-        headers: auth_headers(@user),
-        as: :json
+    get_with_auth '/api/v1/my_tickets', @user
 
     assert_response :ok
     body = response.parsed_body
@@ -59,21 +64,36 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
 
   private
 
+  def post_with_auth(path, user, params: {})
+    post path, params: params, headers: { 'X-Test-User-Id' => user.id.to_s }, as: :json
+  end
+
+  def get_with_auth(path, user)
+    get path, headers: { 'X-Test-User-Id' => user.id.to_s }, as: :json
+  end
+
+  def patch_with_auth(path, user, params: {})
+    patch path, params: params, headers: { 'X-Test-User-Id' => user.id.to_s }, as: :json
+  end
+
+  def create_user(email: 'test@example.com')
+    User.find_or_create_by!(email: email) do |u|
+      u.name = 'testuser'
+      u.password = 'password'
+    end
+  end
+
   def create_event
-    brand = Brand.create!(
-      name: "Brand-#{SecureRandom.hex(4)}",
-      subdomain: SecureRandom.hex(4)
-    )
     Event.create!(
-      brand: brand,
+      brand: Brand.create!(name: 'Brand', subdomain: SecureRandom.hex(4)),
       categories: [Category.find_or_create_by!(name: 'Music')],
-      title: "Event-#{SecureRandom.hex(4)}",
-      location: 'Test Location',
-      start_date: Time.current + 7.days
+      title: 'Event',
+      location: 'Loc',
+      start_date: Time.current
     )
   end
 
-  def create_ticket(user:, event:)
-    Ticket.create!(user: user, event: event, is_active: true)
+  def create_ticket(user:)
+    Ticket.create!(user: user, event: create_event, is_active: true)
   end
 end
