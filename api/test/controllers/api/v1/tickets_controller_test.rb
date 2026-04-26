@@ -6,21 +6,6 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
   setup do
     @user = create_user
     @ticket = create_ticket(user: @user)
-
-    # Patch the controller ONCE in setup to avoid state leakage.
-    Api::V1::TicketsController.class_eval do
-      define_method(:authorize_request) { true } # No RuboCop offense triggered
-
-      def current_user
-        User.find_by(id: request.headers['X-Test-User-Id'])
-      end
-    end
-  end
-
-  # Helper to scope a block to a specific user
-  def as_user(user, &)
-    @test_user = user
-    yield
   end
 
   test 'should allow review and update rating and comment' do
@@ -64,16 +49,22 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
 
   private
 
+  # Генерує заголовок авторизації з JWT токеном
+  def auth_headers(user)
+    token = JwtService.encode(user_id: user.id)
+    { 'Authorization' => "Bearer #{token}" }
+  end
+
   def post_with_auth(path, user, params: {})
-    post path, params: params, headers: { 'X-Test-User-Id' => user.id.to_s }, as: :json
+    post path, params: params, headers: auth_headers(user), as: :json
   end
 
   def get_with_auth(path, user)
-    get path, headers: { 'X-Test-User-Id' => user.id.to_s }, as: :json
+    get path, headers: auth_headers(user), as: :json
   end
 
   def patch_with_auth(path, user, params: {})
-    patch path, params: params, headers: { 'X-Test-User-Id' => user.id.to_s }, as: :json
+    patch path, params: params, headers: auth_headers(user), as: :json
   end
 
   def create_user(email: 'test@example.com')
@@ -85,7 +76,7 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
 
   def create_event
     Event.create!(
-      brand: Brand.create!(name: 'Brand', subdomain: SecureRandom.hex(4)),
+      brand: Brand.create!(name: "Brand #{SecureRandom.hex(4)}", subdomain: SecureRandom.hex(4)),
       categories: [Category.find_or_create_by!(name: 'Music')],
       title: 'Event',
       location: 'Loc',

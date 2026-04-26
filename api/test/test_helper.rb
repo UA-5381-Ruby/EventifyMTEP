@@ -12,6 +12,11 @@ module ActiveSupport
     # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
     fixtures :all
 
+    def auth_headers(user)
+      token = JwtService.encode(user_id: user.id)
+      { 'Authorization' => "Bearer #{token}" }
+    end
+
     # Add more helper methods to be used by all tests here...
   end
 end
