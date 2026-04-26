@@ -22,16 +22,18 @@ Rails.application.routes.draw do
       resources :events, only: [:index, :show, :create]
       resources :brands, only: [:index, :create, :show]
 
-      resources :tickets, only: [:update] do
+      post '/auth/password/reset', to: 'passwords#update', constraints: ->(req) { req.params[:token].present? }
+      post '/auth/password/reset', to: 'passwords#create'
+
+      get 'my_tickets', to: 'tickets#my_tickets'
+
+      resources :tickets, only: [:create] do
         member do
           patch :review
         end
       end
 
       resources :categories, only: [:index, :create]
-
-      post '/auth/password/reset', to: 'passwords#update', constraints: ->(req) { req.params[:token].present? }
-      post '/auth/password/reset', to: 'passwords#create'
     end
   end
 
