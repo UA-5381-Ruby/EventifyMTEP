@@ -11,8 +11,8 @@ module Api
         user = User.find_by('LOWER(email) = ?', email)
 
         if user
-          signed_id = user.signed_id(purpose: :password_reset, expires_in: 2.days)
-          UserMailer.reset_password(user, signed_id).deliver_later
+          token = user.generate_token_for(:password_reset)
+          UserMailer.reset_password(user, token).deliver_later
         end
 
         render json: { message: 'If your email exists, you will receive reset instructions' }, status: :ok
@@ -24,7 +24,7 @@ module Api
 
         return render json: { error: 'Invalid or expired token' }, status: :bad_request if user.nil?
 
-        if user.update!(password: params[:new_password])
+        if user.update(password: params[:new_password])
           render json: { message: 'Password successfully updated' }, status: :ok
         else
           render json: { errors: user.errors.full_messages }, status: :unprocessable_content
