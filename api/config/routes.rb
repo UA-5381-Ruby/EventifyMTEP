@@ -29,6 +29,9 @@ Rails.application.routes.draw do
       end
 
       resources :categories, only: [:index, :create]
+
+      post '/auth/password/reset', to: 'passwords#update', constraints: ->(req) { req.params[:token].present? }
+      post '/auth/password/reset', to: 'passwords#create'
     end
   end
 

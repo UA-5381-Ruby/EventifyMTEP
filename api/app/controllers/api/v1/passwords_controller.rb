@@ -1,0 +1,35 @@
+# frozen_string_literal: true
+
+module Api
+  module V1
+    class PasswordsController < ApplicationController
+      skip_before_action :authorize_request
+
+      # POST /api/v1/auth/password/reset
+      def create
+        email = params[:email].to_s.strip.downcase
+        user = User.find_by('LOWER(email) = ?', email)
+
+        if user
+          signed_id = user.signed_id(purpose: :password_reset, expires_in: 2.days)
+          UserMailer.reset_password(user, signed_id).deliver_later
+        end
+
+        render json: { message: 'If your email exists, you will receive reset instructions' }, status: :ok
+      end
+
+      # POST /api/v1/auth/password/reset?token={signed_id}
+      def update
+        user = User.find_signed(params[:token], purpose: :password_reset)
+
+        return render json: { error: 'Invalid or expired token' }, status: :bad_request if user.nil?
+
+        if user.update!(password: params[:new_password])
+          render json: { message: 'Password successfully updated' }, status: :ok
+        else
+          render json: { errors: user.errors.full_messages }, status: :unprocessable_content
+        end
+      end
+    end
+  end
+end
