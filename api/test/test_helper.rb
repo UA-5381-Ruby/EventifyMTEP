@@ -6,12 +6,18 @@ require 'rails/test_help'
 
 module ActiveSupport
   class TestCase
-    # Run tests in parallel with specified workers
-    parallelize(workers: :number_of_processors)
+    # Generate JWT token for tests
+    def auth_headers(user)
+      token = JwtService.encode(user_id: user.id)
+      { 'Authorization' => "Bearer #{token}" }
+    end
 
-    # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
-    fixtures :all
-
-    # Add more helper methods to be used by all tests here...
+    # Create a test user
+    def create_test_user(email: "user-#{SecureRandom.hex(4)}@test.com", name: 'Test User')
+      User.find_or_create_by!(email: email) do |user|
+        user.name = name
+        user.password = 'password123'
+      end
+    end
   end
 end
