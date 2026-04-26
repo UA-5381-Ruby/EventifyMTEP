@@ -4,24 +4,43 @@ require 'test_helper'
 
 class CategoriesControllerTest < ActionDispatch::IntegrationTest
   setup do
-    # Bypass authentication for controller tests
-    Api::V1::CategoriesController.class_eval do
-      def authenticate_user!; end
+    @user = User.find_or_create_by!(email: 'test@example.com') do |u|
+      u.name = 'testuser'
+      u.password = 'password'
     end
 
-    @category = Category.create!(name: 'Test Category')
+    # Генеруємо токен
+    token = JwtService.encode(user_id: @user.id)
+    @headers = { 'Authorization' => "Bearer #{token}" }
+
+    @category = Category.find_or_create_by!(name: 'Test Category')
   end
 
   test 'should get index' do
-    get '/api/v1/categories', as: :json
+    # Передаємо заголовок авторизації
+    get '/api/v1/categories', headers: @headers, as: :json
+
     assert_response :success
-    assert_includes response.parsed_body.pluck('name'), 'Test Category'
+    # Перевіряємо наявність категорії у відповіді
+    names = response.parsed_body.map { |c| c['name'] }
+    assert_includes names, 'Test Category'
   end
 
   test 'should create category' do
     assert_difference('Category.count') do
-      post '/api/v1/categories', params: { category: { name: 'New Category' } }, as: :json
+      # Передаємо заголовок авторизації
+      post '/api/v1/categories',
+           params: { category: { name: 'New Category' } },
+           headers: @headers,
+           as: :json
     end
+
     assert_response :created
+    assert_equal 'New Category', response.parsed_body['name']
+  end
+
+  test 'should return unauthorized if no token provided' do
+    get '/api/v1/categories', as: :json
+    assert_response :unauthorized
   end
 end
