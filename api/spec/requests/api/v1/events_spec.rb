@@ -8,7 +8,7 @@ RSpec.describe 'Api::V1::Events', type: :request do
 
   # 2. Створюємо користувача, від імені якого робитимемо запити
   let(:user)      { create(:user) }
-
+  let!(:superadmin) { create(:user, is_superadmin: true) }
   let!(:brand)    { create(:brand) }
   let!(:category) { create(:category) }
 

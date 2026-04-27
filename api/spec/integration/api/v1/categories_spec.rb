@@ -4,6 +4,7 @@ require 'swagger_helper'
 
 RSpec.describe 'api/v1/categories', type: :request do
   include AuthHelper
+  let(:superadmin) { create(:user, is_superadmin: true) }
 
   path '/api/v1/categories' do
     get 'List categories' do
@@ -19,7 +20,6 @@ RSpec.describe 'api/v1/categories', type: :request do
         let(:Authorization) { auth_headers(user)['Authorization'] }
 
         before { create_list(:category, 3) }
-
         run_test!
       end
     end
@@ -45,7 +45,6 @@ RSpec.describe 'api/v1/categories', type: :request do
         let(:user) { create(:user) }
         let(:Authorization) { auth_headers(user)['Authorization'] }
         let(:body) { { category: { name: 'Tech' } } }
-
         run_test!
       end
 
@@ -54,7 +53,6 @@ RSpec.describe 'api/v1/categories', type: :request do
         let(:user) { create(:user) }
         let(:Authorization) { auth_headers(user)['Authorization'] }
         let(:body) { { category: { name: '' } } }
-
         run_test!
       end
     end

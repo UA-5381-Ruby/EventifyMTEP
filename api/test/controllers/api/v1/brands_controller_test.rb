@@ -6,22 +6,28 @@ module Api
   module V1
     class BrandsControllerTest < ActionDispatch::IntegrationTest
       setup do
-        @user = User.find_by(email: 'test@example.com') ||
-                User.create!(
-                  name: 'testuser',
-                  email: 'test@example.com',
-                  password: 'password'
-                )
+        @user = User.find_or_create_by!(email: 'test@example.com') do |u|
+          u.name = 'testuser'
+          u.password = 'password'
+        end
+
+        # Генеруємо реальний JWT токен
+        token = JwtService.encode(user_id: @user.id)
+        @headers = { 'Authorization' => "Bearer #{token}" }
+
+        token = JwtService.encode(user_id: @user.id)
+        @headers = { 'Authorization' => "Bearer #{token}" }
 
         @brand = Brand.create!(
           name: 'Test Brand',
           description: 'Test description',
-          subdomain: 'test-brand',
+          subdomain: "test-brand-#{SecureRandom.hex(4)}",
           primary_color: '#FF0000',
           secondary_color: '#00FF00'
         )
+
         BrandMembership.create!(brand: @brand, user: @user, role: 'owner')
-        @category = Category.create!(name: 'Test Category')
+        @category = Category.find_or_create_by!(name: 'Test Category')
 
         @event = Event.create!(
           brand: @brand,
@@ -91,7 +97,7 @@ module Api
                  brand: {
                    name: 'New Brand',
                    description: 'New description',
-                   subdomain: 'new-brand',
+                   subdomain: "new-brand-#{SecureRandom.hex(4)}",
                    primary_color: '#123456',
                    secondary_color: '#654321'
                  }
@@ -105,20 +111,18 @@ module Api
         body = response.parsed_body
         assert_equal 'New Brand', body['name']
         # TODO: uncomment when auth is ready
-        # new_brand = Brand.find(body['id'])
-        # assert new_brand.organizers.exists?(user: @user)
+        new_brand = Brand.find(body['id'])
+        assert new_brand.brand_memberships.exists?(user: @user, role: 'owner')
       end
 
-      # POST /api/v1/brands
+      # POST /api/v1/brands з невалідними даними
       test 'should not create brand with invalid data' do
         assert_no_difference('Brand.count') do
           post '/api/v1/brands',
                params: {
                  brand: {
                    name: '',
-                   subdomain: '',
-                   primary_color: 'red',
-                   secondary_color: 'blue'
+                   subdomain: ''
                  }
                },
                headers: auth_headers(@user),
@@ -126,9 +130,12 @@ module Api
         end
 
         assert_response :unprocessable_content
+        assert response.parsed_body['errors'].present?
+      end
 
-        body = response.parsed_body
-        assert body['errors'].present?
+      test 'should return unauthorized if token is missing' do
+        get '/api/v1/brands', as: :json
+        assert_response :unauthorized
       end
     end
   end

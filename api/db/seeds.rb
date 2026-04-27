@@ -69,8 +69,17 @@ events_data = [
 ]
 
 events_data.each do |attrs|
+  # 1. Витягуємо категорії з хешу атрибутів, щоб вони не потрапили в update!
+  event_categories = attrs.delete(:categories)
+
+  # 2. Знаходимо або створюємо сам івент з іншими полями
   event = Event.find_or_initialize_by(title: attrs[:title])
   event.update!(attrs)
+
+  # 3. Безпечно додаємо категорії по одній, уникаючи дублікатів
+  event_categories.each do |category|
+    EventCategory.find_or_create_by!(event: event, category: category)
+  end
 end
 
 first_event = Event.first
