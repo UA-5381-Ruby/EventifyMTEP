@@ -53,7 +53,7 @@ module Api
         def set_event
           @event = Event.find(params[:id])
         rescue ActiveRecord::RecordNotFound
-          render json: { error: 'Event not found' }, status: :not_found
+          render(json: { error: 'Event not found' }, status: :not_found) and return
         end
 
         def handle_invalid_transition(action)

@@ -47,14 +47,14 @@ module Api
         # Optimization: includes(:categories) prevents N+1 queries in the index action
         @event = Event.includes(:categories).find(params[:event_id])
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Event not found' }, status: :not_found
+        render(json: { error: 'Event not found' }, status: :not_found) and return
       end
 
       def set_event_category
         # Finds the join record by the category_id from the URL
         @event_category = @event.event_categories.find_by!(category_id: params[:category_id])
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Category is not assigned to this event' }, status: :not_found
+        render(json: { error: 'Category is not assigned to this event' }, status: :not_found) and return
       end
 
       def event_category_params
