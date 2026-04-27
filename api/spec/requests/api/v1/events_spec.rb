@@ -7,7 +7,7 @@ RSpec.describe 'Api::V1::Events', type: :request do
   include AuthHelper
 
   # 2. Створюємо користувача, від імені якого робитимемо запити
-  let(:user)      { create(:user) }
+  let(:user) { create(:user) }
   let!(:superadmin) { create(:user, is_superadmin: true) }
   let!(:brand)    { create(:brand) }
   let!(:category) { create(:category) }

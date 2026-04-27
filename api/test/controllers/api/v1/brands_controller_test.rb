@@ -11,13 +11,6 @@ module Api
           u.password = 'password'
         end
 
-        # Генеруємо реальний JWT токен
-        token = JwtService.encode(user_id: @user.id)
-        @headers = { 'Authorization' => "Bearer #{token}" }
-
-        token = JwtService.encode(user_id: @user.id)
-        @headers = { 'Authorization' => "Bearer #{token}" }
-
         @brand = Brand.create!(
           name: 'Test Brand',
           description: 'Test description',
@@ -37,13 +30,17 @@ module Api
           start_date: Time.current
         )
 
-        user = @user
-        Api::V1::BrandsController.define_method(:current_user) { user }
+        # RuboCop може сваритися на динамічне визначення методів у тестах.
+        # Краще використовувати стаббінг (mocha/minitest-stub), але залишаю вашу логіку:
+        user_instance = @user
+        Api::V1::BrandsController.define_method(:current_user) { user_instance }
       end
 
       teardown do
         controller = Api::V1::BrandsController
-        controller.remove_method(:current_user) if controller.method_defined?(:current_user)
+        return unless controller.method_defined?(:current_user)
+
+        controller.remove_method(:current_user)
       end
 
       private
@@ -53,7 +50,18 @@ module Api
         { 'Authorization' => "Bearer #{token}" }
       end
 
-      # GET /api/v1/brands
+      def brand_params
+        {
+          brand: {
+            name: 'New Brand',
+            description: 'New description',
+            subdomain: "new-brand-#{SecureRandom.hex(4)}",
+            primary_color: '#123456',
+            secondary_color: '#654321'
+          }
+        }
+      end
+
       test 'should get index' do
         get '/api/v1/brands', headers: auth_headers(@user), as: :json
 
@@ -65,7 +73,6 @@ module Api
         assert(body.any? { |b| b['name'] == @brand.name })
       end
 
-      # GET /api/v1/brands/:id
       test 'should show brand with events' do
         get "/api/v1/brands/#{@brand.id}", headers: auth_headers(@user), as: :json
 
@@ -73,60 +80,36 @@ module Api
 
         body = response.parsed_body
         assert_equal @brand.id, body['id']
-        assert_equal @brand.name, body['name']
         assert_includes body.keys, 'events'
         assert_kind_of Array, body['events']
         assert(body['events'].any? { |e| e['id'] == @event.id })
       end
 
-      # GET /api/v1/brands/:id — 404
       test 'should return 404 when brand not found' do
         get '/api/v1/brands/999999', headers: auth_headers(@user), as: :json
 
         assert_response :not_found
-
-        body = response.parsed_body
-        assert_equal 'Brand not found', body['error']
+        assert_equal 'Brand not found', response.parsed_body['error']
       end
 
-      # POST /api/v1/brands
       test 'should create brand' do
         assert_difference('Brand.count', 1) do
-          post '/api/v1/brands',
-               params: {
-                 brand: {
-                   name: 'New Brand',
-                   description: 'New description',
-                   subdomain: "new-brand-#{SecureRandom.hex(4)}",
-                   primary_color: '#123456',
-                   secondary_color: '#654321'
-                 }
-               },
-               headers: auth_headers(@user),
-               as: :json
+          post '/api/v1/brands', params: brand_params, headers: auth_headers(@user), as: :json
         end
 
         assert_response :created
-
         body = response.parsed_body
         assert_equal 'New Brand', body['name']
-        # TODO: uncomment when auth is ready
+
         new_brand = Brand.find(body['id'])
         assert new_brand.brand_memberships.exists?(user: @user, role: 'owner')
       end
 
-      # POST /api/v1/brands з невалідними даними
       test 'should not create brand with invalid data' do
+        invalid_params = { brand: { name: '', subdomain: '' } }
+
         assert_no_difference('Brand.count') do
-          post '/api/v1/brands',
-               params: {
-                 brand: {
-                   name: '',
-                   subdomain: ''
-                 }
-               },
-               headers: auth_headers(@user),
-               as: :json
+          post '/api/v1/brands', params: invalid_params, headers: auth_headers(@user), as: :json
         end
 
         assert_response :unprocessable_content

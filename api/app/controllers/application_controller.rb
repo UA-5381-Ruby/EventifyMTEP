@@ -13,15 +13,13 @@ class ApplicationController < ActionController::API
 
   def authorize_request
     header = request.headers['Authorization']
-    
+
     # Return 401 if no Authorization header
-    unless header
-      return render json: { error: 'Unauthorized access. Missing token.' }, status: :unauthorized
-    end
+    return render json: { error: 'Unauthorized access. Missing token.' }, status: :unauthorized unless header
 
     # Extract token from "Bearer <token>" format
     token = header.split.last
-    
+
     begin
       decoded = JwtService.decode(token)
       if decoded
