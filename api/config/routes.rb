@@ -22,6 +22,9 @@ Rails.application.routes.draw do
       resources :events, only: [:index, :show, :create]
       resources :brands, only: [:index, :create, :show]
 
+      post '/auth/password/reset', to: 'passwords#update', constraints: ->(req) { req.params[:token].present? }
+      post '/auth/password/reset', to: 'passwords#create'
+
       get 'my_tickets', to: 'tickets#my_tickets'
 
       resources :tickets, only: [:create] do

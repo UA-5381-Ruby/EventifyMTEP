@@ -15,4 +15,8 @@ class User < ApplicationRecord
             presence: true,
             uniqueness: { case_sensitive: false },
             format: { with: /\A[^@\s]+@[^@\s]+\.[^@\s]+\z/, message: 'must be a valid email address' }
+
+  generates_token_for :password_reset, expires_in: 2.days do
+    password_salt&.last(10)
+  end
 end
