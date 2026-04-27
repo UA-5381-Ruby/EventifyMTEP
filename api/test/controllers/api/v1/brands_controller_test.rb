@@ -15,6 +15,9 @@ module Api
         token = JwtService.encode(user_id: @user.id)
         @headers = { 'Authorization' => "Bearer #{token}" }
 
+        token = JwtService.encode(user_id: @user.id)
+        @headers = { 'Authorization' => "Bearer #{token}" }
+
         @brand = Brand.create!(
           name: 'Test Brand',
           description: 'Test description',
@@ -85,9 +88,11 @@ module Api
 
         assert_response :created
 
-        # Перевірка, чи створилося членство (якщо контролер це робить)
-        new_brand_id = response.parsed_body['id']
-        assert BrandMembership.exists?(brand_id: new_brand_id, user_id: @user.id)
+        body = response.parsed_body
+        assert_equal 'New Brand', body['name']
+        # TODO: uncomment when auth is ready
+        new_brand = Brand.find(body['id'])
+        assert new_brand.brand_memberships.exists?(user: @user, role: 'owner')
       end
 
       # POST /api/v1/brands з невалідними даними
