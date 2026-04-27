@@ -23,7 +23,10 @@ module Api
         user = User.find_by_token_for(:password_reset, params[:token])
 
         return render json: { error: 'Invalid or expired token' }, status: :bad_request if user.nil?
-        return render json: { error: 'New password cannot be blank' }, status: :unprocessable_content if params[:new_password].blank?
+        if params[:new_password].blank?
+          return render json: { error: 'New password cannot be blank' },
+                        status: :unprocessable_content
+        end
 
         if user.update(password: params[:new_password])
           render json: { message: 'Password successfully updated' }, status: :ok
