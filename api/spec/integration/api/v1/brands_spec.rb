@@ -9,19 +9,21 @@ RSpec.describe 'api/v1/brands', type: :request do
     get 'List brands' do
       tags     'Brands'
       produces 'application/json'
-      security [{ Bearer: [] }]
+      security [{ bearer_auth: [] }]
 
       response '200', 'brands listed' do
         schema type: :array, items: { '$ref' => '#/components/schemas/Brand' }
-        let(:user) { create(:user) }
-        let(:Authorization) { auth_headers(user)['Authorization'] }
 
         before do
+          @user = create(:user)
           brands = create_list(:brand, 2)
           brands.each do |brand|
-            create(:brand_membership, brand: brand, user: user, role: 'owner')
+            create(:brand_membership, brand: brand, user: @user, role: 'owner')
           end
         end
+
+        let(:user) { @user }
+        let(:Authorization) { auth_headers(user)['Authorization'] }
 
         run_test!
       end
@@ -31,7 +33,7 @@ RSpec.describe 'api/v1/brands', type: :request do
       tags     'Brands'
       consumes 'application/json'
       produces 'application/json'
-      security [{ Bearer: [] }]
+      security [{ bearer_auth: [] }]
 
       parameter name: :body, in: :body, required: true,
                 schema: { '$ref' => '#/components/schemas/BrandInput' }
@@ -39,7 +41,9 @@ RSpec.describe 'api/v1/brands', type: :request do
       response '201', 'brand created' do
         schema '$ref' => '#/components/schemas/Brand'
 
-        let(:user) { create(:user) }
+        before { @user = create(:user) }
+
+        let(:user) { @user }
         let(:Authorization) { auth_headers(user)['Authorization'] }
 
         let(:body) do
@@ -57,7 +61,9 @@ RSpec.describe 'api/v1/brands', type: :request do
       response '422', 'validation failed' do
         schema '$ref' => '#/components/schemas/ErrorMessages'
 
-        let(:user) { create(:user) }
+        before { @user = create(:user) }
+
+        let(:user) { @user }
         let(:Authorization) { auth_headers(user)['Authorization'] }
         let(:body) { { brand: { name: '', subdomain: '' } } }
 
@@ -72,12 +78,14 @@ RSpec.describe 'api/v1/brands', type: :request do
     get 'Show brand' do
       tags     'Brands'
       produces 'application/json'
-      security [{ Bearer: [] }]
+      security [{ bearer_auth: [] }]
 
       response '200', 'brand found' do
         schema '$ref' => '#/components/schemas/Brand'
 
-        let(:user) { create(:user) }
+        before { @user = create(:user) }
+
+        let(:user) { @user }
         let(:Authorization) { auth_headers(user)['Authorization'] }
 
         let(:id) do
@@ -91,7 +99,10 @@ RSpec.describe 'api/v1/brands', type: :request do
 
       response '404', 'brand not found' do
         schema '$ref' => '#/components/schemas/NotFound'
-        let(:user) { create(:user) }
+
+        before { @user = create(:user) }
+
+        let(:user) { @user }
         let(:Authorization) { auth_headers(user)['Authorization'] }
         let(:id) { 0 }
 

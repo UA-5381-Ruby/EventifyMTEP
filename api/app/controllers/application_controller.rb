@@ -13,8 +13,15 @@ class ApplicationController < ActionController::API
 
   def authorize_request
     header = request.headers['Authorization']
-    token = header.split.last if header
+    
+    # Return 401 if no Authorization header
+    unless header
+      return render json: { error: 'Unauthorized access. Missing token.' }, status: :unauthorized
+    end
 
+    # Extract token from "Bearer <token>" format
+    token = header.split.last
+    
     begin
       decoded = JwtService.decode(token)
       if decoded
@@ -24,6 +31,8 @@ class ApplicationController < ActionController::API
       end
     rescue ActiveRecord::RecordNotFound
       render json: { error: 'User with this token no longer exists.' }, status: :unauthorized
+    rescue StandardError => e
+      render json: { error: "Unauthorized access. #{e.message}" }, status: :unauthorized
     end
   end
 
