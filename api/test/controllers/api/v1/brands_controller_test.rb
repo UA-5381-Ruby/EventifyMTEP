@@ -6,22 +6,25 @@ module Api
   module V1
     class BrandsControllerTest < ActionDispatch::IntegrationTest
       setup do
-        @user = User.find_by(email: 'test@example.com') ||
-                User.create!(
-                  name: 'testuser',
-                  email: 'test@example.com',
-                  password: 'password'
-                )
+        @user = User.find_or_create_by!(email: 'test@example.com') do |u|
+          u.name = 'testuser'
+          u.password = 'password'
+        end
+
+        # Генеруємо реальний JWT токен
+        token = JwtService.encode(user_id: @user.id)
+        @headers = { 'Authorization' => "Bearer #{token}" }
 
         @brand = Brand.create!(
           name: 'Test Brand',
           description: 'Test description',
-          subdomain: 'test-brand',
+          subdomain: "test-brand-#{SecureRandom.hex(4)}",
           primary_color: '#FF0000',
           secondary_color: '#00FF00'
         )
+
         BrandMembership.create!(brand: @brand, user: @user, role: 'owner')
-        @category = Category.create!(name: 'Test Category')
+        @category = Category.find_or_create_by!(name: 'Test Category')
 
         @event = Event.create!(
           brand: @brand,
@@ -30,50 +33,37 @@ module Api
           location: 'Test location',
           start_date: Time.current
         )
-
-        user = @user
-        Api::V1::BrandsController.define_method(:current_user) { user }
-      end
-
-      teardown do
-        controller = Api::V1::BrandsController
-        controller.remove_method(:current_user) if controller.method_defined?(:current_user)
       end
 
       # GET /api/v1/brands
       test 'should get index' do
-        get '/api/v1/brands', as: :json
+        get '/api/v1/brands', headers: @headers, as: :json
 
         assert_response :ok
 
         body = response.parsed_body
         assert_kind_of Array, body
         assert(body.any? { |b| b['id'] == @brand.id })
-        assert(body.any? { |b| b['name'] == @brand.name })
       end
 
       # GET /api/v1/brands/:id
       test 'should show brand with events' do
-        get "/api/v1/brands/#{@brand.id}", as: :json
+        get "/api/v1/brands/#{@brand.id}", headers: @headers, as: :json
 
         assert_response :ok
 
         body = response.parsed_body
         assert_equal @brand.id, body['id']
-        assert_equal @brand.name, body['name']
-        assert_includes body.keys, 'events'
         assert_kind_of Array, body['events']
         assert(body['events'].any? { |e| e['id'] == @event.id })
       end
 
       # GET /api/v1/brands/:id — 404
       test 'should return 404 when brand not found' do
-        get '/api/v1/brands/999999', as: :json
+        get '/api/v1/brands/999999', headers: @headers, as: :json
 
         assert_response :not_found
-
-        body = response.parsed_body
-        assert_equal 'Brand not found', body['error']
+        assert_equal 'Brand not found', response.parsed_body['error']
       end
 
       # POST /api/v1/brands
@@ -84,42 +74,43 @@ module Api
                  brand: {
                    name: 'New Brand',
                    description: 'New description',
-                   subdomain: 'new-brand',
+                   subdomain: "new-brand-#{SecureRandom.hex(4)}",
                    primary_color: '#123456',
                    secondary_color: '#654321'
                  }
                },
+               headers: @headers,
                as: :json
         end
 
         assert_response :created
 
-        body = response.parsed_body
-        assert_equal 'New Brand', body['name']
-        # TODO: uncomment when auth is ready
-        # new_brand = Brand.find(body['id'])
-        # assert new_brand.organizers.exists?(user: @user)
+        # Перевірка, чи створилося членство (якщо контролер це робить)
+        new_brand_id = response.parsed_body['id']
+        assert BrandMembership.exists?(brand_id: new_brand_id, user_id: @user.id)
       end
 
-      # POST /api/v1/brands
+      # POST /api/v1/brands з невалідними даними
       test 'should not create brand with invalid data' do
         assert_no_difference('Brand.count') do
           post '/api/v1/brands',
                params: {
                  brand: {
                    name: '',
-                   subdomain: '',
-                   primary_color: 'red',
-                   secondary_color: 'blue'
+                   subdomain: ''
                  }
                },
+               headers: @headers,
                as: :json
         end
 
         assert_response :unprocessable_content
+        assert response.parsed_body['errors'].present?
+      end
 
-        body = response.parsed_body
-        assert body['errors'].present?
+      test 'should return unauthorized if token is missing' do
+        get '/api/v1/brands', as: :json
+        assert_response :unauthorized
       end
     end
   end

@@ -3,8 +3,13 @@
 require 'rails_helper'
 
 RSpec.describe 'Api::V1::Events', type: :request do
-  let!(:brand)    { create(:brand) }
-  let!(:category) { create(:category) }
+  let!(:superadmin) { create(:user, is_superadmin: true) }
+  let!(:brand)      { create(:brand) }
+  let!(:category)   { create(:category) }
+
+  def auth_headers(user)
+    { 'Authorization' => "Bearer #{JwtService.encode(user_id: user.id)}" }
+  end
 
   let(:valid_params) do
     {
@@ -13,7 +18,6 @@ RSpec.describe 'Api::V1::Events', type: :request do
         start_date: 1.week.from_now.iso8601,
         location: 'Kyiv',
         brand_id: brand.id,
-        # CHANGED: 'category_id' becomes an array of 'category_ids'
         category_ids: [category.id],
         status: 'draft'
       }
@@ -23,7 +27,7 @@ RSpec.describe 'Api::V1::Events', type: :request do
   describe 'POST /api/v1/events' do
     context 'with valid params' do
       it 'returns 201 and creates event' do
-        post '/api/v1/events', params: valid_params, as: :json
+        post '/api/v1/events', params: valid_params, headers: auth_headers(superadmin), as: :json
         expect(response).to have_http_status(:created)
         expect(response.parsed_body['title']).to eq('New Event')
       end
@@ -31,7 +35,7 @@ RSpec.describe 'Api::V1::Events', type: :request do
 
     context 'with invalid params' do
       it 'returns 422 with errors' do
-        post '/api/v1/events', params: { event: { title: '' } }, as: :json
+        post '/api/v1/events', params: { event: { title: '' } }, headers: auth_headers(superadmin), as: :json
         expect(response).to have_http_status(:unprocessable_entity)
         expect(response.parsed_body).to have_key('errors')
       end
@@ -39,11 +43,10 @@ RSpec.describe 'Api::V1::Events', type: :request do
   end
 
   describe 'GET /api/v1/events' do
-    # CHANGED: 'category:' becomes 'categories: []' to pass an array of objects
     before { create_list(:event, 5, brand: brand, categories: [category]) }
 
     it 'returns 200 and paginated list' do
-      get '/api/v1/events', params: { page: 1, per_page: 3 }
+      get '/api/v1/events', params: { page: 1, per_page: 3 }, headers: auth_headers(superadmin)
       expect(response).to have_http_status(:ok)
       body = response.parsed_body
       expect(body['data'].length).to eq(3)
@@ -51,12 +54,11 @@ RSpec.describe 'Api::V1::Events', type: :request do
     end
 
     it 'sorts by start_date desc' do
-      # CHANGED: 'category:' becomes 'categories: []'
       create(:event, brand: brand, categories: [category], start_date: 1.day.from_now)
       create(:event, brand: brand, categories: [category], start_date: 3.days.from_now)
       create(:event, brand: brand, categories: [category], start_date: 2.days.from_now)
 
-      get '/api/v1/events', params: { sort: 'start_date', order: 'desc' }
+      get '/api/v1/events', params: { sort: 'start_date', order: 'desc' }, headers: auth_headers(superadmin)
       expect(response).to have_http_status(:ok)
 
       dates = response.parsed_body['data'].map { |d| Time.iso8601(d['start_date']) }
@@ -65,16 +67,15 @@ RSpec.describe 'Api::V1::Events', type: :request do
   end
 
   describe 'GET /api/v1/events/:id' do
-    # CHANGED: 'category:' becomes 'categories: []'
     let!(:event) { create(:event, brand: brand, categories: [category]) }
 
     it 'returns the event' do
-      get "/api/v1/events/#{event.id}", as: :json
+      get "/api/v1/events/#{event.id}", headers: auth_headers(superadmin), as: :json
       expect(response).to have_http_status(:ok)
     end
 
     it 'returns 404 for unknown id' do
-      get '/api/v1/events/999999', as: :json
+      get '/api/v1/events/999999', headers: auth_headers(superadmin), as: :json
       expect(response).to have_http_status(:not_found)
     end
   end
