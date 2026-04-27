@@ -35,7 +35,9 @@ Rails.application.routes.draw do
 
       resources :brands, only: [:index, :create, :show]
 
-      resources :tickets, only: [:update] do
+      get 'my_tickets', to: 'tickets#my_tickets'
+
+      resources :tickets, only: [:create] do
         member do
           patch :review
         end
