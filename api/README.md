@@ -62,7 +62,7 @@ Table Categories {
 // DEPENDENCY TABLES (Tier 2 & 3)
 // ==========================================
 
-Table BrandMemberships {
+Table Brandbrand_memberships {
   id integer [primary key]
   user_id integer [ref: > Users.id, not null]
   brand_id integer [ref: > Brands.id, not null]
@@ -70,7 +70,7 @@ Table BrandMemberships {
   created_at timestamp
 
   indexes {
-    (user_id, brand_id) [unique, name: 'index_memberships_on_user_and_brand']
+    (user_id, brand_id) [unique, name: 'index_brand_memberships_on_user_and_brand']
   }
 }
 

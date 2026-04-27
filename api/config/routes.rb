@@ -33,14 +33,16 @@ Rails.application.routes.draw do
                   controller: 'event_categories'
       end
 
-      resources :brands, only: [:index, :create, :show]
+      resources :brands, only: [:index, :create, :show, :update, :destroy] do
+        resources :memberships, controller: 'brand_memberships', only: [:index, :create, :update, :destroy]
+      end
 
       post '/auth/password/reset', to: 'passwords#update', constraints: ->(req) { req.params[:token].present? }
       post '/auth/password/reset', to: 'passwords#create'
 
       get 'my_tickets', to: 'tickets#my_tickets'
 
-      resources :tickets, only: [:create] do
+      resources :tickets, only: [:create, :update] do
         member do
           patch :review
         end
