@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Api::V1::Passwords', type: :request do
+  include ActiveSupport::Testing::TimeHelpers
+
   let!(:user) { create(:user) }
 
   describe 'POST /api/v1/auth/password/reset' do
@@ -29,12 +31,12 @@ RSpec.describe 'Api::V1::Passwords', type: :request do
     end
   end
 
-  describe 'POST /api/v1/auth/password/reset?token=valid' do
-    let(:signed_id) { user.signed_id(purpose: :password_reset, expires_in: 2.days) }
+  describe 'POST /api/v1/auth/password/reset?token=...' do
+    let(:token) { user.generate_token_for(:password_reset) }
 
     context 'with valid token' do
       it 'updates password successfully' do
-        post '/api/v1/auth/password/reset', params: { token: signed_id, new_password: 'newpassword123' }, as: :json
+        post '/api/v1/auth/password/reset', params: { token: token, new_password: 'newpassword123' }, as: :json
         expect(response).to have_http_status(:ok)
         expect(response.parsed_body['message']).to eq('Password successfully updated')
         user.reload
@@ -43,11 +45,9 @@ RSpec.describe 'Api::V1::Passwords', type: :request do
     end
 
     context 'with expired token' do
-      let(:expired_signed_id) { user.signed_id(purpose: :password_reset, expires_in: -1.day) }
-
       it 'returns error' do
-        post '/api/v1/auth/password/reset', params: { token: expired_signed_id, new_password: 'newpassword123' },
-                                            as: :json
+        expired_token = travel_to(3.days.ago) { user.generate_token_for(:password_reset) }
+        post '/api/v1/auth/password/reset', params: { token: expired_token, new_password: 'newpassword123' }, as: :json
         expect(response).to have_http_status(:bad_request)
         expect(response.parsed_body['error']).to eq('Invalid or expired token')
       end
@@ -58,6 +58,13 @@ RSpec.describe 'Api::V1::Passwords', type: :request do
         post '/api/v1/auth/password/reset', params: { token: 'invalidtoken', new_password: 'newpassword123' }, as: :json
         expect(response).to have_http_status(:bad_request)
         expect(response.parsed_body['error']).to eq('Invalid or expired token')
+      end
+    end
+
+    context 'with blank password' do
+      it 'returns error' do
+        post '/api/v1/auth/password/reset', params: { token: token, new_password: '' }, as: :json
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end

@@ -20,9 +20,10 @@ module Api
 
       # POST /api/v1/auth/password/reset?token={signed_id}
       def update
-        user = User.find_signed(params[:token], purpose: :password_reset)
+        user = User.find_by_token_for(:password_reset, params[:token])
 
         return render json: { error: 'Invalid or expired token' }, status: :bad_request if user.nil?
+        return render json: { error: 'New password cannot be blank' }, status: :unprocessable_content if params[:new_password].blank?
 
         if user.update(password: params[:new_password])
           render json: { message: 'Password successfully updated' }, status: :ok
