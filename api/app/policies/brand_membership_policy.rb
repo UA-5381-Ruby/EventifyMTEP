@@ -40,7 +40,7 @@ class BrandMembershipPolicy < ApplicationPolicy
   end
 
   def show?
-    user.is_superadmin? || record.brand_memberships.exists?(user: user, role: 'owner')
+    user.is_superadmin? || record.brand.brand_memberships.exists?(user: user, role: 'owner')
   end
 
   private
