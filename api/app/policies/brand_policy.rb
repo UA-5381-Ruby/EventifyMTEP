@@ -1,13 +1,15 @@
 # frozen_string_literal: true
 
 class BrandPolicy < ApplicationPolicy
-  def update?
-    user.is_superadmin? || user_has_role?('owner')
-  end
+ def update?
+  return false if user.nil?
+  user.is_superadmin? || user_has_role?('owner')
+end
 
-  def destroy?
-    user.is_superadmin? || user_has_role?('owner')
-  end
+def destroy?
+  return false if user.nil?
+  user.is_superadmin? || user_has_role?('owner')
+end
 
   def show_brand_memberships?
     user.is_superadmin? || record.brand_memberships.exists?(user_id: user.id)
