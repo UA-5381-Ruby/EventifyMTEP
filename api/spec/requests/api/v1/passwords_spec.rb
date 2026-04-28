@@ -6,7 +6,6 @@ RSpec.describe 'Api::V1::Passwords', type: :request, swagger_doc: 'v1/swagger.ya
   let!(:user) { create(:user) }
 
   path '/api/v1/auth/password/reset' do
-
     post 'Request password reset email' do
       tags 'Auth'
       description 'Надсилає інструкції для скидання пароля на вказаний email'
