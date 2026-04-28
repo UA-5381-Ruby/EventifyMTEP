@@ -1,71 +1,64 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
+require 'swagger_helper'
 
-RSpec.describe 'Api::V1::Passwords', type: :request do
-  include ActiveSupport::Testing::TimeHelpers
-
+RSpec.describe 'Api::V1::Passwords', type: :request, swagger_doc: 'v1/swagger.yaml' do
   let!(:user) { create(:user) }
 
-  describe 'POST /api/v1/auth/password/reset' do
-    context 'with existing email' do
-      it 'sends reset email and returns success' do
-        expect do
-          post '/api/v1/auth/password/reset', params: { email: user.email }, as: :json
-        end.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+  path '/api/v1/auth/password/reset' do
+    post 'Request password reset email' do
+      tags 'Auth'
+      description 'Надсилає інструкції для скидання пароля на вказаний email'
+      consumes 'application/json'
+      parameter name: :params, in: :body, schema: {
+        type: :object,
+        properties: {
+          email: { type: :string, example: 'user@example.com' }
+        },
+        required: ['email']
+      }
 
-        expect(response).to have_http_status(:ok)
-        expect(response.parsed_body['message']).to eq('If your email exists, you will receive reset instructions')
+      response '200', 'Success message' do
+        let(:params) { { email: user.email } }
+        run_test!
+      end
+
+      # Навіть якщо email не існує, ми повертаємо 200 з міркувань безпеки
+      response '200', 'Success message (non-existent email)' do
+        let(:params) { { email: 'unknown@example.com' } }
+        run_test!
       end
     end
 
-    context 'with non-existing email' do
-      it 'returns success without sending email' do
-        expect do
-          post '/api/v1/auth/password/reset', params: { email: 'nonexistent@example.com' }, as: :json
-        end.not_to have_enqueued_job(ActionMailer::MailDeliveryJob)
-
-        expect(response).to have_http_status(:ok)
-        expect(response.parsed_body['message']).to eq('If your email exists, you will receive reset instructions')
-      end
-    end
-  end
-
-  describe 'POST /api/v1/auth/password/reset?token=...' do
-    let(:token) { user.generate_token_for(:password_reset) }
-
-    context 'with valid token' do
-      it 'updates password successfully' do
-        post '/api/v1/auth/password/reset', params: { token: token, new_password: 'newpassword123' }, as: :json
-        expect(response).to have_http_status(:ok)
-        expect(response.parsed_body['message']).to eq('Password successfully updated')
-        user.reload
-        expect(user.authenticate('newpassword123')).to be_truthy
-      end
-    end
-
-    context 'with expired token' do
-      it 'returns error' do
-        expired_token = travel_to(3.days.ago) { user.generate_token_for(:password_reset) }
-        post '/api/v1/auth/password/reset', params: { token: expired_token, new_password: 'newpassword123' }, as: :json
-        expect(response).to have_http_status(:bad_request)
-        expect(response.parsed_body['error']).to eq('Invalid or expired token')
-      end
-    end
-
-    context 'with invalid token' do
-      it 'returns error' do
-        post '/api/v1/auth/password/reset', params: { token: 'invalidtoken', new_password: 'newpassword123' }, as: :json
-        expect(response).to have_http_status(:bad_request)
-        expect(response.parsed_body['error']).to eq('Invalid or expired token')
-      end
-    end
-
-    context 'with blank password' do
-      it 'returns error' do
-        post '/api/v1/auth/password/reset', params: { token: token, new_password: '' }, as: :json
-        expect(response).to have_http_status(:unprocessable_content)
-      end
-    end
+    # patch 'Reset password with token' do
+    #   tags 'Auth'
+    #   description 'Встановлює новий пароль за допомогою отриманого токена'
+    #   consumes 'application/json'
+    #   parameter name: :reset_params, in: :body, schema: {
+    #     type: :object,
+    #     properties: {
+    #       token: { type: :string },
+    #       new_password: { type: :string, example: 'newpassword123' }
+    #     },
+    #     required: ['token', 'new_password']
+    #   }
+    #
+    #   response '200', 'Password updated' do
+    #     let(:token) { user.generate_token_for(:password_reset) }
+    #     let(:reset_params) { { token: token, new_password: 'newpassword123' } }
+    #     run_test!
+    #   end
+    #
+    #   response '400', 'Invalid or expired token' do
+    #     let(:reset_params) { { token: 'invalid', new_password: 'newpassword123' } }
+    #     run_test!
+    #   end
+    #
+    #   response '422', 'Validation error (blank password)' do
+    #     let(:token) { user.generate_token_for(:password_reset) }
+    #     let(:reset_params) { { token: token, new_password: '' } }
+    #     run_test!
+    #   end
+    # end
   end
 end

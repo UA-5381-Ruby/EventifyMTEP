@@ -24,7 +24,7 @@ brand = Brand.find_or_create_by!(subdomain: 'tech-corp') do |b|
 end
 
 # Create owner relationship
-# CHANGED: Replaced the old 'Owner' model with the new polymorphic 'BrandMembership'
+# CHANGED: Replaced the old 'Owner' model with the new join model 'BrandMembership'
 BrandMembership.find_or_create_by!(user: user, brand: brand) do |m|
   m.role = 'owner'
 end

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Events Transitions', type: :request do
   let!(:superadmin) { create(:user, is_superadmin: true) }
@@ -59,7 +60,7 @@ RSpec.describe 'Api::V1::Events Transitions', type: :request do
     end
   end
 
-  describe 'POST /api/v1/events/:id/cancel' do
+  describe 'POST /api/v1/events/:id/cancel', type: :request do
     it 'cancels event and deactivates tickets (Owner)' do
       event  = create(:event, brand: brand, status: 'published')
       user   = create(:user)

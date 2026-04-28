@@ -6,6 +6,6 @@ EventifyMTEP is a multi-tenant event platform designed to provide a seamless exp
 
 ## project structure
 The project is organized into three main directories:
-- `api`: Contains the backend API code, responsible for handling business logic, data management, and communication with the database.
+- [api](api/README.md): Contains the backend API code, responsible for handling business logic, data management, and communication with the database.
 - `web`: Contains the frontend code, responsible for the user interface and user experience of the platform.
 - `docs`: Contains documentation related to the project, including setup instructions, API documentation, and user guides.
