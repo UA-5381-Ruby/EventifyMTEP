@@ -7,22 +7,18 @@ module Api
         render json: { error: e.message }, status: :bad_request
       end
 
+      before_action :authenticate_user!, except: %i[index show]
       before_action :set_brand, only: %i[show update destroy]
 
-      # GET /api/v1/brands
       def index
-        render json: accessible_brands
+        render json: Brand.all
       end
 
-      # GET /api/v1/brands/:id
       def show
         render json: @brand, include: :events
       end
 
-      # POST /api/v1/brands
       def create
-        return render_not_implemented unless current_user
-
         brand = Brand.new(brand_params)
 
         ActiveRecord::Base.transaction do
@@ -40,7 +36,6 @@ module Api
                status: :unprocessable_content
       end
 
-      # PATCH /api/v1/brands/:id
       def update
         authorize @brand
 
@@ -55,38 +50,39 @@ module Api
                status: :unprocessable_entity
       end
 
-      # DELETE /api/v1/brands/:id
       def destroy
         authorize @brand
-
         @brand.destroy
         head :no_content
       end
 
       private
 
-      def render_not_implemented
-        render json: { error: 'Authentication not implemented yet' },
-               status: :not_implemented
+      def authenticate_user!
+        render json: { error: 'Unauthorized' }, status: :unauthorized unless current_user
       end
 
       def current_user
-        @current_user ||= User.first || User.create!(
-          email: 'temp_organizer@example.com',
-          password: 'password123'
-        )
+        return @current_user if defined?(@current_user)
+
+        token = request.headers['Authorization']&.split&.last
+        return nil unless token
+
+        begin
+          decoded_token = AuthHelper.decode(token)
+
+          user_id = decoded_token.is_a?(Array) ? decoded_token.first['user_id'] : decoded_token[:user_id]
+
+          @current_user = User.find_by(id: user_id)
+        rescue StandardError
+          nil
+        end
       end
 
       def set_brand
-        @brand = accessible_brands.find(params[:id])
+        @brand = Brand.find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Brand not found' }, status: :not_found
-      end
-
-      def accessible_brands
-        return Brand.all if current_user.blank?
-
-        current_user.brands
       end
 
       def brand_params

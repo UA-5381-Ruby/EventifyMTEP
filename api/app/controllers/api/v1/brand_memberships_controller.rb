@@ -5,8 +5,10 @@ module Api
     class BrandMembershipsController < ApplicationController
       before_action :set_brand
       before_action :set_membership, only: %i[update destroy]
+      before_action :authorize_membership, only: %i[update destroy]
 
       def index
+        authorize @brand, :show_brand_memberships?
         memberships = @brand.brand_memberships.includes(:user)
         paginated = paginate(memberships)
 
@@ -20,6 +22,7 @@ module Api
 
       def create
         @membership = @brand.brand_memberships.build(create_membership_params)
+        authorize @membership
 
         begin
           if @membership.save
@@ -71,6 +74,10 @@ module Api
         @membership = @brand.brand_memberships.find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Membership not found in this brand' }, status: :not_found
+      end
+
+      def authorize_membership
+        authorize @membership
       end
 
       def create_membership_params

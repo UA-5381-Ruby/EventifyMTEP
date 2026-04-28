@@ -10,6 +10,7 @@ module Api
         @owner_user = create_user('owner@example.com')
         @member_user = create_user('member@example.com')
         @new_user = create_user('new_user@example.com')
+        @unrelated_user = create_user('unrelated@example.com')
 
         @owner_membership = BrandMembership.create!(brand: @brand, user: @owner_user, role: 'owner')
         @member_membership = BrandMembership.create!(brand: @brand, user: @member_user, role: 'user')
@@ -44,9 +45,12 @@ module Api
     # -------- INDEX --------
     class BrandMembershipsIndexTest < BrandMembershipsBaseTest
       test 'should return paginated list of memberships with user data' do
-        get @base_url, headers: auth_headers(@owner_user), as: :json
+        get @base_url,
+            headers: auth_headers(@owner_user),
+            as: :json
 
         assert_response :ok
+
         json_response = JSON.parse(response.body)
 
         assert json_response.key?('data')
@@ -80,6 +84,7 @@ module Api
              as: :json
 
         assert_response :unprocessable_content
+
         json_response = JSON.parse(response.body)
         assert_includes json_response['errors']['base'], 'User is already a member of this brand'
       end
@@ -104,6 +109,7 @@ module Api
               as: :json
 
         assert_response :unprocessable_content
+
         json_response = JSON.parse(response.body)
         assert_includes json_response['errors']['base'], 'Cannot downgrade the last owner of a brand'
 
@@ -143,12 +149,13 @@ module Api
         end
 
         assert_response :unprocessable_content
+
         json_response = JSON.parse(response.body)
         assert_includes json_response['errors']['base'], 'Cannot remove the last owner of a brand'
       end
     end
 
-    # -------- ERRORS --------
+    # -------- NOT FOUND ERRORS --------
     class BrandMembershipsErrorsTest < BrandMembershipsBaseTest
       test 'should return 404 if brand is not found' do
         get '/api/v1/brands/9999999/memberships',
@@ -156,6 +163,7 @@ module Api
             as: :json
 
         assert_response :not_found
+
         json_response = JSON.parse(response.body)
         assert_equal 'Brand not found', json_response['error']
       end
@@ -167,8 +175,46 @@ module Api
               as: :json
 
         assert_response :not_found
+
         json_response = JSON.parse(response.body)
         assert_equal 'Membership not found in this brand', json_response['error']
+      end
+    end
+
+    # -------- AUTHORIZATION ERRORS --------
+    class BrandMembershipsAuthorizationTest < BrandMembershipsBaseTest
+      test 'should return forbidden for index if user has no access to brand' do
+        get @base_url,
+            headers: auth_headers(@unrelated_user),
+            as: :json
+
+        assert_response :forbidden
+      end
+
+      test 'should return forbidden for create if user is not authorized (e.g. regular member)' do
+        post @base_url,
+             params: { membership: { user_id: @new_user.id, role: 'user' } },
+             headers: auth_headers(@member_user),
+             as: :json
+
+        assert_response :forbidden
+      end
+
+      test 'should return forbidden for update if user is not authorized' do
+        patch "#{@base_url}/#{@member_membership.id}",
+              params: { membership: { role: 'manager' } },
+              headers: auth_headers(@member_user),
+              as: :json
+
+        assert_response :forbidden
+      end
+
+      test 'should return forbidden for destroy if user is not authorized' do
+        delete "#{@base_url}/#{@member_membership.id}",
+               headers: auth_headers(@member_user),
+               as: :json
+
+        assert_response :forbidden
       end
     end
   end
