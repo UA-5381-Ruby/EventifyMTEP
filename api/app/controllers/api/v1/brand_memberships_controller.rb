@@ -93,7 +93,8 @@ module Api
         per_page = params.fetch(:per_page, 20).to_i.clamp(1, 100)
         page = [params.fetch(:page, 1).to_i, 1].max
 
-        records = scope.offset((page - 1) * per_page).limit(per_page)
+        records = scope.order(:id).offset((page - 1) * per_page).limit(per_page)
+
 
         {
           records: records,
