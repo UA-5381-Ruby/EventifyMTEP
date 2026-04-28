@@ -36,4 +36,5 @@ end
 group :test do
   gem 'pundit-matchers'
   gem 'shoulda-matchers'
+  gem 'simplecov', require: false
 end

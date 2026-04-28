@@ -1,5 +1,13 @@
 # frozen_string_literal: true
 
+require 'simplecov'
+SimpleCov.start 'rails' do
+  command_name 'Minitest'
+  add_filter '/bin/'
+  add_filter '/db/'
+  add_filter '/test/' # Exclude test files from coverage
+end
+
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 require 'rails/test_help'
