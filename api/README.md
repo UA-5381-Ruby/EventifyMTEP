@@ -62,7 +62,7 @@ Table Categories {
 // DEPENDENCY TABLES (Tier 2 & 3)
 // ==========================================
 
-Table Brandbrand_memberships {
+Table BrandMemberships {
   id integer [primary key]
   user_id integer [ref: > Users.id, not null]
   brand_id integer [ref: > Brands.id, not null]
