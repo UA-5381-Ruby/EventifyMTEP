@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 class JwtService
-  SECRET_KEY = ENV.fetch('JWT_SECRET_KEY') { Rails.application.secret_key_base.to_s }
+  env_secret = ENV['JWT_SECRET_KEY'].presence
+  SECRET_KEY = env_secret || Rails.application.secret_key_base.to_s
+  raise 'JWT_SECRET_KEY must be set in production' if Rails.env.production? && env_secret.blank?
+
   ALGORITHM = 'HS256'
 
   def self.encode(payload, exp = 24.hours.from_now)
