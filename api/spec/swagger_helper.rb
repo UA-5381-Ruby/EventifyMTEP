@@ -14,7 +14,7 @@ RSpec.configure do |config|
         description: 'API documentation for the Eventify platform'
       },
       servers: [
-        { url: 'http://localhost:3000', description: 'Local' }
+        { url: 'http://localhost:3000', description: 'Local server' }
       ],
       components: {
         securitySchemes: {

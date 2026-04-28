@@ -2,6 +2,7 @@
 
 # spec/requests/api/v1/brand_memberships_spec.rb
 require 'rails_helper'
+require 'swagger_helper'
 
 RSpec.describe 'Api::V1::BrandMemberships', type: :request do
   let(:brand) { create(:brand) }

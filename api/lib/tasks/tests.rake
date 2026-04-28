@@ -4,6 +4,9 @@ namespace :test do
     puts "Running Minitest..."
     system("bundle exec rake test")
 
+    puts "Generating Swagger documentation..."
+    system("bundle exec rake rswag:specs:swaggerize")
+
     puts "Running RSpec..."
     system("bundle exec rspec")
   end

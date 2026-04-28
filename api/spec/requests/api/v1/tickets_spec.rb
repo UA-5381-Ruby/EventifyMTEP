@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Tickets', type: :request do
   # Використовуємо FactoryBot для швидкого створення базових даних

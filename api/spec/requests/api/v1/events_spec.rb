@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Events', type: :request do
   # 1. Підключаємо твій хелпер для авторизації
