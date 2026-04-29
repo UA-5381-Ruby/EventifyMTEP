@@ -28,7 +28,7 @@ We use the `dotenv-rails` gem to manage environment variables for local developm
   * `DB_USERNAME`: Your local Postgres username (often `postgres`).
   * `DB_PASSWORD`: Your local Postgres password (leave blank if you don't use one).
   * `JWT_SECRET_KEY`: Paste the secret string generated in Step 2.
-  * `FRFRSWAGGER_SERVER_URL`: Set this explicitly to the local URL of our Swagger UI application (for local development, this is usually `http://localhost:3000`)
+  * `SWAGGER_SERVER_URL`: Set this explicitly to the local URL of our Swagger UI application (for local development, this is usually `http://localhost:3000`)
 
 ---
 

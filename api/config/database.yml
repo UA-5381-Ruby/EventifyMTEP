@@ -20,6 +20,8 @@ default: &default
   max_connections: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   username: <%= ENV["DB_USERNAME"].presence %>
   password: <%= ENV["DB_PASSWORD"].presence %>
+  host: <%= ENV["DB_HOST"].presence %>
+  port: <%= ENV["DB_PORT"].presence %>
 
 development:
   <<: *default
