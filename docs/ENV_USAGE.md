@@ -5,9 +5,9 @@ We use the `dotenv-rails` gem to manage environment variables for local developm
 ## Getting Started
 
 **1. Create your local `.env` file**
-Run the following command in the project root:
+Create the `.env` file inside `api/` (this is `Rails.root`), not in the repository root. From the project root, run:
 ```bash
-cp api/.env.example api/.env
+cd api && cp .env.example .env
 ```
 
 **2. Generate a local JWT Secret**
