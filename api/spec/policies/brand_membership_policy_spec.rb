@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # spec/policies/brand_membership_policy_spec.rb
-require 'rails_helper'
+require 'swagger_helper'
 
 RSpec.describe BrandMembershipPolicy, type: :policy do
   let(:brand) { create(:brand) }
