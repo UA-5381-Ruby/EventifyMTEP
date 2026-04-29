@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-# чи важлива нам унікальність кожного івенту?
-# Якщо так, то треба додати валідацію на унікальність title в межах бренду
-# чи обов'язково назначати категорію кожному івенту?
-# Якщо так, то треба додати валідацію на присутність хоча б однієї категорії
+# TODO: Confirm whether event titles must be unique within a brand; if required,
+# add a scoped uniqueness validation for `title`.
+# TODO: Confirm whether every event must have at least one category; if required,
+# add a validation to enforce category presence.
 class Event < ApplicationRecord
   ALLOWED_SORT_COLUMNS = %w[created_at updated_at title start_date status].freeze
   private_constant :ALLOWED_SORT_COLUMNS

@@ -25,6 +25,8 @@ RSpec.describe 'api/v1/events', type: :request do
         let!(:event3) { create(:event, categories: [category1, category2]) }
 
         let(:category_id) { category1.id }
+
+        run_test!
       end
     end
 
