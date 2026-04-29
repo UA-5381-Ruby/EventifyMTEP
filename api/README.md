@@ -62,7 +62,7 @@ The report provides detailed information on which lines of code are covered by t
 ### Run server
 
 ```shell
-rails s -p 7000
+rails s -p 3000
 ```
 
 
