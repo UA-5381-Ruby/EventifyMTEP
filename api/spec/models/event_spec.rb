@@ -19,10 +19,6 @@ RSpec.describe Event, type: :model do
   it { is_expected.to have_many(:event_categories).dependent(:destroy) }
   it { is_expected.to have_many(:categories).through(:event_categories) }
 
-  it { is_expected.to belong_to(:brand) }
-  it { is_expected.to have_many(:event_categories).dependent(:destroy) }
-  it { is_expected.to have_many(:categories).through(:event_categories) }
-
   it do
     expect(subject).to define_enum_for(:status).with_values(
       draft: 'draft',
