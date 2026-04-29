@@ -79,13 +79,13 @@ RSpec.describe 'Api::V1::Brands', type: :request do
 
     it 'returns 400 Bad Request when required parameters are missing (rescues ParameterMissing)' do
       # Відправляємо пусті параметри, щоб спровокувати ActionController::ParameterMissing
-      post '/api/v1/brands', 
-           params: {}, 
-           headers: headers, 
+      post '/api/v1/brands',
+           params: {},
+           headers: headers,
            as: :json
 
       expect(response).to have_http_status(:bad_request)
-      
+
       json_response = JSON.parse(response.body)
       expect(json_response).to have_key('error')
       expect(json_response['error']).to include('param is missing or the value is empty')
@@ -152,7 +152,7 @@ RSpec.describe 'Api::V1::Brands', type: :request do
 
     it 'returns 401 Unauthorized when token is invalid (rescues StandardError)' do
       invalid_headers = { 'Authorization' => 'Bearer some_fake_garbage_token' }
-      
+
       delete "/api/v1/brands/#{brand.id}", headers: invalid_headers
 
       expect(response).to have_http_status(:unauthorized)

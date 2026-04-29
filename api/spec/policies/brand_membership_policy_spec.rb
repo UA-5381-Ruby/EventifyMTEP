@@ -9,7 +9,7 @@ RSpec.describe BrandMembershipPolicy, type: :policy do
   let(:manager) { create(:user) }
   let(:regular_user) { create(:user) }
   let(:new_user) { create(:user) }
-let(:superadmin) { create(:user, is_superadmin: true) } # адаптуйте під вашу фабрику суперадміна
+  let(:superadmin) { create(:user, is_superadmin: true) } # адаптуйте під вашу фабрику суперадміна
   let(:member) { create(:user) }
   let(:non_member) { create(:user) }
 

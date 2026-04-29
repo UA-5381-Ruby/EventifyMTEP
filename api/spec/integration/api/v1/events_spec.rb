@@ -4,7 +4,6 @@ require 'swagger_helper'
 
 RSpec.describe 'api/v1/events', type: :request do
   path '/api/v1/events' do
-
     # =========================
     # GET /events (filter by category - NO AUTH)
     # =========================
@@ -26,8 +25,6 @@ RSpec.describe 'api/v1/events', type: :request do
         let!(:event3) { create(:event, categories: [category1, category2]) }
 
         let(:category_id) { category1.id }
-
-        
       end
     end
 
@@ -55,29 +52,29 @@ RSpec.describe 'api/v1/events', type: :request do
         let(:brand) { create(:brand) }
 
         before do
-          create(:event, 
-                 title: 'Future Conf',   
-                 brand: brand, 
-                 start_date: 1.month.from_now, 
+          create(:event,
+                 title: 'Future Conf',
+                 brand: brand,
+                 start_date: 1.month.from_now,
                  end_date: 1.month.from_now + 1.day) # Додано end_date
-                 
-          create(:event, 
-                 title: 'Past Meetup',   
-                 brand: brand, 
-                 start_date: 1.month.ago,      
+
+          create(:event,
+                 title: 'Past Meetup',
+                 brand: brand,
+                 start_date: 1.month.ago,
                  end_date: 1.month.ago + 1.day)      # Додано end_date
-                 
-          create(:event, 
-                 title: 'Live Workshop', 
-                 brand: brand, 
-                 start_date: Time.zone.now,    
+
+          create(:event,
+                 title: 'Live Workshop',
+                 brand: brand,
+                 start_date: Time.zone.now,
                  end_date: Time.zone.now + 1.day)    # Додано end_date
         end
 
         run_test!
       end
     end
-    
+
     # =========================
     # POST /events (AUTH REQUIRED)
     # =========================
@@ -130,15 +127,15 @@ RSpec.describe 'api/v1/events', type: :request do
         run_test!
       end
       it 'is invalid if end_date is before start_date' do
-      # Створюємо подію в пам'яті (build, а не create), де кінець раніше за початок
-      event = build(:event, start_date: 1.day.from_now, end_date: 1.day.ago)
-      
-      # Перевіряємо, що подія невалідна
-      expect(event).not_to be_valid
-      
-      # Перевіряємо, що з'явилася правильна помилка, яка покриє ваш червоний рядок
-      expect(event.errors[:end_date]).to include('must be after start date')
-    end
+        # Створюємо подію в пам'яті (build, а не create), де кінець раніше за початок
+        event = build(:event, start_date: 1.day.from_now, end_date: 1.day.ago)
+
+        # Перевіряємо, що подія невалідна
+        expect(event).not_to be_valid
+
+        # Перевіряємо, що з'явилася правильна помилка, яка покриє ваш червоний рядок
+        expect(event.errors[:end_date]).to include('must be after start date')
+      end
     end
   end
 
