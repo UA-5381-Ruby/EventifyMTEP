@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-require 'rails_helper'
 require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Events', type: :request do
@@ -47,7 +46,7 @@ RSpec.describe 'Api::V1::Events', type: :request do
              headers: auth_headers(user),
              as: :json
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body).to have_key('errors')
       end
     end
