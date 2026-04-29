@@ -4,7 +4,6 @@ require 'swagger_helper'
 
 RSpec.describe 'api/v1/brands', type: :request do
   include AuthHelper
-
   path '/api/v1/brands' do
     get 'List brands' do
       tags     'Brands'

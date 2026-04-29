@@ -4,7 +4,8 @@ module Api
   module V1
     class EventsController < ApplicationController
       before_action :set_event, only: [:show]
-
+      
+      #skip_before_action :authenticate_user!, only: [:index]
       def index
         events = filtered_events
 
@@ -81,6 +82,7 @@ module Api
 
         events.joins(:categories).where(categories: { id: params[:category_id] })
       end
+      
     end
   end
 end

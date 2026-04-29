@@ -9,6 +9,36 @@ RSpec.describe BrandMembershipPolicy, type: :policy do
   let(:manager) { create(:user) }
   let(:regular_user) { create(:user) }
   let(:new_user) { create(:user) }
+let(:superadmin) { create(:user, is_superadmin: true) } # адаптуйте під вашу фабрику суперадміна
+  let(:member) { create(:user) }
+  let(:non_member) { create(:user) }
+
+  before do
+    # Додаємо member до бренду
+    create(:brand_membership, brand: brand, user: member, role: 'user')
+  end
+
+  # --- Тести для show_brand_memberships? ---
+
+  it 'denies show_brand_memberships? when user is nil' do
+    policy = BrandPolicy.new(nil, brand)
+    expect(policy.show_brand_memberships?).to be_falsey
+  end
+
+  it 'permits show_brand_memberships? when user is a superadmin' do
+    policy = BrandPolicy.new(superadmin, brand)
+    expect(policy.show_brand_memberships?).to be_truthy
+  end
+
+  it 'permits show_brand_memberships? when user is a member of the brand' do
+    policy = BrandPolicy.new(member, brand)
+    expect(policy.show_brand_memberships?).to be_truthy
+  end
+
+  it 'denies show_brand_memberships? when user is neither a superadmin nor a member' do
+    policy = BrandPolicy.new(non_member, brand)
+    expect(policy.show_brand_memberships?).to be_falsey
+  end
 
   before do
     create(:brand_membership, brand: brand, user: owner, role: 'owner')

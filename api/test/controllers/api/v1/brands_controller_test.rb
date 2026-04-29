@@ -38,7 +38,7 @@ module Api
         render json: brand, status: :created
       rescue ActiveRecord::RecordInvalid => e
         render json: { errors: e.record.errors.full_messages },
-               status: :unprocessable_entity
+               status: :unprocessable_content
       end
 
       # PATCH /api/v1/brands/:id
@@ -49,11 +49,11 @@ module Api
           render json: @brand, status: :ok
         else
           render json: { errors: @brand.errors.full_messages },
-                 status: :unprocessable_entity
+                 status: :unprocessable_content
         end
       rescue ActiveRecord::RecordNotUnique
         render json: { errors: ['Subdomain is already taken'] },
-               status: :unprocessable_entity
+               status: :unprocessable_content
       end
 
       # DELETE /api/v1/brands/:id
@@ -64,7 +64,7 @@ module Api
           head :no_content
         else
           render json: { errors: @brand.errors.full_messages },
-                 status: :unprocessable_entity
+                 status: :unprocessable_content
         end
       end
 

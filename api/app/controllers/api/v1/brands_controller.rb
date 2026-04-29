@@ -43,11 +43,11 @@ module Api
           render json: @brand, status: :ok
         else
           render json: { errors: @brand.errors.full_messages },
-                 status: :unprocessable_entity
+                 status: :unprocessable_content
         end
       rescue ActiveRecord::RecordNotUnique
         render json: { errors: ['Subdomain is already taken'] },
-               status: :unprocessable_entity
+               status: :unprocessable_content
       end
 
       def destroy

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
-
+# чи важлива нам унікальність кожного івенту? Якщо так, то треба додати валідацію на унікальність title в межах бренду
+# чи обов'язково назначати категорію кожному івенту? Якщо так, то треба додати валідацію на присутність хоча б однієї категорії
 class Event < ApplicationRecord
   ALLOWED_SORT_COLUMNS = %w[created_at updated_at title start_date status].freeze
   private_constant :ALLOWED_SORT_COLUMNS
@@ -76,7 +77,15 @@ class Event < ApplicationRecord
     archived: 'archived',
     cancelled: 'cancelled'
   }
+  validate :end_date_after_start_date
 
+def end_date_after_start_date
+  return if end_date.blank? || start_date.blank?
+
+  if end_date < start_date
+    errors.add(:end_date, 'must be after start date')
+  end
+end
   validates :title, presence: true, length: { maximum: 120 }
   validates :location, presence: true, length: { maximum: 200 }
   validates :start_date, presence: true

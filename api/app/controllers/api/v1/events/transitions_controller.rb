@@ -61,14 +61,14 @@ module Api
             return render json: {
               error: 'Cannot submit event',
               message: 'All required fields must be filled before submission'
-            }, status: :unprocessable_entity
+            }, status: :unprocessable_content
           end
 
           render json: {
             error: "Cannot #{action} event",
             current_status: @event.status,
             message: "Transition '#{action}' is not valid from state '#{@event.status}'"
-          }, status: :unprocessable_entity
+          }, status: :unprocessable_content
         end
       end
     end
