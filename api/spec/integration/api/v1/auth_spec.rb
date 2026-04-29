@@ -24,7 +24,7 @@ RSpec.describe 'Api::V1::Auth', type: :request do
         run_test!
       end
 
-      response('422', 'validation error (e.g., email already exists)') do
+      response('422', 'validation error (malformed attributes)') do
         let(:user_params) { { name: '', email: 'invalid_email', password: '123' } }
         run_test!
       end

@@ -19,8 +19,8 @@ RSpec.describe 'Api::V1::Users', type: :request do
         run_test!
       end
 
-      response('401', 'missing or invalid token') do
-        let(:Authorization) { '' }
+      response('401', 'missing token') do
+        let(:Authorization) { nil }
         run_test!
       end
     end
