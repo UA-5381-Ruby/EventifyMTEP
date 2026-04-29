@@ -24,11 +24,11 @@ module Api
         if event_category.save
           render json: event_category.category, status: :created
         else
-          render json: { errors: event_category.errors.to_hash }, status: :unprocessable_entity
+          render json: { errors: event_category.errors.to_hash }, status: :unprocessable_content
         end
       rescue ActiveRecord::RecordNotUnique
         # Validation: Catches composite unique index violation (Race Condition)
-        render json: { errors: { category_id: ['already assigned to this event'] } }, status: :unprocessable_entity
+        render json: { errors: { category_id: ['already assigned to this event'] } }, status: :unprocessable_content
       end
 
       # DELETE /api/v1/events/:event_id/categories/:category_id

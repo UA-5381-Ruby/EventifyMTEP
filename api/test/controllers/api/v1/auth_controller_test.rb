@@ -34,7 +34,7 @@ module Api
           }, as: :json
         end
 
-        assert_response :unprocessable_entity # 422
+        assert_response :unprocessable_content # 422
 
         json_response = JSON.parse(response.body)
         assert_includes json_response['errors'], 'Email has already been taken'

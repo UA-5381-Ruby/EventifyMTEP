@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
+# TODO: Confirm whether event titles must be unique within a brand; if required,
+# add a scoped uniqueness validation for `title`.
+# TODO: Confirm whether every event must have at least one category; if required,
+# add a validation to enforce category presence.
 class Event < ApplicationRecord
   ALLOWED_SORT_COLUMNS = %w[created_at updated_at title start_date status].freeze
   private_constant :ALLOWED_SORT_COLUMNS
@@ -76,7 +80,15 @@ class Event < ApplicationRecord
     archived: 'archived',
     cancelled: 'cancelled'
   }
+  validate :end_date_after_start_date
 
+  def end_date_after_start_date
+    return if end_date.blank? || start_date.blank?
+
+    return unless end_date < start_date
+
+    errors.add(:end_date, 'must be after start date')
+  end
   validates :title, presence: true, length: { maximum: 120 }
   validates :location, presence: true, length: { maximum: 200 }
   validates :start_date, presence: true
