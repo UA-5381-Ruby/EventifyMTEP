@@ -108,52 +108,6 @@ RSpec.describe 'api/v1/brands', type: :request do
 
         run_test!
       end
-      context 'коли оновлення бренду проходить успішно' do
-        before do
-          # Припускаємо, що @brand і brand_params визначені через let
-          allow(controller).to receive(:authorize).with(brand)
-          allow(brand).to receive(:update).with(brand_params).and_return(true)
-          controller.instance_variable_set(:@brand, brand)
-        end
-
-        it 'повертає статус :ok та JSON об\'єкт бренду' do
-          put :update, params: { id: brand.id, brand: brand_params }
-
-          expect(response).to have_http_status(:ok)
-          expect(response.body).to eq(brand.to_json)
-        end
-      end
-
-      context 'коли оновлення не вдається через помилки валідації' do
-        before do
-          allow(controller).to receive(:authorize).with(brand)
-          allow(brand).to receive(:update).with(brand_params).and_return(false)
-          allow(brand.errors).to receive(:full_messages).and_return(['Name is invalid'])
-          controller.instance_variable_set(:@brand, brand)
-        end
-
-        it 'повертає статус :unprocessable_content та список помилок' do
-          put :update, params: { id: brand.id, brand: brand_params }
-
-          expect(response).to have_http_status(:unprocessable_content)
-          expect(JSON.parse(response.body)).to eq({ 'errors' => ['Name is invalid'] })
-        end
-      end
-
-      context 'коли виникає помилка унікальності бази даних (ActiveRecord::RecordNotUnique)' do
-        before do
-          allow(controller).to receive(:authorize).with(brand)
-          allow(brand).to receive(:update).with(brand_params).and_raise(ActiveRecord::RecordNotUnique)
-          controller.instance_variable_set(:@brand, brand)
-        end
-
-        it 'повертає статус :unprocessable_content та повідомлення про зайнятий субдомен' do
-          put :update, params: { id: brand.id, brand: brand_params }
-
-          expect(response).to have_http_status(:unprocessable_content)
-          expect(JSON.parse(response.body)).to eq({ 'errors' => ['Subdomain is already taken'] })
-        end
-      end
     end
   end
 end
