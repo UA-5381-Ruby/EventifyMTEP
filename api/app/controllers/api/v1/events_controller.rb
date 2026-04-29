@@ -3,6 +3,7 @@
 module Api
   module V1
     class EventsController < ApplicationController
+      skip_before_action :authorize_request, only: [:index]
       before_action :set_event, only: [:show]
 
       def index

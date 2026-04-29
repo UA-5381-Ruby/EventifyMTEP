@@ -15,7 +15,23 @@ RSpec.describe 'api/v1/events', type: :request do
       parameter name: :category_id, in: :query, type: :integer, required: false
 
       response '200', 'events filtered by category' do
-        schema type: :array, items: { '$ref' => '#/components/schemas/Event' }
+        schema type: :object,
+               properties: {
+                 data: {
+                   type: :array,
+                   items: { '$ref' => '#/components/schemas/Event' }
+                 },
+                 meta: {
+                   type: :object,
+                   properties: {
+                     page: { type: :integer },
+                     per_page: { type: :integer },
+                     total: { type: :integer }
+                   },
+                   required: %w[page per_page total]
+                 }
+               },
+               required: %w[data meta]
 
         let!(:category1) { create(:category) }
         let!(:category2) { create(:category) }
@@ -64,13 +80,13 @@ RSpec.describe 'api/v1/events', type: :request do
                  title: 'Past Meetup',
                  brand: brand,
                  start_date: 1.month.ago,
-                 end_date: 1.month.ago + 1.day)      # Додано end_date
+                 end_date: 1.month.ago + 1.day) # Додано end_date
 
           create(:event,
                  title: 'Live Workshop',
                  brand: brand,
                  start_date: Time.zone.now,
-                 end_date: Time.zone.now + 1.day)    # Додано end_date
+                 end_date: Time.zone.now + 1.day) # Додано end_date
         end
 
         run_test!
