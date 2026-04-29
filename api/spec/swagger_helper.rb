@@ -120,11 +120,80 @@ RSpec.configure do |config|
               description: { type: :string, example: 'Annual conference', nullable: true },
               location: { type: :string, example: 'Kyiv, Ukraine' },
               start_date: { type: :string, format: 'date-time', example: '2025-12-01T10:00:00Z' },
-              end_date: { type: :string,  format: 'date-time', example: '2025-12-02T18:00:00Z', nullable: true },
+              end_date: { type: :string, format: 'date-time', example: '2025-12-02T18:00:00Z', nullable: true },
               brand_id: { type: :integer, example: 1 },
               category_ids: { type: :array, items: { type: :integer }, example: [1, 2] }
             },
             required: %w[title location start_date brand_id]
+          },
+
+          Ticket: {
+            type: :object,
+            properties: {
+              id: { type: :integer, example: 1 },
+              user_id: { type: :integer, example: 5 },
+              event_id: { type: :integer, example: 10 },
+              qr_code: { type: :string, example: '550e8400-e29b-41d4-a716-446655440000' },
+              is_active: { type: :boolean, example: true },
+              created_at: { type: :string, format: 'date-time' },
+              updated_at: { type: :string, format: 'date-time' },
+              event: {
+                type: :object,
+                properties: {
+                  id: { type: :integer, example: 10 },
+                  title: { type: :string, example: 'Tech Summit 2025' },
+                  location: { type: :string, example: 'Kyiv, Ukraine' },
+                  start_date: { type: :string, format: 'date-time', example: '2025-12-01T10:00:00.000Z' },
+                  end_date: { type: :string, format: 'date-time', example: '2025-12-02T18:00:00.000Z', nullable: true }
+                }
+              },
+              event_feedback: {
+                type: :object,
+                properties: {
+                  id: { type: :integer, example: 1 },
+                  ticket_id: { type: :integer, example: 1 },
+                  rating: { type: :integer, minimum: 1, maximum: 5, example: 5, nullable: true },
+                  comment: { type: :string, example: 'Great event!', nullable: true }
+                },
+                nullable: true
+              }
+            },
+            required: %w[id user_id event_id qr_code is_active]
+          },
+
+          TicketInput: {
+            type: :object,
+            properties: {
+              event_id: { type: :integer, example: 10 }
+            },
+            required: %w[event_id]
+          },
+
+          TicketUpdateInput: {
+            type: :object,
+            properties: {
+              is_active: { type: :boolean, example: false }
+            }
+          },
+
+          TicketList: {
+            type: :object,
+            properties: {
+              data: {
+                type: :array,
+                items: { '$ref' => '#/components/schemas/Ticket' }
+              },
+              meta: {
+                type: :object,
+                properties: {
+                  page: { type: :integer, example: 1 },
+                  per_page: { type: :integer, example: 20 },
+                  total: { type: :integer, example: 100 }
+                },
+                required: %w[page per_page total]
+              }
+            },
+            required: %w[data meta]
           },
 
           EventFeedback: {
@@ -132,15 +201,18 @@ RSpec.configure do |config|
             properties: {
               id: { type: :integer, example: 1 },
               ticket_id: { type: :integer, example: 5 },
-              rating: { type: :integer, example: 5, nullable: true },
-              comment: { type: :string, example: 'Great event!', nullable: true }
-            }
+              rating: { type: :integer, minimum: 1, maximum: 5, example: 5, nullable: true },
+              comment: { type: :string, example: 'Great event!', nullable: true },
+              created_at: { type: :string, format: 'date-time' },
+              updated_at: { type: :string, format: 'date-time' }
+            },
+            required: %w[id ticket_id]
           },
 
           ReviewInput: {
             type: :object,
             properties: {
-              rating: { type: :integer, example: 5 },
+              rating: { type: :integer, minimum: 1, maximum: 5, example: 5 },
               comment: { type: :string, example: 'Amazing experience!' }
             }
           },
@@ -150,7 +222,14 @@ RSpec.configure do |config|
             properties: {
               errors: {
                 type: :object,
-                example: { title: ["can't be blank"], location: ['is too long'] }
+                additionalProperties: {
+                  type: :array,
+                  items: { type: :string }
+                },
+                example: {
+                  title: ["can't be blank"],
+                  location: ['is too long']
+                }
               }
             }
           },
@@ -169,7 +248,7 @@ RSpec.configure do |config|
           NotFound: {
             type: :object,
             properties: {
-              error: { type: :string, example: 'Event not found' }
+              error: { type: :string, example: 'Ticket not found' }
             }
           },
 

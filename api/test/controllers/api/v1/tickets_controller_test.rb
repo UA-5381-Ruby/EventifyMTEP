@@ -9,9 +9,9 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should allow review and update rating and comment' do
-    patch_with_auth "/api/v1/tickets/#{@ticket.id}/review",
-                    @user,
-                    params: { ticket: { rating: 5, comment: 'Great event' } }
+    post_with_auth "/api/v1/tickets/#{@ticket.id}/review", # ← Змініть з patch на post
+                   @user,
+                   params: { ticket: { rating: 5, comment: 'Great event' } }
 
     assert_response :ok
     assert_equal 5, @ticket.event_feedback.reload.rating
@@ -32,19 +32,57 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
     post_with_auth '/api/v1/tickets', @user, params: { ticket: { event_id: event.id } }
 
     assert_response :unprocessable_content
-    assert_includes response.parsed_body['errors'].join, 'already registered'
+    errors = response.parsed_body['errors']
+
+    # errors це об'єкт типу { "base" => ["User is already..."] }
+    error_messages = errors.values.join
+    assert_includes error_messages, 'already registered'
   end
 
   test 'should return my tickets' do
     other_user = create_user(email: "other-#{SecureRandom.hex(4)}@example.com")
     other_ticket = create_ticket(user: other_user)
 
-    get_with_auth '/api/v1/my_tickets', @user
+    get_with_auth '/api/v1/tickets', @user
 
     assert_response :ok
     body = response.parsed_body
-    assert(body.any? { |t| t['id'] == @ticket.id })
-    refute(body.any? { |t| t['id'] == other_ticket.id })
+    assert(body['data'].any? { |t| t['id'] == @ticket.id })
+    refute(body['data'].any? { |t| t['id'] == other_ticket.id })
+  end
+
+  test 'should get single ticket' do
+    get_with_auth "/api/v1/tickets/#{@ticket.id}", @user
+
+    assert_response :ok
+    assert_equal @ticket.id, response.parsed_body['id']
+    assert response.parsed_body.key?('qr_code')
+  end
+
+  test 'should return 404 for non-existent ticket' do
+    get_with_auth '/api/v1/tickets/99999', @user
+
+    assert_response :not_found
+  end
+
+  test 'should update ticket status' do
+    patch_with_auth "/api/v1/tickets/#{@ticket.id}",
+                    @user,
+                    params: { ticket: { is_active: false } }
+
+    assert_response :ok
+    assert_equal false, response.parsed_body['is_active']
+  end
+
+  test 'should search tickets by event name' do
+    event = create_event(title: 'Unique Tech Summit 2025')
+    ticket = create_ticket(user: @user, event: event)
+
+    get_with_auth '/api/v1/tickets?q=Tech', @user
+
+    assert_response :ok
+    body = response.parsed_body
+    assert(body['data'].any? { |t| t['id'] == ticket.id })
   end
 
   private
@@ -74,17 +112,17 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  def create_event
+  def create_event(title: 'Event', brand: nil)
     Event.create!(
-      brand: Brand.create!(name: "Brand #{SecureRandom.hex(4)}", subdomain: SecureRandom.hex(4)),
+      brand: brand || Brand.create!(name: "Brand #{SecureRandom.hex(4)}", subdomain: SecureRandom.hex(4)),
       categories: [Category.find_or_create_by!(name: 'Music')],
-      title: 'Event',
+      title: title,
       location: 'Loc',
       start_date: Time.current
     )
   end
 
-  def create_ticket(user:)
-    Ticket.create!(user: user, event: create_event, is_active: true)
+  def create_ticket(user:, event: nil)
+    Ticket.create!(user: user, event: event || create_event, is_active: true)
   end
 end
