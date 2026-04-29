@@ -27,7 +27,7 @@ RSpec.describe 'Api::V1::Users', type: :request do
   end
 
   path '/api/v1/users/{id}' do
-    parameter name: :id, in: :path, type: :integer, description: 'User ID'
+    parameter name: :id, in: :path, type: :integer, required: true, description: 'User ID'
 
     parameter name: :Authorization, in: :header, type: :string, required: true, description: 'JWT Token'
 
