@@ -14,7 +14,7 @@ RSpec.configure do |config|
         description: 'API documentation for the Eventify platform'
       },
       servers: [
-        { url: ENV.fetch('SWAGGER_SERVER_URL'), description: 'Local server' }
+        { url: ENV.fetch('SWAGGER_SERVER_URL', 'http://127.0.0.1:3000'), description: 'Local server' }
       ],
       components: {
         securitySchemes: {
