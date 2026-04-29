@@ -15,56 +15,39 @@ RSpec.describe UserMailer, type: :mailer do
     let(:token) { 'fake_token_123' }
 
     before do
-      # Мокаємо ENV щоб не впасти на ENV.fetch
       allow(ENV)
         .to receive(:fetch)
         .with('FRONTEND_URL')
         .and_return('http://localhost:3000')
     end
 
-    it 'sends email to correct recipient' do
-      mail = UserMailer.reset_password(user, token)
+    subject(:mail) { UserMailer.reset_password(user, token) }
 
+    it 'sends email to correct recipient' do
       expect(mail.to).to eq([user.email])
     end
 
     it 'sets correct subject' do
-      mail = UserMailer.reset_password(user, token)
-
-      expect(mail.subject)
-        .to eq('Reset your password')
+      expect(mail.subject).to eq('Reset your password')
     end
 
     it 'includes user name in email body' do
-      mail = UserMailer.reset_password(user, token)
-
-      expect(mail.body.encoded)
-        .to include('Hi Test')
+      expect(mail.body.encoded).to include('Hi Test')
     end
 
     it 'includes reset link in email body' do
-      mail = UserMailer.reset_password(user, token)
-
-      expected_link =
-        "http://localhost:3000/reset?token=#{token}"
-
-      expect(mail.body.encoded)
-        .to include(expected_link)
+      expected_link = "http://localhost:3000/reset?token=#{token}"
+      expect(mail.body.encoded).to include(expected_link)
     end
 
     it 'generates valid mail object' do
-      mail = UserMailer.reset_password(user, token)
-
       expect(mail).to be_present
       expect(mail.body).to be_present
     end
 
     it 'delivers email' do
-      expect do
-        UserMailer
-          .reset_password(user, token)
-          .deliver_now
-      end.to change { ActionMailer::Base.deliveries.count }.by(1)
+      expect { mail.deliver_now }
+        .to change { ActionMailer::Base.deliveries.count }.by(1)
     end
   end
 end
