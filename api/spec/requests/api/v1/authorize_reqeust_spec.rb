@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'swagger_helper'
 
 RSpec.describe ApplicationController, type: :controller do
@@ -17,7 +19,7 @@ RSpec.describe ApplicationController, type: :controller do
     context 'when Authorization header is missing' do
       it 'returns 401 unauthorized with missing token error' do
         get :index
-        
+
         expect(response).to have_http_status(:unauthorized)
         expect(JSON.parse(response.body)['error']).to eq('Unauthorized access. Missing token.')
       end
@@ -35,7 +37,7 @@ RSpec.describe ApplicationController, type: :controller do
 
         it 'returns 401 unauthorized with invalid token error' do
           get :index
-          
+
           expect(response).to have_http_status(:unauthorized)
           expect(JSON.parse(response.body)['error']).to eq('Unauthorized access. Invalid token.')
         end
@@ -55,7 +57,7 @@ RSpec.describe ApplicationController, type: :controller do
 
           it 'allows the request and sets @current_user' do
             get :index
-            
+
             expect(response).to have_http_status(:ok)
             expect(response.body).to eq('Success')
             expect(assigns(:current_user)).to eq(user)
@@ -69,7 +71,7 @@ RSpec.describe ApplicationController, type: :controller do
 
           it 'returns 401 unauthorized with user no longer exists error' do
             get :index
-            
+
             expect(response).to have_http_status(:unauthorized)
             expect(JSON.parse(response.body)['error']).to eq('User with this token no longer exists.')
           end
@@ -85,7 +87,7 @@ RSpec.describe ApplicationController, type: :controller do
 
         it 'returns 401 unauthorized with the error message' do
           get :index
-          
+
           expect(response).to have_http_status(:unauthorized)
           expect(JSON.parse(response.body)['error']).to eq("Unauthorized access. #{error_message}")
         end
