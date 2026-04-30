@@ -7,7 +7,7 @@ module Api
         render json: { error: e.message }, status: :bad_request
       end
 
-      before_action :authenticate_user!, except: %i[index show]
+      skip_before_action :authorize_request, only: %i[index show]
       before_action :set_brand, only: %i[show update destroy]
 
       def index
@@ -57,27 +57,6 @@ module Api
       end
 
       private
-
-      def authenticate_user!
-        render json: { error: 'Unauthorized' }, status: :unauthorized unless current_user
-      end
-
-      def current_user
-        return @current_user if defined?(@current_user)
-
-        token = request.headers['Authorization']&.split&.last
-        return nil unless token
-
-        begin
-          decoded_token = AuthHelper.decode(token)
-
-          user_id = decoded_token.is_a?(Array) ? decoded_token.first['user_id'] : decoded_token[:user_id]
-
-          @current_user = User.find_by(id: user_id)
-        rescue StandardError
-          nil
-        end
-      end
 
       def set_brand
         @brand = Brand.find(params[:id])
