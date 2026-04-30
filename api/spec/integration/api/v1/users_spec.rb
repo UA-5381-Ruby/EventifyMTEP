@@ -9,8 +9,6 @@ RSpec.describe 'Api::V1::Users', type: :request do
       security [{ bearer_auth: [] }]
       produces 'application/json'
 
-      parameter name: :Authorization, in: :header, type: :string, required: true, description: 'JWT Token'
-
       response('200', 'successful') do
         let(:admin) do
           User.create!(name: 'Admin', email: 'admin_index@test.com', password: 'password123', is_superadmin: true)
@@ -28,8 +26,6 @@ RSpec.describe 'Api::V1::Users', type: :request do
 
   path '/api/v1/users/{id}' do
     parameter name: :id, in: :path, type: :integer, required: true, description: 'User ID'
-
-    parameter name: :Authorization, in: :header, type: :string, required: true, description: 'JWT Token'
 
     get('View user profile') do
       tags 'Users'
