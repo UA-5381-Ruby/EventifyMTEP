@@ -40,11 +40,11 @@ Rails.application.routes.draw do
       post '/auth/password/reset', to: 'passwords#update', constraints: ->(req) { req.params[:token].present? }
       post '/auth/password/reset', to: 'passwords#create'
 
-      get 'my_tickets', to: 'tickets#my_tickets'
+      get 'my_tickets', to: 'tickets#index'
 
-      resources :tickets, only: [:create] do
+      resources :tickets, only: [:index, :create, :update, :show] do
         member do
-          patch :review
+          post :review
         end
       end
 
