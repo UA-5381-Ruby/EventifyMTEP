@@ -42,7 +42,7 @@ Rails.application.routes.draw do
 
       get 'my_tickets', to: 'tickets#my_tickets'
 
-      resources :tickets, only: [:create, :update] do
+      resources :tickets, only: [:create] do
         member do
           patch :review
         end

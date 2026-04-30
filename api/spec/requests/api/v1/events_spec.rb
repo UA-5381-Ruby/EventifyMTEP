@@ -19,8 +19,7 @@ RSpec.describe 'Api::V1::Events', type: :request do
         start_date: 1.week.from_now.iso8601,
         location: 'Kyiv',
         brand_id: brand.id,
-        category_ids: [category.id],
-        status: 'draft'
+        category_ids: [category.id]
       }
     }
   end
@@ -28,10 +27,9 @@ RSpec.describe 'Api::V1::Events', type: :request do
   describe 'POST /api/v1/events' do
     context 'with valid params' do
       it 'returns 201 and creates event' do
-        # 3. Додаємо headers: auth_headers(user)
         post '/api/v1/events',
              params: valid_params,
-             headers: auth_headers(user),
+             headers: auth_headers(superadmin),
              as: :json
 
         expect(response).to have_http_status(:created)
@@ -43,11 +41,22 @@ RSpec.describe 'Api::V1::Events', type: :request do
       it 'returns 422 with errors' do
         post '/api/v1/events',
              params: { event: { title: '' } },
-             headers: auth_headers(user),
+             headers: auth_headers(superadmin),
              as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body).to have_key('errors')
+      end
+    end
+
+    context 'as a regular (non-superadmin) user' do
+      it 'returns 403 Forbidden' do
+        post '/api/v1/events',
+             params: valid_params,
+             headers: auth_headers(user),
+             as: :json
+
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
