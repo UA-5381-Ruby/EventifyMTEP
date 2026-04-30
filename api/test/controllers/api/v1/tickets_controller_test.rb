@@ -35,8 +35,8 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
     errors = response.parsed_body['errors']
 
     # errors це об'єкт типу { "base" => ["User is already..."] }
-    error_messages = errors.values.flatten
-    assert error_messages.any? { |m| m.include?('already registered') }
+    error_messages = errors.values.join
+    assert_includes error_messages, 'already registered'
   end
 
   test 'should return my tickets' do

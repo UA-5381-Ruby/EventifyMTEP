@@ -20,13 +20,13 @@ module Api
       # @param [Hash] params - Request parameters (supports `:per_page`, `:page`, `:q`, `:status`).
       #   Also supports `:sort` and `:order`.
       def index
-        filtered_tickets_relation = filtered_tickets
+        tickets = filtered_tickets
 
-        total = filtered_tickets_relation.unscope(:includes).except(:offset, :limit).count
+        total = tickets.count
         per_page = params.fetch(:per_page, 20).to_i.clamp(1, 100)
         page = [params.fetch(:page, 1).to_i, 1].max
 
-        tickets = filtered_tickets_relation.offset((page - 1) * per_page).limit(per_page)
+        tickets = tickets.offset((page - 1) * per_page).limit(per_page)
 
         render json: {
           data: tickets.as_json(include: {
@@ -82,7 +82,7 @@ module Api
                        event_feedback: { only: %i[id rating comment] } }
           ), status: :ok
         else
-          render json: { errors: @ticket.errors.messages }, status: :unprocessable_content
+          render json: { errors: @ticket.errors.full_messages }, status: :unprocessable_content
         end
       end
 
@@ -99,7 +99,7 @@ module Api
         if feedback.update(review_params)
           render json: feedback, status: :ok
         else
-          render json: { errors: feedback.errors.messages }, status: :unprocessable_content
+          render json: { errors: feedback.errors.full_messages }, status: :unprocessable_content
         end
       end
 
@@ -119,7 +119,9 @@ module Api
       # @return [ActionController::Parameters] The permitted `ticket` parameters including:
       #   :event_id
       def ticket_params
-        params.require(:ticket).permit(:event_id)
+        params.expect(ticket: [:event_id])
+      rescue ActionController::ParameterMissing
+        params.permit(:event_id)
       end
 
       ##
@@ -127,7 +129,9 @@ module Api
       # @return [ActionController::Parameters] The permitted parameters including:
       #   :is_active
       def ticket_update_params
-        params.require(:ticket).permit(:is_active)
+        params.expect(ticket: [:is_active])
+      rescue ActionController::ParameterMissing
+        params.permit(:is_active)
       end
 
       ##
@@ -135,7 +139,9 @@ module Api
       # @return [ActionController::Parameters] The permitted parameters including:
       #   :rating, :comment
       def review_params
-        params.require(:ticket).permit(:rating, :comment)
+        params.expect(ticket: %i[rating comment])
+      rescue ActionController::ParameterMissing
+        params.permit(:rating, :comment)
       end
 
       ##
