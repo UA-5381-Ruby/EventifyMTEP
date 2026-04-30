@@ -106,7 +106,7 @@ RSpec.describe 'api/v1/events', type: :request do
       parameter name: :body, in: :body, required: true,
                 schema: { '$ref' => '#/components/schemas/EventInput' }
 
-      let(:user) { create(:user) }
+      let(:user) { create(:user, is_superadmin: true) }
       let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
 
       response '201', 'event created' do
