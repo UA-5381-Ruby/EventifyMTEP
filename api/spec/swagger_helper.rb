@@ -164,16 +164,28 @@ RSpec.configure do |config|
           TicketInput: {
             type: :object,
             properties: {
-              event_id: { type: :integer, example: 10 }
+              ticket: {
+                type: :object,
+                properties: {
+                  event_id: { type: :integer, example: 10 }
+                },
+                required: %w[event_id]
+              }
             },
-            required: %w[event_id]
+            required: %w[ticket]
           },
 
           TicketUpdateInput: {
             type: :object,
             properties: {
-              is_active: { type: :boolean, example: false }
-            }
+              ticket: {
+                type: :object,
+                properties: {
+                  is_active: { type: :boolean, example: false }
+                }
+              }
+            },
+            required: %w[ticket]
           },
 
           TicketList: {
@@ -212,9 +224,15 @@ RSpec.configure do |config|
           ReviewInput: {
             type: :object,
             properties: {
-              rating: { type: :integer, minimum: 1, maximum: 5, example: 5 },
-              comment: { type: :string, example: 'Amazing experience!' }
-            }
+              ticket: {
+                type: :object,
+                properties: {
+                  rating: { type: :integer, minimum: 1, maximum: 5, example: 5 },
+                  comment: { type: :string, example: 'Amazing experience!' }
+                }
+              }
+            },
+            required: %w[ticket]
           },
 
           ValidationErrors: {
@@ -248,7 +266,7 @@ RSpec.configure do |config|
           NotFound: {
             type: :object,
             properties: {
-              error: { type: :string, example: 'Ticket not found' }
+              error: { type: :string, example: 'Resource not found' }
             }
           },
 

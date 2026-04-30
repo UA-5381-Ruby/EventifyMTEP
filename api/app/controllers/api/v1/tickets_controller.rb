@@ -66,6 +66,9 @@ module Api
         else
           render json: { errors: @ticket.errors.messages }, status: :unprocessable_content
         end
+      rescue ActiveRecord::RecordNotUnique
+        render json: { errors: { base: ['User is already registered for this event'] } },
+               status: :unprocessable_content
       end
 
       ##

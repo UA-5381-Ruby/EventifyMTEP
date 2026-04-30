@@ -9,7 +9,7 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test 'should allow review and update rating and comment' do
-    post_with_auth "/api/v1/tickets/#{@ticket.id}/review", # ← Змініть з patch на post
+    post_with_auth "/api/v1/tickets/#{@ticket.id}/review",
                    @user,
                    params: { ticket: { rating: 5, comment: 'Great event' } }
 

@@ -18,9 +18,14 @@ class Ticket < ApplicationRecord
   }
 
   scope :sorted_by, lambda { |sort_field, order|
-    sort_field = 'created_at' if sort_field.blank?
-    order_direction = order&.downcase == 'asc' ? 'ASC' : 'DESC'
-    order("tickets.#{sort_field} #{order_direction}")
+    allowed_fields = {
+      'created_at' => :created_at,
+      'updated_at' => :updated_at,
+      'is_active' => :is_active
+    }
+    field = allowed_fields.fetch(sort_field.to_s, :created_at)
+    direction = order&.downcase == 'asc' ? :asc : :desc
+    order(field => direction)
   }
 
   private
