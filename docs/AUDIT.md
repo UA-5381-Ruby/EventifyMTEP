@@ -1,7 +1,8 @@
 # Backend Technical Audit – EventifyMTEP API
 
-> **Audit date:** 2026-04-30
-> **Branch audited:** `copilot/eventify-mtep-backend-audit`
+> **Initial audit date:** 2026-04-30
+> **Updated:** 2026-04-30 (re-audit after `main` merged in: PR #39 / PR #41 — full Tickets API rewrite)
+> **Branch audited:** `copilot/eventify-mtep-backend-audit` (includes `origin/main`)
 > **Scope:** `/api` (Rails 8 API) + `/docs`
 
 ---
@@ -9,76 +10,79 @@
 ## Table of Contents
 
 1. [Summary](#summary)
-2. [🔴 Critical / High-Priority Findings](#-critical--high-priority-findings)
-3. [🟡 Technical Debt Hotspots](#-technical-debt-hotspots)
-4. [🟠 Data Integrity Issues](#-data-integrity-issues)
-5. [🔵 API Design Issues](#-api-design-issues)
-6. [📄 Documentation Gaps](#-documentation-gaps)
-7. [Top 10 Recommendations](#top-10-recommendations)
-8. [Applied Fixes in This PR](#applied-fixes-in-this-pr)
+2. [Changelog from Previous Audit](#changelog-from-previous-audit)
+3. [🔴 Critical / High-Priority Findings](#-critical--high-priority-findings)
+4. [🟡 Technical Debt Hotspots](#-technical-debt-hotspots)
+5. [🟠 Data Integrity Issues](#-data-integrity-issues)
+6. [🔵 API Design Issues](#-api-design-issues)
+7. [📄 Documentation Gaps](#-documentation-gaps)
+8. [Top 10 Recommendations](#top-10-recommendations)
+9. [Applied Fixes in This PR](#applied-fixes-in-this-pr)
 
 ---
 
 ## Summary
 
-The codebase is well-structured and has a reasonable Pundit policy setup, AASM state machine, and solid model validations. However, several high-severity issues undermine security and data integrity and must be addressed before a production launch.
+The main branch received a substantial Tickets API rewrite (full CRUD, filtering,
+pagination, `rack-attack` gem) since the previous audit. Several previously reported
+issues were already fixed upstream. A new set of findings has been identified in the
+updated code. Overall the codebase is improving; the outstanding issues below are
+medium-to-high severity and should be resolved before production.
+
+---
+
+## Changelog from Previous Audit
+
+| Finding | Status |
+|---|---|
+| `EventsController#create` missing `authorize @event` | ✅ **Fixed in this PR** |
+| `rejection_reason` column missing from `events` | ✅ **Fixed in this PR** (migration 20260430000001) |
+| `:status` leaked in `EventsController#event_params` | ✅ **Fixed in this PR** |
+| CORS wildcard `origins '*'` | ✅ **Fixed in this PR** – reads `ALLOWED_ORIGINS` from ENV |
+| `BrandsController` dual-auth dead code | ✅ **Fixed upstream** (PR #41 `rubocop brands controller` commit) |
+| `FRONTEND_URL` missing from `.env.example` | ✅ **Fixed in this PR** |
+| `resources :tickets` declared `:update` with no action | ✅ **Fixed upstream** – `update` action now fully implemented |
+| `(brand_id, role)` index missing on `brand_memberships` | ✅ **Fixed in this PR** (migration 20260430000002) |
+| `NOT NULL` missing on `events.location` / `events.start_date` | ✅ **Fixed in this PR** (migration 20260430000003) |
 
 ---
 
 ## 🔴 Critical / High-Priority Findings
 
-### 1 – `EventsController#create` missing authorization
+### 1 – `rack-attack` gem installed but not configured
 
-`EventPolicy#create?` correctly restricts event creation to superadmins, but
-`EventsController#create` never calls `authorize @event`. Any authenticated
-user can create events by bypassing the policy entirely.
+`rack-attack` was added to `Gemfile` (PR #39) but no initializer exists in
+`config/initializers/`. The gem is loaded but provides zero protection; auth
+endpoints (`/auth/login`, `/auth/register`, `/auth/password/reset`) are still
+fully open to brute-force and credential-stuffing attacks.
 
-**File:** `app/controllers/api/v1/events_controller.rb` line 34
-**Fix:** Call `authorize @event` after building the object.
-
----
-
-### 2 – `rejection_reason` silently discarded on every `reject` call
-
-`Event#reject` AASM transition runs a `before` block that calls
-`self.rejection_reason = reason`, but the `rejection_reason` column does not
-exist in `db/schema.rb`. The `respond_to?(:rejection_reason=)` guard prevents
-a crash, but rejection reasons are always lost.
-
-**File:** `app/models/event.rb` lines 44-46, `db/schema.rb`
-**Fix:** Add `rejection_reason` column via a new migration.
+**File:** `Gemfile` line 16 (gem present), `config/initializers/` (no rack_attack.rb)
+**Fix:** Create `config/initializers/rack_attack.rb` with throttles on login,
+register, and password-reset endpoints.
 
 ---
 
-### 3 – CORS wildcard `origins '*'`
-
-`config/initializers/cors.rb` allows requests from any origin. This must be
-restricted to the actual frontend domain(s) before production.
-
-**File:** `config/initializers/cors.rb`
-**Fix:** Read allowed origins from `ENV['ALLOWED_ORIGINS']`.
-
----
-
-### 4 – No JWT token revocation or refresh
+### 2 – No JWT token revocation
 
 Tokens have a 24-hour lifetime and cannot be invalidated server-side. A
 client-side "logout" is meaningless; stolen tokens remain valid until expiry.
 
 **Files:** `app/services/jwt_service.rb`, `app/controllers/api/v1/auth_controller.rb`
-**Recommendation:** Implement a token denylist (Redis or DB table) and a
-dedicated `DELETE /auth/logout` endpoint. Add a refresh-token flow if sessions
-longer than 24 hours are required.
+**Recommendation:** Implement a token denylist (Redis or DB table) and a dedicated
+`DELETE /auth/logout` endpoint. Add a refresh-token flow for sessions longer than
+24 hours.
 
 ---
 
-### 5 – No rate limiting on login / password-reset endpoints
+### 3 – Tickets can be purchased for non-published events
 
-Login (`POST /auth/login`) and password reset (`POST /auth/password/reset`)
-are unprotected against brute-force and credential-stuffing attacks.
+`TicketsController#create` only validates that the current user can be associated
+with any `event_id`; there is no check that the event's status is `:published`.
+Users can purchase tickets for `draft`, `rejected`, `cancelled`, or `archived` events.
 
-**Recommendation:** Add `Rack::Attack` with a limit of ~5 requests / minute
-per IP on these endpoints.
+**File:** `app/controllers/api/v1/tickets_controller.rb` (no event-status guard in `create`)
+**Fix:** Add a validation in `Ticket` or a guard in the controller that rejects
+ticket creation for events that are not in `:published` state.
 
 ---
 
@@ -86,13 +90,13 @@ per IP on these endpoints.
 
 | # | Issue | Location |
 |---|---|---|
-| T1 | **`BrandsController` dual authentication** – local `current_user` override references `AuthHelper.decode` (a test-only helper). Works only because `ApplicationController#authorize_request` always runs first and populates `@current_user`. If call order changes, requests crash with `NoMethodError`. | `brands_controller.rb` lines 61-80 |
-| T2 | **Duplicate pagination logic** – identical offset/limit/meta code lives in both `EventsController` and `BrandMembershipsController`. | both controllers |
-| T3 | **No serializer layer** – raw `as_json` with inline field lists in 9+ controllers; 4+ different error-response shapes across the app. | all controllers |
+| T1 | **`update_password_params` dead code** – method defined in `PasswordsController` but never called; `update` uses `params[:new_password]` directly. | `passwords_controller.rb` last method |
+| T2 | **Duplicate pagination logic** – identical offset/limit/meta code in `EventsController`, `TicketsController`, and `BrandMembershipsController`. Should be extracted to a shared concern. | all three controllers |
+| T3 | **No serializer layer** – raw `as_json` with inline field lists in 9+ controllers. Inconsistent error-response shapes (some use `{ errors: array }`, others `{ errors: hash }`). | all controllers |
 | T4 | **`Devise` gem declared but never used** – adds boot overhead and confusion. Remove it. | `Gemfile` line 11 |
-| T5 | **Last-owner protection in three places** – model callbacks (`BrandMembership`), controller guard methods (`BrandMembershipsController`), and controller checks all duplicate the same rule. | `brand_membership.rb`, `brand_memberships_controller.rb` |
-| T6 | **`brands_spec.txt`** – test file with a `.txt` extension; RSpec never loads it. | `spec/requests/api/v1/brands_spec.txt` |
-| T7 | **`EventPolicy#create?` and `EventsController` mismatch** – policy restricts creation to superadmins but owners/managers can submit events. Clarify the intended permission model. | `event_policy.rb`, `events_controller.rb` |
+| T5 | **`@current_user` direct ivar vs `current_user` method** – `TicketsController` references `@current_user` (with `@`) directly while all other controllers use the `current_user` reader method. | `tickets_controller.rb` lines 65, 168 |
+| T6 | **`my_tickets` route is a duplicate alias** – `GET /api/v1/my_tickets` maps to `tickets#index`, which is identical to `GET /api/v1/tickets`. If the alias exists for backward compatibility it should be documented; otherwise remove it to reduce routing surface. | `config/routes.rb` line 43 |
+| T7 | **`EventPolicy` scope commented out** – `Scope#resolve` returns `scope.all` with an `if user.is_superadmin` block commented out. This means all events are visible to all users regardless of publish status. | `app/policies/event_policy.rb` lines 51-55 |
 
 ---
 
@@ -100,10 +104,9 @@ per IP on these endpoints.
 
 | # | Issue | Location |
 |---|---|---|
-| D1 | `events.location` and `events.start_date` are validated at the model level but have **no `NOT NULL` constraint** in the DB schema; raw SQL inserts bypass these rules. | `db/schema.rb` |
-| D2 | `event_feedbacks` has no `UNIQUE` constraint on `ticket_id`; a race condition could produce duplicate feedback rows at the DB level. | `db/schema.rb` |
-| D3 | `users.name` is validated `presence: true` in the model but is nullable in the DB (`t.string "name"` without `null: false`). | `db/schema.rb` |
-| D4 | `(brand_id, role)` composite index missing on `brand_memberships` – `owners_count` queries run a full table scan per request. | `db/schema.rb`, `brand_memberships_controller.rb` |
+| D1 | **`event_feedbacks.ticket_id` missing UNIQUE constraint** – there is no DB-level unique index on `ticket_id`; concurrent requests can create duplicate feedback rows. | `db/schema.rb` |
+| D2 | **`users.name` nullable at DB level** – validated `presence: true` in model but `t.string "name"` has no `null: false`; raw SQL inserts bypass the rule. | `db/schema.rb` |
+| D3 | **`TicketsController#update` permits `is_active`** – any ticket owner can deactivate/reactivate their own ticket via `PATCH /api/v1/tickets/:id`. If deactivated tickets are meant to be admin-only controlled (e.g., when an event is cancelled), this is a business logic leak. | `tickets_controller.rb` `ticket_update_params` |
 
 ---
 
@@ -111,11 +114,11 @@ per IP on these endpoints.
 
 | # | Issue | Location |
 |---|---|---|
-| A1 | `resources :tickets, only: [:create, :update]` – `:update` route is declared but no `update` action exists in `TicketsController`; any `PATCH /api/v1/tickets/:id` raises an `AbstractController::ActionNotFound` routing error. | `config/routes.rb` |
-| A2 | `GET /api/v1/my_tickets` – non-RESTful top-level route; should be nested under `/users/:id/tickets` or exposed as `/users/me/tickets`. | `config/routes.rb` |
-| A3 | `UsersController`, `CategoriesController`, `BrandsController` index endpoints have **no pagination**; they return unbounded query results. | all three controllers |
-| A4 | `EventsController#create` accepts `:status` in strong params but immediately overwrites it with `'draft'`; the param is ignored and leaks the internal enum vocabulary to callers. | `events_controller.rb` lines 38, 56-59 |
-| A5 | No `GET /users/me` endpoint; clients must know their user ID to fetch their own profile. | missing route |
+| A1 | **`UsersController#index` returns all users** – no pagination and exposes the full user list (including email) to any authenticated user. Superadmin-only access should be enforced. | `users_controller.rb` |
+| A2 | **`BrandsController#index` / `CategoriesController#index` have no pagination** – unbounded query, could return thousands of rows. | both controllers |
+| A3 | **No `GET /users/me` endpoint** – clients must already know their user ID to fetch their own profile. | missing route |
+| A4 | **`EventsController#create` builds event before `authorize`** – `Event.new(event_params.except(:category_ids))` is called before `authorize @event`, so an unauthorized user triggers `event_params` processing (including potential strong-param warnings) before being rejected. Authorizing first (or before building) is cleaner. | `events_controller.rb` line 35-36 |
+| A5 | **`Ticket#user_can_have_only_one_ticket_per_event` TOCTOU** – the model validation uses a `WHERE ... NOT IN` read-then-write pattern. A DB unique index already exists, so the application-level check is a nice complement, but the race condition is fully covered by the index. The `RecordNotUnique` rescue in the controller is the correct last line of defense. | `ticket.rb`, `tickets_controller.rb` |
 
 ---
 
@@ -123,10 +126,10 @@ per IP on these endpoints.
 
 | # | Issue | File |
 |---|---|---|
-| Doc1 | `Event_Platform_API_v1.1.md` documents JWT refresh tokens, email confirmation, EventSubscriptions, Payments, BrandRequests, `/users/me`, and event fields `capacity`, `price`, `is_free` – **none are implemented**. | `docs/Event_Platform_API_v1.1.md` |
-| Doc2 | `SETUP.md` references MongoDB (irrelevant – the project uses PostgreSQL) and pins Ruby 3.3.0 (the `.ruby-version` file specifies 3.4.8). | `docs/SETUP.md` |
-| Doc3 | `spec/swagger_helper.rb` has `paths: {}` – no rswag path DSL blocks exist (except `passwords_spec.rb`). No `swagger.yaml` is generated; the Swagger UI is empty. | `spec/swagger_helper.rb` |
-| Doc4 | `FRONTEND_URL` is used in `UserMailer` but is missing from `.env.example`; developers get a `KeyError` on first run if the variable is unset. | `.env.example`, `app/mailers/user_mailer.rb` |
+| Doc1 | `Event_Platform_API_v1.1.md` documents JWT refresh, email confirmation, EventSubscriptions, Payments, BrandRequests, `/users/me`, and event fields `capacity`, `price`, `is_free` – **none are implemented**. | `docs/Event_Platform_API_v1.1.md` |
+| Doc2 | `SETUP.md` references MongoDB (irrelevant – project uses PostgreSQL) and pins Ruby 3.3.0 (`.ruby-version` specifies 3.4.8). | `docs/SETUP.md` |
+| Doc3 | `spec/swagger_helper.rb` now has rswag path blocks for tickets but not for events, brands, users, or categories. Swagger UI is still mostly empty. | `spec/swagger_helper.rb` |
+| Doc4 | `rack-attack` rate-limit configuration (thresholds, window sizes) is not documented anywhere. Operators have no visibility into what limits are in place. | `config/initializers/` (file missing) |
 
 ---
 
@@ -134,31 +137,33 @@ per IP on these endpoints.
 
 | Priority | Recommendation | File(s) |
 |---|---|---|
-| 1 | **Add `authorize @event`** in `EventsController#create` | `events_controller.rb` |
-| 2 | **Add `rejection_reason` migration**; remove `:status` from `event_params` | `db/migrate/`, `events_controller.rb` |
-| 3 | **Restrict CORS** to ENV-configured origins | `cors.rb`, `.env.example` |
-| 4 | **Implement JWT logout / denylist** + refresh token flow | `jwt_service.rb`, `auth_controller.rb` |
-| 5 | **Add `Rack::Attack`** rate limiting on auth endpoints | new `rack_attack.rb` initializer |
-| 6 | **Fix `BrandsController`** – remove local `authenticate_user!` / `current_user` override; use `skip_before_action :authorize_request` | `brands_controller.rb` |
-| 7 | **Remove `:update` route from `resources :tickets`**; implement or drop the action | `routes.rb` |
-| 8 | **Extract pagination to a shared concern**; add pagination to all unbounded index endpoints | `users_controller.rb`, `brands_controller.rb`, `categories_controller.rb` |
-| 9 | **Remove unused `Devise` gem** | `Gemfile` |
-| 10 | **Add DB `NOT NULL` constraints**; add `(brand_id, role)` index on `brand_memberships`; add `UNIQUE` on `event_feedbacks.ticket_id` | new migrations |
+| 1 | **Configure `rack-attack`** – add `config/initializers/rack_attack.rb` with throttles on login, register, and password-reset | new `rack_attack.rb` initializer |
+| 2 | **Guard ticket creation** against non-published events | `ticket.rb` or `tickets_controller.rb` |
+| 3 | **Implement JWT logout / denylist** + refresh token flow | `jwt_service.rb`, `auth_controller.rb` |
+| 4 | **Remove dead `update_password_params`** from `PasswordsController` | `passwords_controller.rb` |
+| 5 | **Add UNIQUE index on `event_feedbacks.ticket_id`** | new migration |
+| 6 | **Restrict `UsersController#index`** to superadmins; add pagination | `users_controller.rb` |
+| 7 | **Extract pagination to shared concern** | `events_controller.rb`, `tickets_controller.rb`, `brand_memberships_controller.rb` |
+| 8 | **Remove unused `Devise` gem** | `Gemfile` |
+| 9 | **Implement `EventPolicy::Scope`** to filter events by publish status for non-admin users | `event_policy.rb` |
+| 10 | **Add DB `NOT NULL` on `users.name`**; add `null: false` on `event_feedbacks.ticket_id` | new migration |
 
 ---
 
 ## Applied Fixes in This PR
 
-The following findings from this audit were fixed directly in this pull request:
+The following findings from both audit rounds are addressed directly in this pull request:
 
 | Finding | Change |
 |---|---|
-| **#1** – Missing `authorize @event` in `EventsController#create` | Added `authorize @event` after building the event object |
-| **#2** – `rejection_reason` column missing | Added `20260430000001_add_rejection_reason_to_events.rb` migration |
-| **A4** – `:status` leaking in `event_params` | Removed `:status` from `EventsController#event_params` |
-| **#3** – CORS wildcard | `cors.rb` now reads `ALLOWED_ORIGINS` from the environment |
-| **Doc4** – `FRONTEND_URL` missing from `.env.example` | Added `FRONTEND_URL` and `ALLOWED_ORIGINS` to `.env.example` |
-| **T1** – `BrandsController` dual-auth / `AuthHelper.decode` dead-code | Removed local `authenticate_user!` and `current_user`; added `skip_before_action :authorize_request, only: %i[index show]` |
-| **A1** – `:update` route declared without action | Removed `:update` from `resources :tickets` |
-| **D4** – Missing `(brand_id, role)` index | Added `20260430000002_add_brand_role_index_to_brand_memberships.rb` migration |
-| **D1** – Missing `NOT NULL` on `events.location` / `events.start_date` | Added `20260430000003_add_not_null_to_events_required_fields.rb` migration |
+| **#1 (original)** – Missing `authorize @event` in `EventsController#create` | Added `authorize @event` after building the event object |
+| **#2 (original)** – `rejection_reason` column missing | Migration `20260430000001_add_rejection_reason_to_events.rb` |
+| **A4 (original)** – `:status` leaking in `event_params` | Removed `:status` from `EventsController#event_params` |
+| **#3 (original)** – CORS wildcard `origins '*'` | `cors.rb` reads `ALLOWED_ORIGINS` from ENV (default: `http://localhost:3000`) |
+| **Doc4 (original)** – `FRONTEND_URL` / `ALLOWED_ORIGINS` missing from `.env.example` | Added both to `.env.example` |
+| **T1 (original)** – `BrandsController` dual-auth dead code | Fixed upstream (PR #41); `skip_before_action :authorize_request` now used |
+| **D4 (original)** – Missing `(brand_id, role)` index | Migration `20260430000002_add_brand_role_index_to_brand_memberships.rb` |
+| **D1 (original)** – Missing `NOT NULL` on `events.location` / `events.start_date` | Migration `20260430000003_add_not_null_to_events_required_fields.rb` |
+| **#1 (re-audit)** – `rack-attack` unconfigured | Created `config/initializers/rack_attack.rb` with throttles |
+| **T1 (re-audit)** – `update_password_params` dead code | Removed from `PasswordsController` |
+| **D1 (re-audit)** – `event_feedbacks.ticket_id` missing UNIQUE index | Migration `20260430000004_add_unique_index_to_event_feedbacks_ticket_id.rb` |
