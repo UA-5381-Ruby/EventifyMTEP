@@ -4,8 +4,6 @@ require 'swagger_helper'
 
 RSpec.describe ApplicationController, type: :controller do
   controller do
-    before_action :authorize_request
-
     def index
       render plain: 'Success'
     end
