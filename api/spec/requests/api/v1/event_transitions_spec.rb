@@ -12,7 +12,7 @@ RSpec.describe 'Api::V1::Events Transitions', type: :request do
 
   # Хелпер для створення JWT заголовків
   def auth_headers(user)
-    token = JwtService.encode(user_id: user.id)
+    token = JwtService.encode(user_id: user.id, password_salt: user.password_salt)
     { 'Authorization' => "Bearer #{token}" }
   end
 

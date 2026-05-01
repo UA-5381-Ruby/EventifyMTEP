@@ -10,7 +10,7 @@ RSpec.describe 'Api::V1::EventCategories', type: :request do
   let!(:category)   { create(:category) }
 
   def auth_headers(user)
-    token = JwtService.encode(user_id: user.id)
+    token = JwtService.encode(user_id: user.id, password_salt: user.password_salt)
     { 'Authorization' => "Bearer #{token}" }
   end
 

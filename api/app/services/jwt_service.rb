@@ -18,4 +18,16 @@ class JwtService
   rescue JWT::ExpiredSignature, JWT::DecodeError
     nil
   end
+
+  # Validate that the token's password_salt matches the user's current password_salt
+  # This ensures that tokens become invalid if the password has been changed
+  def self.valid_token_salt?(token, user)
+    decoded = decode(token)
+    return false if decoded.nil?
+
+    # Token must have password_salt to be valid
+    return false unless decoded.key?(:password_salt)
+
+    decoded[:password_salt] == user.password_salt
+  end
 end

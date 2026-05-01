@@ -23,7 +23,7 @@ RSpec.describe 'api/v1/brands', type: :request do
         end
 
         let(:user) { @user }
-        let(:Authorization) { auth_headers(user)['Authorization'] }
+        let(:Authorization) { jwt_for(user) }
 
         run_test!
       end
@@ -44,7 +44,7 @@ RSpec.describe 'api/v1/brands', type: :request do
         before { @user = create(:user) }
 
         let(:user) { @user }
-        let(:Authorization) { auth_headers(user)['Authorization'] }
+        let(:Authorization) { jwt_for(user) }
 
         let(:body) do
           {
@@ -64,7 +64,7 @@ RSpec.describe 'api/v1/brands', type: :request do
         before { @user = create(:user) }
 
         let(:user) { @user }
-        let(:Authorization) { auth_headers(user)['Authorization'] }
+        let(:Authorization) { jwt_for(user) }
         let(:body) { { brand: { name: '', subdomain: '' } } }
 
         run_test!
@@ -86,7 +86,7 @@ RSpec.describe 'api/v1/brands', type: :request do
         before { @user = create(:user) }
 
         let(:user) { @user }
-        let(:Authorization) { auth_headers(user)['Authorization'] }
+        let(:Authorization) { jwt_for(user) }
 
         let(:id) do
           brand = create(:brand)
@@ -103,7 +103,7 @@ RSpec.describe 'api/v1/brands', type: :request do
         before { @user = create(:user) }
 
         let(:user) { @user }
-        let(:Authorization) { auth_headers(user)['Authorization'] }
+        let(:Authorization) { jwt_for(user) }
         let(:id) { 0 }
 
         run_test!

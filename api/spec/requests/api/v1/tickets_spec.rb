@@ -22,7 +22,7 @@ RSpec.describe 'api/v1/tickets', type: :request do
       parameter name: :event_id, in: :query, type: :integer, required: false
 
       let(:user) { create(:user) }
-      let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+      let(:Authorization) { jwt_for(user) }
 
       response '200', 'tickets listed successfully' do
         schema '$ref' => '#/components/schemas/TicketList'
@@ -135,7 +135,7 @@ RSpec.describe 'api/v1/tickets', type: :request do
                 schema: { '$ref' => '#/components/schemas/TicketInput' }
 
       let(:user) { create(:user) }
-      let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+      let(:Authorization) { jwt_for(user) }
 
       response '201', 'ticket created' do
         schema '$ref' => '#/components/schemas/Ticket'
@@ -201,7 +201,7 @@ RSpec.describe 'api/v1/tickets', type: :request do
       description 'Returns a specific ticket with associated event and feedback.'
 
       let(:user) { create(:user) }
-      let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+      let(:Authorization) { jwt_for(user) }
 
       response '200', 'ticket found' do
         schema '$ref' => '#/components/schemas/Ticket'
@@ -243,7 +243,7 @@ RSpec.describe 'api/v1/tickets', type: :request do
                 schema: { '$ref' => '#/components/schemas/TicketUpdateInput' }
 
       let(:user) { create(:user) }
-      let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+      let(:Authorization) { jwt_for(user) }
 
       response '200', 'ticket updated' do
         schema '$ref' => '#/components/schemas/Ticket'
@@ -299,7 +299,7 @@ RSpec.describe 'api/v1/tickets', type: :request do
                 schema: { '$ref' => '#/components/schemas/ReviewInput' }
 
       let(:user) { create(:user) }
-      let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+      let(:Authorization) { jwt_for(user) }
 
       response '200', 'review created successfully' do
         schema '$ref' => '#/components/schemas/EventFeedback'
