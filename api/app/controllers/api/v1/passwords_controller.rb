@@ -34,10 +34,6 @@ module Api
           render json: { errors: user.errors.full_messages }, status: :unprocessable_content
         end
       end
-
-      def update_password_params
-        params.permit(:new_password, :password_confirmation)
-      end
     end
   end
 end
