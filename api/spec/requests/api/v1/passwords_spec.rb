@@ -85,7 +85,7 @@ RSpec.describe 'Api::V1::Passwords', type: :request, swagger_doc: 'v1/swagger.ya
       operationId 'password_change'
       description 'Change password for authenticated user. Requires valid JWT and current password.'
       consumes 'application/json'
-      security [{ bearerAuth: [] }]
+      security [{ bearer_auth: [] }]
 
       parameter name: :Authorization, in: :header, type: :string, required: true
       parameter name: :request_body, in: :body, schema: {
