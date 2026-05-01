@@ -109,6 +109,7 @@ The routes below are derived from `config/routes.rb` and the current controllers
 | POST | `/api/v1/auth/register` | Public | Register a new user and return a JWT. |
 | POST | `/api/v1/auth/login` | Public | Authenticate and return a JWT. |
 | POST | `/api/v1/auth/password/reset` | Public | Request password reset email, or confirm reset when `token` is provided as a query parameter. |
+| PATCH | `/api/v1/auth/password/change` | Authenticated | Change password for an authenticated user. |
 | GET | `/api/v1/users` | Authenticated | List users. |
 | GET | `/api/v1/users/:id` | Authenticated | Show a user profile. |
 | PATCH/PUT | `/api/v1/users/:id` | Authenticated | Update a user; restricted by policy. |
