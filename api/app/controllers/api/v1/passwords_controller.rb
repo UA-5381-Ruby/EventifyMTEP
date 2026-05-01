@@ -61,7 +61,7 @@ module Api
       def require_correct_current_password
         return if current_user.authenticate(params[:current_password])
 
-        render json: { error: 'Current password is incorrect' }, status: :unauthorized
+        return render json: { error: 'Current password is incorrect' }, status: :unauthorized
       end
     end
   end
