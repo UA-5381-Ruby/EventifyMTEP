@@ -30,4 +30,31 @@ RSpec.describe JwtService do
 
     expect(result).to be_nil
   end
+
+  describe '#valid_token_salt?' do
+    let(:user) { create(:user) }
+
+    it 'returns true if token salt matches user password_salt' do
+      token = JwtService.encode(user_id: user.id, password_salt: user.password_salt)
+
+      expect(JwtService.valid_token_salt?(token, user)).to be(true)
+    end
+
+    it 'returns true if token does not have password_salt (legacy token)' do
+      token = JwtService.encode(user_id: user.id)
+
+      expect(JwtService.valid_token_salt?(token, user)).to be(true)
+    end
+
+    it 'returns false if token salt does not match user password_salt' do
+      token = JwtService.encode(user_id: user.id, password_salt: 'old_salt')
+      user.update(password: 'newpassword123') # This changes password_salt
+
+      expect(JwtService.valid_token_salt?(token, user)).to be(false)
+    end
+
+    it 'returns false if token is invalid' do
+      expect(JwtService.valid_token_salt?('invalid.token', user)).to be(false)
+    end
+  end
 end

@@ -13,6 +13,6 @@ module AuthHelper
   end
 
   def jwt_for(user)
-    ::JwtService.encode(user_id: user.id)
+    ::JwtService.encode(user_id: user.id, password_salt: user.password_salt)
   end
 end

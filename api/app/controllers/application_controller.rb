@@ -24,6 +24,10 @@ class ApplicationController < ActionController::API
       decoded = JwtService.decode(token)
       if decoded
         @current_user = User.find(decoded[:user_id])
+        # Validate password_salt to ensure JWT is still valid after password changes
+        unless JwtService.valid_token_salt?(token, @current_user)
+          render json: { error: 'Unauthorized access. Token has been invalidated.' }, status: :unauthorized
+        end
       else
         render json: { error: 'Unauthorized access. Invalid token.' }, status: :unauthorized
       end
