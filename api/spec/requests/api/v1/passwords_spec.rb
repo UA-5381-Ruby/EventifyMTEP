@@ -76,4 +76,62 @@ RSpec.describe 'Api::V1::Passwords', type: :request, swagger_doc: 'v1/swagger.ya
       end
     end
   end
+
+  path '/api/v1/auth/password/change' do
+    let!(:user) { create(:user, password: 'oldpassword123') }
+
+    patch 'Change password' do
+      tags 'Auth'
+      operationId 'password_change'
+      description 'Change password for authenticated user. Requires valid JWT and current password.'
+      consumes 'application/json'
+      security [{ bearerAuth: [] }]
+
+      parameter name: :Authorization, in: :header, type: :string, required: true
+      parameter name: :request_body, in: :body, schema: {
+        type: :object,
+        properties: {
+          current_password: { type: :string, example: 'oldpassword123' },
+          new_password: { type: :string, example: 'newpassword456' }
+        },
+        required: %w[current_password new_password]
+      }
+
+      response '200', 'Password changed successfully' do
+        let(:request_body) { { current_password: 'oldpassword123', new_password: 'newpassword456' } }
+        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        run_test!
+      end
+
+      response '401', 'Wrong current password' do
+        let(:request_body) { { current_password: 'wrongpassword', new_password: 'newpassword456' } }
+        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        run_test!
+      end
+
+      response '401', 'Missing or invalid JWT' do
+        let(:request_body) { { current_password: 'oldpassword123', new_password: 'newpassword456' } }
+        let(:Authorization) { 'Bearer invalid.token' }
+        run_test!
+      end
+
+      response '422', 'Blank new password' do
+        let(:request_body) { { current_password: 'oldpassword123', new_password: '' } }
+        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        run_test!
+      end
+
+      response '422', 'Blank current password' do
+        let(:request_body) { { current_password: '', new_password: 'newpassword456' } }
+        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        run_test!
+      end
+
+      response '422', 'Validation error (password too short)' do
+        let(:request_body) { { current_password: 'oldpassword123', new_password: '123' } }
+        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        run_test!
+      end
+    end
+  end
 end

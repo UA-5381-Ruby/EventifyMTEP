@@ -11,4 +11,8 @@ module AuthHelper
       'Accept' => 'application/json'
     }
   end
+
+  def jwt_for(user)
+    ::JwtService.encode(user_id: user.id)
+  end
 end
