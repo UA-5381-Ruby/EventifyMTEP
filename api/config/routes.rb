@@ -41,11 +41,11 @@ Rails.application.routes.draw do
       post '/auth/password/reset', to: 'passwords#create'
       patch '/auth/password/change', to: 'passwords#change'
 
-      get 'my_tickets', to: 'tickets#my_tickets'
+      get 'my_tickets', to: 'tickets#index'
 
-      resources :tickets, only: [:create, :update] do
+      resources :tickets, only: [:index, :create, :update, :show] do
         member do
-          patch :review
+          post :review
         end
       end
 
