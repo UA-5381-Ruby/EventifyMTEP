@@ -1,51 +1,64 @@
-API
-гість
-я як гість хочу мати можливість зареєструватись (відправляється емаіл з лінкою на підтвердження) POST /api/v1/auth/register
-я як гість хочу мати можливість підтвердити свою реєстрацію POST /api/v1/auth/confirm-email
-я як гість хочу мати можливість авторизуватись POST /api/v1/auth/login
-я як гість хочу мати можливість відновити пароль POST /api/v1/auth/password/reset
-я як гість хочу мати можливість підтвердити відновлення паролю POST /api/v1/auth/password/reset
+Eventify API user stories
+Current repository scope only
 
-я як гість хочу мати можливість переглянути список брендів GET /api/v1/brands
-я як гість хочу мати можливість переглянути бренд  GET /api/v1/brands/:id
-я як гість хочу мати можливість переглянути список  GET подій /api/v1/events
-я як гість хочу мати можливість переглянути подію  GET /api/v1/events/:id
-я як гість хочу мати можливість переглянути список подій відфільтрувавши їх по певних критеріях GET /api/v1/events?params
+Guest
+- As a guest, I can register a new account: POST /api/v1/auth/register
+- As a guest, I can log in and receive a JWT token: POST /api/v1/auth/login
+- As a guest, I can request a password reset email: POST /api/v1/auth/password/reset
+- As a guest, I can confirm a password reset by sending a new password with a reset token: POST /api/v1/auth/password/reset?token=...
+- As a guest, I can browse the list of brands: GET /api/v1/brands
+- As a guest, I can view a single brand and its events: GET /api/v1/brands/:id
+- As a guest, I can browse the event list: GET /api/v1/events
+- As a guest, I can filter the event list by supported query parameters: GET /api/v1/events?params
 
-користувач
-я як користувач хочу мати можливість переглянути інформацію про себе GET /api/v1/users/:id
-я як користувач хочу мати можливість змінити інформацію про себе PATCH/PUT /api/v1/users/:id
-я як користувач хочу мати можливість змінити пароль PATCH/PUT /api/v1/users/:id
+Authenticated user
+- As an authenticated user, I can list users: GET /api/v1/users
+- As an authenticated user, I can view a user profile: GET /api/v1/users/:id
+- As an authenticated user, I can update my own profile: PATCH /api/v1/users/:id
+- As an authenticated user, I can delete my own profile: DELETE /api/v1/users/:id
+- As an authenticated user, I can view a single event: GET /api/v1/events/:id
+- As an authenticated user, I can list categories: GET /api/v1/categories
+- As an authenticated user, I can create a category: POST /api/v1/categories
+- As an authenticated user, I can view categories linked to an event: GET /api/v1/events/:event_id/categories
+- As an authenticated user, I can create a brand and become its owner: POST /api/v1/brands
+- As an authenticated user, I can view my tickets: GET /api/v1/tickets or GET /api/v1/my_tickets
+- As an authenticated user, I can create a ticket for an event: POST /api/v1/tickets
+- As an authenticated user, I can view one of my tickets: GET /api/v1/tickets/:id
+- As an authenticated user, I can update one of my tickets, for example to change its active state: PATCH /api/v1/tickets/:id
+- As an authenticated user, I can create or update a review for one of my tickets: POST /api/v1/tickets/:id/review
 
-я як користувач хочу мати можливість переглянути список брендів GET /api/v1/brands
-я як користувач хочу мати можливість переглянути список подій GET /api/v1/events
-я як користувач хочу мати можливість переглянути список подій відфільтрувавши їх по певних критеріях GET /api/v1/events?params
-я як користувач хочу мати можливість купити квиток на подію POST /api/v1/tickets {event_id, count} (автоматично відправити pdf на почту)
-я як користувач хочу мати можливість переглянути свої квитки GET /api/v1/tickets
-я як користувач хочу мати можливість відправити квитки на свою почту POST /api/v1/tickets/send-to-email (відправити pdf на почту)
+Brand manager
+- As a brand manager, I can view the membership list for my brand: GET /api/v1/brands/:brand_id/memberships
+- As a brand manager, I can add non-owner members to my brand: POST /api/v1/brands/:brand_id/memberships
+- As a brand manager, I can update memberships when policy rules allow it: PATCH /api/v1/brands/:brand_id/memberships/:id
+- As a brand manager, I can remove members with the restrictions defined by policy: DELETE /api/v1/brands/:brand_id/memberships/:id
+- As a brand manager, I can attach categories to events in my brand: POST /api/v1/events/:event_id/categories
+- As a brand manager, I can remove categories from events in my brand: DELETE /api/v1/events/:event_id/categories/:category_id
+- As a brand manager, I can submit an event for review: POST /api/v1/events/:id/submit
+- As a brand manager, I can cancel an event in my brand: POST /api/v1/events/:id/cancel
 
-я як користувач хочу мати можливість відслідковувати подію post /api/v1/events/:id/subscribe (якщо вже додана то відписатися)
-я як користувач хочу мати можливість переглянути події які я відслідковую /api/v1/events/subscribe
-я як користувач хочу мати можливість написати фідбек про подію  POST /api/v1/events/{event_id}/feedbacks
-я як користувач хочу мати можливість подати заявку на створення бренду POST /api/v1/brands (власник 1)
+Brand owner
+- As a brand owner, I can update my brand: PATCH /api/v1/brands/:id
+- As a brand owner, I can delete my brand: DELETE /api/v1/brands/:id
+- As a brand owner, I can manage all brand memberships, while preserving at least one owner: POST/PATCH/DELETE /api/v1/brands/:brand_id/memberships...
+- As a brand owner, I can submit an event for review: POST /api/v1/events/:id/submit
+- As a brand owner, I can cancel an event in my brand: POST /api/v1/events/:id/cancel
 
+Superadmin
+- As a superadmin, I can create events directly: POST /api/v1/events
+- As a superadmin, I can approve events under review: POST /api/v1/events/:id/approve
+- As a superadmin, I can reject events under review: POST /api/v1/events/:id/reject
+- As a superadmin, I can update or delete any user: PATCH/DELETE /api/v1/users/:id
+- As a superadmin, I can update or delete any brand: PATCH/DELETE /api/v1/brands/:id
+- As a superadmin, I can manage any brand membership: GET/POST/PATCH/DELETE /api/v1/brands/:brand_id/memberships...
 
-менеджер бренду
-я як менеджер бренду хочу мати можливість переглянути дані про бренд GET /api/v1/brands
-я як менеджер бренду хочу мати можливість оновити дані про бренд PUT /api/v1/brands
-я як менеджер бренду хочу мати можливість додати нового менеджера POST /api/v1/brands/{id}/managers  (:email)(тільки користувач сичтеми)
-я як менеджер бренду хочу мати можливість видалити існуючого менеджера DELETE /api/v1/brands/{brand_id}/managers/{user_id}
-я як менеджер бренду хочу мати можливість створити нову подію POST /api/v1/events
-я як менеджер бренду хочу мати можливість переглянути інформацію про подію GET /api/v1/events/:id
-я як менеджер бренду хочу мати можливість оновити існуючу подію PUT /api/v1/events/:id
-
-адміністратор(supper_admin)
-я як адміністратор хочу мати можливість переглянути список заяв на створення брендів GET /api/v1/admin/brand-requests
-я як адміністратор хочу мати можливість підтвердити або відмовити у заяві на створення брендів PATCH /api/v1/admin/brand-requests/{request_id}/status
-	```{
-	"status": "approved", // або "rejected"
-	"comment": "Все добре, бренд активовано" // обов'язково при відмові
-	}```
+Not currently implemented
+- Email confirmation
+- Refresh tokens and logout
+- Event subscriptions
+- Payments
+- Brand approval requests
+- Dedicated admin moderation endpoints
 
 
 
