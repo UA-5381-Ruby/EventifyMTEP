@@ -4,7 +4,7 @@ require 'swagger_helper'
 
 RSpec.describe 'api/v1/categories', type: :request do
   let(:superadmin) { create(:user, is_superadmin: true) }
-  let(:Authorization) { "Bearer #{JwtService.encode(user_id: superadmin.id)}" }
+  let(:Authorization) { "Bearer #{JwtService.encode(user_id: superadmin.id, password_salt: superadmin.password_salt)}" }
 
   path '/api/v1/categories' do
     get 'List categories' do

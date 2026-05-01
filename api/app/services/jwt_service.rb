@@ -25,8 +25,8 @@ class JwtService
     decoded = decode(token)
     return false if decoded.nil?
 
-    # If token doesn't have password_salt (legacy tokens), allow it
-    return true unless decoded.key?(:password_salt)
+    # Token must have password_salt to be valid
+    return false unless decoded.key?(:password_salt)
 
     decoded[:password_salt] == user.password_salt
   end

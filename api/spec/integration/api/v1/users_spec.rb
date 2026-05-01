@@ -13,7 +13,7 @@ RSpec.describe 'Api::V1::Users', type: :request do
         let(:admin) do
           User.create!(name: 'Admin', email: 'admin_index@test.com', password: 'password123', is_superadmin: true)
         end
-        let(:Authorization) { "Bearer #{JwtService.encode(user_id: admin.id)}" }
+        let(:Authorization) { "Bearer #{JwtService.encode(user_id: admin.id, password_salt: admin.password_salt)}" }
         run_test!
       end
 

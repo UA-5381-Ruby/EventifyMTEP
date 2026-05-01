@@ -10,7 +10,7 @@ class CategoriesControllerTest < ActionDispatch::IntegrationTest
     end
 
     # Генеруємо токен
-    token = JwtService.encode(user_id: @user.id)
+    token = JwtService.encode(user_id: @user.id, password_salt: @user.password_salt)
     @headers = { 'Authorization' => "Bearer #{token}" }
 
     @category = Category.find_or_create_by!(name: 'Test Category')

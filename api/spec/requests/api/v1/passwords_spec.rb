@@ -100,10 +100,19 @@ RSpec.describe 'Api::V1::Passwords', type: :request, swagger_doc: 'v1/swagger.ya
       response '200', 'Password changed successfully' do
         let(:request_body) { { current_password: 'oldpassword123', new_password: 'newpassword456' } }
         let(:Authorization) { "Bearer #{jwt_for(user)}" }
+        before do
+          @old_token = jwt_for(user) # Capture token before password change
+        end
         after do |_example|
           user.reload
           expect(user.authenticate('newpassword456')).to be_truthy
           expect(user.authenticate('oldpassword123')).to be_falsey
+
+          # Verify that the JWT token used for the change is now invalidated
+          patch '/api/v1/auth/password/change',
+                params: { current_password: 'newpassword456', new_password: 'newpassword789' },
+                headers: { 'Authorization' => "Bearer #{@old_token}" }
+          expect(response.status).to eq(401)
         end
         run_test!
       end

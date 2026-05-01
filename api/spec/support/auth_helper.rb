@@ -4,7 +4,7 @@
 module AuthHelper
   # Цей метод генерує заголовки з токеном для конкретного користувача
   def auth_headers(user)
-    token = ::JwtService.encode(user_id: user.id)
+    token = ::JwtService.encode(user_id: user.id, password_salt: user.password_salt)
     {
       'Authorization' => "Bearer #{token}",
       'Content-Type' => 'application/json',

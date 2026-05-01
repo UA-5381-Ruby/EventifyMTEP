@@ -40,10 +40,10 @@ RSpec.describe JwtService do
       expect(JwtService.valid_token_salt?(token, user)).to be(true)
     end
 
-    it 'returns true if token does not have password_salt (legacy token)' do
+    it 'returns false if token does not have password_salt' do
       token = JwtService.encode(user_id: user.id)
 
-      expect(JwtService.valid_token_salt?(token, user)).to be(true)
+      expect(JwtService.valid_token_salt?(token, user)).to be(false)
     end
 
     it 'returns false if token salt does not match user password_salt' do
