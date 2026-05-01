@@ -99,13 +99,13 @@ RSpec.describe 'Api::V1::Passwords', type: :request, swagger_doc: 'v1/swagger.ya
 
       response '200', 'Password changed successfully' do
         let(:request_body) { { current_password: 'oldpassword123', new_password: 'newpassword456' } }
-        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        let(:Authorization) { jwt_for(user) }
         run_test!
       end
 
       response '401', 'Wrong current password' do
         let(:request_body) { { current_password: 'wrongpassword', new_password: 'newpassword456' } }
-        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        let(:Authorization) { jwt_for(user) }
         run_test!
       end
 
@@ -117,19 +117,19 @@ RSpec.describe 'Api::V1::Passwords', type: :request, swagger_doc: 'v1/swagger.ya
 
       response '422', 'Blank new password' do
         let(:request_body) { { current_password: 'oldpassword123', new_password: '' } }
-        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        let(:Authorization) { jwt_for(user) }
         run_test!
       end
 
       response '422', 'Blank current password' do
         let(:request_body) { { current_password: '', new_password: 'newpassword456' } }
-        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        let(:Authorization) { jwt_for(user) }
         run_test!
       end
 
       response '422', 'Validation error (password too short)' do
         let(:request_body) { { current_password: 'oldpassword123', new_password: '123' } }
-        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        let(:Authorization) { jwt_for(user) }
         run_test!
       end
     end

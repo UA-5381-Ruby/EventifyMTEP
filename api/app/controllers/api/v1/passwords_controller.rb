@@ -52,16 +52,16 @@ module Api
 
       def require_valid_password_params
         if params[:current_password].blank?
-          return render json: { error: 'Current password cannot be blank' }, status: :unprocessable_content
+          render json: { error: 'Current password cannot be blank' }, status: :unprocessable_content
         elsif params[:new_password].blank?
-          return render json: { error: 'New password cannot be blank' }, status: :unprocessable_content
+          render json: { error: 'New password cannot be blank' }, status: :unprocessable_content
         end
       end
 
       def require_correct_current_password
         return if current_user.authenticate(params[:current_password])
 
-        return render json: { error: 'Current password is incorrect' }, status: :unauthorized
+        render json: { error: 'Current password is incorrect' }, status: :unauthorized
       end
     end
   end

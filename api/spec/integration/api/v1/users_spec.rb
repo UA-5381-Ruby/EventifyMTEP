@@ -35,14 +35,14 @@ RSpec.describe 'Api::V1::Users', type: :request do
       response('200', 'successfully found') do
         let(:user) { User.create!(name: 'User Show', email: 'show@test.com', password: 'password123') }
         let(:id) { user.id }
-        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        let(:Authorization) { jwt_for(user) }
         run_test!
       end
 
       response('404', 'user not found') do
         let(:user) { User.create!(name: 'User', email: 'random@test.com', password: 'password123') }
         let(:id) { 999_999 }
-        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        let(:Authorization) { jwt_for(user) }
         run_test!
       end
     end
@@ -65,7 +65,7 @@ RSpec.describe 'Api::V1::Users', type: :request do
       response('200', 'successfully updated') do
         let(:user) { User.create!(name: 'Old Name', email: 'update@test.com', password: 'password123') }
         let(:id) { user.id }
-        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        let(:Authorization) { jwt_for(user) }
         let(:user_params) { { name: 'New Name' } }
         run_test!
       end
@@ -78,7 +78,7 @@ RSpec.describe 'Api::V1::Users', type: :request do
       response('204', 'successfully deleted (no content)') do
         let(:user) { User.create!(name: 'To Delete', email: 'delete@test.com', password: 'password123') }
         let(:id) { user.id }
-        let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+        let(:Authorization) { jwt_for(user) }
         run_test!
       end
     end
