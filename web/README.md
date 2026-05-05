@@ -4,7 +4,7 @@ Eventify — Multi-Tenant Event Platform
 
 The `web/` directory is reserved for the future frontend application.
 
-## Tecknologies
+## Technologies
 
 <div align="center">
 
