@@ -3,7 +3,10 @@
 module Api
   module V1
     class PasswordsController < ApplicationController
-      skip_before_action :authorize_request
+      skip_before_action :authorize_request, only: %i[create update]
+
+      before_action :require_valid_password_params, only: :change
+      before_action :require_correct_current_password, only: :change
 
       # POST /api/v1/auth/password/reset
       def create
@@ -35,8 +38,30 @@ module Api
         end
       end
 
-      def update_password_params
-        params.permit(:new_password, :password_confirmation)
+      # PATCH /api/v1/auth/password/change
+      def change
+        if current_user.update(password: params[:new_password])
+          render json: { message: 'Password successfully changed' }, status: :ok
+        else
+          render json: { errors: current_user.errors.full_messages },
+                 status: :unprocessable_content
+        end
+      end
+
+      private
+
+      def require_valid_password_params
+        if params[:current_password].blank?
+          render json: { error: 'Current password cannot be blank' }, status: :unprocessable_content
+        elsif params[:new_password].blank?
+          render json: { error: 'New password cannot be blank' }, status: :unprocessable_content
+        end
+      end
+
+      def require_correct_current_password
+        return if current_user.authenticate(params[:current_password])
+
+        render json: { error: 'Current password is incorrect' }, status: :unauthorized
       end
     end
   end

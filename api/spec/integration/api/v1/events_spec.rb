@@ -64,7 +64,7 @@ RSpec.describe 'api/v1/events', type: :request do
       parameter name: :to, in: :query, type: :string, required: false
 
       let(:user) { create(:user) }
-      let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+      let(:Authorization) { jwt_for(user) }
 
       response '200', 'events listed successfully' do
         let(:brand) { create(:brand) }
@@ -107,7 +107,7 @@ RSpec.describe 'api/v1/events', type: :request do
                 schema: { '$ref' => '#/components/schemas/EventInput' }
 
       let(:user) { create(:user) }
-      let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+      let(:Authorization) { jwt_for(user) }
 
       response '201', 'event created' do
         schema '$ref' => '#/components/schemas/Event'
@@ -169,7 +169,7 @@ RSpec.describe 'api/v1/events', type: :request do
       security [{ bearer_auth: [] }]
 
       let(:user) { create(:user) }
-      let(:Authorization) { "Bearer #{JwtService.encode(user_id: user.id)}" }
+      let(:Authorization) { jwt_for(user) }
 
       response '200', 'event found' do
         schema '$ref' => '#/components/schemas/Event'

@@ -42,7 +42,7 @@ RSpec.describe ApplicationController, type: :controller do
       end
 
       context 'and token is valid' do
-        let(:decoded_payload) { { user_id: user.id } }
+        let(:decoded_payload) { { user_id: user.id, password_salt: user.password_salt } }
 
         before do
           allow(JwtService).to receive(:decode).with(token).and_return(decoded_payload)
