@@ -1,266 +1,179 @@
-# Development Environment Setup Guide
+# Development Setup Guide
 
-This guide ensures we all share a consistent development environment. By following these steps, we minimize "this works on my machine" bugs.
+This guide focuses on the environment required by the current repository state. The active application is the Rails API in `api/`.
 
-## 1. System Update & Basic Dependencies
+## What you need
 
-Before we begin, let's update our system's package index and install basic networking and version control tools.
+According to `.tool-versions`, `api/Gemfile`, and the current Rails configuration, the project expects:
 
-```bash
-# Update package indexes
-sudo apt update
+- Ruby `3.4.8`
+- Bundler
+- PostgreSQL
+- Git
+- build tools required for native gems such as `pg`
 
-# Install necessary utilities for subsequent steps
-sudo apt install -y git ca-certificates curl
-```
+Optional but useful:
 
-## 2. Ruby & Ruby on Rails Setup
+- Docker, if you want to experiment with the production-oriented `api/Dockerfile`
+- an editor with Ruby support such as JetBrains RubyMine or VS Code
 
-We need the Rails framework and Ruby build tools for our project.
+## Quick start
 
-```bash
-# Clone ruby-build (an rbenv plugin that provides a command to compile and install different versions of Ruby)
-git clone https://github.com/rbenv/ruby-build.git
-
-# Install Rails version 8.0.0 globally
-# Note: using sudo for gem install might be required by your current environment setup, 
-# but it is generally recommended to use version managers (rbenv/rvm) without sudo.
-sudo gem install rails --version 8.0.0
-```
-
-## 3. PostgreSQL Setup
-
-If there are old or conflicting Postgres repositories on your system, it's best to remove them before doing a clean installation.
-
-```bash
-# Check if there are third-party PostgreSQL repositories in the system
-grep -R "apt.postgresql.org" /etc/apt/sources.list /etc/apt/sources.list.d/
-
-# Remove the old PGDG repository list to avoid conflicts
-sudo rm -f /etc/apt/sources.list.d/pgdg.list
-
-# Update the package list after removing the repository
-sudo apt update
-
-# Install PostgreSQL from the official Ubuntu repositories
-sudo apt install -y postgresql
-```
-
-## 4. Docker Setup
-
-Next, we install Docker to run containerized services (like databases). First, we remove any old versions, then install the latest ones from Docker's official repository.
-
-```bash
-# Remove all possible old Docker packages to avoid conflicts
-for pkg in docker.io docker-doc docker-compose docker-compose-v2 podman-docker containerd runc; do 
-  sudo apt-get remove -y $pkg
-done
-
-# Prepare the directory for GPG keys
-sudo install -m 0755 -d /etc/apt/keyrings
-
-# Download Docker's official GPG key
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-
-# Add the Docker repository to apt sources
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-$(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-# Update the system with the new repository
-sudo apt-get update
-
-# Install Docker Engine, CLI, Containerd, and required plugins
-sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
-# Add the current user to the docker group to run Docker without sudo
-sudo usermod -aG docker $USER
-
-# Apply group permissions without needing to log out and log back in
-newgrp docker
-
-## 5. MongoDB Database Setup via Docker
-
-Now that Docker is installed, we can spin up MongoDB.
-
-> **Note:** If a container with this name already exists, remove it first using `docker stop mongo-logs` and `docker rm mongo-logs`.
-
-```bash
-# Run a MongoDB container in the background (detached mode)
-# Container name: mongo-logs, mapped to port 27017
-docker run --name mongo-logs -p 27017:27017 -d mongo
-
-# Check the status of running containers
-docker ps -a
-```
-
-### Developer Reference
-
-Handy commands for managing this container:
-
-- Stop: `docker stop mongo-logs`
-- Start again: `docker start mongo-logs`
-- Remove: `docker rm mongo-logs` (container must be stopped first)
-
-## ## 6. RuboCop Linter Setup
-
-We use RuboCop to maintain a consistent code style across the project.
-
-Run these commands in the root directory of your project:
-
-```bash
-# Download the standard RuboCop config file from the official repository
-curl -o .rubocop.yml https://raw.githubusercontent.com/rubocop/rubocop/refs/heads/master/.rubocop.yml
-
-# Install the RuboCop gem
-gem install rubocop
-
-# Initialize Bundler (this creates a Gemfile if you don't have one yet)
-bundle init
-```
-
-With the config file in place and dependencies installed, run the following command from your project root to check your code:
-
-```bash
-# Run the linter
-bundle exec rubocop
-```
-
-## ## 7. Additional Static Analysis (ruby-lint)
-
-While RuboCop handles our code formatting and style guidelines, we also use ruby-lint for deeper static code analysis. It focuses specifically on finding logical errors (such as undefined methods or missing variables) rather than styling issues.
-
-```bash
-# Install the ruby-lint gem globally
-gem install ruby-lint
-
-# To analyze a specific file or directory, run:
-ruby-lint path/to/your/file.rb
-```
-
-## Clone our repository
+From a terminal:
 
 ```bash
 git clone https://github.com/UA-5381-Ruby/EventifyMTEP.git
+cd EventifyMTEP/api
+bundle install
+cp .env.example .env
+bin/rails secret
+bin/rails db:prepare
+bin/rails server -p 3000
 ```
 
-## 8. Visual Studio Code (VS Code) Setup
+After running `bin/rails secret`, copy the generated value into `JWT_SECRET_KEY` inside `api/.env`.
 
-To ensure a smooth and consistent development experience, we highly recommend using VS Code with a standardized set of extensions and workspace settings. This will enable syntax highlighting, code navigation, and automatic linting.
+## Linux or WSL setup
+
+If you are using Ubuntu or WSL, install the common dependencies first:
 
 ```bash
-git clone https://github.com/rbenv/rbenv.git ~/.rbenv
-echo 'eval "$(~/.rbenv/bin/rbenv init - bash)"' >> ~/.bashrc
-rbenv install 3.3.0
-rbenv global 3.3.0
-gem install rails --version 8.0.0
-gem install ruby-lsp rubocop
+sudo apt update
+sudo apt install -y build-essential git curl libpq-dev pkg-config postgresql-client
 ```
 
-Please install the following extensions from the VS Code Marketplace:
+### Install Ruby 3.4.8
 
-- Ruby LSP (by Shopify) - Provides the official language server features for Ruby (autocomplete, go-to-definition, etc.).
-- Rubocop (by Loris Cro or standard extension) - Integrates RuboCop directly into the editor for inline feedback.
-- Docker (by Microsoft) - Makes it easier to manage our MongoDB and other containers.
+Use your preferred version manager. Examples include `asdf` or `rbenv`.
 
-### Workspace Settings
+If you use `rbenv`, make sure your shell initializes it correctly, then install the required Ruby version:
 
-To automate formatting and keep our code style consistent without manual effort, create a `.vscode/settings.json` file in the root directory of the project (if it doesn't already exist) and add the following configuration:
-
-```json
-{
-  "editor.formatOnSave": true,
-  "[ruby]": {
-    "editor.defaultFormatter": "Shopify.ruby-lsp",
-    "editor.formatOnSave": true
-  },
-  "rubyLsp.formatter": "rubocop",
-  "rubyLsp.rubyVersionManager": "rbenv"
-}
+```bash
+rbenv install 3.4.8
+rbenv global 3.4.8
+gem install bundler
 ```
 
-This configuration ensures that every time you save a Ruby file, RuboCop will automatically format it according to our .rubocop.yml rules, and the editor will correctly use rbenv to find our Ruby version.
-
-## Windows
-
-This guide will help you set up a Ruby on Rails environment directly on Windows, without using virtual machines or WSL.
-
-## 1. Ruby & Build Tools (DevKit) Installation
-
-Since Windows doesn't have built-in compilers (like gcc in Linux), we need a special package that installs both Ruby and the MSYS2 environment, which is required for compiling gems with native extensions.
-
-1. Go to the RubyInstaller for Windows website.
-2. Download the Ruby+Devkit version (e.g., Ruby+Devkit 3.3.x (x64)).
-3. Run the installer. During installation, make sure to keep the "ridk install" checkbox checked (this installs MSYS2).
-4. After the installation is complete, a black terminal window will open. Press Enter (or type 3 and press Enter) to install the base MSYS2 toolchain (MSYS2 base installation + MSYS2 system update + MSYS2 and MINGW development toolchain).
-
-To check if everything works, open PowerShell and type:
-
-```powershell
-ruby -v
-```
-
-## 2. Git & Node.js Installation
-
-1. Download and install Git for Windows. You can leave all settings at their defaults during installation.
-2. (Optional, but recommended for frontend assets) Download and install the LTS version of Node.js.
-
-## 3. Database Setup
-
-Since we are working natively, it's best to install databases using their official Windows installers.
+If you use `asdf`, install the version from `.tool-versions` and then install Bundler.
 
 ### PostgreSQL
 
-1. Download the PostgreSQL installer for Windows.
-2. Run it. During installation, the system will ask you to create a password for the postgres superuser — make sure to remember it, as you will need it for the Rails configuration (database.yml).
+Make sure you have a running PostgreSQL instance and credentials that match your local `api/.env` and `api/config/database.yml` setup.
 
-### MongoDB
+Minimal verification commands:
 
-Since we originally ran MongoDB via Docker in our main guide, you have two options here:
-
-#### Option A (Recommended)
-
-Install Docker Desktop for Windows and run the exact same command in PowerShell:
-
-```powershell
-docker run --name mongo-logs -p 27017:27017 -d mongo
+```bash
+psql --version
+cd api
+bin/rails db:version
 ```
 
-#### Option B (Completely Docker-free)
+## Windows notes
 
-Download the MongoDB Community Server installer for Windows and install it like a regular application.
+The repository can be worked on from Windows, but WSL2 is usually the simplest path for a Rails/PostgreSQL stack.
 
-## 4. Installing Rails & Linters
+### Recommended approach: WSL2
 
-Open PowerShell and run the following commands to install Rails, RuboCop, and the language servers for VS Code. (In Windows, we do not need sudo to install gems).
+1. Install WSL2 and an Ubuntu distribution.
+2. Clone the repository inside the Linux filesystem.
+3. Follow the Linux/WSL setup steps above.
 
-```powershell
-gem install rails --version 8.0.0
-gem install rubocop ruby-lsp ruby-lint
+### Native Windows option
+
+If you prefer a native Windows setup, you will generally need:
+
+- Ruby `3.4.8` via RubyInstaller
+- MSYS2 / DevKit support for native gem compilation
+- PostgreSQL installed locally
+- Bundler
+
+Command-line details vary by installation method, so treat the Linux/WSL instructions as the canonical workflow for this repository.
+
+## Environment variables
+
+Create `api/.env` from the example file:
+
+```bash
+cd api
+cp .env.example .env
 ```
 
-> **Note:** If you encounter errors with red text during gem installation (especially those interacting with the database, like pg), it usually means MSYS2 cannot find the paths to your installed PostgreSQL. This is one of the main reasons developers often prefer WSL.
+The currently documented variables are:
 
-## 5. VS Code Setup
+- `DB_USERNAME`
+- `DB_PASSWORD`
+- `DB_HOST`
+- `DB_PORT`
+- `JWT_SECRET_KEY`
+- `SWAGGER_SERVER_URL`
 
-1. Install Visual Studio Code.
-2. Add the Ruby LSP and Rubocop extensions.
-3. In your project, create or edit the `.vscode/settings.json` file.
+See [`ENV_USAGE.md`](ENV_USAGE.md) for details.
 
-Important difference from Linux: Since we are not using version managers like rbenv or rvm on Windows (Ruby is installed globally via RubyInstaller), we need to disable that option for the LSP.
+## Database commands
 
-```json
-{
-  "editor.formatOnSave": true,
-  "[ruby]": {
-    "editor.defaultFormatter": "Shopify.ruby-lsp",
-    "editor.formatOnSave": true
-  },
-  "rubyLsp.formatter": "rubocop",
-  "rubyLsp.rubyVersionManager": "none"
-}
+Use these commands from `api/`:
+
+```bash
+bin/rails db:prepare
+bin/rails db:seed
+bin/rails db:test:prepare
+bin/rails db:reset
 ```
 
-### Troubleshooting Tip for Windows
+## Testing and developer commands
 
-If the Ruby LSP extension in VS Code complains that it can't find bundle or other commands, ensure that the path to your Ruby bin folder is added to your System Environment Variables (Path). RubyInstaller usually does this automatically.
+```bash
+cd api
+bundle exec rake test
+bundle exec rspec
+bundle exec rake test:all
+bin/rubocop
+RAILS_ENV=test bundle exec rake rswag:specs:swaggerize
+```
+
+What these commands do:
+
+- `bundle exec rake test` runs the Minitest suite.
+- `bundle exec rspec` runs the RSpec suite.
+- `bundle exec rake test:all` runs Minitest, regenerates Swagger, then runs RSpec.
+- `bin/rubocop` runs the linter configured in the bundle.
+- `RAILS_ENV=test bundle exec rake rswag:specs:swaggerize` refreshes the generated OpenAPI file.
+
+## Swagger and local verification
+
+Start the API locally:
+
+```bash
+cd api
+bin/rails server -p 3000
+```
+
+Then open:
+
+```text
+http://localhost:3000/api-docs
+```
+
+Swagger UI is mounted only in development and test environments.
+
+## Optional Docker usage
+
+The repository includes `api/Dockerfile`, but it is explicitly designed for production-style builds rather than day-to-day local development.
+
+If you want to build it manually from `api/`:
+
+```bash
+docker build -t eventify-api .
+```
+
+The image expects production configuration, including a Rails master key, so local Rails commands remain the recommended development workflow.
+
+## Editor support
+
+Any Ruby-aware editor should work. Helpful features include:
+
+- Ruby LSP support
+- RuboCop integration
+- YAML and Markdown support
+
+If you add editor-specific setup notes later, keep them aligned with the actual toolchain in this repository.

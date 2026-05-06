@@ -32,6 +32,14 @@ Rack::Attack.throttle(
   request.ip if request.path == '/api/v1/auth/password/reset' && request.post?
 end
 
+Rack::Attack.throttle(
+  'auth/password_change',
+  limit: ENV.fetch('RACK_ATTACK_LOGIN_LIMIT', 5).to_i,
+  period: ENV.fetch('RACK_ATTACK_LOGIN_PERIOD', 60).to_i
+) do |request|
+  request.ip if request.path == '/api/v1/auth/password/change' && request.patch?
+end
+
 Rack::Attack.throttled_responder = lambda do |_request|
   [
     429,

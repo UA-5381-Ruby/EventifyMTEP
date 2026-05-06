@@ -1,7 +1,7 @@
 # Backend Technical Audit – EventifyMTEP API
 
 > **Initial audit date:** 2026-04-30
-> **Updated:** 2026-04-30 (re-audit after `main` merged in: PR #39 / PR #41 — full Tickets API rewrite)
+> **Updated:** 2026-05-06 (re-audit after `main` merged in: PRs #42–#44 — JWT password-salt invalidation, change-password endpoint, test helper refactor)
 > **Branch audited:** `copilot/eventify-mtep-backend-audit` (includes `origin/main`)
 > **Scope:** `/api` (Rails 8 API) + `/docs`
 
@@ -44,33 +44,40 @@ medium-to-high severity and should be resolved before production.
 | `resources :tickets` declared `:update` with no action | ✅ **Fixed upstream** – `update` action now fully implemented |
 | `(brand_id, role)` index missing on `brand_memberships` | ✅ **Fixed in this PR** (migration 20260430000002) |
 | `NOT NULL` missing on `events.location` / `events.start_date` | ✅ **Fixed in this PR** (migration 20260430000003) |
+| **T1** – `update_password_params` dead code in `PasswordsController` | ✅ **Fixed in this PR** – method removed |
+| **D1** – `event_feedbacks.ticket_id` missing UNIQUE index | ✅ **Fixed in this PR** (migration 20260430000004) |
+| **#1** – `rack-attack` unconfigured | ✅ **Fixed in this PR** – throttles for login, register, password-reset, and **password-change** |
+| **#2** – No JWT token revocation (partial) | ✅ **Partially mitigated upstream** (PR #44) – tokens embed `password_salt`; changing the password invalidates all existing tokens. A full denylist/logout is still recommended. |
 
 ---
 
 ## 🔴 Critical / High-Priority Findings
 
-### 1 – `rack-attack` gem installed but not configured
+### 1 – `rack-attack` coverage gap: `PATCH /auth/password/change` (now fixed)
 
-`rack-attack` was added to `Gemfile` (PR #39) but no initializer exists in
-`config/initializers/`. The gem is loaded but provides zero protection; auth
-endpoints (`/auth/login`, `/auth/register`, `/auth/password/reset`) are still
-fully open to brute-force and credential-stuffing attacks.
+The new password-change endpoint (PR #44) accepts a `current_password` parameter.
+An attacker who obtains a valid JWT (e.g., through session hijacking) can iterate
+the `current_password` field on this endpoint to enumerate or brute-force the
+account's current password. The original `rack_attack.rb` only covered login,
+register, and password-reset.
 
-**File:** `Gemfile` line 16 (gem present), `config/initializers/` (no rack_attack.rb)
-**Fix:** Create `config/initializers/rack_attack.rb` with throttles on login,
-register, and password-reset endpoints.
+**Fix applied in this PR:** Added `auth/password_change` throttle (5 requests per
+60 s by default) in `config/initializers/rack_attack.rb`.
 
 ---
 
-### 2 – No JWT token revocation
+### 2 – No server-side JWT logout / denylist (partially mitigated)
 
-Tokens have a 24-hour lifetime and cannot be invalidated server-side. A
-client-side "logout" is meaningless; stolen tokens remain valid until expiry.
+Tokens have a 24-hour lifetime. PR #44 introduced `password_salt` in the JWT
+payload: changing the password immediately invalidates all prior tokens. However,
+there is still no way to revoke a specific token (e.g., on logout or device change)
+short of changing the password.
 
 **Files:** `app/services/jwt_service.rb`, `app/controllers/api/v1/auth_controller.rb`
-**Recommendation:** Implement a token denylist (Redis or DB table) and a dedicated
-`DELETE /auth/logout` endpoint. Add a refresh-token flow for sessions longer than
-24 hours.
+**Recommendation (open):** Add a `DELETE /auth/logout` endpoint backed by a token
+denylist (Redis or DB) so users can revoke individual sessions without having to
+change their password. Combine with a short-lived access token + refresh token flow
+for long-running sessions.
 
 ---
 
@@ -90,13 +97,12 @@ ticket creation for events that are not in `:published` state.
 
 | # | Issue | Location |
 |---|---|---|
-| T1 | **`update_password_params` dead code** – method defined in `PasswordsController` but never called; `update` uses `params[:new_password]` directly. | `passwords_controller.rb` last method |
-| T2 | **Duplicate pagination logic** – identical offset/limit/meta code in `EventsController`, `TicketsController`, and `BrandMembershipsController`. Should be extracted to a shared concern. | all three controllers |
-| T3 | **No serializer layer** – raw `as_json` with inline field lists in 9+ controllers. Inconsistent error-response shapes (some use `{ errors: array }`, others `{ errors: hash }`). | all controllers |
-| T4 | **`Devise` gem declared but never used** – adds boot overhead and confusion. Remove it. | `Gemfile` line 11 |
-| T5 | **`@current_user` direct ivar vs `current_user` method** – `TicketsController` references `@current_user` (with `@`) directly while all other controllers use the `current_user` reader method. | `tickets_controller.rb` lines 65, 168 |
-| T6 | **`my_tickets` route is a duplicate alias** – `GET /api/v1/my_tickets` maps to `tickets#index`, which is identical to `GET /api/v1/tickets`. If the alias exists for backward compatibility it should be documented; otherwise remove it to reduce routing surface. | `config/routes.rb` line 43 |
-| T7 | **`EventPolicy` scope commented out** – `Scope#resolve` returns `scope.all` with an `if user.is_superadmin` block commented out. This means all events are visible to all users regardless of publish status. | `app/policies/event_policy.rb` lines 51-55 |
+| T1 | **Duplicate pagination logic** – identical offset/limit/meta code in `EventsController`, `TicketsController`, and `BrandMembershipsController`. Should be extracted to a shared concern. | all three controllers |
+| T2 | **No serializer layer** – raw `as_json` with inline field lists in 9+ controllers. Inconsistent error-response shapes (some use `{ errors: array }`, others `{ errors: hash }`). | all controllers |
+| T3 | **`Devise` gem declared but never used** – adds boot overhead and confusion. Remove it. | `Gemfile` line 11 |
+| T4 | **`@current_user` direct ivar vs `current_user` method** – `TicketsController` references `@current_user` (with `@`) directly while all other controllers use the `current_user` reader method. | `tickets_controller.rb` lines 65, 168 |
+| T5 | **`my_tickets` route is a duplicate alias** – `GET /api/v1/my_tickets` maps to `tickets#index`, which is identical to `GET /api/v1/tickets`. If the alias exists for backward compatibility it should be documented; otherwise remove it to reduce routing surface. | `config/routes.rb` line 43 |
+| T6 | **`EventPolicy` scope commented out** – `Scope#resolve` returns `scope.all` with an `if user.is_superadmin` block commented out. This means all events are visible to all users regardless of publish status. | `app/policies/event_policy.rb` lines 51-55 |
 
 ---
 
@@ -137,22 +143,22 @@ ticket creation for events that are not in `:published` state.
 
 | Priority | Recommendation | File(s) |
 |---|---|---|
-| 1 | **Configure `rack-attack`** – add `config/initializers/rack_attack.rb` with throttles on login, register, and password-reset | new `rack_attack.rb` initializer |
+| 1 | **Implement JWT logout / denylist** + refresh token flow | `jwt_service.rb`, `auth_controller.rb`, new route |
 | 2 | **Guard ticket creation** against non-published events | `ticket.rb` or `tickets_controller.rb` |
-| 3 | **Implement JWT logout / denylist** + refresh token flow | `jwt_service.rb`, `auth_controller.rb` |
-| 4 | **Remove dead `update_password_params`** from `PasswordsController` | `passwords_controller.rb` |
-| 5 | **Add UNIQUE index on `event_feedbacks.ticket_id`** | new migration |
-| 6 | **Restrict `UsersController#index`** to superadmins; add pagination | `users_controller.rb` |
-| 7 | **Extract pagination to shared concern** | `events_controller.rb`, `tickets_controller.rb`, `brand_memberships_controller.rb` |
-| 8 | **Remove unused `Devise` gem** | `Gemfile` |
-| 9 | **Implement `EventPolicy::Scope`** to filter events by publish status for non-admin users | `event_policy.rb` |
-| 10 | **Add DB `NOT NULL` on `users.name`**; add `null: false` on `event_feedbacks.ticket_id` | new migration |
+| 3 | **Restrict `UsersController#index`** to superadmins; add pagination | `users_controller.rb` |
+| 4 | **Add UNIQUE index on `event_feedbacks.ticket_id`** | ✅ Done (migration 20260430000004) |
+| 5 | **Extract pagination to shared concern** | `events_controller.rb`, `tickets_controller.rb`, `brand_memberships_controller.rb` |
+| 6 | **Remove unused `Devise` gem** | `Gemfile` |
+| 7 | **Implement `EventPolicy::Scope`** to filter events by publish status for non-admin users | `event_policy.rb` |
+| 8 | **Add DB `NOT NULL` on `users.name`** | new migration |
+| 9 | **Add a serializer layer** (e.g. jsonapi-serializer) to unify API response shapes | all controllers |
+| 10 | **Document rate-limit thresholds** in `SETUP.md` or `ENV_USAGE.md` | `config/initializers/rack_attack.rb` |
 
 ---
 
 ## Applied Fixes in This PR
 
-The following findings from both audit rounds are addressed directly in this pull request:
+The following findings from all audit rounds are addressed directly in this pull request:
 
 | Finding | Change |
 |---|---|
@@ -164,6 +170,8 @@ The following findings from both audit rounds are addressed directly in this pul
 | **T1 (original)** – `BrandsController` dual-auth dead code | Fixed upstream (PR #41); `skip_before_action :authorize_request` now used |
 | **D4 (original)** – Missing `(brand_id, role)` index | Migration `20260430000002_add_brand_role_index_to_brand_memberships.rb` |
 | **D1 (original)** – Missing `NOT NULL` on `events.location` / `events.start_date` | Migration `20260430000003_add_not_null_to_events_required_fields.rb` |
-| **#1 (re-audit)** – `rack-attack` unconfigured | Created `config/initializers/rack_attack.rb` with throttles |
+| **#1 (re-audit)** – `rack-attack` unconfigured | Created `config/initializers/rack_attack.rb` with throttles for login, register, password-reset, **and password-change** |
 | **T1 (re-audit)** – `update_password_params` dead code | Removed from `PasswordsController` |
 | **D1 (re-audit)** – `event_feedbacks.ticket_id` missing UNIQUE index | Migration `20260430000004_add_unique_index_to_event_feedbacks_ticket_id.rb` |
+| **#1 (3rd audit)** – `PATCH /auth/password/change` not throttled | Added `auth/password_change` throttle to `rack_attack.rb` (5 req/60 s per IP) |
+| **JWT spec POST test** – rswag events spec using non-superadmin user | `spec/integration/api/v1/events_spec.rb`: `create(:user, is_superadmin: true)` + `jwt_for` pattern |

@@ -1,17 +1,44 @@
 # yaml-language-server: $schema=https://coderabbit.ai/integrations/schema.v2.json
 language: "en-US"
+
 reviews:
   profile: "assertive"
   high_level_summary: true
   collapse_walkthrough: false
-  # Path-specific instructions for your monorepo structure
+
   path_instructions:
     - path: "api/**/*"
-      instructions: "This is a Ruby on Rails backend. Review for Rails best practices, security vulnerabilities (SQL injection, mass assignment), and efficient database queries."
+      instructions: |
+        This is a Ruby on Rails backend. Review requirements:
+        - ActiveRecord: Identify N+1 queries, suggest proper use of 'includes' or 'joins'.
+        - PostgreSQL: Check for efficient indexing and optimal SQL execution.
+        - Security: Audit JWT implementation and ensure 'authenticate_user!' is correctly applied.
+        - Rubocop: Ensure adherence to the project's style guide and Ruby idioms.
+        - Logic: Check Service Objects and Controllers for Single Responsibility Principle.
+
+    - path: "api/app/models/logs/**/*"
+      instructions: |
+        Review MongoDB/Mongoid usage. Focus on document schema consistency and efficient logging patterns.
+
+    - path: "api/spec/**/*"
+      instructions: |
+        Review RSpec tests:
+        - Ensure 'let' and 'factory_bot' are used correctly.
+        - Check for comprehensive testing of edge cases and JWT auth headers.
+        - Verify that mocks and stubs are not overused, maintaining test reliability.
+
     - path: "web/**/*"
-      instructions: "This is a React frontend using JS/TS. Review for component performance, proper hook usage, and TypeScript type safety."
+      instructions: |
+        This is a React (TS/Tailwind) frontend. Strictly follow these guidelines:
+        - Use Functional Components and modern Hooks only.
+        - Ensure strict TypeScript type safety; avoid 'any'.
+        - Review Tailwind CSS usage for utility class efficiency and consistency.
+        - Check for performance bottlenecks (unnecessary re-renders).
+        - Verify accessibility (a11y) standards in JSX.
+
     - path: "docs/**/*"
-      instructions: "This directory contains documentation. Review for clarity, technical accuracy, and formatting."
+      instructions: |
+        This directory contains documentation. Review for clarity, technical accuracy, and formatting.
 
 chat:
   auto_reply: true
