@@ -1,28 +1,23 @@
-import type { Config } from "jest";
+import type { Config } from 'jest';
 
 const config: Config = {
-  testEnvironment: "jsdom",
-  setupFilesAfterEnv: ["<rootDir>/src/test/setup.ts"],
+  testEnvironment: 'jsdom',
+  setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
   transform: {
-    "^.+\\.(t|j)sx?$": [
-      "@swc/jest",
+    '^.+\\.(t|j)sx?$': [
+      '@swc/jest',
       {
         jsc: {
           transform: {
-            react: { runtime: "automatic" },
+            react: { runtime: 'automatic' },
           },
         },
       },
     ],
   },
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
-    "\\.(css|svg|png|jpg|jpeg|gif|webp)$": "identity-obj-proxy",
-  },
-  globals: {
-    "ts-jest": {
-      tsconfig: "./tsconfig.jest.json",
-    },
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(css|svg|png|jpg|jpeg|gif|webp)$': 'identity-obj-proxy',
   },
 };
 
