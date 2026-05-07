@@ -1,4 +1,9 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { UIPreview } from './pages/UIPreview'
+
+// function App() {
+//   return <UIPreview />
+// }
 
 function App() {
   return (
