@@ -15,7 +15,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
 
     return (
       <div className="flex flex-col gap-1">
-        {/* Label */}
         {label && (
           <label
             htmlFor={inputId}
@@ -28,9 +27,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           </label>
         )}
 
-        {/* Input wrapper */}
         <div className="relative">
-          {/* Left Icon */}
           {leftIcon && (
             <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400">
               {leftIcon}
@@ -45,15 +42,11 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
               'px-3 py-2 text-base',
               'transition-colors duration-200',
               'placeholder:text-neutral-400',
-              // border кольори
               error
                 ? 'border-error-500 focus:border-error-500 focus:ring-error-500'
                 : 'border-neutral-300 focus:border-primary-500 focus:ring-primary-500',
-              // focus ring
               'focus:outline-none focus:ring-2 focus:ring-offset-0',
-              // disabled
               'disabled:bg-neutral-100 disabled:text-neutral-400 disabled:cursor-not-allowed',
-              // відступи якщо є іконки
               leftIcon  && 'pl-10',
               rightIcon && 'pr-10',
               className
@@ -61,7 +54,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             {...props}
           />
 
-          {/* Right Icon */}
           {rightIcon && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400">
               {rightIcon}
@@ -69,7 +61,6 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
         </div>
 
-        {/* Error або Hint */}
         {error && (
           <p className="text-sm text-error-600">{error}</p>
         )}

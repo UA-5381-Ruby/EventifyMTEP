@@ -45,7 +45,6 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
 Checkbox.displayName = 'Checkbox'
 
 
-// ── Radio (окремий компонент в тому ж файлі) ─────────────
 interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   label?: string
 }
