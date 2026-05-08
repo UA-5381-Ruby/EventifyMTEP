@@ -1,4 +1,4 @@
-export { Container }   from './Container'
-export { Header }      from './Header'
-export { Footer }      from './Footer'
-export { PageWrapper } from './PageWrapper'
+export { Container } from './Container';
+export { Header } from './Header';
+export { Footer } from './Footer';
+export { PageWrapper } from './PageWrapper';

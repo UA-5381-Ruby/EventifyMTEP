@@ -1,17 +1,17 @@
-import { type HTMLAttributes } from 'react'
-import { cn } from '../../lib/utils'
+import { type HTMLAttributes } from 'react';
+import { cn } from '../../lib/utils';
 
 interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
-  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
+  size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
 }
 
 const sizeStyles = {
-  sm:   'max-w-2xl',
-  md:   'max-w-4xl',
-  lg:   'max-w-6xl',
-  xl:   'max-w-7xl',
+  sm: 'max-w-2xl',
+  md: 'max-w-4xl',
+  lg: 'max-w-6xl',
+  xl: 'max-w-7xl',
   full: 'max-w-full',
-}
+};
 
 export function Container({ size = 'xl', className, children, ...props }: ContainerProps) {
   return (
@@ -21,5 +21,5 @@ export function Container({ size = 'xl', className, children, ...props }: Contai
     >
       {children}
     </div>
-  )
+  );
 }
