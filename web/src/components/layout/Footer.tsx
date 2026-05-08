@@ -1,4 +1,5 @@
-import { Container } from './Container'
+import { Container } from './Container';
+import { Link } from 'react-router-dom';
 
 export function Footer() {
   return (
@@ -9,11 +10,21 @@ export function Footer() {
             © {new Date().getFullYear()} Eventify. All rights reserved.
           </p>
           <div className="flex gap-6">
-            <a href="/privacy" className="text-sm text-neutral-500 hover:text-primary-600 transition-colors">Privacy</a>
-            <a href="/terms" className="text-sm text-neutral-500 hover:text-primary-600 transition-colors">Terms</a>
+            <Link
+              to="/privacy"
+              className="text-sm text-neutral-500 hover:text-primary-600 transition-colors"
+            >
+              Privacy
+            </Link>
+            <Link
+              to="/terms"
+              className="text-sm text-neutral-500 hover:text-primary-600 transition-colors"
+            >
+              Terms
+            </Link>
           </div>
         </div>
       </Container>
     </footer>
-  )
+  );
 }

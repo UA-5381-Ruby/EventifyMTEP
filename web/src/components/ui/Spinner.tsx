@@ -1,11 +1,11 @@
-import { cn } from '../../lib/utils'
+import { cn } from '../../lib/utils';
 
-type SpinnerSize = 'sm' | 'md' | 'lg' | 'xl'
+type SpinnerSize = 'sm' | 'md' | 'lg' | 'xl';
 
 interface SpinnerProps {
-  size?: SpinnerSize
-  className?: string
-  label?: string   // для accessibility
+  size?: SpinnerSize;
+  className?: string;
+  label?: string; // для accessibility
 }
 
 const sizeStyles: Record<SpinnerSize, string> = {
@@ -13,7 +13,7 @@ const sizeStyles: Record<SpinnerSize, string> = {
   md: 'h-6 w-6 border-2',
   lg: 'h-8 w-8 border-[3px]',
   xl: 'h-12 w-12 border-4',
-}
+};
 
 export function Spinner({ size = 'md', className, label = 'Loading...' }: SpinnerProps) {
   return (
@@ -27,5 +27,5 @@ export function Spinner({ size = 'md', className, label = 'Loading...' }: Spinne
         className
       )}
     />
-  )
+  );
 }
