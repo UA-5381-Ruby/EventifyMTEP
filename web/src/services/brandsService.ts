@@ -7,7 +7,7 @@ import type {
 } from '@/types/brand';
 
 export class BrandsService {
-  private readonly endpoint = '/brands';
+  private readonly endpoint = '/api/v1/brands';
   async getAllBrands(): Promise<Brand[]> {
     const res = await apiClient.get<Brand[]>(this.endpoint);
     return res.data;
