@@ -33,4 +33,4 @@ export class BrandsService {
   }
 }
 
-export const brandsService = new BrandsService();;
+export const brandsService = new BrandsService();
