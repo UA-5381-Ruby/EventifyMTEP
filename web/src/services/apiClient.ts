@@ -34,6 +34,10 @@ apiClient.interceptors.response.use(
       localStorage.removeItem('access_token');
 
       window.location.href = '/login';
+    } else if (error.response?.status === 403) {
+      const forbiddenError = new Error('You do not have permission to perform this action');
+      forbiddenError.name = 'ForbiddenError';
+      return Promise.reject(forbiddenError);
     }
 
     return Promise.reject(error);
