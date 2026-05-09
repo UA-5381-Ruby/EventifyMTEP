@@ -37,7 +37,7 @@ describe('BrandsService', () => {
 
     const result = await brandsService.getAllBrands();
 
-    expect(apiClient.get).toHaveBeenCalledWith('/brands');
+    expect(apiClient.get).toHaveBeenCalledWith('/api/v1/brands');
     expect(result).toEqual(mockBrands);
   });
 
