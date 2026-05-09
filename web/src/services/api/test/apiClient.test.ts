@@ -10,7 +10,7 @@ describe('apiClient', () => {
     });
 
     afterEach(() => {
-        mock.reset();
+        mock.restore();
     });
 
     it('adds Authorization header when token exists', async () => {
