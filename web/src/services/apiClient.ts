@@ -35,11 +35,15 @@ apiClient.interceptors.response.use(
 
       window.location.href = '/login';
     } else if (error.response?.status === 403) {
-      const forbiddenError = new Error('You do not have permission to perform this action');
+      const forbiddenError = error as AxiosError & {
+        isForbidden?: boolean;
+      };
+    
+      forbiddenError.isForbidden = true;
       forbiddenError.name = 'ForbiddenError';
+    
       return Promise.reject(forbiddenError);
     }
-
     return Promise.reject(error);
   }
 );
