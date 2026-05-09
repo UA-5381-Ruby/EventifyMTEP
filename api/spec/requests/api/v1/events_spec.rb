@@ -3,8 +3,8 @@
 require 'swagger_helper'
 
 RSpec.describe 'Api::V1::Events', type: :request do
-  
   include AuthHelper
+
   let(:user) { create(:user) }
   let!(:superadmin) { create(:user, is_superadmin: true) }
   let!(:brand)    { create(:brand) }
@@ -23,18 +23,16 @@ RSpec.describe 'Api::V1::Events', type: :request do
     }
   end
 
-  
-    context 'with valid params' do
-      it 'returns 201 and creates event' do
-        post '/api/v1/events',
-             params: valid_params,
-             headers: auth_headers(user),
-             as: :json
+  context 'with valid params' do
+    it 'returns 201 and creates event' do
+      post '/api/v1/events',
+           params: valid_params,
+           headers: auth_headers(user),
+           as: :json
 
-        expect(response).to have_http_status(:created)
-        expect(response.parsed_body['title']).to eq('New Event')
-      end
-  
+      expect(response).to have_http_status(:created)
+      expect(response.parsed_body['title']).to eq('New Event')
+    end
 
     context 'with invalid params' do
       it 'returns 422 with errors' do
@@ -49,7 +47,7 @@ RSpec.describe 'Api::V1::Events', type: :request do
     end
   end
 
-    describe 'GET /api/v1/events' do
+  describe 'GET /api/v1/events' do
     before { create_list(:event, 5, brand: brand, categories: [category]) }
 
     it 'returns 200 and paginated list' do
@@ -78,7 +76,7 @@ RSpec.describe 'Api::V1::Events', type: :request do
       dates = response.parsed_body['data'].map { |d| Time.iso8601(d['start_date']) }
       expect(dates).to eq(dates.sort.reverse)
     end
-  
+
     let!(:event) { create(:event, brand: brand, categories: [category]) }
 
     it 'returns the event' do
