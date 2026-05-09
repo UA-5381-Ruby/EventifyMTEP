@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/apiClient';
+import apiClient from './apiClient';
 import type {
   Brand,
   BrandWithEvents,
@@ -7,25 +7,30 @@ import type {
 } from '@/types/brand';
 
 export class BrandsService {
+  private readonly endpoint = '/brands';
   async getAllBrands(): Promise<Brand[]> {
-    return apiClient.get<Brand[]>('/brands');
+    const res = await apiClient.get<Brand[]>(this.endpoint);
+    return res.data;
   }
 
   async getBrandById(id: string): Promise<BrandWithEvents> {
-    return apiClient.get<BrandWithEvents>(`/brands/${id}`);
+    const res = await apiClient.get<BrandWithEvents>(`${this.endpoint}/${id}`);
+    return res.data;
   }
 
   async createBrand(payload: CreateBrandRequest): Promise<Brand> {
-    return apiClient.post<Brand>('/brands', payload);
+    const res = await apiClient.post<Brand>(this.endpoint, payload);
+    return res.data;
   }
 
   async updateBrand(id: string, payload: UpdateBrandRequest): Promise<Brand> {
-    return apiClient.patch<Brand>(`/brands/${id}`, payload);
+    const res = await apiClient.patch<Brand>(`${this.endpoint}/${id}`, payload);
+    return res.data;
   }
 
   async deleteBrand(id: string): Promise<void> {
-    return apiClient.delete(`/brands/${id}`);
+    await apiClient.delete(`${this.endpoint}/${id}`);
   }
 }
 
-export const brandsService = new BrandsService();
+export const brandsService = new BrandsService();;
