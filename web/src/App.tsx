@@ -6,7 +6,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<h1 className="bg-emerald-500">Home</h1>} />
-        <Route path="/test/preview" element={<UIPreview />}/>
+        <Route path="/test/preview" element={<UIPreview />} />
       </Routes>
     </Router>
   );
