@@ -1,11 +1,25 @@
 {
   "devDependencies": {
+    "@rolldown/binding-linux-x64-gnu": "^1.0.0",
+    "@testing-library/jest-dom": "^6.9.1",
     "@types/react": "^19.2.14",
-    "@types/react-dom": "^19.2.3"
+    "@types/react-dom": "^19.2.3",
+    "happy-dom": "^20.9.0",
+    "jsdom": "^29.1.1",
+    "vitest": "^2.1.9"
   },
   "dependencies": {
+    "i18next": "^26.0.10",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "react-router-dom": "^7.15.0"
+    "react-router-dom": "^7.15.0",
+    "react-toastify": "^11.1.0"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview",
+    "test": "vitest"
   }
 }

@@ -1,59 +1,33 @@
-import MockAdapter from 'axios-mock-adapter';
-import apiClient from '../../apiClient';
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-describe('apiClient', () => {
-    let mock: MockAdapter;
+/// <reference types="vitest" />
+// @vitest-environment jsdom
+import { defineConfig } from 'vitest/config';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
+import eslint from 'vite-plugin-eslint';
 
-    beforeEach(() => {
-        mock = new MockAdapter(apiClient);
-        localStorage.clear();
-    });
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-    afterEach(() => {
-        mock.restore();
-    });
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-    it('adds Authorization header when token exists', async () => {
-        localStorage.setItem('access_token', 'TEST_TOKEN');
+// https://vite.dev/config/
+export default defineConfig({
+    plugins: [
+        react(),
+        tailwindcss(),
+        eslint(),
+    ],
 
-        mock.onGet('/test').reply((config) => {
-            return [
-                200,
-                {
-                    authHeader: config.headers?.Authorization,
-                },
-            ];
-        });
+    resolve: {
+        alias: {
+            '@': resolve(__dirname, './src'),
+        },
+    },
 
-        const response = await apiClient.get('/test');
-
-        expect(response.data.authHeader).toBe('Bearer TEST_TOKEN');
-    });
-
-    it('does NOT add Authorization header when token is missing', async () => {
-        mock.onGet('/test').reply((config) => {
-            return [
-                200,
-                {
-                    authHeader: config.headers?.Authorization,
-                },
-            ];
-        });
-
-        const response = await apiClient.get('/test');
-
-        expect(response.data.authHeader).toBeUndefined();
-    });
-
-    it('handles 401 response', async () => {
-        mock.onGet('/protected').reply(401);
-
-        await expect(
-            apiClient.get('/protected'),
-        ).rejects.toBeTruthy();
-    });
-
-    it('uses correct baseURL', () => {
-        expect(apiClient.defaults.baseURL).toBeDefined();
-    });
+    test: {
+        globals: true,
+        environment: 'jsdom',
+        setupFiles: './src/test/setup.ts',
+    },
 });

@@ -9,6 +9,10 @@
     }
   ],
   "compilerOptions": {
-    "module": "CommonJS"
+    "module": "CommonJS",
+    "types": [
+      "vitest/globals",
+      "@testing-library/jest-dom"
+    ]
   }
 }

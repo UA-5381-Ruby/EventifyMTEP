@@ -2,7 +2,7 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-// @ts-expect-error: vite-plugin-eslint lacks proper type resolution for the current TS config
+// @ts-ignore 
 import eslint from 'vite-plugin-eslint';
 
 import { dirname, resolve } from 'node:path';
