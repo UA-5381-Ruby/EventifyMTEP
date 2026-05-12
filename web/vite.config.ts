@@ -2,7 +2,6 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
-// @ts-ignore
 import eslint from 'vite-plugin-eslint';
 
 import { dirname, resolve } from 'node:path';
