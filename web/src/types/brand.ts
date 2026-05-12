@@ -1,23 +1,30 @@
 export interface Brand {
-  id: string;
+  id: number;
   name: string;
-  description: string;
-  logoUrl?: string;
-  ownerId: string;
+  description: string | null;
+  logo_url?: string;
+  subdomain: string;
+  primary_color?: string;
+  secondary_color?: string;
+}
+
+export interface BrandEvent {
+  id: number;
+  title: string;
+  start_date: string;
 }
 
 export interface BrandWithEvents extends Brand {
-  events: Array<{
-    id: string;
-    title: string;
-    startDate: string;
-  }>;
+  events: BrandEvent[];
 }
 
 export interface CreateBrandRequest {
   name: string;
-  description: string;
-  logoUrl?: string;
+  description?: string;
+  logo_url?: string;
+  subdomain: string;
+  primary_color?: string;
+  secondary_color?: string;
 }
 
 export type UpdateBrandRequest = Partial<CreateBrandRequest>;
