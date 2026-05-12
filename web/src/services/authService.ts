@@ -1,5 +1,11 @@
 import apiClient, { parseApiError, tokenStorage } from '@/lib/apiClient';
-import type { AuthResponse, AuthState, LoginRequest, RegisterRequest } from '@/types/auth';
+import type {
+  AuthResponse,
+  AuthState,
+  AuthUser,
+  LoginRequest,
+  RegisterRequest,
+} from '@/types/auth';
 
 let authState: AuthState = {
   user: null,
@@ -8,6 +14,18 @@ let authState: AuthState = {
 
 type AuthStateListener = (state: AuthState) => void;
 const listeners = new Set<AuthStateListener>();
+
+async function init(): Promise<void> {
+  const token = tokenStorage.get();
+  if (!token) return;
+
+  try {
+    const { data } = await apiClient.get<{ user: AuthUser }>('/auth/login');
+    setAuthState({ user: data.user, isAuthenticated: true });
+  } catch {
+    logout();
+  }
+}
 
 function setAuthState(next: AuthState): void {
   authState = next;
@@ -38,7 +56,7 @@ async function register(payload: RegisterRequest): Promise<AuthResponse> {
   try {
     const { data } = await apiClient.post<AuthResponse>('/api/v1/auth/register', payload);
 
-    tokenStorage.set(data.access_token);
+    tokenStorage.set(data.token);
     setAuthState({ user: data.user, isAuthenticated: true });
 
     return data;
@@ -55,7 +73,7 @@ async function login(payload: LoginRequest): Promise<AuthResponse> {
   try {
     const { data } = await apiClient.post<AuthResponse>('/api/v1/auth/login', payload);
 
-    tokenStorage.set(data.access_token);
+    tokenStorage.set(data.token);
     setAuthState({ user: data.user, isAuthenticated: true });
 
     return data;
@@ -114,6 +132,8 @@ const AuthService = {
   // Password recovery
   requestPasswordReset,
   confirmPasswordReset,
+
+  init,
 } as const;
 
 export default AuthService;
