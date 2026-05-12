@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { authService } from '../services/authService';
+import type { FormEvent } from 'react';
+import authService from "@/services/authService.ts";
 export const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
     const handleSubmit = async (
-        e: React.FormEvent<HTMLFormElement>,
+        e: FormEvent<HTMLFormElement>,
     ) => {
         e.preventDefault();
 
