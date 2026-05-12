@@ -35,6 +35,15 @@ reviews:
         - Review Tailwind CSS usage for utility class efficiency and consistency.
         - Check for performance bottlenecks (unnecessary re-renders).
         - Verify accessibility (a11y) standards in JSX.
+        - Testing: Ensure all new components or logic have corresponding Jest tests.
+
+    - path: "web/src/test/**/*"
+      instructions: |
+        Review Jest and React Testing Library (RTL) suites:
+        - Ensure use of 'screen' and prioritize accessible queries (e.g., findByRole).
+        - Check for proper cleanup and avoidance of implementation detail testing.
+        - Verify that asynchronous operations are handled with 'waitFor' or 'find' queries.
+        - Ensure high coverage for hooks and utility functions.
 
     - path: "docs/**/*"
       instructions: |
