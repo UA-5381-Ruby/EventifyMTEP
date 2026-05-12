@@ -1,11 +1,7 @@
 // src/services/api/apiClient.ts
 // This file sets up an Axios instance for making API requests, including interceptors for handling authentication tokens and response errors.
 // SetUp: npm install axios
-import axios, {
-  type AxiosInstance,
-  type InternalAxiosRequestConfig,
-  type AxiosError,
-} from 'axios';
+import axios, { type AxiosInstance, type InternalAxiosRequestConfig, type AxiosError } from 'axios';
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL ?? 'http://localhost:3000',
