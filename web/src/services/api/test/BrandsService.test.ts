@@ -1,20 +1,22 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { AxiosResponse } from 'axios';
 import apiClient from '../../apiClient';
 import { brandsService } from '../../brandsService';
+import type {CreateBrandRequest} from "@/types/brand.ts";
 
-vi.mock('../../apiClient', () => ({
+// Замінюємо vi.mock на jest.mock
+jest.mock('../../apiClient', () => ({
   default: {
-    get: vi.fn(),
-    post: vi.fn(),
-    patch: vi.fn(),
-    delete: vi.fn(),
+    get: jest.fn(),
+    post: jest.fn(),
+    patch: jest.fn(),
+    delete: jest.fn(),
   },
 }));
 
 describe('BrandsService', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    // Замінюємо vi.clearAllMocks на jest.clearAllMocks
+    jest.clearAllMocks();
   });
 
   it('should fetch all brands', async () => {
@@ -27,7 +29,8 @@ describe('BrandsService', () => {
       },
     ];
 
-    vi.mocked(apiClient.get).mockResolvedValue({
+    // Використовуємо jest.mocked для типізації моків
+    jest.mocked(apiClient.get).mockResolvedValue({
       data: mockBrands,
     } as AxiosResponse);
 
@@ -46,7 +49,7 @@ describe('BrandsService', () => {
       events: [],
     };
 
-    vi.mocked(apiClient.get).mockResolvedValue({
+    jest.mocked(apiClient.get).mockResolvedValue({
       data: mockBrand,
     } as AxiosResponse);
 
@@ -58,9 +61,10 @@ describe('BrandsService', () => {
   });
 
   it('should create brand', async () => {
-    const payload = {
+    const payload: CreateBrandRequest  = {
+      subdomain: "",
       name: 'Brand A',
-      description: 'Description',
+      description: 'Description'
     };
 
     const mockBrand = {
@@ -69,15 +73,15 @@ describe('BrandsService', () => {
       ownerId: 'owner1',
     };
 
-    vi.mocked(apiClient.post).mockResolvedValue({
+    jest.mocked(apiClient.post).mockResolvedValue({
       data: mockBrand,
     } as AxiosResponse);
 
     const result = await brandsService.createBrand(payload);
 
     expect(apiClient.post).toHaveBeenCalledWith(
-      '/api/v1/brands',
-      payload
+        '/api/v1/brands',
+        payload
     );
     expect(result).toEqual(mockBrand);
   });
@@ -94,21 +98,21 @@ describe('BrandsService', () => {
       ownerId: 'owner1',
     };
 
-    vi.mocked(apiClient.patch).mockResolvedValue({
+    jest.mocked(apiClient.patch).mockResolvedValue({
       data: mockBrand,
     } as AxiosResponse);
 
     const result = await brandsService.updateBrand('1', payload);
 
     expect(apiClient.patch).toHaveBeenCalledWith(
-      '/api/v1/brands/1',
-      payload
+        '/api/v1/brands/1',
+        payload
     );
     expect(result).toEqual(mockBrand);
   });
 
   it('should delete brand', async () => {
-    vi.mocked(apiClient.delete).mockResolvedValue({} as AxiosResponse);
+    jest.mocked(apiClient.delete).mockResolvedValue({} as AxiosResponse);
 
     await brandsService.deleteBrand('1');
 
@@ -116,9 +120,9 @@ describe('BrandsService', () => {
   });
 
   it('should handle API errors', async () => {
-    vi.mocked(apiClient.get).mockRejectedValue(new Error('API Error'));
+    jest.mocked(apiClient.get).mockRejectedValue(new Error('API Error'));
 
     await expect(brandsService.getBrandById('123'))
-      .rejects.toThrow('API Error');
+        .rejects.toThrow('API Error');
   });
 });
