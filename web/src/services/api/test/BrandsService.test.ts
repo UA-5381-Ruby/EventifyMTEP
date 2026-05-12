@@ -1,20 +1,22 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { AxiosResponse } from 'axios';
 import apiClient from '../../apiClient';
 import { brandsService } from '../../brandsService';
 
-vi.mock('../../apiClient', () => ({
+// Замінюємо vi.mock на jest.mock
+jest.mock('../../apiClient', () => ({
+  __esModule: true, // Допомагає Jest правильно обробляти default експорти
   default: {
-    get: vi.fn(),
-    post: vi.fn(),
-    patch: vi.fn(),
-    delete: vi.fn(),
+    get: jest.fn(),
+    post: jest.fn(),
+    patch: jest.fn(),
+    delete: jest.fn(),
   },
 }));
 
 describe('BrandsService', () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    // Замінюємо vi.clearAllMocks()
+    jest.clearAllMocks();
   });
 
   it('should fetch all brands', async () => {
@@ -27,7 +29,8 @@ describe('BrandsService', () => {
       },
     ];
 
-    vi.mocked(apiClient.get).mockResolvedValue({
+    // Замінюємо vi.mocked на jest.mocked
+    jest.mocked(apiClient.get).mockResolvedValue({
       data: mockBrands,
     } as AxiosResponse);
 
@@ -46,7 +49,7 @@ describe('BrandsService', () => {
       events: [],
     };
 
-    vi.mocked(apiClient.get).mockResolvedValue({
+    jest.mocked(apiClient.get).mockResolvedValue({
       data: mockBrand,
     } as AxiosResponse);
 
@@ -69,7 +72,7 @@ describe('BrandsService', () => {
       ownerId: 'owner1',
     };
 
-    vi.mocked(apiClient.post).mockResolvedValue({
+    jest.mocked(apiClient.post).mockResolvedValue({
       data: mockBrand,
     } as AxiosResponse);
 
@@ -94,7 +97,7 @@ describe('BrandsService', () => {
       ownerId: 'owner1',
     };
 
-    vi.mocked(apiClient.patch).mockResolvedValue({
+    jest.mocked(apiClient.patch).mockResolvedValue({
       data: mockBrand,
     } as AxiosResponse);
 
@@ -108,7 +111,7 @@ describe('BrandsService', () => {
   });
 
   it('should delete brand', async () => {
-    vi.mocked(apiClient.delete).mockResolvedValue({} as AxiosResponse);
+    jest.mocked(apiClient.delete).mockResolvedValue({} as AxiosResponse);
 
     await brandsService.deleteBrand('1');
 
@@ -116,7 +119,7 @@ describe('BrandsService', () => {
   });
 
   it('should handle API errors', async () => {
-    vi.mocked(apiClient.get).mockRejectedValue(new Error('API Error'));
+    jest.mocked(apiClient.get).mockRejectedValue(new Error('API Error'));
 
     await expect(brandsService.getBrandById('123'))
       .rejects.toThrow('API Error');
