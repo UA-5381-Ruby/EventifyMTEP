@@ -1,4 +1,4 @@
-import AuthService from '@/services/AuthService';
+import AuthService from '../services/authService';
 import apiClient, { tokenStorage } from '@/lib/apiClient';
 
 jest.mock('@/lib/apiClient', () => ({
