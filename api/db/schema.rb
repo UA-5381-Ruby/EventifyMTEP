@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_04_22_210420) do
+ActiveRecord::Schema[8.1].define(version: 2026_04_30_000004) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,6 +25,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_210420) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["brand_id"], name: "index_brand_memberships_on_brand_id"
+    t.index ["brand_id", "role"], name: "index_brand_memberships_on_brand_id_and_role"
     t.index ["user_id", "brand_id"], name: "index_brand_memberships_on_user_id_and_brand_id", unique: true
     t.index ["user_id"], name: "index_brand_memberships_on_user_id"
   end
@@ -65,6 +66,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_210420) do
     t.bigint "ticket_id", null: false
     t.datetime "updated_at", null: false
     t.index ["ticket_id"], name: "index_event_feedbacks_on_ticket_id"
+    t.index ["ticket_id"], name: "index_event_feedbacks_on_ticket_id_unique", unique: true
   end
 
   create_table "events", force: :cascade do |t|
@@ -72,8 +74,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_04_22_210420) do
     t.datetime "created_at", null: false
     t.text "description"
     t.datetime "end_date"
-    t.string "location"
-    t.datetime "start_date"
+    t.string "location", null: false
+    t.string "rejection_reason"
+    t.datetime "start_date", null: false
     t.enum "status", default: "draft", enum_type: "event_status"
     t.string "title", null: false
     t.datetime "updated_at", null: false

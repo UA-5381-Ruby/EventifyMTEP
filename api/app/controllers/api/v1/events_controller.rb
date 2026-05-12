@@ -33,6 +33,7 @@ module Api
 
       def create
         @event = Event.new(event_params.except(:category_ids))
+        authorize @event
         @event.category_ids = event_params[:category_ids] if event_params[:category_ids].present?
 
         @event.status = 'draft'
@@ -55,7 +56,7 @@ module Api
       def event_params
         params.expect(event: [
                         :title, :description, :location, :start_date,
-                        :end_date, :status, :brand_id, { category_ids: [] }
+                        :end_date, :brand_id, { category_ids: [] }
                       ])
       end
 
