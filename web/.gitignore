@@ -8,6 +8,7 @@
 /.idea
 .vscode/
 .DS_Store/
+.DS_Store
 
 # dependencies
 /node_modules
@@ -22,12 +23,9 @@
 # testing
 /coverage
 
-# next.js
-/.next/
-/out/
-
 # production
 /build
+/dist
 
 # misc
 *.pem
@@ -43,8 +41,5 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
 .history
-
-*.js
-*.d.ts
+next-env.d.ts

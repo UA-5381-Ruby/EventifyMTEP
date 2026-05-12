@@ -72,7 +72,7 @@
 
 ## Naming Conventions
 
-- Компоненти: PascalCase (`Button`, `CardHeader`)
+- Components: PascalCase (`Button`, `CardHeader`)
 - Props: camelCase (`isLoading`, `fullWidth`)
-- CSS класи: лише Tailwind (без кастомних inline стилів)
-- Файли: `ComponentName.tsx`
+- CSS classes: Tailwind only (no custom inline styles)
+- Files: `ComponentName.tsx`

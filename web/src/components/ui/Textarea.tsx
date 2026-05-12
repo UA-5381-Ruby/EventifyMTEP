@@ -1,15 +1,15 @@
-import { type TextareaHTMLAttributes, forwardRef } from 'react'
-import { cn } from '../../lib/utils'
+import { type TextareaHTMLAttributes, forwardRef } from 'react';
+import { cn } from '../../lib/utils';
 
 interface TextareaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label?: string
-  error?: string
-  hint?: string
+  label?: string;
+  error?: string;
+  hint?: string;
 }
 
 export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ label, error, hint, className, id, ...props }, ref) => {
-    const textareaId = id || label?.toLowerCase().replace(/\s+/g, '-')
+    const textareaId = id || label?.toLowerCase().replace(/\s+/g, '-');
 
     return (
       <div className="flex flex-col gap-1">
@@ -42,8 +42,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         {error && <p className="text-sm text-error-600">{error}</p>}
         {!error && hint && <p className="text-sm text-neutral-500">{hint}</p>}
       </div>
-    )
+    );
   }
-)
+);
 
-Textarea.displayName = 'Textarea'
+Textarea.displayName = 'Textarea';

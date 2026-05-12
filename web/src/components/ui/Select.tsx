@@ -1,23 +1,23 @@
-import { type SelectHTMLAttributes, forwardRef } from 'react'
-import { cn } from '../../lib/utils'
+import { type SelectHTMLAttributes, forwardRef } from 'react';
+import { cn } from '../../lib/utils';
 
 interface SelectOption {
-  value: string
-  label: string
-  disabled?: boolean
+  value: string;
+  label: string;
+  disabled?: boolean;
 }
 
 interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
-  label?: string
-  error?: string
-  hint?: string
-  options: SelectOption[]
-  placeholder?: string
+  label?: string;
+  error?: string;
+  hint?: string;
+  options: SelectOption[];
+  placeholder?: string;
 }
 
 export const Select = forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, error, hint, options, placeholder, className, id, ...props }, ref) => {
-    const selectId = id || label?.toLowerCase().replace(/\s+/g, '-')
+    const selectId = id || label?.toLowerCase().replace(/\s+/g, '-');
 
     return (
       <div className="flex flex-col gap-1">
@@ -57,10 +57,15 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ))}
           </select>
 
-          {/* Стрілочка */}
+          {/* Dropdown arrow icon */}
           <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M19 9l-7 7-7-7"
+              />
             </svg>
           </div>
         </div>
@@ -68,8 +73,8 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
         {error && <p className="text-sm text-error-600">{error}</p>}
         {!error && hint && <p className="text-sm text-neutral-500">{hint}</p>}
       </div>
-    )
+    );
   }
-)
+);
 
-Select.displayName = 'Select'
+Select.displayName = 'Select';

@@ -1,14 +1,14 @@
-import { type InputHTMLAttributes, forwardRef } from 'react'
-import { cn } from '../../lib/utils'
+import { type InputHTMLAttributes, forwardRef } from 'react';
+import { cn } from '@/lib/utils';
 
 interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
-  label?: string
-  error?: string
+  label?: string;
+  error?: string;
 }
 
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
   ({ label, error, className, id, ...props }, ref) => {
-    const checkId = id || `checkbox-${label?.toLowerCase().replace(/\s+/g, '-')}`
+    const checkId = id || `checkbox-${label?.toLowerCase().replace(/\s+/g, '-')}`;
 
     return (
       <div className="flex flex-col gap-1">
@@ -32,27 +32,23 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             )}
             {...props}
           />
-          {label && (
-            <span className="text-sm text-neutral-700 select-none">{label}</span>
-          )}
+          {label && <span className="text-sm text-neutral-700 select-none">{label}</span>}
         </label>
         {error && <p className="text-sm text-error-600 ml-6">{error}</p>}
       </div>
-    )
+    );
   }
-)
+);
 
-Checkbox.displayName = 'Checkbox'
+Checkbox.displayName = 'Checkbox';
 
-
-// ── Radio (окремий компонент в тому ж файлі) ─────────────
 interface RadioProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
-  label?: string
+  label?: string;
 }
 
 export const Radio = forwardRef<HTMLInputElement, RadioProps>(
   ({ label, className, id, ...props }, ref) => {
-    const radioId = id || `radio-${label?.toLowerCase().replace(/\s+/g, '-')}`
+    const radioId = id || `radio-${label?.toLowerCase().replace(/\s+/g, '-')}`;
 
     return (
       <label
@@ -73,12 +69,10 @@ export const Radio = forwardRef<HTMLInputElement, RadioProps>(
           )}
           {...props}
         />
-        {label && (
-          <span className="text-sm text-neutral-700 select-none">{label}</span>
-        )}
+        {label && <span className="text-sm text-neutral-700 select-none">{label}</span>}
       </label>
-    )
+    );
   }
-)
+);
 
-Radio.displayName = 'Radio'
+Radio.displayName = 'Radio';
