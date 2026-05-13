@@ -1,8 +1,8 @@
 import type { AxiosResponse } from 'axios';
 import { CategoriesService } from '../services/categoriesService.ts';
-import apiClient from '../services/apiClient';
+import apiClient from '@/lib/apiClient';
 
-jest.mock('../services/apiClient', () => ({
+jest.mock('../lib/apiClient', () => ({
   __esModule: true,
   default: {
     get: jest.fn(),
@@ -20,7 +20,7 @@ describe('CategoriesService', () => {
   describe('getCategories', () => {
     it('should fetch categories and sort them by name', async () => {
       const mockCategories = [
-        { id: 1, name: 'Conference'},
+        { id: 1, name: 'Conference' },
         { id: 2, name: 'Workshop' },
         { id: 3, name: 'Music' },
       ];
@@ -73,8 +73,9 @@ describe('CategoriesService', () => {
 
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
 
-      await expect(CategoriesService.createCategory(payload))
-        .rejects.toThrow('422 Unprocessable Entity');
+      await expect(CategoriesService.createCategory(payload)).rejects.toThrow(
+        '422 Unprocessable Entity'
+      );
 
       expect(consoleSpy).toHaveBeenCalledWith('Error creating category:', apiError);
 
