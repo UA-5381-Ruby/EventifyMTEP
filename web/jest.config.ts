@@ -1,29 +1,30 @@
-import type { Config } from 'jest';
+import type {Config} from 'jest';
 
 const config: Config = {
   testEnvironment: 'jsdom',
   testMatch: ['<rootDir>/src/test/**/*.test.{ts,tsx}'],
   setupFilesAfterEnv: ['<rootDir>/src/test/setup.ts'],
-  globals: {
-    'import.meta': {
-      env: {
-        VITE_API_BASE_URL: 'http://localhost:3000',
-        MODE: 'test',
-        DEV: true,
-      },
-    },
-  },
   transform: {
     '^.+\\.(t|j)sx?$': [
       '@swc/jest',
       {
         jsc: {
           transform: {
-            react: { runtime: 'automatic' },
+            react: {runtime: 'automatic'},
+            // Ось цей блок вирішує проблему з import.meta
+            optimizer: {
+              globals: {
+                vars: {
+                  'import.meta.env': 'process.env',
+                },
+              },
+            },
           },
           parser: {
             syntax: 'typescript',
             tsx: true,
+            // Дозволяємо динамічні імпорти, якщо вони є
+            dynamicImport: true,
           },
         },
         module: {

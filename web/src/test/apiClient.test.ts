@@ -1,5 +1,5 @@
 import MockAdapter from 'axios-mock-adapter';
-import apiClient from '../../apiClient';
+import apiClient from '../lib/apiClient';
 
 describe('apiClient', () => {
   let mock: MockAdapter;
@@ -14,7 +14,7 @@ describe('apiClient', () => {
   });
 
   it('adds Authorization header when token exists', async () => {
-    localStorage.setItem('access_token', 'TEST_TOKEN');
+    localStorage.setItem('accessToken', 'TEST_TOKEN');
 
     mock.onGet('/test').reply((config) => {
       return [
@@ -52,6 +52,6 @@ describe('apiClient', () => {
   });
 
   it('uses correct baseURL', () => {
-    expect(apiClient.defaults.baseURL).toBeDefined();
+    expect(apiClient.defaults.baseURL).toBe('http://localhost:3000');
   });
 });
