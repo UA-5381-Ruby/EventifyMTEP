@@ -1,4 +1,4 @@
-import apiClient from '@/services/apiClient';
+import apiClient from '@/lib/apiClient';
 import {
   type UserRole,
   type Membership,

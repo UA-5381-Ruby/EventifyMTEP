@@ -1,5 +1,5 @@
 import apiClient from '@/lib/apiClient';
-import { BrandMembershipsService } from '@/services/BrandMembershipsService'; // Змініть шлях на ваш реальний
+import { BrandMembershipsService } from '@/services/BrandMembershipsService';
 import {
   type UserRole,
   type CreateMembershipRequest,
@@ -7,7 +7,7 @@ import {
 } from '@/types/brandMemberships';
 
 // Мокаємо apiClient, щоб він не робив реальних HTTP-запитів
-jest.mock('@/services/apiClient', () => ({
+jest.mock('@/lib/apiClient', () => ({
   get: jest.fn(),
   post: jest.fn(),
   patch: jest.fn(),
