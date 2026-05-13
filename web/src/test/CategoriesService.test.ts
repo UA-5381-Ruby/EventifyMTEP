@@ -1,8 +1,8 @@
 import type { AxiosResponse } from 'axios';
-import { CategoriesService } from '../services/categoriesService.ts';
+import { CategoriesService } from '@/services/categoriesService.ts';
 import apiClient from '@/lib/apiClient';
 
-jest.mock('../lib/apiClient', () => ({
+jest.mock('@/lib/apiClient', () => ({
   __esModule: true,
   default: {
     get: jest.fn(),

@@ -1,5 +1,5 @@
 import MockAdapter from 'axios-mock-adapter';
-import apiClient from '../lib/apiClient';
+import apiClient from '@/lib/apiClient';
 
 describe('apiClient', () => {
   let mock: MockAdapter;
