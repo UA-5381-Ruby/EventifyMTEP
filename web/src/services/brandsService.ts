@@ -1,11 +1,6 @@
-import apiClient from './apiClient';
+import apiClient from '@/lib/apiClient';
 import type { AxiosError } from 'axios';
-import type {
-  Brand,
-  BrandWithEvents,
-  CreateBrandRequest,
-  UpdateBrandRequest,
-} from '@/types/brand';
+import type { Brand, BrandWithEvents, CreateBrandRequest, UpdateBrandRequest } from '@/types/brand';
 
 type ForbiddenError = AxiosError & { isForbidden?: boolean };
 
@@ -28,7 +23,7 @@ export class BrandsService {
 
   async updateBrand(id: number, payload: UpdateBrandRequest): Promise<Brand> {
     try {
-      const res = await apiClient.patch<Brand>(`${this.endpoint}/${id}`, {brand: payload});
+      const res = await apiClient.patch<Brand>(`${this.endpoint}/${id}`, { brand: payload });
       return res.data;
     } catch (error) {
       if ((error as ForbiddenError).isForbidden) {
