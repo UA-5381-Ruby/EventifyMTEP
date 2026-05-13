@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "engines": {
-    "node": "24.15.0"
+    "node": ">=24.15.0"
   },
   "scripts": {
     "dev": "vite",
@@ -30,7 +30,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@rolldown/binding-linux-x64-gnu": "^1.0.0",
     "@swc/core": "^1.15.33",
     "@swc/jest": "^0.2.39",
     "@tailwindcss/vite": "^4.2.4",
