@@ -13,22 +13,22 @@ export class BrandsService {
     return res.data;
   }
 
-  async getBrandById(id: string): Promise<BrandWithEvents> {
+  async getBrandById(id: number): Promise<BrandWithEvents> {
     const res = await apiClient.get<BrandWithEvents>(`${this.endpoint}/${id}`);
     return res.data;
   }
 
   async createBrand(payload: CreateBrandRequest): Promise<Brand> {
-    const res = await apiClient.post<Brand>(this.endpoint, payload);
+    const res = await apiClient.post<Brand>(this.endpoint, { brand: payload });
     return res.data;
   }
 
-  async updateBrand(id: string, payload: UpdateBrandRequest): Promise<Brand> {
-    const res = await apiClient.patch<Brand>(`${this.endpoint}/${id}`, payload);
+  async updateBrand(id: number, payload: UpdateBrandRequest): Promise<Brand> {
+    const res = await apiClient.patch<Brand>(`${this.endpoint}/${id}`, { brand: payload });
     return res.data;
   }
 
-  async deleteBrand(id: string): Promise<void> {
+  async deleteBrand(id: number): Promise<void> {
     await apiClient.delete(`${this.endpoint}/${id}`);
   }
 }
