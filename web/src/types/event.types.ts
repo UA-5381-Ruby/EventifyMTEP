@@ -9,24 +9,28 @@ export type EventStatus =
   | 'archived'
   | 'cancelled';
 
+export type EventSortField = 'created_at' | 'updated_at' | 'title' | 'start_date' | 'status';
+export type SortOrder = 'asc' | 'desc';
+
 export interface Event {
-  id: string;
+  id: number; 
   title: string;
   start_date: string;
   status: EventStatus;
-  brand_id: string;
+  brand_id: number;
 }
 
 export interface EventDetail extends Event {
-  description: string | null;
+  description: string;
   location: string;
   end_date: string | null;
   brand: {
-    id: string;
+    id: number;
     name: string;
+    logoUrl?: string;
   };
   categories: {
-    id: string;
+    id: number;
     name: string;
   }[];
 }
@@ -34,28 +38,25 @@ export interface EventDetail extends Event {
 export interface EventQueryParams {
   page?: number;
   per_page?: number;
-  sort?: 'created_at' | 'updated_at' | 'title' | 'start_date' | 'status';
-  order?: 'asc' | 'desc';
+  search?: string;
+  sort?: EventSortField;
+  order?: SortOrder;
+  status?: EventStatus;
   q?: string;
   from?: string;
   to?: string;
-  brand_id?: string;
-  status?: EventStatus;
-  category_id?: string;
+  brand_id?: number;
+  category_id?: number;
 }
 
 export interface CreateEventRequest {
   title: string;
   location: string;
   start_date: string;
-  brand_id: string;
+  brand_id: number;
   description?: string;
   end_date?: string;
-  category_ids?: string[];
-}
-
-export interface EventTransitionRequest {
-  reason?: string;
+  category_ids?: number[];
 }
 
 export interface PaginationMeta {
