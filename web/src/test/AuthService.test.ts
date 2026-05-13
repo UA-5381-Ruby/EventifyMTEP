@@ -1,4 +1,4 @@
-import AuthService from '../services/authService';
+import AuthService from '@/services/authService';
 import apiClient, { tokenStorage } from '@/lib/apiClient';
 
 jest.mock('@/lib/apiClient', () => ({
@@ -32,7 +32,7 @@ describe('login', () => {
   it('stores the JWT in localStorage on success', async () => {
     const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.fake.sig';
     mockPost.mockResolvedValueOnce({
-      data: { access_token: fakeToken, user: { id: '1', email: 'a@b.com', name: 'Ada' } },
+      data: { token: fakeToken, user: { id: '1', email: 'a@b.com', name: 'Ada' } },
     });
 
     await AuthService.login({ email: 'a@b.com', password: 'secret' });
@@ -44,7 +44,7 @@ describe('login', () => {
   it('updates auth state to isAuthenticated on success', async () => {
     const user = { id: '1', email: 'a@b.com', name: 'Ada' };
     mockPost.mockResolvedValueOnce({
-      data: { access_token: 'tok', user },
+      data: { token: 'tok', user },
     });
 
     await AuthService.login({ email: 'a@b.com', password: 'secret' });
@@ -100,11 +100,11 @@ describe('register', () => {
   it('resolves with the full AuthResponse so UI can derive loading/error state', async () => {
     const user = { id: '2', email: 'b@b.com', name: 'Bob' };
     const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.fake.sig';
-    mockPost.mockResolvedValueOnce({ data: { access_token: fakeToken, user } });
+    mockPost.mockResolvedValueOnce({ data: { token: fakeToken, user } });
 
     const result = await AuthService.register({ name: 'Bob', email: 'b@b.com', password: 'pw' });
 
-    expect(result).toEqual({ access_token: fakeToken, user });
+    expect(result).toEqual({ token: fakeToken, user });
   });
 });
 
@@ -132,7 +132,7 @@ describe('subscribe', () => {
 
   it('notifies subscriber when login succeeds', async () => {
     const user = { id: '1', email: 'a@b.com', name: 'Ada' };
-    mockPost.mockResolvedValueOnce({ data: { access_token: 'tok', user } });
+    mockPost.mockResolvedValueOnce({ data: { token: 'tok', user } });
 
     const listener = jest.fn();
     const unsub = AuthService.subscribe(listener);
