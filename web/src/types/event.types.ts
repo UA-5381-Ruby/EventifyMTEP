@@ -13,7 +13,7 @@ export type EventSortField = 'created_at' | 'updated_at' | 'title' | 'start_date
 export type SortOrder = 'asc' | 'desc';
 
 export interface Event {
-  id: number; 
+  id: number;
   title: string;
   start_date: string;
   status: EventStatus;

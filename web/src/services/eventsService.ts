@@ -1,11 +1,11 @@
-import apiClient from './apiClient';
-import type { 
-  Event, 
-  EventDetail, 
-  EventQueryParams, 
+import apiClient from '@/lib/apiClient';
+import type {
+  Event,
+  EventDetail,
+  EventQueryParams,
   CreateEventRequest,
-  PaginatedResponse 
-} from '../types/event.types';
+  PaginatedResponse,
+} from '@/types/event.types';
 
 export const EventsService = {
   async getEvents(params: EventQueryParams = {}): Promise<PaginatedResponse<Event>> {
@@ -41,5 +41,5 @@ export const EventsService = {
   async cancelEvent(id: number): Promise<Event> {
     const response = await apiClient.post(`/api/v1/events/${id}/cancel`);
     return response.data.data;
-  }
+  },
 };
