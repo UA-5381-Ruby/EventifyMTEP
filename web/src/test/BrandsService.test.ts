@@ -138,4 +138,20 @@ describe('BrandsService', () => {
     await expect(brandsService.getBrandById(1))
       .rejects.toThrow('API Error');
   });
+
+  it('should throw permission error when updating brand without ownership', async () => {
+    const forbiddenError = Object.assign(new Error('Forbidden'), { isForbidden: true });
+    jest.mocked(apiClient.patch).mockRejectedValue(forbiddenError);
+
+    await expect(brandsService.updateBrand(1, { name: 'Test' }))
+      .rejects.toThrow('You do not have permission to update this brand');
+  });
+
+  it('should throw permission error when deleting brand without ownership', async () => {
+    const forbiddenError = Object.assign(new Error('Forbidden'), { isForbidden: true });
+    jest.mocked(apiClient.delete).mockRejectedValue(forbiddenError);
+
+    await expect(brandsService.deleteBrand(1))
+      .rejects.toThrow('You do not have permission to delete this brand');
+  });
 });
