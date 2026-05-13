@@ -1,4 +1,4 @@
-import axios, {AxiosError, type AxiosInstance} from 'axios';
+import axios, { AxiosError, type AxiosInstance } from 'axios';
 
 const TOKEN_KEY = 'accessToken';
 

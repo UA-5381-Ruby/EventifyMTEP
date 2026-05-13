@@ -1,4 +1,4 @@
-import type {Config} from 'jest';
+import type { Config } from 'jest';
 
 const config: Config = {
   testEnvironment: 'jsdom',
@@ -10,7 +10,7 @@ const config: Config = {
       {
         jsc: {
           transform: {
-            react: {runtime: 'automatic'},
+            react: { runtime: 'automatic' },
             // Ось цей блок вирішує проблему з import.meta
             optimizer: {
               globals: {

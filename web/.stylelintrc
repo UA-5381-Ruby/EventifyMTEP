@@ -1,8 +1,5 @@
 {
-  "extends": [
-    "stylelint-config-standard",
-    "stylelint-config-tailwindcss"
-  ],
+  "extends": ["stylelint-config-standard", "stylelint-config-tailwindcss"],
   "rules": {
     "at-rule-no-unknown": [
       true,
@@ -22,14 +19,8 @@
     "rule-empty-line-before": [
       "always-multi-line",
       {
-        "except": [
-          "after-single-line-comment",
-          "first-nested"
-        ],
-        "ignore": [
-          "after-comment",
-          "inside-block"
-        ]
+        "except": ["after-single-line-comment", "first-nested"],
+        "ignore": ["after-comment", "inside-block"]
       }
     ]
   }
