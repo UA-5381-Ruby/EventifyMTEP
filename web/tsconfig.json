@@ -9,6 +9,8 @@
     }
   ],
   "compilerOptions": {
-    "module": "CommonJS"
+    "module": "CommonJS",
+    "types": ["jest", "node"],
+    "lib": ["ES2020", "DOM"]
   }
 }
