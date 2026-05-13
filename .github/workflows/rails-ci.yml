@@ -35,7 +35,7 @@ jobs:
       - name: Scan for known security vulnerabilities in gems used
         run: bin/bundler-audit
 
-  lint:
+  lint_ruby:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -67,7 +67,7 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
-  test:
+  test_ruby:
     runs-on: ubuntu-latest
     defaults:
       run:
