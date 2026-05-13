@@ -11,10 +11,12 @@ jest.mock('../services/apiClient.ts', () => ({
   },
 }));
 
-import apiClient from '../services/apiClient.ts';
+import apiClient from '../services/apiClient';
 import { brandsService } from '../services/brandsService.ts';
 
 describe('BrandsService', () => {
+  const endpoint = '/api/v1/brands';
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
@@ -35,7 +37,7 @@ describe('BrandsService', () => {
 
     const result = await brandsService.getAllBrands();
 
-    expect(apiClient.get).toHaveBeenCalledWith('/api/v1/brands');
+    expect(apiClient.get).toHaveBeenCalledWith(endpoint);
     expect(result).toEqual(mockBrands);
   });
 
@@ -68,7 +70,7 @@ describe('BrandsService', () => {
 
     const result = await brandsService.getBrandById(1);
 
-    expect(apiClient.get).toHaveBeenCalledWith('/api/v1/brands/1');
+    expect(apiClient.get).toHaveBeenCalledWith(`${endpoint}/1`);
     expect(result).toEqual(mockBrand);
     expect(result.events).toHaveLength(1);
     expect(result.events[0].title).toBe('Tech Summit 2025');
@@ -93,7 +95,7 @@ describe('BrandsService', () => {
     const result = await brandsService.createBrand(payload);
 
     expect(apiClient.post).toHaveBeenCalledWith(
-      '/api/v1/brands',
+      endpoint,
       { brand: payload }
     );
     expect(result).toEqual(mockBrand);
@@ -118,7 +120,7 @@ describe('BrandsService', () => {
     const result = await brandsService.updateBrand(1, payload);
 
     expect(apiClient.patch).toHaveBeenCalledWith(
-      '/api/v1/brands/1',
+      (`${endpoint}/1`),
       { brand: payload }
     );
     expect(result).toEqual(mockBrand);
@@ -129,7 +131,7 @@ describe('BrandsService', () => {
 
     await brandsService.deleteBrand(1);
 
-    expect(apiClient.delete).toHaveBeenCalledWith('/api/v1/brands/1');
+    expect(apiClient.delete).toHaveBeenCalledWith(`${endpoint}/1`);
   });
 
   it('should handle API errors', async () => {
