@@ -1,10 +1,10 @@
 {
-    "errors": {
-        "forbidden_generic": "You do not have permission to perform this action.",
-        "brand_memberships": {
-            "add_forbidden": "You do not have permission to assign this role. Only Owners can assign Admin or Owner roles.",
-            "update_forbidden": "You lack the authority to change this user's role.",
-            "remove_forbidden": "You do not have permission to remove this member. Managers can only remove regular users."
-        }
+  "errors": {
+    "forbidden_generic": "You do not have permission to perform this action.",
+    "brand_memberships": {
+      "add_forbidden": "You do not have permission to assign this role. Only Owners can assign Admin or Owner roles.",
+      "update_forbidden": "You lack the authority to change this user's role.",
+      "remove_forbidden": "You do not have permission to remove this member. Managers can only remove regular users."
     }
+  }
 }
