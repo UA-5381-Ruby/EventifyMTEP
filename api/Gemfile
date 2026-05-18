@@ -11,6 +11,7 @@ gem 'bundler-audit', '~> 0.9.3', groups: %i[development test]
 gem 'devise'
 gem 'dotenv-rails', groups: %i[development test]
 gem 'jwt'
+gem 'net-imap', '>= 0.6.4'
 gem 'pg', '~> 1.1'
 gem 'puma', '~> 8.0'
 gem 'pundit'
