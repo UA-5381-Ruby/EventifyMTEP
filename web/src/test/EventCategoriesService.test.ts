@@ -71,14 +71,16 @@ describe('EventCategoriesService', () => {
 
       await EventCategoriesService.linkCategoryToEvent(mockEventId, mockCategoryId);
 
-      const expectedPayload: LinkCategoryRequest = { category_id: mockCategoryId };
+      const expectedPayload: LinkCategoryRequest = {
+        category_id: mockCategoryId,
+      };
       expect(apiClient.post).toHaveBeenCalledWith(
         `/api/v1/events/${mockEventId}/categories`,
         expectedPayload
       );
     });
 
-    it('повинен передати помилку 409 Conflict, якщо категорія вже пов\'язана', async () => {
+    it("повинен передати помилку 409 Conflict, якщо категорія вже пов'язана", async () => {
       const conflictError = new Error('409 Conflict: Category already linked');
 
       jest.mocked(apiClient.post).mockRejectedValue(conflictError);
@@ -112,7 +114,7 @@ describe('EventCategoriesService', () => {
       );
     });
 
-    it('повинен передати помилку 404 Not Found, якщо категорія не пов\'язана', async () => {
+    it("повинен передати помилку 404 Not Found, якщо категорія не пов'язана", async () => {
       const notFoundError = new Error('404 Not Found');
 
       jest.mocked(apiClient.delete).mockRejectedValue(notFoundError);
@@ -135,7 +137,6 @@ describe('EventCategoriesService', () => {
 
   describe('Integration scenarios', () => {
     it('повинен дозволити отримати категорії, додати нову та видалити', async () => {
-      // Сценарій: отримуємо початкові категорії
       const initialCategories: Category[] = [mockCategory];
       jest.mocked(apiClient.get).mockResolvedValueOnce({
         data: initialCategories,
@@ -144,7 +145,6 @@ describe('EventCategoriesService', () => {
       const result1 = await EventCategoriesService.getEventCategories(mockEventId);
       expect(result1).toEqual(initialCategories);
 
-      // Додаємо нову категорію
       jest.mocked(apiClient.post).mockResolvedValueOnce({
         data: {},
       } as AxiosResponse);
@@ -152,7 +152,6 @@ describe('EventCategoriesService', () => {
       await EventCategoriesService.linkCategoryToEvent(mockEventId, 2);
       expect(apiClient.post).toHaveBeenCalled();
 
-      // Видаляємо категорію
       jest.mocked(apiClient.delete).mockResolvedValueOnce({
         data: {},
       } as AxiosResponse);
