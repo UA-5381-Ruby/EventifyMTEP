@@ -22,18 +22,23 @@
   h1 {
     @apply text-4xl font-bold text-neutral-900 leading-tight;
   }
+
   h2 {
     @apply text-3xl font-bold text-neutral-900 leading-tight;
   }
+
   h3 {
     @apply text-2xl font-semibold text-neutral-900;
   }
+
   h4 {
     @apply text-xl font-semibold text-neutral-900;
   }
+
   h5 {
     @apply text-lg font-medium text-neutral-900;
   }
+
   h6 {
     @apply text-base font-medium text-neutral-900;
   }

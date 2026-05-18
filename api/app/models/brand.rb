@@ -24,6 +24,11 @@ class Brand < ApplicationRecord
             format: {
               with: HEX_COLOR_REGEX,
               message: 'must be a valid hex color code'
-            },
-            allow_blank: true
+            }
+
+  validates :secondary_color,
+            format: {
+              with: HEX_COLOR_REGEX,
+              message: 'must be a valid hex color code'
+            }
 end
