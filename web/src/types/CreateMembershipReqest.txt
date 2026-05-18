@@ -1,0 +1,6 @@
+import type { UserRole } from './UserRole';
+
+export interface CreateMembershipRequest {
+    user_id: string;
+    role: UserRole;
+}

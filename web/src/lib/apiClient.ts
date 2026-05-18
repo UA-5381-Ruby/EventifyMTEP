@@ -1,142 +1,60 @@
-/**
- * API Client configuration and utilities
- * Handles JWT authentication and common API operations
- */
+import axios, { AxiosError, type AxiosInstance } from 'axios';
 
-type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
+const TOKEN_KEY = 'accessToken';
 
-interface FetchOptions extends RequestInit {
-  skipAuth?: boolean;
+export const tokenStorage = {
+  get: (): string | null => localStorage.getItem(TOKEN_KEY),
+  set: (token: string): void => localStorage.setItem(TOKEN_KEY, token),
+  clear: (): void => localStorage.removeItem(TOKEN_KEY),
+};
+
+const apiClient: AxiosInstance = axios.create({
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
+  headers: {
+    'Content-Type': 'application/json',
+    Accept: 'application/json',
+  },
+});
+
+// Attach the Bearer token to every request if one is stored.
+apiClient.interceptors.request.use((config) => {
+  const token = tokenStorage.get();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+interface RailsErrorBody {
+  error?: string;
+  errors?: string | string[];
 }
 
-class ApiClient {
-  private baseUrl: string;
-  private defaultHeaders: HeadersInit = {
-    'Content-Type': 'application/json',
-  };
+/**
+ * Converts an Axios error into a plain, user-friendly string.
+ */
+export function parseApiError(err: unknown): never {
+  if (axios.isAxiosError(err)) {
+    const axiosErr = err as AxiosError<RailsErrorBody>;
+    const data = axiosErr.response?.data;
 
-  constructor(baseUrl: string = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000') {
-    this.baseUrl = baseUrl;
-  }
+    if (data) {
+      if (typeof data.error === 'string') throw new Error(data.error);
 
-  /**
-   * Retrieves JWT token from localStorage
-   */
-  private getAuthToken(): string | null {
-    return localStorage.getItem('authToken');
-  }
-
-  /**
-   * Constructs headers with JWT token if available
-   */
-  private getHeaders(skipAuth: boolean = false): HeadersInit {
-    const headers = { ...this.defaultHeaders };
-
-    if (!skipAuth) {
-      const token = this.getAuthToken();
-      if (token) {
-        (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
+      if (data.errors) {
+        const msg = Array.isArray(data.errors) ? data.errors.join(', ') : data.errors;
+        throw new Error(msg);
       }
     }
 
-    return headers;
-  }
-
-  /**
-   * Makes an HTTP request to the API
-   */
-  private async request<T>(
-    method: HttpMethod,
-    path: string,
-    options: FetchOptions = {}
-  ): Promise<T> {
-    const { skipAuth = false, ...fetchOptions } = options;
-    const url = `${this.baseUrl}${path}`;
-
-    const response = await fetch(url, {
-      method,
-      headers: this.getHeaders(skipAuth),
-      ...fetchOptions,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({ message: 'Unknown error' }));
-      const error = new Error(errorData.message || `HTTP ${response.status}`) as unknown as Record<string, unknown>;
-      error.status = response.status;
-      error.data = errorData;
-      throw error;
+    // Network-level failures (no response at all)
+    if (!axiosErr.response) {
+      throw new Error('Network error — please check your connection.');
     }
-
-    // Handle 204 No Content
-    if (response.status === 204) {
-      return undefined as T;
-    }
-
-    return response.json();
   }
 
-  /**
-   * GET request
-   */
-  public get<T>(path: string, options?: FetchOptions): Promise<T> {
-    return this.request<T>('GET', path, options);
-  }
-
-  /**
-   * POST request
-   */
-  public post<T>(path: string, body?: unknown, options?: FetchOptions): Promise<T> {
-    return this.request<T>('POST', path, {
-      ...options,
-      body: body ? JSON.stringify(body) : undefined,
-    });
-  }
-
-  /**
-   * PUT request
-   */
-  public put<T>(path: string, body?: unknown, options?: FetchOptions): Promise<T> {
-    return this.request<T>('PUT', path, {
-      ...options,
-      body: body ? JSON.stringify(body) : undefined,
-    });
-  }
-
-  /**
-   * PATCH request
-   */
-  public patch<T>(path: string, body?: unknown, options?: FetchOptions): Promise<T> {
-    return this.request<T>('PATCH', path, {
-      ...options,
-      body: body ? JSON.stringify(body) : undefined,
-    });
-  }
-
-  /**
-   * DELETE request
-   */
-  public delete<T>(path: string, options?: FetchOptions): Promise<T> {
-    return this.request<T>('DELETE', path, options);
-  }
-
-  /**
-   * Sets/updates the auth token (typically called after login)
-   */
-  public setAuthToken(token: string): void {
-    localStorage.setItem('authToken', token);
-  }
-
-  /**
-   * Clears the auth token (typically called on logout)
-   */
-  public clearAuthToken(): void {
-    localStorage.removeItem('authToken');
-  }
+  // Unknown shape — rethrow as-is so nothing is silently swallowed
+  throw err instanceof Error ? err : new Error('An unexpected error occurred.');
 }
-
-/**
- * Singleton instance of the API client
- */
-export const apiClient = new ApiClient();
 
 export default apiClient;
