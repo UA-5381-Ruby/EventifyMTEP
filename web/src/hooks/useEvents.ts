@@ -40,7 +40,7 @@ export function useEvents(params: EventQueryParams) {
         };
 
         const response = await EventsService.getEvents(queryParams);
-        
+
         if (isMounted) {
           setState({
             events: response.data,
@@ -51,7 +51,8 @@ export function useEvents(params: EventQueryParams) {
         }
       } catch (err: unknown) {
         if (isMounted) {
-          const errorMessage = err instanceof Error ? err.message : 'Failed to load events. Please try again.';
+          const errorMessage =
+            err instanceof Error ? err.message : 'Failed to load events. Please try again.';
           setState((prev) => ({
             ...prev,
             isLoading: false,
@@ -72,8 +73,8 @@ export function useEvents(params: EventQueryParams) {
     setRefetchIndex((prev) => prev + 1);
   }
 
-  return { 
-    ...state, 
-    refetch: triggerRefetch 
+  return {
+    ...state,
+    refetch: triggerRefetch,
   };
 }

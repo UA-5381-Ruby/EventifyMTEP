@@ -3,18 +3,25 @@ import { Badge, Button } from '../ui';
 import { cn } from '@/lib/utils';
 import type { Event, EventStatus } from '../../types/event.types';
 
-type BadgeVariant = 'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'outline';
+type BadgeVariant =
+  | 'default'
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'warning'
+  | 'error'
+  | 'outline';
 
 const STATUS_CONFIG: Record<EventStatus, { label: string; variant: BadgeVariant }> = {
-  draft:                 { label: 'Draft',       variant: 'default'   },
-  draft_on_review:       { label: 'In Review',   variant: 'warning'   },
-  published:             { label: 'Published',   variant: 'success'   },
-  rejected:              { label: 'Rejected',    variant: 'error'     },
-  published_unverified:  { label: 'Unverified',  variant: 'secondary' },
-  published_on_review:   { label: 'In Review',   variant: 'warning'   },
-  published_rejected:    { label: 'Rejected',    variant: 'error'     },
-  archived:              { label: 'Archived',    variant: 'outline'   },
-  cancelled:             { label: 'Cancelled',   variant: 'error'     },
+  draft: { label: 'Draft', variant: 'default' },
+  draft_on_review: { label: 'In Review', variant: 'warning' },
+  published: { label: 'Published', variant: 'success' },
+  rejected: { label: 'Rejected', variant: 'error' },
+  published_unverified: { label: 'Unverified', variant: 'secondary' },
+  published_on_review: { label: 'In Review', variant: 'warning' },
+  published_rejected: { label: 'Rejected', variant: 'error' },
+  archived: { label: 'Archived', variant: 'outline' },
+  cancelled: { label: 'Cancelled', variant: 'error' },
 };
 
 function formatDate(iso: string) {
@@ -35,7 +42,10 @@ interface EventCardProps {
 
 export function EventCard({ event }: EventCardProps) {
   const navigate = useNavigate();
-  const config = STATUS_CONFIG[event.status as EventStatus] ?? { label: event.status, variant: 'default' as BadgeVariant };
+  const config = STATUS_CONFIG[event.status as EventStatus] ?? {
+    label: event.status,
+    variant: 'default' as BadgeVariant,
+  };
   const upcoming = event.start_date ? isUpcoming(event.start_date) : false;
 
   return (
@@ -43,7 +53,7 @@ export function EventCard({ event }: EventCardProps) {
       className={cn(
         'group relative flex flex-col rounded-xl bg-white border transition-all duration-200',
         'hover:shadow-md hover:-translate-y-0.5',
-        upcoming ? 'border-neutral-200' : 'border-neutral-100',
+        upcoming ? 'border-neutral-200' : 'border-neutral-100'
       )}
     >
       {upcoming && event.status === 'published' && (
@@ -101,8 +111,13 @@ export function EventCardSkeleton() {
 
 function CalendarIcon() {
   return (
-    <svg className="w-3.5 h-3.5 text-neutral-400 shrink-0" viewBox="0 0 16 16" fill="none"
-      stroke="currentColor" strokeWidth="1.5">
+    <svg
+      className="w-3.5 h-3.5 text-neutral-400 shrink-0"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
       <rect x="1.5" y="2.5" width="13" height="12" rx="1.5" />
       <path d="M5 1v3M11 1v3M1.5 6.5h13" strokeLinecap="round" />
     </svg>

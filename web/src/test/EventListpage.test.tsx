@@ -14,26 +14,48 @@ jest.mock('../components/layout', () => ({
 }));
 
 jest.mock('../components/ui', () => ({
-  Input: ({ placeholder, onChange }: { placeholder: string; onChange: React.ChangeEventHandler<HTMLInputElement> }) => (
-    <input placeholder={placeholder} onChange={onChange} data-testid="search-input" />
-  ),
-  Select: ({ options, onChange, value }: {
+  Input: ({
+    placeholder,
+    onChange,
+  }: {
+    placeholder: string;
+    onChange: React.ChangeEventHandler<HTMLInputElement>;
+  }) => <input placeholder={placeholder} onChange={onChange} data-testid="search-input" />,
+  Select: ({
+    options,
+    onChange,
+    value,
+  }: {
     options: { value: string; label: string }[];
     onChange: React.ChangeEventHandler<HTMLSelectElement>;
     value: string;
   }) => (
-    <select onChange={onChange} value={value} aria-label={options[0]?.label || "Select option"}>
-      {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+    <select onChange={onChange} value={value} aria-label={options[0]?.label || 'Select option'}>
+      {options.map((o) => (
+        <option key={o.value} value={o.value}>
+          {o.label}
+        </option>
+      ))}
     </select>
   ),
-  Button: ({ children, onClick, disabled }: {
+  Button: ({
+    children,
+    onClick,
+    disabled,
+  }: {
     children: React.ReactNode;
     onClick?: () => void;
     disabled?: boolean;
-  }) => <button onClick={onClick} disabled={disabled}>{children}</button>,
+  }) => (
+    <button onClick={onClick} disabled={disabled}>
+      {children}
+    </button>
+  ),
   Spinner: () => <div data-testid="spinner">Loading…</div>,
   Alert: ({ children, title }: { children: React.ReactNode; title: string }) => (
-    <div role="alert"><strong>{title}</strong> {children}</div>
+    <div role="alert">
+      <strong>{title}</strong> {children}
+    </div>
   ),
 }));
 
@@ -53,8 +75,14 @@ const baseState = {
 };
 
 const mockEvents: Event[] = [
-  { id: 1, title: 'Tech Summit', start_date: '2026-09-01T09:00:00Z', status: 'published', brand_id: 101 },
-  { id: 2, title: 'Art Expo',    start_date: '2026-10-15T10:00:00Z', status: 'draft',     brand_id: 102 },
+  {
+    id: 1,
+    title: 'Tech Summit',
+    start_date: '2026-09-01T09:00:00Z',
+    status: 'published',
+    brand_id: 101,
+  },
+  { id: 2, title: 'Art Expo', start_date: '2026-10-15T10:00:00Z', status: 'draft', brand_id: 102 },
 ];
 
 const mockMeta = { page: 1, per_page: 12, total: 2 };
@@ -63,12 +91,11 @@ function renderPage() {
   return render(
     <MemoryRouter>
       <EventListPage />
-    </MemoryRouter>,
+    </MemoryRouter>
   );
 }
 
 describe('EventListPage', () => {
-
   beforeEach(() => jest.clearAllMocks());
 
   it('shows a spinner while loading', () => {
@@ -181,7 +208,7 @@ describe('EventListPage', () => {
 
     expect(screen.getByText(/← Prev/)).toBeInTheDocument();
     expect(screen.getByText(/Next →/)).toBeInTheDocument();
-    
+
     expect(screen.getByText('3')).toBeInTheDocument();
   });
 

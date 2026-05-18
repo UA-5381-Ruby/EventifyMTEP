@@ -12,12 +12,15 @@ function App() {
       <Routes>
         <Route path="/test/preview" element={<UIPreview />} />
 
-        <Route path="/" element={
-          <>
-            <Header />
-            <h1 className="bg-emerald-500">This is an event list page.</h1>
-          </>
-        } />
+        <Route
+          path="/"
+          element={
+            <>
+              <Header />
+              <h1 className="bg-emerald-500">This is an event list page.</h1>
+            </>
+          }
+        />
         <Route path="/login" element={<LoginPage />} />
         <Route
           path="/register"
@@ -25,7 +28,7 @@ function App() {
         />
 
         <Route path="/events" element={<EventListPage />} />
-        
+
         <Route element={<ProtectedRoute />}>
           <Route
             path="/dashboard"
