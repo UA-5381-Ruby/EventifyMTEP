@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { EventsService } from '../services/eventsService';
-import type { Event, EventQueryParams, PaginationMeta } from '../types/event.types';
+import type { Event, PaginationMeta, EventQueryParams } from '../types/event.types';
 
 interface UseEventsState {
   events: Event[];
@@ -9,11 +9,7 @@ interface UseEventsState {
   error: string | null;
 }
 
-interface UseEventsReturn extends UseEventsState {
-  refetch: () => void;
-}
-
-export function useEvents(params: EventQueryParams): UseEventsReturn {
+export function useEvents(params: EventQueryParams) {
   const [state, setState] = useState<UseEventsState>({
     events: [],
     meta: null,
@@ -21,23 +17,63 @@ export function useEvents(params: EventQueryParams): UseEventsReturn {
     error: null,
   });
 
-  const fetchEvents = useCallback(async () => {
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
-    try {
-      const response = await EventsService.getEvents(params);
-      setState({ events: response.data, meta: response.meta, isLoading: false, error: null });
-    } catch {
-      setState((prev) => ({
-        ...prev,
-        isLoading: false,
-        error: 'Failed to load events. Please try again.',
-      }));
-    }
-  }, [JSON.stringify(params)]);
+  const [refetchIndex, setRefetchIndex] = useState(0);
+
+  const { page, per_page, sort, order, q, status, brand_id, category_id, search } = params;
 
   useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
+    let isMounted = true;
 
-  return { ...state, refetch: fetchEvents };
+    async function startFetching() {
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+      try {
+        const queryParams: EventQueryParams = {
+          page,
+          per_page,
+          sort,
+          order,
+          q,
+          status,
+          brand_id,
+          category_id,
+          search,
+        };
+
+        const response = await EventsService.getEvents(queryParams);
+        
+        if (isMounted) {
+          setState({
+            events: response.data,
+            meta: response.meta,
+            isLoading: false,
+            error: null,
+          });
+        }
+      } catch (err: unknown) {
+        if (isMounted) {
+          const errorMessage = err instanceof Error ? err.message : 'Failed to load events. Please try again.';
+          setState((prev) => ({
+            ...prev,
+            isLoading: false,
+            error: errorMessage,
+          }));
+        }
+      }
+    }
+
+    startFetching();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [page, per_page, sort, order, q, status, brand_id, category_id, search, refetchIndex]);
+
+  function triggerRefetch() {
+    setRefetchIndex((prev) => prev + 1);
+  }
+
+  return { 
+    ...state, 
+    refetch: triggerRefetch 
+  };
 }
