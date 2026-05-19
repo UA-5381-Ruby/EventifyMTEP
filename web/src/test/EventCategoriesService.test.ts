@@ -1,5 +1,5 @@
 import type { AxiosResponse } from 'axios';
-import { EventCategoriesService } from '@/services/EventCategoriesService';
+import { EventCategoriesService } from '@/services/eventCategoriesService';
 import apiClient from '@/lib/apiClient';
 import type { Category, LinkCategoryRequest } from '@/types/category';
 
