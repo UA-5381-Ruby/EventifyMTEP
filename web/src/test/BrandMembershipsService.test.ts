@@ -1,5 +1,5 @@
 import apiClient from '@/lib/apiClient';
-import { BrandMembershipsService } from '@/services/BrandMembershipsService';
+import { BrandMembershipsService } from '../services/brandMembershipsService';
 import {
   type UserRole,
   type CreateMembershipRequest,

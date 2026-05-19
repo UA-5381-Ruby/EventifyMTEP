@@ -1,19 +1,19 @@
 export interface CreateEventPayload {
-    title: string;
-    [key: string]: any;
+  title: string;
+  [key: string]: unknown;
 }
 
 export interface UpdateUserPayload {
-    name?: string;
-    email?: string;
-    role?: string;
+  name?: string;
+  email?: string;
+  role?: string;
 }
 
 export interface UpdateBrandPayload {
-    name?: string;
+  name?: string;
 }
 
 export interface SuperadminMembershipPayload {
-    user_id: string | number;
-    role: string;
+  user_id: string | number;
+  role: string;
 }

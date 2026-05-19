@@ -1,5 +1,5 @@
 import MockAdapter from 'axios-mock-adapter';
-import { type AxiosError } from 'axios';
+import { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import apiClient, { tokenStorage, parseApiError } from '@/lib/apiClient';
 
 describe('apiClient', () => {
@@ -9,7 +9,7 @@ describe('apiClient', () => {
     mock = new MockAdapter(apiClient);
     localStorage.clear();
     jest.clearAllMocks();
-  })
+  });
 
   afterEach(() => {
     mock.restore();
@@ -67,7 +67,6 @@ describe('apiClient', () => {
 
       expect(tokenStorage.get()).toBe(token);
 
-
       tokenStorage.clear();
       expect(localStorage.getItem('accessToken')).toBeNull();
       expect(tokenStorage.get()).toBeNull();
@@ -97,7 +96,7 @@ describe('apiClient', () => {
   });
 
   describe('parseApiError', () => {
-    const createAxiosError = (data?: any, noResponse: boolean = false): AxiosError => {
+    const createAxiosError = (data?: unknown, noResponse: boolean = false): AxiosError => {
       const error = new Error('Test Axios Error') as AxiosError;
       error.isAxiosError = true;
       if (!noResponse) {
@@ -106,7 +105,7 @@ describe('apiClient', () => {
           status: 400,
           statusText: 'Bad Request',
           headers: {},
-          config: {} as any,
+          config: {} as InternalAxiosRequestConfig,
         };
       }
       return error;
