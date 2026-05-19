@@ -35,16 +35,16 @@ export function EventPagination({ page, totalPages, onPageChange }: EventPaginat
       <div className="flex items-center gap-1">
         {pages.map((p, i) =>
           p === 'gap' ? (
-            <span key={`gap-${i}`} className="px-1 text-neutral-300 text-sm">…</span>
+            <span key={`gap-${i}`} className="px-1 text-neutral-300 text-sm">
+              …
+            </span>
           ) : (
             <button
               key={p}
               onClick={() => onPageChange(p)}
               className={[
                 'w-8 h-8 rounded-md text-sm font-medium transition-colors',
-                p === page
-                  ? 'bg-primary-500 text-white'
-                  : 'text-neutral-600 hover:bg-neutral-100',
+                p === page ? 'bg-primary-500 text-white' : 'text-neutral-600 hover:bg-neutral-100',
               ].join(' ')}
             >
               {p}

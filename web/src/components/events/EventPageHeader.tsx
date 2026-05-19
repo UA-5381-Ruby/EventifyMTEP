@@ -58,9 +58,7 @@ export function EventPageHeader({
 
           {hasActivePills && (
             <div className="flex flex-wrap gap-2">
-              {search && (
-                <FilterPill onRemove={onRemoveSearch}>"{search}"</FilterPill>
-              )}
+              {search && <FilterPill onRemove={onRemoveSearch}>"{search}"</FilterPill>}
               {status && (
                 <FilterPill onRemove={onRemoveStatus}>
                   {STATUS_OPTIONS.find((o) => o.value === status)?.label}

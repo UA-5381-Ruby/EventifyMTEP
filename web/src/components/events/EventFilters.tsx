@@ -2,18 +2,18 @@ import React from 'react';
 import { Input, Select } from '@/components/ui';
 
 export const STATUS_OPTIONS = [
-  { value: '',                 label: 'All statuses' },
-  { value: 'published',        label: 'Published'    },
-  { value: 'draft',            label: 'Draft'        },
-  { value: 'draft_on_review',  label: 'In Review'    },
-  { value: 'cancelled',        label: 'Cancelled'    },
-  { value: 'archived',         label: 'Archived'     },
+  { value: '', label: 'All statuses' },
+  { value: 'published', label: 'Published' },
+  { value: 'draft', label: 'Draft' },
+  { value: 'draft_on_review', label: 'In Review' },
+  { value: 'cancelled', label: 'Cancelled' },
+  { value: 'archived', label: 'Archived' },
 ];
 
 export const SORT_OPTIONS = [
   { value: 'created_at', label: 'Newest first' },
-  { value: 'start_date', label: 'Start date'   },
-  { value: 'title',      label: 'Title A–Z'    },
+  { value: 'start_date', label: 'Start date' },
+  { value: 'title', label: 'Title A–Z' },
 ];
 
 interface EventFiltersProps {
@@ -22,7 +22,7 @@ interface EventFiltersProps {
   sort: string;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onStatusChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
-  onSortChange:   (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  onSortChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 
 export function EventFilters({
@@ -41,23 +41,21 @@ export function EventFilters({
         onChange={onSearchChange}
         leftIcon={<SearchIcon />}
       />
-      <Select
-        options={STATUS_OPTIONS}
-        value={status}
-        onChange={onStatusChange}
-      />
-      <Select
-        options={SORT_OPTIONS}
-        value={sort}
-        onChange={onSortChange}
-      />
+      <Select options={STATUS_OPTIONS} value={status} onChange={onStatusChange} />
+      <Select options={SORT_OPTIONS} value={sort} onChange={onSortChange} />
     </div>
   );
 }
 
 function SearchIcon() {
   return (
-    <svg className="w-4 h-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5">
+    <svg
+      className="w-4 h-4"
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+    >
       <circle cx="6.5" cy="6.5" r="4.5" />
       <path d="M10.5 10.5L14 14" strokeLinecap="round" />
     </svg>

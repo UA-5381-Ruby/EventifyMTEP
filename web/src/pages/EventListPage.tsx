@@ -12,8 +12,8 @@ const PER_PAGE = 12;
 export function EventListPage() {
   const [search, setSearch] = useState('');
   const [status, setStatus] = useState('');
-  const [sort, setSort]     = useState<EventQueryParams['sort']>('created_at');
-  const [page, setPage]     = useState(1);
+  const [sort, setSort] = useState<EventQueryParams['sort']>('created_at');
+  const [page, setPage] = useState(1);
 
   const params: EventQueryParams = {
     page,
@@ -21,14 +21,16 @@ export function EventListPage() {
     sort,
     order: sort === 'title' ? 'asc' : 'desc',
     ...(search.trim() ? { q: search.trim() } : {}),
-    ...(status        ? { status: status as EventStatus } : {}),
+    ...(status ? { status: status as EventStatus } : {}),
   };
 
   const { events, meta, isLoading, error, refetch } = useEvents(params);
 
   const totalPages = meta ? Math.ceil(meta.total / meta.per_page) : 1;
 
-  function resetPage() { setPage(1); }
+  function resetPage() {
+    setPage(1);
+  }
 
   function clearFilters() {
     setSearch('');
@@ -39,26 +41,39 @@ export function EventListPage() {
   return (
     <PageWrapper>
       <div className="min-h-screen bg-neutral-50">
-
         <EventPageHeader
           total={meta?.total ?? null}
           isLoading={isLoading}
           search={search}
           status={status}
-          onRemoveSearch={() => { setSearch(''); resetPage(); }}
-          onRemoveStatus={() => { setStatus(''); resetPage(); }}
+          onRemoveSearch={() => {
+            setSearch('');
+            resetPage();
+          }}
+          onRemoveStatus={() => {
+            setStatus('');
+            resetPage();
+          }}
         />
 
         <Container>
           <div className="py-8">
-
             <EventFilters
               search={search}
               status={status}
               sort={sort ?? 'created_at'}
-              onSearchChange={(e) => { setSearch(e.target.value); resetPage(); }}
-              onStatusChange={(e) => { setStatus(e.target.value); resetPage(); }}
-              onSortChange={(e)   => { setSort(e.target.value as EventQueryParams['sort']); resetPage(); }}
+              onSearchChange={(e) => {
+                setSearch(e.target.value);
+                resetPage();
+              }}
+              onStatusChange={(e) => {
+                setStatus(e.target.value);
+                resetPage();
+              }}
+              onSortChange={(e) => {
+                setSort(e.target.value as EventQueryParams['sort']);
+                resetPage();
+              }}
             />
 
             <EventGrid
@@ -71,13 +86,8 @@ export function EventListPage() {
             />
 
             {!isLoading && (
-              <EventPagination
-                page={page}
-                totalPages={totalPages}
-                onPageChange={setPage}
-              />
+              <EventPagination page={page} totalPages={totalPages} onPageChange={setPage} />
             )}
-
           </div>
         </Container>
       </div>
