@@ -1,5 +1,5 @@
 import { Button, Alert } from '@/components/ui';
-import { EventCard, EventCardSkeleton } from './EventCard';
+import { EventCard, EventCardSkeleton } from '@/components/events/EventCard';
 import type { Event } from '@/types/event.types';
 
 interface EventGridProps {

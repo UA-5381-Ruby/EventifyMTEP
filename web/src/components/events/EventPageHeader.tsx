@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container } from '@/components/layout';
-import { STATUS_OPTIONS } from './EventFilters';
+import { STATUS_OPTIONS } from '@/constants/event.constants';
 
 interface FilterPillProps {
   children: React.ReactNode;
