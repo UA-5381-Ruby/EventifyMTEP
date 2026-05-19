@@ -15,9 +15,9 @@ import {
   Alert,
   Spinner,
   Modal,
-} from '../components/ui';
-import { Container } from '../components/layout';
-import { PageWrapper } from '../components/layout';
+} from '@/components/ui';
+import { Container } from '@/components/layout';
+import { PageWrapper } from '@/components/layout';
 
 export function UIPreview() {
   const [modalOpen, setModalOpen] = useState(false);
