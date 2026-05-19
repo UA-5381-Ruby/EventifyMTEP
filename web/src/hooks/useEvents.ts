@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { EventsService } from '../services/eventsService';
-import type { Event, PaginationMeta, EventQueryParams } from '../types/event.types';
+import { EventsService } from '@/services/eventsService';
+import type { Event, PaginationMeta, EventQueryParams } from '@/types/event.types';
 
 interface UseEventsState {
   events: Event[];

@@ -1,19 +1,19 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { EventListPage } from '../pages/EventListPage';
-import * as useEventsModule from '../hooks/useEvents';
-import type { Event } from '../types/event.types';
+import { EventListPage } from '@/pages/EventListPage';
+import * as useEventsModule from '@/hooks/useEvents';
+import type { Event } from '@/types/event.types';
 
-jest.mock('../hooks/useEvents');
+jest.mock('@/hooks/useEvents');
 const mockUseEvents = jest.spyOn(useEventsModule, 'useEvents');
 
-jest.mock('../components/layout', () => ({
+jest.mock('@/components/layout', () => ({
   PageWrapper: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Container: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
 }));
 
-jest.mock('../components/ui', () => ({
+jest.mock('@/components/ui', () => ({
   Input: ({
     placeholder,
     onChange,
@@ -59,7 +59,7 @@ jest.mock('../components/ui', () => ({
   ),
 }));
 
-jest.mock('../components/events/EventCard', () => ({
+jest.mock('@/components/events/EventCard', () => ({
   EventCard: ({ event }: { event: { title: string } }) => (
     <div data-testid="event-card">{event.title}</div>
   ),

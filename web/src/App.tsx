@@ -4,7 +4,7 @@ import { UIPreview } from '@/pages/UIPreview.tsx';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { LoginPage } from '@/pages/LoginPage';
 import { EventListPage } from '@/pages/EventListPage.tsx';
-import { Header } from './components/layout';
+import { Header } from '@/components/layout';
 
 function App() {
   return (

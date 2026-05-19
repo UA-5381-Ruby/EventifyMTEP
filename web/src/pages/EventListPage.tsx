@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { PageWrapper, Container } from '../components/layout';
-import { Input, Select, Button, Alert } from '../components/ui';
-import { EventCard, EventCardSkeleton } from '../components/events/EventCard';
-import { useEvents } from '../hooks/useEvents';
-import type { EventQueryParams, EventStatus } from '../types/event.types';
+import { PageWrapper, Container } from '@/components/layout';
+import { Input, Select, Button, Alert } from '@/components/ui';
+import { EventCard, EventCardSkeleton } from '@/components/events/EventCard';
+import { useEvents } from '@/hooks/useEvents';
+import type { EventQueryParams, EventStatus } from '@/types/event.types';
 
 const STATUS_OPTIONS = [
   { value: '', label: 'All statuses' },
