@@ -1,5 +1,4 @@
 import apiClient from '@/lib/apiClient';
-
 import {
   type UserRole,
   type Membership,
@@ -19,7 +18,6 @@ export const BrandMembershipsService = {
     brandId: string,
     params: PaginationParams
   ): Promise<PaginatedResponse<Membership>> {
-  
     const queryParams = new URLSearchParams();
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.per_page) queryParams.append('per_page', params.per_page.toString());

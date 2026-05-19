@@ -1,7 +1,5 @@
 import apiClient from '@/lib/apiClient';
-
 import type { AxiosError } from 'axios';
-
 import type { Brand, BrandWithEvents, CreateBrandRequest, UpdateBrandRequest } from '@/types/brand';
 
 type ForbiddenError = AxiosError & { isForbidden?: boolean };
