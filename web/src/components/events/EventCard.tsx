@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Badge, Button } from '../ui';
+import { Badge, Button } from '@/components/ui';
 import { cn } from '@/lib/utils';
 import type { Event, EventStatus } from '@/types/event.types';
 

@@ -1,4 +1,4 @@
-import apiClient from '../lib/apiClient';
+import apiClient from '@/lib/apiClient';
 
 export interface User {
   id: number;
@@ -7,7 +7,7 @@ export interface User {
 }
 
 export const getCurrentUser = async (): Promise<User> => {
-  const response = await apiClient.get<User>('/users/me');
+  const response = await apiClient.get<User>('api/v1/users/me');
 
   return response.data;
 };
