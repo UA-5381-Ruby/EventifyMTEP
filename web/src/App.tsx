@@ -3,6 +3,7 @@ import { UIPreview } from '@/pages/UIPreview.tsx';
 
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { LoginPage } from '@/pages/LoginPage';
+import {RegistrationPage} from "@/pages/RegistrationPage.tsx";
 
 function App() {
   return (
@@ -12,10 +13,7 @@ function App() {
 
         <Route path="/" element={<h1 className="bg-emerald-500">This is an event list page.</h1>} />
         <Route path="/login" element={<LoginPage />} />
-        <Route
-          path="/register"
-          element={<h1 className="bg-emerald-500">This is a register page.</h1>}
-        />
+        <Route path="/register" element={<RegistrationPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route

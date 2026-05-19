@@ -5,9 +5,10 @@ import {Input, Button, Checkbox, EyeIcon, EyeOffIcon} from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
 import authService from '@/services/authService.ts';
 
-export const LoginPage = () => {
+export function RegistrationPage() {
   const navigate = useNavigate();
 
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -17,14 +18,15 @@ export const LoginPage = () => {
     e.preventDefault();
 
     try {
-      await authService.login({
+      await authService.register({
+        name,
         email,
         password,
       });
-      console.log('Login success');
+      console.log('Registration success');
       navigate('/dashboard', { replace: true });
     } catch (error) {
-      console.error('Login failed', error);
+      console.error('Registration failed', error);
     }
   };
 
@@ -32,17 +34,26 @@ export const LoginPage = () => {
     <PageWrapper>
       <div className="min-h-screen bg-slate-50 relative flex items-center justify-center p-4 sm:p-6 overflow-hidden">
 
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,#94a3b81a_1px,transparent_1px),linear-gradient(to_bottom,#94a3b81a_1px,transparent_1px)] bg-[size:24px_24px]" />
+=        <div className="absolute inset-0 bg-[linear-gradient(to_right,#94a3b81a_1px,transparent_1px),linear-gradient(to_bottom,#94a3b81a_1px,transparent_1px)] bg-[size:24px_24px]" />
 
         <div className="w-full max-w-[960px] min-h-[640px] flex flex-col md:flex-row rounded-3xl overflow-hidden bg-[#d8e7ff] shadow-[0_20px_60px_-15px_rgba(59,130,246,0.15)] border border-white/60 relative z-10">
 
           <div className="w-full md:w-[55%] bg-white md:rounded-r-[3.5rem] p-8 sm:p-12 flex flex-col justify-center relative z-20 shrink-0 shadow-[12px_0_40px_rgba(59,130,246,0.08)] border-r border-blue-50/50">
 
             <h1 className="text-3xl font-bold text-neutral-900 text-center mb-10 tracking-tight">
-              Log In
+              Registration
             </h1>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              <Input
+                label="Name"
+                placeholder="Enter your name"
+                value={name}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+                autoComplete="name"
+                required
+              />
+
               <Input
                 label="E-mail Address"
                 type="email"
@@ -60,7 +71,7 @@ export const LoginPage = () => {
                   placeholder="Enter password"
                   value={password}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   className="pr-10"
                   required
                 />
@@ -90,17 +101,18 @@ export const LoginPage = () => {
               </div>
 
               <Button type="submit" fullWidth variant="outline" className="mt-2 h-11 text-base shadow-sm shadow-blue-500/10 border-blue-500 text-blue-500 hover:bg-blue-50">
-                Log In
+                Create Account
               </Button>
+
             </form>
 
             <p className="mt-8 text-sm text-neutral-500 text-left">
-              Don't have an account?{' '}
+              Already have an account?{' '}
               <button
-                onClick={() => navigate('/register')}
+                onClick={() => navigate('/login')}
                 className="font-medium text-neutral-900 hover:underline"
               >
-                Sign Up
+                Log In
               </button>
             </p>
           </div>
@@ -113,6 +125,6 @@ export const LoginPage = () => {
       </div>
     </PageWrapper>
   );
-};
+}
 
 <><EyeIcon/><EyeOffIcon/></>
