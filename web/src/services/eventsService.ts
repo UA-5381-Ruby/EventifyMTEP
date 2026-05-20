@@ -5,7 +5,7 @@ import type {
   EventQueryParams,
   CreateEventRequest,
   PaginatedResponse,
-} from '@/types/event.types';
+} from '@/types/event.ts';
 
 export const EventsService = {
   async getEvents(params: EventQueryParams = {}): Promise<PaginatedResponse<Event>> {

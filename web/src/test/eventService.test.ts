@@ -6,7 +6,7 @@ import type {
   EventQueryParams,
   PaginatedResponse,
   CreateEventRequest,
-} from '@/types/event.types';
+} from '@/types/event.ts';
 
 jest.mock('@/lib/apiClient', () => ({
   __esModule: true,
