@@ -1,6 +1,6 @@
 import { useState, type SyntheticEvent, type ChangeEvent } from 'react';
 import { Modal, Input, Button } from '@/components/ui';
-import { EyeIcon, EyeOffIcon } from './icons/EyeIcon';
+import { EyeIcon, EyeOffIcon } from '@/components/auth';
 
 interface ResetPasswordModalProps {
   isOpen: boolean;
@@ -37,12 +37,10 @@ export function ResetPasswordModal({ isOpen, onClose, onResetComplete }: ResetPa
   const isFormValid = password.length > 0 && confirmPassword.length > 0;
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose}>
+    <Modal isOpen={isOpen} onClose={handleClose} title="Reset Password">
       <div className="w-full max-w-[360px] mx-auto text-center py-2">
-        <h2 className="text-2xl font-bold text-neutral-900 mb-3 tracking-tight">Reset Password</h2>
-
         <p className="text-xs text-neutral-500 mb-8 leading-relaxed">
-          Please enter your new password. We'll send you a link to reset your password.
+          Please enter your new password.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5 text-left">

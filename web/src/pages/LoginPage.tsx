@@ -1,8 +1,8 @@
 import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Input, Button, Checkbox, EyeIcon, EyeOffIcon } from '@/components/ui';
+import { Input, Button, Checkbox } from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
-import { ForgotPasswordModal, ResetPasswordModal } from '@/components/auth';
+import { ForgotPasswordModal, ResetPasswordModal, EyeIcon, EyeOffIcon } from '@/components/auth';
 import authService from '@/services/authService.ts';
 
 export function LoginPage() {
