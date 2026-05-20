@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import authService from '@/services/authService.ts';
+import authService from '@/services/auth-service.ts';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');

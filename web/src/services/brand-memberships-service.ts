@@ -1,11 +1,11 @@
-import apiClient from '@/lib/apiClient';
+import apiClient from '@/lib/api-client';
 import {
   type UserRole,
   type Membership,
   type CreateMembershipRequest,
   type PaginationParams,
   type PaginatedResponse,
-} from '@/types/brandMemberships';
+} from '@/types/brand-memberships';
 
 export const BrandMembershipsService = {
   /**

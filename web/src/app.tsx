@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { UIPreview } from '@/pages/UIPreview.tsx';
+import { UIPreview } from '@/pages/ui-preview.tsx';
 
-import ProtectedRoute from '@/components/ProtectedRoute';
-import { LoginPage } from '@/pages/LoginPage';
+import ProtectedRoute from '@/components/protected-route';
+import { LoginPage } from '@/pages/login-page';
 
 function App() {
   return (

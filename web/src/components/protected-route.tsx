@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
-import AuthService from '@/services/authService';
+import AuthService from '@/services/auth-service';
 
 const ProtectedRoute = () => {
   const [state, setState] = useState(AuthService.getState());

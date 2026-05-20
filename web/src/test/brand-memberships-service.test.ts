@@ -1,13 +1,13 @@
-import apiClient from '@/lib/apiClient';
-import { BrandMembershipsService } from '@/services/brandMembershipsService';
+import apiClient from '@/lib/api-client';
+import { BrandMembershipsService } from '@/services/brand-memberships-service';
 import {
   type UserRole,
   type CreateMembershipRequest,
   type PaginationParams,
-} from '@/types/brandMemberships';
+} from '@/types/brand-memberships';
 
 // Мокаємо apiClient, щоб він не робив реальних HTTP-запитів
-jest.mock('@/lib/apiClient', () => ({
+jest.mock('@/lib/api-client', () => ({
   get: jest.fn(),
   post: jest.fn(),
   patch: jest.fn(),

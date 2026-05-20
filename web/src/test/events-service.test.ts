@@ -1,5 +1,5 @@
-import apiClient from '@/lib/apiClient';
-import { EventsService } from '@/services/eventsService';
+import apiClient from '@/lib/api-client';
+import { EventsService } from '@/services/events-service';
 import type {
   Event,
   EventDetail,
@@ -8,7 +8,7 @@ import type {
   CreateEventRequest,
 } from '@/types/event.ts';
 
-jest.mock('@/lib/apiClient', () => ({
+jest.mock('@/lib/api-client', () => ({
   __esModule: true,
   default: {
     get: jest.fn(),

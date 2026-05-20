@@ -22,7 +22,6 @@ export default defineConfig([
     },
   },
 
-  // Конфігурація для тотального kebab-case всередині папки src
   {
     files: ['src/**/*.{ts,tsx}'],
     plugins: {
@@ -32,17 +31,15 @@ export default defineConfig([
       'check-file/filename-naming-convention': [
         'error',
         {
-          // Тепер абсолютно всі файли (.ts та .tsx) мають бути в kebab-case
           '**/*.{ts,tsx}': 'KEBAB_CASE',
         },
         {
-          ignoreMiddleExtensions: true, // Пропускає крапки у файлах на кшталт auth.types.ts або button.test.tsx
+          ignoreMiddleExtensions: true,
         },
       ],
       'check-file/folder-naming-convention': [
         'error',
         {
-          // Усі папки без винятку теж у нижньому регістрі з дефісами
           'src/**/': 'KEBAB_CASE',
         },
       ],

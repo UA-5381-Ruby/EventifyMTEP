@@ -1,5 +1,5 @@
-import apiClient from '@/lib/apiClient';
-import { TicketsService } from '@/services/ticketsService';
+import apiClient from '@/lib/api-client';
+import { TicketsService } from '@/services/tickets-service';
 import type {
   Ticket,
   TicketQueryParams,
@@ -8,7 +8,7 @@ import type {
   TicketFeedback,
 } from '@/types/ticket';
 
-jest.mock('@/lib/apiClient', () => ({
+jest.mock('@/lib/api-client', () => ({
   __esModule: true,
   default: {
     get: jest.fn(),
