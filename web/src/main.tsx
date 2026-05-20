@@ -1,9 +1,9 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './styles/index.css';
-import App from './App.tsx';
+import App from './app.tsx';
 
-import AuthService from './services/authService.ts';
+import AuthService from './services/auth-service.ts';
 
 // This fragment validates token presence before rendering
 // so that protected routes always stay in the correct stay.
