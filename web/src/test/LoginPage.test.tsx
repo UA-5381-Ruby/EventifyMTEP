@@ -8,7 +8,6 @@ const renderLogin = () => render(<LoginPage />);
 describe('LoginPage', () => {
   beforeEach(() => jest.clearAllMocks());
 
-
   it('renders the heading', () => {
     renderLogin();
     expect(screen.getByRole('heading', { name: /log in/i })).toBeInTheDocument();
@@ -131,9 +130,7 @@ describe('LoginPage', () => {
   it('does not call onSuccess when ForgotPasswordModal is submitted with empty email', () => {
     renderLogin();
     fireEvent.click(screen.getByRole('button', { name: /forgot password/i }));
-    fireEvent.submit(
-      screen.getByRole('button', { name: /^send$/i }).closest('form')!,
-    );
+    fireEvent.submit(screen.getByRole('button', { name: /^send$/i }).closest('form')!);
     expect(screen.getByRole('heading', { name: /forgot password/i })).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: /reset password/i })).not.toBeInTheDocument();
   });
@@ -239,9 +236,9 @@ describe('LoginPage', () => {
     const passwordInput = screen.getByPlaceholderText('Enter new password');
     expect(passwordInput).toHaveAttribute('type', 'password');
 
-    const eyeButtons = screen.getAllByRole('button').filter(
-      (btn) => !btn.textContent && btn.querySelector('svg'),
-    );
+    const eyeButtons = screen
+      .getAllByRole('button')
+      .filter((btn) => !btn.textContent && btn.querySelector('svg'));
     fireEvent.click(eyeButtons[0]);
     expect(passwordInput).toHaveAttribute('type', 'text');
   });

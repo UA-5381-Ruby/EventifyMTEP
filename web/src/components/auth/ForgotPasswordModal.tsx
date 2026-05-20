@@ -9,11 +9,11 @@ interface ForgotPasswordModalProps {
 }
 
 export function ForgotPasswordModal({
-                                      isOpen,
-                                      onClose,
-                                      onSuccess,
-                                      onNavigateToLogin,
-                                    }: ForgotPasswordModalProps) {
+  isOpen,
+  onClose,
+  onSuccess,
+  onNavigateToLogin,
+}: ForgotPasswordModalProps) {
   const [email, setEmail] = useState('');
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -26,12 +26,11 @@ export function ForgotPasswordModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="w-full max-w-[360px] mx-auto text-center py-2">
-        <h2 className="text-2xl font-bold text-neutral-900 mb-3 tracking-tight">
-          Forgot Password
-        </h2>
+        <h2 className="text-2xl font-bold text-neutral-900 mb-3 tracking-tight">Forgot Password</h2>
 
         <p className="text-xs text-neutral-500 mb-8 leading-relaxed">
-          Please enter your email address associated with your account. We'll send you a link to reset your password.
+          Please enter your email address associated with your account. We'll send you a link to
+          reset your password.
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-6 text-left">

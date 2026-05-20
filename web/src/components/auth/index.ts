@@ -1,3 +1,3 @@
 export * from './ForgotPasswordModal';
 export * from './ResetPasswordModal';
-export * from './icons/EyeIcon'
+export * from './icons/EyeIcon';

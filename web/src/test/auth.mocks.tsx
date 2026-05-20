@@ -21,10 +21,10 @@ jest.mock('../components/layout', () => ({
 
 jest.mock('../components/ui', () => ({
   Modal: ({
-            isOpen,
-            onClose,
-            children,
-          }: {
+    isOpen,
+    onClose,
+    children,
+  }: {
     isOpen: boolean;
     onClose: () => void;
     children: React.ReactNode;
@@ -36,14 +36,14 @@ jest.mock('../components/ui', () => ({
       </div>
     ) : null,
   Input: ({
-            label,
-            type = 'text',
-            placeholder,
-            value,
-            onChange,
-            required,
-            className,
-          }: {
+    label,
+    type = 'text',
+    placeholder,
+    value,
+    onChange,
+    required,
+    className,
+  }: {
     label?: string;
     type?: string;
     placeholder?: string;
@@ -74,10 +74,10 @@ jest.mock('../components/ui', () => ({
     );
   },
   Button: ({
-             children,
-             type,
-             ...rest
-           }: {
+    children,
+    type,
+    ...rest
+  }: {
     children: React.ReactNode;
     type?: 'submit' | 'button' | 'reset';
     [key: string]: unknown;
@@ -87,10 +87,10 @@ jest.mock('../components/ui', () => ({
     </button>
   ),
   Checkbox: ({
-               label,
-               checked,
-               onChange,
-             }: {
+    label,
+    checked,
+    onChange,
+  }: {
     label: string;
     checked: boolean;
     onChange: React.ChangeEventHandler<HTMLInputElement>;

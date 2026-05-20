@@ -3,7 +3,7 @@ import { UIPreview } from '@/pages/UIPreview.tsx';
 
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { LoginPage } from '@/pages/LoginPage';
-import {RegistrationPage} from "@/pages/RegistrationPage.tsx";
+import { RegistrationPage } from '@/pages/RegistrationPage.tsx';
 
 function App() {
   return (

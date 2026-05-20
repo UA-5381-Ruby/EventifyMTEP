@@ -8,11 +8,7 @@ interface ResetPasswordModalProps {
   onResetComplete: () => void;
 }
 
-export function ResetPasswordModal({
-                                     isOpen,
-                                     onClose,
-                                     onResetComplete,
-                                   }: ResetPasswordModalProps) {
+export function ResetPasswordModal({ isOpen, onClose, onResetComplete }: ResetPasswordModalProps) {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -35,9 +31,7 @@ export function ResetPasswordModal({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="w-full max-w-[360px] mx-auto text-center py-2">
-        <h2 className="text-2xl font-bold text-neutral-900 mb-3 tracking-tight">
-          Reset Password
-        </h2>
+        <h2 className="text-2xl font-bold text-neutral-900 mb-3 tracking-tight">Reset Password</h2>
 
         <p className="text-xs text-neutral-500 mb-8 leading-relaxed">
           Please enter your new password. We'll send you a link to reset your password.
@@ -45,9 +39,7 @@ export function ResetPasswordModal({
 
         <form onSubmit={handleSubmit} className="space-y-5 text-left">
           <div className="space-y-1.5 relative">
-            <label className="text-xs font-medium text-neutral-600 pl-0.5">
-              New Password
-            </label>
+            <label className="text-xs font-medium text-neutral-600 pl-0.5">New Password</label>
             <Input
               type={showPassword ? 'text' : 'password'}
               placeholder="Enter new password"
@@ -66,9 +58,7 @@ export function ResetPasswordModal({
           </div>
 
           <div className="space-y-1.5 relative">
-            <label className="text-xs font-medium text-neutral-600 pl-0.5">
-              Re-enter Password
-            </label>
+            <label className="text-xs font-medium text-neutral-600 pl-0.5">Re-enter Password</label>
             <input
               type="password"
               placeholder="Re-enter new password"
@@ -95,9 +85,7 @@ export function ResetPasswordModal({
             )}
 
             {error && (
-              <p className="text-[11px] font-medium text-[#B70404] pl-0.5 pt-0.5">
-                {error}
-              </p>
+              <p className="text-[11px] font-medium text-[#B70404] pl-0.5 pt-0.5">{error}</p>
             )}
           </div>
 
