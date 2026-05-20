@@ -21,10 +21,10 @@ jest.mock('@/components/layout', () => ({
 
 jest.mock('@/components/ui', () => ({
   Modal: ({
-            onClose,
-            title,
-            children,
-          }: {
+    onClose,
+    title,
+    children,
+  }: {
     onClose: () => void;
     title?: string;
     children: React.ReactNode;
@@ -37,15 +37,15 @@ jest.mock('@/components/ui', () => ({
   ),
 
   Input: ({
-            label,
-            type = 'text',
-            placeholder,
-            value,
-            onChange,
-            required,
-            className,
-            id,
-          }: {
+    label,
+    type = 'text',
+    placeholder,
+    value,
+    onChange,
+    required,
+    className,
+    id,
+  }: {
     label?: string;
     id?: string;
     type?: string;
@@ -79,10 +79,10 @@ jest.mock('@/components/ui', () => ({
   },
 
   Button: ({
-             children,
-             type,
-             ...rest
-           }: {
+    children,
+    type,
+    ...rest
+  }: {
     children: React.ReactNode;
     type?: 'submit' | 'button' | 'reset';
     [key: string]: unknown;
@@ -93,10 +93,10 @@ jest.mock('@/components/ui', () => ({
   ),
 
   Checkbox: ({
-               label,
-               checked,
-               onChange,
-             }: {
+    label,
+    checked,
+    onChange,
+  }: {
     label: string;
     checked: boolean;
     onChange: React.ChangeEventHandler<HTMLInputElement>;
@@ -110,11 +110,11 @@ jest.mock('@/components/ui', () => ({
 
 jest.mock('@/components/auth', () => {
   const ForgotPasswordModal = ({
-                                 isOpen,
-                                 onClose,
-                                 onSuccess,
-                                 onNavigateToLogin,
-                               }: {
+    isOpen,
+    onClose,
+    onSuccess,
+    onNavigateToLogin,
+  }: {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: (email: string) => void;
@@ -139,13 +139,7 @@ jest.mock('@/components/auth', () => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
             required
           />
-          {email && (
-            <button
-              type="button"
-              aria-label="Clear input"
-              onClick={() => setEmail('')}
-            />
-          )}
+          {email && <button type="button" aria-label="Clear input" onClick={() => setEmail('')} />}
           <button type="submit">Send</button>
         </form>
         <button type="button" onClick={onNavigateToLogin}>
@@ -156,10 +150,10 @@ jest.mock('@/components/auth', () => {
   };
 
   const ResetPasswordModal = ({
-                                isOpen,
-                                onClose,
-                                onResetComplete,
-                              }: {
+    isOpen,
+    onClose,
+    onResetComplete,
+  }: {
     isOpen: boolean;
     onClose: () => void;
     onResetComplete: () => void;
@@ -195,10 +189,7 @@ jest.mock('@/components/auth', () => {
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
             required
           />
-          <button
-            type="button"
-            onClick={() => setShowPassword((v: boolean) => !v)}
-          >
+          <button type="button" onClick={() => setShowPassword((v: boolean) => !v)}>
             <svg />
           </button>
           <input
@@ -212,11 +203,7 @@ jest.mock('@/components/auth', () => {
             required
           />
           {confirmPassword && (
-            <button
-              type="button"
-              aria-label="✕"
-              onClick={() => setConfirmPassword('')}
-            >
+            <button type="button" aria-label="✕" onClick={() => setConfirmPassword('')}>
               ✕
             </button>
           )}
