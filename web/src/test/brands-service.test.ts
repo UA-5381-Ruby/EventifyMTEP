@@ -1,7 +1,7 @@
 import type { AxiosResponse } from 'axios';
 import type { CreateBrandRequest } from '@/types/brand.ts';
 
-jest.mock('@/lib/apiClient.ts', () => ({
+jest.mock('@/lib/api-client.ts', () => ({
   __esModule: true,
   default: {
     get: jest.fn(),
@@ -11,8 +11,8 @@ jest.mock('@/lib/apiClient.ts', () => ({
   },
 }));
 
-import apiClient from '@/lib/apiClient';
-import { brandsService } from '@/services/brandsService.ts';
+import apiClient from '@/lib/api-client';
+import { brandsService } from '@/services/brands-service.ts';
 
 describe('BrandsService', () => {
   const endpoint = '/api/v1/brands';

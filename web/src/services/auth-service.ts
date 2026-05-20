@@ -1,4 +1,4 @@
-import apiClient, { parseApiError, tokenStorage } from '@/lib/apiClient';
+import apiClient, { parseApiError, tokenStorage } from '@/lib/api-client';
 import type {
   AuthResponse,
   AuthState,

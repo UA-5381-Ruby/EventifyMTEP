@@ -1,4 +1,4 @@
-import apiClient from '@/lib/apiClient';
+import apiClient from '@/lib/api-client';
 import type { Category, CreateCategoryRequest } from '@/types/category';
 
 export class CategoriesService {

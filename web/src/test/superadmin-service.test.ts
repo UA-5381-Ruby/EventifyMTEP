@@ -1,6 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
-import apiClient from '@/lib/apiClient';
-import { SuperadminService } from '@/services/superadminService';
+import apiClient from '@/lib/api-client';
+import { SuperadminService } from '@/services/superadmin-service';
 
 describe('SuperadminService', () => {
   let mock: MockAdapter;

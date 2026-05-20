@@ -1,6 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
 import { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
-import apiClient, { tokenStorage, parseApiError } from '@/lib/apiClient';
+import apiClient, { tokenStorage, parseApiError } from '@/lib/api-client';
 
 describe('apiClient', () => {
   let mock: MockAdapter;

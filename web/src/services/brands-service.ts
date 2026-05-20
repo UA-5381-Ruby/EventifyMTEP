@@ -1,4 +1,4 @@
-import apiClient from '@/lib/apiClient';
+import apiClient from '@/lib/api-client';
 import type { AxiosError } from 'axios';
 import type { Brand, BrandWithEvents, CreateBrandRequest, UpdateBrandRequest } from '@/types/brand';
 

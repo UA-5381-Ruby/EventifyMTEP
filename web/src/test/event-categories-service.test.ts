@@ -1,9 +1,9 @@
 import type { AxiosResponse } from 'axios';
-import { EventCategoriesService } from '@/services/eventCategoriesService';
-import apiClient from '@/lib/apiClient';
+import { EventCategoriesService } from '@/services/event-categories-service';
+import apiClient from '@/lib/api-client';
 import type { Category, LinkCategoryRequest } from '@/types/category';
 
-jest.mock('@/lib/apiClient', () => ({
+jest.mock('@/lib/api-client', () => ({
   __esModule: true,
   default: {
     get: jest.fn(),
