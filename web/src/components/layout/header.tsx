@@ -10,7 +10,7 @@ export function Header() {
             to="/"
             className="flex items-center gap-2 font-heading text-xl font-bold text-primary-600"
           >
-            <span className="text-2xl">🎉</span>
+            <span className="text-2xl"></span>
             Eventify
           </Link>
 
