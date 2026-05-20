@@ -47,6 +47,7 @@ export function ResetPasswordModal({ isOpen, onClose, onResetComplete }: ResetPa
           <div className="space-y-1.5 relative">
             <label className="text-xs font-medium text-neutral-600 pl-0.5">New Password</label>
             <Input
+              id={'new-password'}
               type={showPassword ? 'text' : 'password'}
               placeholder="Enter new password"
               value={password}
@@ -64,9 +65,15 @@ export function ResetPasswordModal({ isOpen, onClose, onResetComplete }: ResetPa
           </div>
 
           <div className="space-y-1.5 relative">
-            <label className="text-xs font-medium text-neutral-600 pl-0.5">Re-enter Password</label>
-            <input
-              type="password"
+            <label
+              htmlFor="confirm-password"
+              className="text-xs font-medium text-neutral-600 pl-0.5"
+            >
+              Re-enter Password
+            </label>
+            <Input
+              id={'confirm-password'}
+              type={showPassword ? 'text' : 'password'}
               placeholder="Re-enter new password"
               value={confirmPassword}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
