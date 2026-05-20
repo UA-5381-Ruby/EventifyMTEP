@@ -8,4 +8,4 @@ export { Badge } from './Badge';
 export { Alert } from './Alert';
 export { Spinner } from './Spinner';
 export { Modal } from './Modal';
-export { EyeIcon, EyeOffIcon } from './icons/EyeIcon';
+export { EyeIcon, EyeOffIcon } from '@/components/auth';
