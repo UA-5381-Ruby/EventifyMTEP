@@ -52,16 +52,14 @@ jest.mock('../components/ui', () => ({
     required?: boolean;
     className?: string;
   }) => {
-    const testId = label
-      ? `input-${label.toLowerCase().replace(/\s+/g, '-')}`
-      : placeholder
-        ? `input-${placeholder.toLowerCase().replace(/\s+/g, '-')}`
-        : undefined;
+    const safeIdSource = label ?? placeholder;
+    const safeId = safeIdSource ? safeIdSource.toLowerCase().replace(/\s+/g, '-') : undefined;
+    const testId = safeId ? `input-${safeId}` : undefined;
     return (
       <div>
-        {label && <label htmlFor={label}>{label}</label>}
+        {label && safeId && <label htmlFor={safeId}>{label}</label>}
         <input
-          id={label}
+          id={safeId}
           type={type}
           placeholder={placeholder}
           value={value}
