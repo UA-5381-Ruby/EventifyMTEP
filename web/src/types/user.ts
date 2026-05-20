@@ -1,9 +1,8 @@
 export interface User {
-  id: string;
+  id: number;
   name: string;
   email: string;
-  role: 'user' | 'admin' | 'superadmin';
-  createdAt: string;
+  is_superadmin: boolean;
 }
 
 export interface UpdateUserRequest {

@@ -23,7 +23,7 @@ export const UserService = {
    * @returns The user profile
    * @throws Error if user is not found (404) or request fails
    */
-  async getUserById(id: string): Promise<User> {
+  async getUserById(id: number | string): Promise<User> {
     try {
       const response = await apiClient.get<User>(`/api/v1/users/${id}`);
       return response.data;
@@ -40,7 +40,7 @@ export const UserService = {
    * @returns The updated user profile
    * @throws Error if permission is denied (403) or user is not found (404)
    */
-  async updateUser(id: string, payload: UpdateUserRequest): Promise<User> {
+  async updateUser(id: number | string, payload: UpdateUserRequest): Promise<User> {
     try {
       const response = await apiClient.patch<User>(`/api/v1/users/${id}`, payload);
       return response.data;
@@ -55,7 +55,7 @@ export const UserService = {
    * @param id The ID of the user to delete
    * @throws Error if permission is denied (403) or user is not found (404)
    */
-  async deleteUser(id: string): Promise<void> {
+  async deleteUser(id: number | string): Promise<void> {
     try {
       await apiClient.delete(`/api/v1/users/${id}`);
     } catch (err) {

@@ -17,19 +17,17 @@ jest.mock('@/lib/apiClient', () => ({
 
 describe('UserService', () => {
   const mockUser: User = {
-    id: 'user-123',
+    id: 123,
     name: 'John Doe',
     email: 'john@example.com',
-    role: 'user',
-    createdAt: '2024-01-01T00:00:00Z',
+    is_superadmin: false,
   };
 
   const mockAdminUser: User = {
-    id: 'admin-456',
+    id: 456,
     name: 'Admin User',
     email: 'admin@example.com',
-    role: 'admin',
-    createdAt: '2024-01-01T00:00:00Z',
+    is_superadmin: true,
   };
 
   beforeEach(() => {
@@ -73,9 +71,9 @@ describe('UserService', () => {
         data: mockUser,
       } as AxiosResponse);
 
-      const result = await UserService.getUserById('user-123');
+      const result = await UserService.getUserById('123');
 
-      expect(apiClient.get).toHaveBeenCalledWith('/api/v1/users/user-123');
+      expect(apiClient.get).toHaveBeenCalledWith('/api/v1/users/123');
       expect(result).toEqual(mockUser);
     });
 
@@ -86,14 +84,14 @@ describe('UserService', () => {
       await expect(UserService.getUserById('non-existent')).rejects.toThrow('Not Found');
     });
 
-    it('should handle different user roles correctly', async () => {
+    it('should handle superadmin users correctly', async () => {
       (apiClient.get as jest.Mock).mockResolvedValue({
         data: mockAdminUser,
       } as AxiosResponse);
 
-      const result = await UserService.getUserById('admin-456');
+      const result = await UserService.getUserById('456');
 
-      expect(result.role).toBe('admin');
+      expect(result.is_superadmin).toBe(true);
     });
   });
 
@@ -109,9 +107,9 @@ describe('UserService', () => {
         data: updatedUser,
       } as AxiosResponse);
 
-      const result = await UserService.updateUser('user-123', updatePayload);
+      const result = await UserService.updateUser('123', updatePayload);
 
-      expect(apiClient.patch).toHaveBeenCalledWith('/api/v1/users/user-123', updatePayload);
+      expect(apiClient.patch).toHaveBeenCalledWith('/api/v1/users/123', updatePayload);
       expect(result).toEqual(updatedUser);
     });
 
@@ -123,9 +121,9 @@ describe('UserService', () => {
         data: updatedUser,
       } as AxiosResponse);
 
-      const result = await UserService.updateUser('user-123', updatePayload);
+      const result = await UserService.updateUser('123', updatePayload);
 
-      expect(apiClient.patch).toHaveBeenCalledWith('/api/v1/users/user-123', updatePayload);
+      expect(apiClient.patch).toHaveBeenCalledWith('/api/v1/users/123', updatePayload);
       expect(result.name).toBe('Updated Name');
     });
 
@@ -139,9 +137,9 @@ describe('UserService', () => {
         data: updatedUser,
       } as AxiosResponse);
 
-      const result = await UserService.updateUser('user-123', updatePayload);
+      const result = await UserService.updateUser('123', updatePayload);
 
-      expect(apiClient.patch).toHaveBeenCalledWith('/api/v1/users/user-123', updatePayload);
+      expect(apiClient.patch).toHaveBeenCalledWith('/api/v1/users/123', updatePayload);
       expect(result.email).toBe('newemail@example.com');
     });
 
@@ -151,7 +149,7 @@ describe('UserService', () => {
 
       const updatePayload: UpdateUserRequest = { name: 'Hacker' };
 
-      await expect(UserService.updateUser('user-123', updatePayload)).rejects.toThrow('Forbidden');
+      await expect(UserService.updateUser('123', updatePayload)).rejects.toThrow('Forbidden');
     });
 
     it('should throw an error when user is not found (404)', async () => {
@@ -170,16 +168,16 @@ describe('UserService', () => {
     it('should delete a user with DELETE /api/v1/users/:id', async () => {
       (apiClient.delete as jest.Mock).mockResolvedValue({});
 
-      await UserService.deleteUser('user-123');
+      await UserService.deleteUser('123');
 
-      expect(apiClient.delete).toHaveBeenCalledWith('/api/v1/users/user-123');
+      expect(apiClient.delete).toHaveBeenCalledWith('/api/v1/users/123');
     });
 
     it('should throw an error when permission is denied (403)', async () => {
       const error = new Error('Forbidden');
       (apiClient.delete as jest.Mock).mockRejectedValue(error);
 
-      await expect(UserService.deleteUser('user-123')).rejects.toThrow('Forbidden');
+      await expect(UserService.deleteUser('123')).rejects.toThrow('Forbidden');
     });
 
     it('should throw an error when user is not found (404)', async () => {
@@ -192,12 +190,12 @@ describe('UserService', () => {
     it('should successfully delete multiple users in sequence', async () => {
       (apiClient.delete as jest.Mock).mockResolvedValue({});
 
-      await UserService.deleteUser('user-1');
-      await UserService.deleteUser('user-2');
+      await UserService.deleteUser('1');
+      await UserService.deleteUser('2');
 
       expect(apiClient.delete).toHaveBeenCalledTimes(2);
-      expect(apiClient.delete).toHaveBeenNthCalledWith(1, '/api/v1/users/user-1');
-      expect(apiClient.delete).toHaveBeenNthCalledWith(2, '/api/v1/users/user-2');
+      expect(apiClient.delete).toHaveBeenNthCalledWith(1, '/api/v1/users/1');
+      expect(apiClient.delete).toHaveBeenNthCalledWith(2, '/api/v1/users/2');
     });
   });
 });
