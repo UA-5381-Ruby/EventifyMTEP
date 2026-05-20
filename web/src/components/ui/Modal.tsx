@@ -24,16 +24,15 @@ export function Modal({ isOpen, onClose, title, size = 'md', children, footer }:
   const overlayRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<Element | null>(null);
+  const mouseDownTargetRef = useRef<EventTarget | null>(null);
   const titleId = useId();
 
-  // Save the element that opened the modal so we can restore focus on close
   useEffect(() => {
     if (isOpen) {
       triggerRef.current = document.activeElement;
     }
   }, [isOpen]);
 
-  // Move focus into the dialog when it opens; restore it when it closes
   useEffect(() => {
     if (!isOpen) {
       (triggerRef.current as HTMLElement | null)?.focus();
@@ -41,10 +40,13 @@ export function Modal({ isOpen, onClose, title, size = 'md', children, footer }:
     }
 
     const firstFocusable = dialogRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE)[0];
-    firstFocusable?.focus();
+    if (firstFocusable) {
+      firstFocusable.focus();
+    } else {
+      dialogRef.current?.focus();
+    }
   }, [isOpen]);
 
-  // Trap focus inside the dialog
   useEffect(() => {
     if (!isOpen) return;
 
@@ -54,13 +56,18 @@ export function Modal({ isOpen, onClose, title, size = 'md', children, footer }:
       const focusable = Array.from(
         dialogRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? []
       );
-      if (focusable.length === 0) return;
+
+      if (focusable.length === 0) {
+        e.preventDefault();
+        dialogRef.current?.focus();
+        return;
+      }
 
       const first = focusable[0];
       const last = focusable[focusable.length - 1];
 
       if (e.shiftKey) {
-        if (document.activeElement === first) {
+        if (document.activeElement === first || document.activeElement === dialogRef.current) {
           e.preventDefault();
           last.focus();
         }
@@ -76,7 +83,6 @@ export function Modal({ isOpen, onClose, title, size = 'md', children, footer }:
     return () => document.removeEventListener('keydown', handleTab);
   }, [isOpen]);
 
-  // Close on Escape
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -85,30 +91,39 @@ export function Modal({ isOpen, onClose, title, size = 'md', children, footer }:
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  // Prevent background scroll while open
   useEffect(() => {
-    document.body.style.overflow = isOpen ? 'hidden' : '';
+    if (!isOpen) return;
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
     return () => {
-      document.body.style.overflow = '';
+      document.body.style.overflow = originalOverflow;
     };
   }, [isOpen]);
 
   if (!isOpen) return null;
 
+  const handleMouseDown = (e: React.MouseEvent) => {
+    mouseDownTargetRef.current = e.target;
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (e.target === overlayRef.current && mouseDownTargetRef.current === overlayRef.current) {
+      onClose();
+    }
+  };
+
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      onClick={(e) => {
-        if (e.target === overlayRef.current) onClose();
-      }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
     >
-      <div className="absolute inset-0 bg-black/50 backdrop-blur-sm" />
-
       <div
         ref={dialogRef}
+        tabIndex={-1}
         className={cn(
-          'relative z-10 w-full rounded-xl bg-white shadow-xl',
+          'relative z-10 w-full rounded-xl bg-white shadow-xl focus:outline-none',
           'animate-[fadeIn_0.15s_ease-out]',
           sizeStyles[size]
         )}

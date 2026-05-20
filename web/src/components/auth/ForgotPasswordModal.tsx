@@ -11,6 +11,11 @@ interface ForgotPasswordModalProps {
 export function ForgotPasswordModal({ isOpen, onClose, onSuccess }: ForgotPasswordModalProps) {
   const [email, setEmail] = useState('');
 
+  const handleClose = () => {
+    setEmail('');
+    onClose();
+  };
+
   const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (email.trim()) {
@@ -19,7 +24,7 @@ export function ForgotPasswordModal({ isOpen, onClose, onSuccess }: ForgotPasswo
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Forgot Password">
+    <Modal isOpen={isOpen} onClose={handleClose} title="Forgot Password">
       <div className="w-full max-w-[360px] mx-auto text-center py-2">
         <p className="text-xs text-neutral-500 mb-8 leading-relaxed">
           Please enter your email address associated with your account. We'll send you a link to
