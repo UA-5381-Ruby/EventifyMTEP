@@ -55,12 +55,12 @@ jest.mock('@/components/ui', () => ({
     required?: boolean;
     className?: string;
   }) => {
+    const inputId = id ?? label;
     const testId = label
       ? `input-${label.toLowerCase().replace(/\s+/g, '-')}`
       : placeholder
         ? `input-${placeholder.toLowerCase().replace(/\s+/g, '-')}`
         : undefined;
-    const inputId = id ?? label;
     return (
       <div>
         {label && <label htmlFor={inputId}>{label}</label>}
