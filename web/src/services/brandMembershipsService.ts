@@ -18,7 +18,6 @@ export const BrandMembershipsService = {
     brandId: string,
     params: PaginationParams
   ): Promise<PaginatedResponse<Membership>> {
-    // (query string)
     const queryParams = new URLSearchParams();
     if (params.page) queryParams.append('page', params.page.toString());
     if (params.per_page) queryParams.append('per_page', params.per_page.toString());
@@ -56,7 +55,6 @@ export const BrandMembershipsService = {
     membershipId: string,
     role: UserRole
   ): Promise<Membership> {
-    // Відправляємо дані у форматі { brand_membership: { role: '...' } } або як вимагає ваш бекенд
     const payload = { role };
 
     const response = await apiClient.patch<Membership>(
