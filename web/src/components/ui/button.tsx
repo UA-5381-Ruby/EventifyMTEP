@@ -1,6 +1,6 @@
 import { type ButtonHTMLAttributes, forwardRef } from 'react';
 import { cn } from '@/lib/utils';
-import { Spinner } from './Spinner';
+import { Spinner } from './spinner';
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'outline' | 'ghost';
 type ButtonSize = 'sm' | 'md' | 'lg';

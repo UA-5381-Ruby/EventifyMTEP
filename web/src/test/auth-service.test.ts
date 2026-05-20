@@ -1,7 +1,7 @@
-import AuthService from '@/services/authService';
-import apiClient, { tokenStorage } from '@/lib/apiClient';
+import AuthService from '@/services/auth-service';
+import apiClient, { tokenStorage } from '@/lib/api-client';
 
-jest.mock('@/lib/apiClient', () => ({
+jest.mock('@/lib/api-client', () => ({
   __esModule: true,
   default: {
     post: jest.fn(),

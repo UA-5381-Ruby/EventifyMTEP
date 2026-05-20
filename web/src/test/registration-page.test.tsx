@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { mockNavigate } from './auth.mocks';
-import { RegistrationPage } from '../pages/RegistrationPage';
-import authService from '../services/authService';
+import { RegistrationPage } from '@/pages/registration-page';
+import authService from '@/services/auth-service';
 
 const renderRegistration = () => render(<RegistrationPage />);
 

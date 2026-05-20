@@ -7,7 +7,7 @@ jest.mock('react-router-dom', () => ({
   MemoryRouter: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 
-jest.mock('@/services/authService', () => ({
+jest.mock('@/services/auth-service', () => ({
   __esModule: true,
   default: {
     login: jest.fn(),

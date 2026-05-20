@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input, Button, Checkbox } from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
 import { EyeIcon, EyeOffIcon } from '@/components/auth';
-import authService from '@/services/authService.ts';
+import authService from '@/services/auth-service';
 
 export function RegistrationPage() {
   const navigate = useNavigate();

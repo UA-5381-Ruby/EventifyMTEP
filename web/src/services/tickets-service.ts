@@ -1,4 +1,4 @@
-import apiClient, { parseApiError } from '@/lib/apiClient';
+import apiClient, { parseApiError } from '@/lib/api-client';
 import axios from 'axios';
 import type {
   Ticket,

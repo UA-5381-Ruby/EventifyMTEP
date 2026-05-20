@@ -1,7 +1,7 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { mockNavigate } from './auth.mocks';
-import { LoginPage } from '@/pages/LoginPage';
-import authService from '@/services/authService';
+import { LoginPage } from '@/pages/login-page';
+import authService from '@/services/auth-service';
 
 const renderLogin = () => render(<LoginPage />);
 

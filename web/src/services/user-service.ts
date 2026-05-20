@@ -1,4 +1,4 @@
-import apiClient from '@/lib/apiClient.ts';
+import apiClient from '@/lib/api-client.ts';
 
 export interface User {
   id: number;
