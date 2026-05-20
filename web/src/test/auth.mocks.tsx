@@ -100,6 +100,6 @@ jest.mock('../components/ui', () => ({
       {label}
     </label>
   ),
-  EyeIcon: () => <span data-testid="eye-icon">open</span>,
-  EyeOffIcon: () => <span data-testid="eye-off-icon">close</span>,
+  EyeIcon: () => <span data-testid="eye-icon" />,
+  EyeOffIcon: () => <span data-testid="eye-off-icon" />,
 }));
