@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from 'react';
+import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
 import { Modal, Input, Button } from '@/components/ui';
 
 interface ForgotPasswordModalProps {
@@ -16,7 +16,7 @@ export function ForgotPasswordModal({
 }: ForgotPasswordModalProps) {
   const [email, setEmail] = useState('');
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (email.trim()) {
       onSuccess(email);
@@ -46,7 +46,7 @@ export function ForgotPasswordModal({
               <button
                 type="button"
                 onClick={() => setEmail('')}
-                className="absolute right-3 top-[14px] text-neutral-400 hover:text-neutral-600 transition-colors focus:outline-none"
+                className="absolute right-3 top-[9px] text-neutral-400 hover:text-neutral-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm"
                 aria-label="Clear input"
               >
                 ✕

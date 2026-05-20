@@ -1,4 +1,4 @@
-import { useState, type FormEvent, type ChangeEvent } from 'react';
+import { useState, type SyntheticEvent, type ChangeEvent } from 'react';
 import { Modal, Input, Button } from '@/components/ui';
 import { EyeIcon, EyeOffIcon } from './icons/EyeIcon';
 
@@ -14,7 +14,15 @@ export function ResetPasswordModal({ isOpen, onClose, onResetComplete }: ResetPa
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleClose = () => {
+    setPassword('');
+    setConfirmPassword('');
+    setShowPassword(false);
+    setError('');
+    onClose();
+  };
+
+  const handleSubmit = (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
@@ -29,7 +37,7 @@ export function ResetPasswordModal({ isOpen, onClose, onResetComplete }: ResetPa
   const isFormValid = password.length > 0 && confirmPassword.length > 0;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <div className="w-full max-w-[360px] mx-auto text-center py-2">
         <h2 className="text-2xl font-bold text-neutral-900 mb-3 tracking-tight">Reset Password</h2>
 

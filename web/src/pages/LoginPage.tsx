@@ -1,4 +1,4 @@
-import { useState, type ChangeEvent } from 'react';
+import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button, Checkbox, EyeIcon, EyeOffIcon } from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
@@ -16,7 +16,7 @@ export function LoginPage() {
   const [isForgotOpen, setIsForgotOpen] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
@@ -68,7 +68,7 @@ export function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 bottom-2.5 text-neutral-400 hover:text-neutral-600 transition-colors focus:outline-none"
+                    className="absolute right-3 bottom-2.5 text-neutral-400 hover:text-neutral-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOffIcon /> : <EyeIcon />}
