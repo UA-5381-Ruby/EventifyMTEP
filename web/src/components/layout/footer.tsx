@@ -22,6 +22,12 @@ export function Footer() {
             >
               Terms
             </Link>
+            <Link
+              to="/test/preview"
+              className="text-sm font-medium text-neutral-600 hover:text-primary-600 transition-colors"
+            >
+              Preview UI
+            </Link>
           </div>
         </div>
       </Container>

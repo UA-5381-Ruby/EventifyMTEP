@@ -5,7 +5,7 @@ import { EventFilters } from '@/components/events/event-filters.tsx';
 import { EventGrid } from '@/components/events/event-grid.tsx';
 import { EventPagination } from '@/components/events/event-pagination.tsx';
 import { useEvents } from '@/hooks/use-events.ts';
-import type { EventQueryParams, EventStatus } from '@/types/event.types';
+import type { EventQueryParams, EventStatus } from '@/types/event';
 
 const PER_PAGE = 12;
 
