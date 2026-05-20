@@ -31,17 +31,17 @@ export function Header() {
 
           <div className="flex items-center gap-3">
             <Link
-              to="/login"
+              to="/register"
               className="text-sm font-medium text-neutral-700 hover:text-primary-600 transition-colors"
             >
-              Log in
+              Sign up
             </Link>
 
             <Link
-              to="/register"
+              to="/login"
               className="inline-flex items-center px-4 py-2 rounded-md bg-primary-500 text-sm font-medium text-white hover:bg-primary-600 transition-colors"
             >
-              Sign up
+              Log in
             </Link>
           </div>
         </div>
