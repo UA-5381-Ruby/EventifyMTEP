@@ -20,6 +20,21 @@ jest.mock('../components/layout', () => ({
 }));
 
 jest.mock('../components/ui', () => ({
+  Modal: ({
+            isOpen,
+            onClose,
+            children,
+          }: {
+    isOpen: boolean;
+    onClose: () => void;
+    children: React.ReactNode;
+  }) =>
+    isOpen ? (
+      <div role="dialog">
+        <button type="button" aria-label="Close modal" onClick={onClose} />
+        {children}
+      </div>
+    ) : null,
   Input: ({
             label,
             type = 'text',
@@ -29,28 +44,35 @@ jest.mock('../components/ui', () => ({
             required,
             className,
           }: {
-    label: string;
+    label?: string;
     type?: string;
     placeholder?: string;
     value: string;
     onChange: React.ChangeEventHandler<HTMLInputElement>;
     required?: boolean;
     className?: string;
-  }) => (
-    <div>
-      <label htmlFor={label}>{label}</label>
-      <input
-        id={label}
-        type={type}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-        required={required}
-        className={className}
-        data-testid={`input-${label.toLowerCase().replace(/\s+/g, '-')}`}
-      />
-    </div>
-  ),
+  }) => {
+    const testId = label
+      ? `input-${label.toLowerCase().replace(/\s+/g, '-')}`
+      : placeholder
+        ? `input-${placeholder.toLowerCase().replace(/\s+/g, '-')}`
+        : undefined;
+    return (
+      <div>
+        {label && <label htmlFor={label}>{label}</label>}
+        <input
+          id={label}
+          type={type}
+          placeholder={placeholder}
+          value={value}
+          onChange={onChange}
+          required={required}
+          className={className}
+          data-testid={testId}
+        />
+      </div>
+    );
+  },
   Button: ({
              children,
              type,
@@ -78,6 +100,6 @@ jest.mock('../components/ui', () => ({
       {label}
     </label>
   ),
-  EyeIcon: () => <span data-testid="eye-icon">👁</span>,
-  EyeOffIcon: () => <span data-testid="eye-off-icon">🙈</span>,
+  EyeIcon: () => <span data-testid="eye-icon">open</span>,
+  EyeOffIcon: () => <span data-testid="eye-off-icon">close</span>,
 }));
