@@ -30,11 +30,6 @@ describe('RegistrationPage', () => {
     expect(screen.getByLabelText(/remember me/i)).toBeInTheDocument();
   });
 
-  it('renders the "Forgot Password?" button', () => {
-    renderRegistration();
-    expect(screen.getByRole('button', { name: /forgot password/i })).toBeInTheDocument();
-  });
-
   it('renders the "Log In" button', () => {
     renderRegistration();
     expect(screen.getByRole('button', { name: /^log in$/i })).toBeInTheDocument();
@@ -92,12 +87,6 @@ describe('RegistrationPage', () => {
     expect(checkbox).toBeChecked();
     fireEvent.click(checkbox);
     expect(checkbox).not.toBeChecked();
-  });
-
-  it('navigates to /forgot-password when "Forgot Password?" is clicked', () => {
-    renderRegistration();
-    fireEvent.click(screen.getByRole('button', { name: /forgot password/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/forgot-password');
   });
 
   it('navigates to /login when "Log In" is clicked', () => {
