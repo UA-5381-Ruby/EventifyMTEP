@@ -1,8 +1,20 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Container } from './container';
 import { Search, User } from 'lucide-react';
 
 export function Header() {
+  const navigate = useNavigate();
+
+  const handleProfileClick = () => {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+      navigate('/profile/settings');
+    } else {
+      navigate('/register');
+    }
+  };
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-neutral-200 bg-white">
       {/* Верхній поверх */}
@@ -20,7 +32,7 @@ export function Header() {
               </Link>
 
               {/* Navigation */}
-              <nav className="hidflex items-center gap-6">
+              <nav className="flex items-center gap-6">
                 <Link
                   to="/brands"
                   className="text-sm text-neutral-700 hover:text-black"
@@ -63,6 +75,7 @@ export function Header() {
 
                 <Search size={16} className="text-neutral-500" />
               </div>
+
               {/* Sign up */}
               <Link
                 to="/register"
@@ -78,8 +91,12 @@ export function Header() {
               >
                 Log in
               </Link>
+
               {/* Profile */}
-              <button className="w-8 h-8 rounded-full bg-neutral-300 flex items-center justify-center">
+              <button
+                onClick={handleProfileClick}
+                className="w-8 h-8 rounded-full bg-neutral-300 flex items-center justify-center"
+              >
                 <User size={16} />
               </button>
             </div>
@@ -89,7 +106,13 @@ export function Header() {
 
       {/* Нижній поверх */}
       <div className="bg-neutral-100">
-
+        <Container>
+          <div className="h-10 flex items-center">
+            <span className="text-sm text-neutral-600">
+              Superadmin Dashboard
+            </span>
+          </div>
+        </Container>
       </div>
     </header>
   );
