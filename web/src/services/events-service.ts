@@ -22,24 +22,4 @@ export const EventsService = {
     const response = await apiClient.post('/api/v1/events', { event: payload });
     return response.data.data;
   },
-
-  async submitEvent(id: number): Promise<Event> {
-    const response = await apiClient.post(`/api/v1/events/${id}/submit`);
-    return response.data.data;
-  },
-
-  async approveEvent(id: number): Promise<Event> {
-    const response = await apiClient.post(`/api/v1/events/${id}/approve`);
-    return response.data.data;
-  },
-
-  async rejectEvent(id: number, payload: { reason?: string } = {}): Promise<Event> {
-    const response = await apiClient.post(`/api/v1/events/${id}/reject`, payload);
-    return response.data.data;
-  },
-
-  async cancelEvent(id: number): Promise<Event> {
-    const response = await apiClient.post(`/api/v1/events/${id}/cancel`);
-    return response.data.data;
-  },
 };
