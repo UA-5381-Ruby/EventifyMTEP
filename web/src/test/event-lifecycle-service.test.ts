@@ -1,4 +1,4 @@
-import apiClient from '@/lib/api-client';
+import apiClient, { parseApiError } from '@/lib/api-client';
 import { EventLifecycleService } from '@/services/event-lifecycle-service';
 import type { Event } from '@/types/event';
 
@@ -73,6 +73,31 @@ describe('EventLifecycleService', () => {
 
       expect(mockedPost).toHaveBeenCalledWith('/api/v1/events/1/cancel');
       expect(result.status).toBe('cancelled');
+    });
+  });
+
+  describe('Error Handling (handleLifecycleError)', () => {
+    it('Branch 1: throws specific message if Axios error contains response.data.message (422/403)', async () => {
+      const specificMessage = 'All required fields must be filled before submission';
+      const mockAxiosError = {
+        isAxiosError: true,
+        response: {
+          data: { message: specificMessage }
+        }
+      };
+
+      mockedPost.mockRejectedValueOnce(mockAxiosError);
+
+      await expect(EventLifecycleService.submitEvent(1)).rejects.toThrow(specificMessage);
+    });
+
+    it('Branch 2: fallbacks to parseApiError for non-Axios or standard errors', async () => {
+      const standardError = new Error('Network down');
+      mockedPost.mockRejectedValueOnce(standardError);
+
+      await expect(EventLifecycleService.submitEvent(1)).rejects.toThrow();
+
+      expect(parseApiError).toHaveBeenCalledWith(standardError);
     });
   });
 });
