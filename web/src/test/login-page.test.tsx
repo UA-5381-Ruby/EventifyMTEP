@@ -86,6 +86,31 @@ describe('LoginPage', () => {
     expect(checkbox).not.toBeChecked();
   });
 
+  it('calls authService.login with rememberMe = true', async () => {
+    (authService.login as jest.Mock).mockResolvedValueOnce({});
+    renderLogin();
+
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'user@example.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), {
+      target: { value: 'secret123' },
+    });
+
+    fireEvent.click(screen.getByLabelText(/remember me/i));
+    fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
+
+    await waitFor(() => {
+      expect(authService.login).toHaveBeenCalledWith(
+        {
+          email: 'user@example.com',
+          password: 'secret123',
+        },
+        true
+      );
+    });
+  });
+
   it('navigates to /register when "Sign Up" is clicked', () => {
     renderLogin();
     fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
@@ -314,7 +339,7 @@ describe('LoginPage', () => {
     await waitFor(() => {
       expect(authService.login).toHaveBeenCalledTimes(1);
     });
-    expect(mockNavigate).not.toHaveBeenCalledWith('/events', expect.anything());
+    expect(mockNavigate).not.toHaveBeenCalledWith();
   });
 
   it('shows error message when login fails', async () => {
