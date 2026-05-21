@@ -13,16 +13,17 @@ export function RegistrationPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError('');
 
     try {
       await authService.register({ name, email, password }, rememberMe);
-      console.log('Registration success');
       navigate('/events', { replace: true });
-    } catch (error) {
-      console.error('Registration failed', error);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
     }
   };
 
@@ -85,6 +86,12 @@ export function RegistrationPage() {
                   onChange={(e: ChangeEvent<HTMLInputElement>) => setRememberMe(e.target.checked)}
                 />
               </div>
+
+              {error && (
+                <p className="text-sm text-red-500 text-center -mt-2" role="alert">
+                  {error}
+                </p>
+              )}
 
               <Button
                 type="submit"

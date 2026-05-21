@@ -150,4 +150,44 @@ describe('RegistrationPage', () => {
     });
     expect(mockNavigate).not.toHaveBeenCalledWith('/events', expect.anything());
   });
+
+  it('shows error message when registration fails', async () => {
+    (authService.register as jest.Mock).mockRejectedValueOnce(new Error('Email already taken'));
+    renderRegistration();
+
+    fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'taken@example.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), { target: { value: 'pass1234' } });
+    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Email already taken');
+    });
+  });
+
+  it('clears error message on new submit attempt', async () => {
+    (authService.register as jest.Mock)
+      .mockRejectedValueOnce(new Error('Email already taken'))
+      .mockResolvedValueOnce({});
+    renderRegistration();
+
+    fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'taken@example.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), { target: { value: 'pass1234' } });
+    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+  });
 });

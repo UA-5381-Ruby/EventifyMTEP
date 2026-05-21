@@ -12,19 +12,20 @@ export function LoginPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState('');
 
   const [isForgotOpen, setIsForgotOpen] = useState(false);
   const [isResetOpen, setIsResetOpen] = useState(false);
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError('');
 
     try {
       await authService.login({ email, password }, rememberMe);
-      console.log('Login success');
       navigate('/events', { replace: true });
-    } catch (error) {
-      console.error('Login failed', error);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     }
   };
 
@@ -86,6 +87,12 @@ export function LoginPage() {
                     Forgot Password?
                   </button>
                 </div>
+
+                {error && (
+                  <p className="text-sm text-red-500 text-center -mt-2" role="alert">
+                    {error}
+                  </p>
+                )}
 
                 <Button
                   type="submit"

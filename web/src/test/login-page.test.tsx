@@ -316,4 +316,46 @@ describe('LoginPage', () => {
     });
     expect(mockNavigate).not.toHaveBeenCalledWith('/events', expect.anything());
   });
+
+  it('shows error message when login fails', async () => {
+    (authService.login as jest.Mock).mockRejectedValueOnce(new Error('Invalid credentials'));
+    renderLogin();
+
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'wrong@example.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), {
+      target: { value: 'wrongpass' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Invalid credentials');
+    });
+  });
+
+  it('clears error message on new submit attempt', async () => {
+    (authService.login as jest.Mock)
+      .mockRejectedValueOnce(new Error('Invalid credentials'))
+      .mockResolvedValueOnce({});
+    renderLogin();
+
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'wrong@example.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), {
+      target: { value: 'wrongpass' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+  });
 });
