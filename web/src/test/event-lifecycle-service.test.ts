@@ -82,8 +82,8 @@ describe('EventLifecycleService', () => {
       const mockAxiosError = {
         isAxiosError: true,
         response: {
-          data: { message: specificMessage }
-        }
+          data: { message: specificMessage },
+        },
       };
 
       mockedPost.mockRejectedValueOnce(mockAxiosError);
