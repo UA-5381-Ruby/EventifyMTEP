@@ -20,12 +20,9 @@ export function LoginPage() {
     e.preventDefault();
 
     try {
-      await authService.login({
-        email,
-        password,
-      });
+      await authService.login({ email, password }, rememberMe);
       console.log('Login success');
-      navigate('/dashboard', { replace: true });
+      navigate('/events', { replace: true });
     } catch (error) {
       console.error('Login failed', error);
     }

@@ -1,7 +1,21 @@
+import { useState, useEffect } from 'react';
 import { Container } from './container';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import AuthService from '@/services/auth-service';
 
 export function Header() {
+  const [state, setState] = useState(AuthService.getState());
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    return AuthService.subscribe(setState);
+  }, []);
+
+  const handleLogout = () => {
+    AuthService.logout();
+    navigate('/login', { replace: true });
+  };
+
   return (
     <header className="sticky top-0 z-40 w-full border-b border-neutral-200 bg-white/80 backdrop-blur-sm">
       <Container>
@@ -30,19 +44,32 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-3">
-            <Link
-              to="/register"
-              className="text-sm font-medium text-neutral-700 hover:text-primary-600 transition-colors"
-            >
-              Sign up
-            </Link>
-
-            <Link
-              to="/login"
-              className="inline-flex items-center px-4 py-2 rounded-md bg-primary-500 text-sm font-medium text-white hover:bg-primary-600 transition-colors"
-            >
-              Log in
-            </Link>
+            {state.isAuthenticated ? (
+              <>
+                <span className="text-sm font-medium text-neutral-700">{state.user?.name}</span>
+                <button
+                  onClick={handleLogout}
+                  className="inline-flex items-center px-4 py-2 rounded-md bg-primary-500 text-sm font-medium text-white hover:bg-primary-600 transition-colors"
+                >
+                  Log out
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/register"
+                  className="text-sm font-medium text-neutral-700 hover:text-primary-600 transition-colors"
+                >
+                  Sign up
+                </Link>
+                <Link
+                  to="/login"
+                  className="inline-flex items-center px-4 py-2 rounded-md bg-primary-500 text-sm font-medium text-white hover:bg-primary-600 transition-colors"
+                >
+                  Log in
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </Container>

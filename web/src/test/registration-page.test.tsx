@@ -107,15 +107,18 @@ describe('RegistrationPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
-      expect(authService.register).toHaveBeenCalledWith({
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: 'pass1234',
-      });
+      expect(authService.register).toHaveBeenCalledWith(
+        {
+          name: 'John Doe',
+          email: 'john@example.com',
+          password: 'pass1234',
+        },
+        false
+      );
     });
   });
 
-  it('navigates to /dashboard after successful registration', async () => {
+  it('navigates to /events after successful registration', async () => {
     (authService.register as jest.Mock).mockResolvedValueOnce({});
     renderRegistration();
 
@@ -127,11 +130,11 @@ describe('RegistrationPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true });
+      expect(mockNavigate).toHaveBeenCalledWith('/events', { replace: true });
     });
   });
 
-  it('does not navigate to /dashboard when registration throws', async () => {
+  it('does not navigate to /events when registration throws', async () => {
     (authService.register as jest.Mock).mockRejectedValueOnce(new Error('Email already taken'));
     renderRegistration();
 
@@ -145,6 +148,6 @@ describe('RegistrationPage', () => {
     await waitFor(() => {
       expect(authService.register).toHaveBeenCalledTimes(1);
     });
-    expect(mockNavigate).not.toHaveBeenCalledWith('/dashboard', expect.anything());
+    expect(mockNavigate).not.toHaveBeenCalledWith('/events', expect.anything());
   });
 });

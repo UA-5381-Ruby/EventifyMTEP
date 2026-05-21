@@ -2,6 +2,15 @@ import React from 'react';
 
 export const mockNavigate = jest.fn();
 
+beforeAll(() => {
+  jest.spyOn(console, 'log').mockImplementation(() => {});
+  jest.spyOn(console, 'error').mockImplementation(() => {});
+});
+
+afterAll(() => {
+  jest.restoreAllMocks();
+});
+
 jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
   MemoryRouter: ({ children }: { children: React.ReactNode }) => <>{children}</>,

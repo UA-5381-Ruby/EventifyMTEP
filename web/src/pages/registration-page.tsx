@@ -18,13 +18,9 @@ export function RegistrationPage() {
     e.preventDefault();
 
     try {
-      await authService.register({
-        name,
-        email,
-        password,
-      });
+      await authService.register({ name, email, password }, rememberMe);
       console.log('Registration success');
-      navigate('/dashboard', { replace: true });
+      navigate('/events', { replace: true });
     } catch (error) {
       console.error('Registration failed', error);
     }

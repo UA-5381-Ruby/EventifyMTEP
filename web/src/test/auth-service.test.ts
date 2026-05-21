@@ -26,8 +26,6 @@ beforeEach(() => {
   localStorage.clear();
 });
 
-// ─── 1. localStorage is updated immediately on successful auth ───────────────
-
 describe('login', () => {
   it('stores the JWT in localStorage on success', async () => {
     const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.fake.sig';
@@ -37,8 +35,19 @@ describe('login', () => {
 
     await AuthService.login({ email: 'a@b.com', password: 'secret' });
 
-    expect(tokenStorage.set).toHaveBeenCalledWith(fakeToken);
+    expect(tokenStorage.set).toHaveBeenCalledWith(fakeToken, false);
     expect(tokenStorage.set).toHaveBeenCalledTimes(1);
+  });
+
+  it('stores the JWT in localStorage when rememberMe is true', async () => {
+    const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.fake.sig';
+    mockPost.mockResolvedValueOnce({
+      data: { token: fakeToken, user: { id: '1', email: 'a@b.com', name: 'Ada' } },
+    });
+
+    await AuthService.login({ email: 'a@b.com', password: 'secret' }, true);
+
+    expect(tokenStorage.set).toHaveBeenCalledWith(fakeToken, true);
   });
 
   it('updates auth state to isAuthenticated on success', async () => {
@@ -59,8 +68,6 @@ describe('login', () => {
     expect(tokenStorage.set).not.toHaveBeenCalled();
   });
 });
-
-// ─── 2. Password reset handles both steps ────────────────────────────────────
 
 describe('requestPasswordReset', () => {
   it('POSTs to the correct endpoint with just the email', async () => {
@@ -94,8 +101,6 @@ describe('confirmPasswordReset', () => {
   });
 });
 
-// ─── 3. Methods return typed Promises ────────────────────────────────────────
-
 describe('register', () => {
   it('resolves with the full AuthResponse so UI can derive loading/error state', async () => {
     const user = { id: '2', email: 'b@b.com', name: 'Bob' };
@@ -117,8 +122,6 @@ describe('logout', () => {
   });
 });
 
-// ─── 4. Subscriber is notified on state changes ──────────────────────────────
-
 describe('subscribe', () => {
   it('emits current state immediately on subscribe', () => {
     const listener = jest.fn();
@@ -136,7 +139,7 @@ describe('subscribe', () => {
 
     const listener = jest.fn();
     const unsub = AuthService.subscribe(listener);
-    listener.mockClear(); // ignore the immediate emit
+    listener.mockClear();
 
     await AuthService.login({ email: 'a@b.com', password: 'pw' });
 

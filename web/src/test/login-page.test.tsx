@@ -272,14 +272,17 @@ describe('LoginPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
 
     await waitFor(() => {
-      expect(authService.login).toHaveBeenCalledWith({
-        email: 'user@example.com',
-        password: 'secret123',
-      });
+      expect(authService.login).toHaveBeenCalledWith(
+        {
+          email: 'user@example.com',
+          password: 'secret123',
+        },
+        false
+      );
     });
   });
 
-  it('navigates to /dashboard after successful login', async () => {
+  it('navigates to /events after successful login', async () => {
     (authService.login as jest.Mock).mockResolvedValueOnce({});
     renderLogin();
 
@@ -292,11 +295,11 @@ describe('LoginPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true });
+      expect(mockNavigate).toHaveBeenCalledWith('/events', { replace: true });
     });
   });
 
-  it('does not navigate to /dashboard when login throws', async () => {
+  it('does not navigate to /events when login throws', async () => {
     (authService.login as jest.Mock).mockRejectedValueOnce(new Error('Invalid credentials'));
     renderLogin();
 
@@ -311,6 +314,6 @@ describe('LoginPage', () => {
     await waitFor(() => {
       expect(authService.login).toHaveBeenCalledTimes(1);
     });
-    expect(mockNavigate).not.toHaveBeenCalledWith('/dashboard', expect.anything());
+    expect(mockNavigate).not.toHaveBeenCalledWith('/events', expect.anything());
   });
 });
