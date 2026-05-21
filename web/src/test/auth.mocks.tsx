@@ -2,13 +2,14 @@ import React from 'react';
 
 export const mockNavigate = jest.fn();
 
-beforeAll(() => {
-  jest.spyOn(console, 'log').mockImplementation(() => {});
-  jest.spyOn(console, 'error').mockImplementation(() => {});
+let errorSpy: jest.SpyInstance;
+
+beforeEach(() => {
+  errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 });
 
-afterAll(() => {
-  jest.restoreAllMocks();
+afterEach(() => {
+  errorSpy.mockRestore();
 });
 
 jest.mock('react-router-dom', () => ({

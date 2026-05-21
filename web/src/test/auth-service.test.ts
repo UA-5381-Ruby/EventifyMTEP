@@ -1,6 +1,5 @@
 import AuthService from '@/services/auth-service';
 import apiClient, { tokenStorage } from '@/lib/api-client';
-
 jest.mock('@/lib/api-client', () => ({
   __esModule: true,
   default: {
@@ -26,10 +25,11 @@ const mockGet = apiClient.get as jest.Mock;
 beforeEach(() => {
   jest.clearAllMocks();
   localStorage.clear();
+  (tokenStorage.get as jest.Mock).mockReturnValue(null);
 });
 
 describe('login', () => {
-  it('stores the JWT in localStorage on success', async () => {
+  it('stores the JWT in sessionStorage by default (remember=false)', async () => {
     const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.fake.sig';
     mockPost.mockResolvedValueOnce({
       data: { token: fakeToken, user: { id: '1', email: 'a@b.com', name: 'Ada' } },
@@ -54,9 +54,7 @@ describe('login', () => {
 
   it('updates auth state to isAuthenticated on success', async () => {
     const user = { id: '1', email: 'a@b.com', name: 'Ada' };
-    mockPost.mockResolvedValueOnce({
-      data: { token: 'tok', user },
-    });
+    mockPost.mockResolvedValueOnce({ data: { token: 'tok', user } });
 
     await AuthService.login({ email: 'a@b.com', password: 'secret' });
 
@@ -72,7 +70,7 @@ describe('login', () => {
 });
 
 describe('register', () => {
-  it('resolves with the full AuthResponse so UI can derive loading/error state', async () => {
+  it('resolves with the full AuthResponse', async () => {
     const user = { id: '2', email: 'b@b.com', name: 'Bob' };
     const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.fake.sig';
     mockPost.mockResolvedValueOnce({ data: { token: fakeToken, user } });
@@ -149,7 +147,7 @@ describe('requestPasswordReset', () => {
 });
 
 describe('confirmPasswordReset', () => {
-  it('POSTs to the same endpoint with the token as a query param', async () => {
+  it('POSTs to the correct endpoint with the token as a query param', async () => {
     mockPost.mockResolvedValueOnce({ data: {} });
 
     await AuthService.confirmPasswordReset('reset-token-xyz', 'newPassw0rd!');
@@ -211,16 +209,28 @@ describe('subscribe', () => {
 });
 
 describe('init', () => {
-  it('does nothing when no token in storage', async () => {
+  it('resets auth state when no token in storage', async () => {
     (tokenStorage.get as jest.Mock).mockReturnValueOnce(null);
 
     await AuthService.init();
 
     expect(mockGet).not.toHaveBeenCalled();
+    expect(AuthService.getState()).toEqual({ user: null, isAuthenticated: false });
   });
 
   it('calls logout when token cannot be parsed (invalid jwt structure)', async () => {
     (tokenStorage.get as jest.Mock).mockReturnValueOnce('not.a.valid.jwt');
+
+    await AuthService.init();
+
+    expect(tokenStorage.clear).toHaveBeenCalled();
+    expect(AuthService.getState()).toEqual({ user: null, isAuthenticated: false });
+  });
+
+  it('calls logout when token is valid JWT but has no user_id field', async () => {
+    const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.' + btoa(JSON.stringify({ sub: 'someone' })) + '.sig';
+
+    (tokenStorage.get as jest.Mock).mockReturnValueOnce(fakeToken);
 
     await AuthService.init();
 
@@ -241,15 +251,42 @@ describe('init', () => {
     expect(AuthService.getState()).toEqual({ user, isAuthenticated: true });
   });
 
-  it('calls logout when API call fails during init', async () => {
+  it('calls logout when API returns 401', async () => {
     const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.' + btoa(JSON.stringify({ user_id: 1 })) + '.sig';
 
     (tokenStorage.get as jest.Mock).mockReturnValueOnce(fakeToken);
-    mockGet.mockRejectedValueOnce(new Error('Network error'));
+    mockGet.mockRejectedValueOnce({ response: { status: 401 } });
 
     await AuthService.init();
 
     expect(tokenStorage.clear).toHaveBeenCalled();
     expect(AuthService.getState()).toEqual({ user: null, isAuthenticated: false });
+  });
+
+  it('calls logout when API returns 403', async () => {
+    const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.' + btoa(JSON.stringify({ user_id: 1 })) + '.sig';
+
+    (tokenStorage.get as jest.Mock).mockReturnValueOnce(fakeToken);
+    mockGet.mockRejectedValueOnce({ response: { status: 403 } });
+
+    await AuthService.init();
+
+    expect(tokenStorage.clear).toHaveBeenCalled();
+    expect(AuthService.getState()).toEqual({ user: null, isAuthenticated: false });
+  });
+
+  it('keeps session and warns when API fails with non-auth error', async () => {
+    const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.' + btoa(JSON.stringify({ user_id: 1 })) + '.sig';
+    const warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => {});
+
+    (tokenStorage.get as jest.Mock).mockReturnValueOnce(fakeToken);
+    mockGet.mockRejectedValueOnce({ response: { status: 500 } });
+
+    await AuthService.init();
+
+    expect(tokenStorage.clear).not.toHaveBeenCalled();
+    expect(warnSpy).toHaveBeenCalledWith('Auth init failed, keeping session:', expect.anything());
+
+    warnSpy.mockRestore();
   });
 });

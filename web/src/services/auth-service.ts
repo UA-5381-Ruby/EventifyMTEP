@@ -1,3 +1,4 @@
+import type { AxiosError } from 'axios';
 import apiClient, { parseApiError, tokenStorage } from '@/lib/api-client';
 import type {
   AuthResponse,
@@ -26,7 +27,10 @@ function parseUserIdFromToken(token: string): number | null {
 
 async function init(): Promise<void> {
   const token = tokenStorage.get();
-  if (!token) return;
+  if (!token) {
+    setAuthState({ user: null, isAuthenticated: false });
+    return;
+  }
 
   const userId = parseUserIdFromToken(token);
   if (!userId) {
@@ -36,9 +40,19 @@ async function init(): Promise<void> {
 
   try {
     const { data } = await apiClient.get<AuthUser>(`/api/v1/users/${userId}`);
+
     setAuthState({ user: data, isAuthenticated: true });
-  } catch {
-    logout();
+  } catch (err: unknown) {
+    const error = err as AxiosError;
+
+    const status = error.response?.status;
+
+    if (status === 401 || status === 403) {
+      logout();
+      return;
+    }
+
+    console.warn('Auth init failed, keeping session:', err);
   }
 }
 

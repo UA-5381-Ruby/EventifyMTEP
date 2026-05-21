@@ -49,7 +49,7 @@ export function Header() {
                 <span className="text-sm font-medium text-neutral-700">{state.user?.name}</span>
                 <button
                   onClick={handleLogout}
-                  className="inline-flex items-center px-4 py-2 rounded-md bg-primary-500 text-sm font-medium text-white hover:bg-primary-600 transition-colors"
+                  className="inline-flex items-center px-4 py-2 rounded-md bg-primary-500 text-sm font-medium text-white hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 transition-colors"
                 >
                   Log out
                 </button>
@@ -58,13 +58,13 @@ export function Header() {
               <>
                 <Link
                   to="/register"
-                  className="text-sm font-medium text-neutral-700 hover:text-primary-600 transition-colors"
+                  className="text-sm font-medium text-neutral-700 hover:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded transition-colors"
                 >
                   Sign up
                 </Link>
                 <Link
                   to="/login"
-                  className="inline-flex items-center px-4 py-2 rounded-md bg-primary-500 text-sm font-medium text-white hover:bg-primary-600 transition-colors"
+                  className="inline-flex items-center px-4 py-2 rounded-md bg-primary-500 text-sm font-medium text-white hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded transition-colors"
                 >
                   Log in
                 </Link>
