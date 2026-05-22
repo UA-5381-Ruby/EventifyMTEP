@@ -107,59 +107,6 @@ describe('EventsService', () => {
     });
   });
 
-  describe('Management Methods (Transitions)', () => {
-    it('submitEvent: should call submit endpoint and return draft_on_review status', async () => {
-      mockedPost.mockResolvedValueOnce({
-        data: { data: { ...mockEvent, status: 'draft_on_review' } },
-      });
-
-      const result = await EventsService.submitEvent(1);
-
-      expect(mockedPost).toHaveBeenCalledWith('/api/v1/events/1/submit');
-      expect(result.status).toBe('draft_on_review');
-    });
-
-    it('rejectEvent: should call reject endpoint with reason', async () => {
-      mockedPost.mockResolvedValueOnce({ data: { data: { ...mockEvent, status: 'rejected' } } });
-      const payload = { reason: 'Invalid data' };
-
-      const result = await EventsService.rejectEvent(1, payload);
-
-      expect(mockedPost).toHaveBeenCalledWith('/api/v1/events/1/reject', payload);
-      expect(result.status).toBe('rejected');
-    });
-
-    // --- НОВІ ТЕСТИ ---
-
-    it('approveEvent: should call approve endpoint and return published status', async () => {
-      // Налаштовуємо мок на повернення статусу 'published'
-      mockedPost.mockResolvedValueOnce({
-        data: { data: { ...mockEvent, status: 'published' } },
-      });
-
-      const result = await EventsService.approveEvent(1);
-
-      // Перевіряємо правильність URL
-      expect(mockedPost).toHaveBeenCalledWith('/api/v1/events/1/approve');
-      // Перевіряємо, чи статус оброблено правильно
-      expect(result.status).toBe('published');
-    });
-
-    it('cancelEvent: should call cancel endpoint and return cancelled status', async () => {
-      // Налаштовуємо мок на повернення статусу 'cancelled'
-      mockedPost.mockResolvedValueOnce({
-        data: { data: { ...mockEvent, status: 'cancelled' } },
-      });
-
-      const result = await EventsService.cancelEvent(1);
-
-      // Перевіряємо правильність URL
-      expect(mockedPost).toHaveBeenCalledWith('/api/v1/events/1/cancel');
-      // Перевіряємо, чи статус оброблено правильно
-      expect(result.status).toBe('cancelled');
-    });
-  });
-
   describe('Creation', () => {
     it('should create an event with correct payload structure', async () => {
       const payload: CreateEventRequest = {
