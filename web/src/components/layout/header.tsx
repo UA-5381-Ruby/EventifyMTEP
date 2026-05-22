@@ -1,9 +1,21 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { Container } from './container';
+import { Link, useNavigate } from 'react-router-dom';
+import AuthService from '@/services/auth-service';
 import { Search, User } from 'lucide-react';
 
 export function Header() {
+  const [state, setState] = useState(AuthService.getState());
   const navigate = useNavigate();
+
+  useEffect(() => {
+    return AuthService.subscribe(setState);
+  }, []);
+
+  const handleLogout = () => {
+    AuthService.logout();
+    navigate('/login', { replace: true });
+  };
 
   const handleProfileClick = () => {
     const token = localStorage.getItem('token');
@@ -72,36 +84,44 @@ export function Header() {
                   placeholder="Search"
                   className="outline-none text-sm"
                 />
-
                 <Search size={16} className="text-neutral-500" />
-              </div>
 
-              {/* Sign up */}
-              <Link
-                to="/register"
-                className="text-sm font-medium text-neutral-700 hover:text-primary-600 transition-colors"
-              >
-                Sign up
-              </Link>
-
-              {/* Log in */}
-              <Link
-                to="/login"
-                className="inline-flex items-center px-4 py-2 rounded-md bg-primary-500 text-sm font-medium text-white hover:bg-primary-600 transition-colors"
-              >
-                Log in
-              </Link>
-
-              {/* Profile */}
-              <button
-                onClick={handleProfileClick}
-                className="w-8 h-8 rounded-full bg-neutral-300 flex items-center justify-center"
-              >
-                <User size={16} />
-              </button>
-            </div>
+          <div className="flex items-center gap-3">
+            {state.isAuthenticated ? (
+              <>
+                <span className="text-sm font-medium text-neutral-700">{state.user?.name}</span>
+                <button
+                  onClick={handleLogout}
+                  className="inline-flex items-center px-4 py-2 rounded-md bg-primary-500 text-sm font-medium text-white hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 transition-colors"
+                >
+                  Log out
+                </button>
+                <button
+                    onClick={handleProfileClick}
+                    className="w-8 h-8 rounded-full bg-neutral-300 flex items-center justify-center"
+                >
+                  <User size={16} />
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/register"
+                  className="text-sm font-medium text-neutral-700 hover:text-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded transition-colors"
+                >
+                  Sign up
+                </Link>
+                <Link
+                  to="/login"
+                  className="inline-flex items-center px-4 py-2 rounded-md bg-primary-500 text-sm font-medium text-white hover:bg-primary-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-500 focus-visible:ring-offset-2 rounded transition-colors"
+                >
+                  Log in
+                </Link>
+              </>
+            )}
           </div>
-        </Container>
+        </div>
+      </Container>
       </div>
 
       {/* Нижній поверх */}
