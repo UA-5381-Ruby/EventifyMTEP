@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Badge, Button } from '@/components/ui';
 import { cn } from '@/lib/utils';
-import type { Event, EventStatus } from '@/types/event.types';
+import type { Event, EventStatus } from '@/types/event';
 
 type BadgeVariant =
   | 'default'
@@ -52,7 +52,7 @@ export function EventCard({ event }: EventCardProps) {
     <article
       className={cn(
         'group relative flex flex-col rounded-xl bg-white border transition-all duration-200',
-        'hover:shadow-md hover:-translate-y-0.5',
+        'hover:shadow-md hover:border-neutral-200',
         upcoming ? 'border-neutral-200' : 'border-neutral-100'
       )}
     >

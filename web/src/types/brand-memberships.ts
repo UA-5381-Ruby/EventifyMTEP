@@ -3,9 +3,9 @@
 export type UserRole = 'admin' | 'owner' | 'manager' | 'member';
 
 export interface Membership {
-  id: string;
-  brand_id: string;
-  user_id: string;
+  id: number;
+  brand_id: number;
+  user_id: number;
   role: UserRole;
   user: {
     name: string;
@@ -14,7 +14,7 @@ export interface Membership {
 }
 
 export interface CreateMembershipRequest {
-  user_id: string;
+  user_id: number;
   role: UserRole;
 }
 

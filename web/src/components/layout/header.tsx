@@ -36,6 +36,12 @@ export function Header() {
               Events
             </Link>
             <Link
+              to="/brands"
+              className="text-sm font-medium text-neutral-600 hover:text-primary-600 transition-colors"
+            >
+              Brands
+            </Link>
+            <Link
               to="/about"
               className="text-sm font-medium text-neutral-600 hover:text-primary-600 transition-colors"
             >

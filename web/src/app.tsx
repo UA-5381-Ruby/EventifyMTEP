@@ -6,6 +6,9 @@ import { LoginPage } from '@/pages/login-page';
 import { RegistrationPage } from '@/pages/registration-page.tsx';
 import { EventListPage } from '@/pages/event-list-page.tsx';
 import { NotFoundPage } from '@/pages/not-found-page.tsx';
+import { Dashboard } from '@/pages/dashboard.tsx';
+import { BrandListPage } from '@/pages/brand-list-page.tsx';
+import { BrandProfilePage } from '@/pages/brand-dashboard-page.tsx';
 
 function App() {
   return (
@@ -20,10 +23,11 @@ function App() {
         <Route path="/events" element={<EventListPage />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route
-            path="/dashboard"
-            element={<h1 className="bg-emerald-500">This is a dashboard.</h1>}
-          />
+          <Route path="/brands" element={<BrandListPage />} />
+
+          <Route path="/dashboard" element={<Dashboard />} />
+
+          <Route path="/dashboard/brands/:id" element={<BrandProfilePage />} />
 
           <Route
             path="/profile"
