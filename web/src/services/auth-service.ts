@@ -1,3 +1,4 @@
+import type { AxiosError } from 'axios';
 import apiClient, { parseApiError, tokenStorage } from '@/lib/api-client';
 import type {
   AuthResponse,
@@ -15,15 +16,58 @@ let authState: AuthState = {
 type AuthStateListener = (state: AuthState) => void;
 const listeners = new Set<AuthStateListener>();
 
+function decodeBase64Url(value: string): string {
+  const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+  const padding = '='.repeat((4 - (normalized.length % 4)) % 4);
+  const base64 = normalized + padding;
+  const binary = atob(base64);
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+
+  return new TextDecoder().decode(bytes);
+}
+
+function parseUserIdFromToken(token: string): number | null {
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) {
+      return null;
+    }
+
+    const payload = JSON.parse(decodeBase64Url(parts[1]));
+    return payload.user_id ?? null;
+  } catch {
+    return null;
+  }
+}
+
 async function init(): Promise<void> {
   const token = tokenStorage.get();
-  if (!token) return;
+  if (!token) {
+    setAuthState({ user: null, isAuthenticated: false });
+    return;
+  }
+
+  const userId = parseUserIdFromToken(token);
+  if (!userId) {
+    logout();
+    return;
+  }
 
   try {
-    const { data } = await apiClient.get<{ user: AuthUser }>('/auth/login');
-    setAuthState({ user: data.user, isAuthenticated: true });
-  } catch {
-    logout();
+    const { data } = await apiClient.get<AuthUser>(`/api/v1/users/${userId}`);
+
+    setAuthState({ user: data, isAuthenticated: true });
+  } catch (err: unknown) {
+    const error = err as AxiosError;
+
+    const status = error.response?.status;
+
+    if (status === 401 || status === 403) {
+      logout();
+      return;
+    }
+
+    console.warn('Auth init failed, keeping session:', err);
   }
 }
 
@@ -32,48 +76,35 @@ function setAuthState(next: AuthState): void {
   listeners.forEach((cb) => cb(authState));
 }
 
-/**
- * Subscribe to auth state changes.
- * Returns an unsubscribe function — call it inside useEffect's cleanup.
- *
- * @example
- * useEffect(() => {
- *   return AuthService.subscribe(setState);
- * }, []);
- */
 function subscribe(listener: AuthStateListener): () => void {
   listeners.add(listener);
-  // Immediately emit current state so the subscriber is never stale on mount.
   listener(authState);
   return () => listeners.delete(listener);
 }
-
 /**
  * POST /api/v1/auth/register
- * Creates a new account and immediately signs the user in.
  */
-async function register(payload: RegisterRequest): Promise<AuthResponse> {
+async function register(payload: RegisterRequest, remember = false): Promise<AuthResponse> {
   try {
     const { data } = await apiClient.post<AuthResponse>('/api/v1/auth/register', payload);
 
-    tokenStorage.set(data.token);
+    tokenStorage.set(data.token, remember);
     setAuthState({ user: data.user, isAuthenticated: true });
 
     return data;
   } catch (err) {
-    parseApiError(err); // always throws — return type is `never`
+    parseApiError(err);
   }
 }
 
 /**
  * POST /api/v1/auth/login
- * Authenticates an existing user and stores their JWT.
  */
-async function login(payload: LoginRequest): Promise<AuthResponse> {
+async function login(payload: LoginRequest, remember = false): Promise<AuthResponse> {
   try {
     const { data } = await apiClient.post<AuthResponse>('/api/v1/auth/login', payload);
 
-    tokenStorage.set(data.token);
+    tokenStorage.set(data.token, remember);
     setAuthState({ user: data.user, isAuthenticated: true });
 
     return data;
@@ -93,7 +124,6 @@ function logout(): void {
 
 /**
  * POST /api/v1/auth/password/reset
- * Triggers the password-reset email from your Rails mailer.
  */
 async function requestPasswordReset(email: string): Promise<void> {
   try {
@@ -105,14 +135,13 @@ async function requestPasswordReset(email: string): Promise<void> {
 
 /**
  * POST /api/v1/auth/password/reset?token=<token>
- * Completes the reset flow using the token from the user's email link.
  */
 async function confirmPasswordReset(token: string, newPassword: string): Promise<void> {
   try {
     await apiClient.post(
       '/api/v1/auth/password/reset',
       { new_password: newPassword },
-      { params: { token } } // Axios serialises this as ?token=<value>
+      { params: { token } }
     );
   } catch (err) {
     parseApiError(err);
@@ -120,16 +149,13 @@ async function confirmPasswordReset(token: string, newPassword: string): Promise
 }
 
 const AuthService = {
-  // State
   getState: (): AuthState => authState,
   subscribe,
 
-  // Auth
   register,
   login,
   logout,
 
-  // Password recovery
   requestPasswordReset,
   confirmPasswordReset,
 
