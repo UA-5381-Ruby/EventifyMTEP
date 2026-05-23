@@ -20,11 +20,10 @@ export function BrandDashboardPage() {
     memberships,
     membershipsLoading,
     isEditOpen,
-    editName,
-    editDesc,
+    editFields,
+    saveError,
     setIsEditOpen,
-    setEditName,
-    setEditDesc,
+    handleFieldChange,
     handleSave,
   } = useBrandDashboard(id);
 
@@ -123,7 +122,7 @@ export function BrandDashboardPage() {
           </Card>
 
           <section className="space-y-6">
-            <h2 className="text-sm font-bold text-neutral-800 uppercase tracking-wider">Events</h2>
+            <h4 className="font-bold text-neutral-800 ">Events</h4>
             <EventFilters
               search={filters.search}
               status={filters.status}
@@ -154,13 +153,22 @@ export function BrandDashboardPage() {
 
       <BrandEditModal
         isOpen={isEditOpen}
-        name={editName}
-        description={editDesc}
+        name={editFields.name}
+        description={editFields.description}
+        logoUrl={editFields.logo_url}
+        subdomain={editFields.subdomain}
+        primaryColor={editFields.primary_color}
+        secondaryColor={editFields.secondary_color}
         onClose={() => setIsEditOpen(false)}
-        onNameChange={(e) => setEditName(e.target.value)}
-        onDescriptionChange={(e) => setEditDesc(e.target.value)}
+        onChange={handleFieldChange}
         onSave={handleSave}
       />
+
+      {saveError && (
+        <Alert variant="error" title="Failed to save">
+          {saveError}
+        </Alert>
+      )}
     </PageWrapper>
   );
 }

@@ -2,10 +2,9 @@ import apiClient from '@/lib/api-client';
 import type { AxiosError } from 'axios';
 import type { Brand, BrandWithEvents, CreateBrandRequest, UpdateBrandRequest } from '@/types/brand';
 
-type ForbiddenError = AxiosError & { isForbidden?: boolean };
-
 export class BrandsService {
   private readonly endpoint = '/api/v1/brands';
+
   async getAllBrands(): Promise<Brand[]> {
     const res = await apiClient.get<Brand[]>(this.endpoint);
     return res.data;
@@ -26,7 +25,8 @@ export class BrandsService {
       const res = await apiClient.patch<Brand>(`${this.endpoint}/${id}`, { brand: payload });
       return res.data;
     } catch (error) {
-      if ((error as ForbiddenError).isForbidden) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 403) {
         throw new Error('You do not have permission to update this brand', { cause: error });
       }
       throw error;
@@ -37,7 +37,8 @@ export class BrandsService {
     try {
       await apiClient.delete(`${this.endpoint}/${id}`);
     } catch (error) {
-      if ((error as ForbiddenError).isForbidden) {
+      const axiosError = error as AxiosError;
+      if (axiosError.response?.status === 403) {
         throw new Error('You do not have permission to delete this brand', { cause: error });
       }
       throw error;

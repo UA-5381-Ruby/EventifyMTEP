@@ -85,12 +85,7 @@ export function BrandDashboardHeader({
         </div>
       </div>
 
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={onEdit}
-        className="font-medium border-neutral-200 text-neutral-600 bg-white hover:bg-neutral-50 shadow-sm rounded-xl px-4"
-      >
+      <Button variant="outline" size="sm" onClick={onEdit}>
         Edit brand settings
       </Button>
     </div>
