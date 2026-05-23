@@ -339,7 +339,7 @@ describe('LoginPage', () => {
     await waitFor(() => {
       expect(authService.login).toHaveBeenCalledTimes(1);
     });
-    expect(mockNavigate).not.toHaveBeenCalledWith();
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it('shows error message when login fails', async () => {

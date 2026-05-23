@@ -16,9 +16,24 @@ let authState: AuthState = {
 type AuthStateListener = (state: AuthState) => void;
 const listeners = new Set<AuthStateListener>();
 
+function decodeBase64Url(value: string): string {
+  const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+  const padding = '='.repeat((4 - (normalized.length % 4)) % 4);
+  const base64 = normalized + padding;
+  const binary = atob(base64);
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+
+  return new TextDecoder().decode(bytes);
+}
+
 function parseUserIdFromToken(token: string): number | null {
   try {
-    const payload = JSON.parse(atob(token.split('.')[1]));
+    const parts = token.split('.');
+    if (parts.length < 2) {
+      return null;
+    }
+
+    const payload = JSON.parse(decodeBase64Url(parts[1]));
     return payload.user_id ?? null;
   } catch {
     return null;

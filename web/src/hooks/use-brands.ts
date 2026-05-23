@@ -17,6 +17,10 @@ interface BrandQueryParams {
   q?: string;
 }
 
+interface BrandWithCount extends Brand {
+  events_count?: number;
+}
+
 export function useBrands(params: BrandQueryParams): UseBrandsResult {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [total, setTotal] = useState<number | null>(null);
@@ -52,9 +56,11 @@ export function useBrands(params: BrandQueryParams): UseBrandsResult {
         if (params.sort === 'name') {
           result.sort((a, b) => a.name.localeCompare(b.name));
         } else if (params.sort === 'events_count') {
-          result.sort((a, b) => ((b as any).events_count ?? 0) - ((a as any).events_count ?? 0));
+          result.sort(
+            (a, b) =>
+              ((b as BrandWithCount).events_count ?? 0) - ((a as BrandWithCount).events_count ?? 0)
+          );
         }
-
         setTotal(result.length);
 
         const start = (params.page - 1) * params.per_page;

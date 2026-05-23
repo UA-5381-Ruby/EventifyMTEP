@@ -1,6 +1,6 @@
 import { Container } from '@/components/layout';
 import { Badge } from '@/components/ui';
-import { STATUS_OPTIONS } from '@/constants/event.constants';
+import { STATUS_TO_TAB } from '@/constants/event.constants';
 
 interface EventPageHeaderProps {
   total: number | null;
@@ -53,12 +53,13 @@ export function EventPageHeader({
                   </button>
                 </Badge>
               )}
+
               {status && (
                 <Badge
                   variant="outline"
                   className="inline-flex items-center gap-1.5 text-xs font-medium bg-primary-50 text-primary-700 border-primary-200 rounded-full px-3 py-1"
                 >
-                  {STATUS_OPTIONS.find((o) => o.value === status)?.label}
+                  {STATUS_TO_TAB[status]}
                   <button
                     onClick={onRemoveStatus}
                     className="text-primary-400 hover:text-primary-600 transition-colors ml-0.5 focus:outline-none"

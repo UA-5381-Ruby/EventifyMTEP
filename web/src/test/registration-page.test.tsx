@@ -177,7 +177,7 @@ describe('RegistrationPage', () => {
     await waitFor(() => {
       expect(authService.register).toHaveBeenCalledTimes(1);
     });
-    expect(mockNavigate).not.toHaveBeenCalledWith();
+    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it('shows error message when registration fails', async () => {

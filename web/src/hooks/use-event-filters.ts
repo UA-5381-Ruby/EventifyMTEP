@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { SORT_OPTIONS } from '@/constants/event.constants';
 import type { Event } from '@/types/event';
-import { STATUS_TO_TAB, TAB_TO_STATUS } from '@/components/events/event-filters';
-import type { EventTabStatus } from '@/components/events/event-filters';
+import { STATUS_TO_TAB, TAB_TO_STATUS } from '@/constants/event.constants';
+import type { EventTabStatus } from '@/constants/event.constants';
 
 const STATUS_REGISTRY: Record<string, { group: EventTabStatus }> = {
   draft: { group: 'Drafts' },

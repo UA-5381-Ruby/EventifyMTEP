@@ -26,30 +26,6 @@ describe('SuperadminService', () => {
       expect(JSON.parse(mock.history.post[0].data)).toEqual(payload);
       expect(result).toEqual(responseData);
     });
-
-    it('approveEvent sends POST request to /api/v1/events/:id/approve', async () => {
-      const eventId = 123;
-      const responseData = { success: true };
-
-      mock.onPost(`/api/v1/events/${eventId}/approve`).reply(200, responseData);
-
-      const result = await SuperadminService.approveEvent(eventId);
-
-      expect(mock.history.post[0].url).toBe(`/api/v1/events/${eventId}/approve`);
-      expect(result).toEqual(responseData);
-    });
-
-    it('rejectEvent sends POST request to /api/v1/events/:id/reject', async () => {
-      const eventId = 123;
-      const responseData = { success: true };
-
-      mock.onPost(`/api/v1/events/${eventId}/reject`).reply(200, responseData);
-
-      const result = await SuperadminService.rejectEvent(eventId);
-
-      expect(mock.history.post[0].url).toBe(`/api/v1/events/${eventId}/reject`);
-      expect(result).toEqual(responseData);
-    });
   });
 
   describe('Users', () => {

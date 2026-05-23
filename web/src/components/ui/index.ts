@@ -9,3 +9,4 @@ export { Alert } from './alert';
 export { Spinner } from './spinner';
 export { Modal } from './modal';
 export { Pagination } from './pagination';
+export { SearchInput } from './search-input';
