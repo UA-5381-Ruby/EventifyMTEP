@@ -11,6 +11,7 @@ import {
   Spinner,
   Modal,
   Pagination,
+  SearchInput,
 } from '@/components/ui';
 
 import { Container, PageWrapper } from '@/components/layout';
@@ -18,6 +19,8 @@ import { Container, PageWrapper } from '@/components/layout';
 export function UIPreview() {
   const [modalOpen, setModalOpen] = useState(false);
   const [checked, setChecked] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState('');
 
   const [currentPage, setCurrentPage] = useState(3);
 
@@ -59,6 +62,13 @@ export function UIPreview() {
               <Input label="With error" error="This field is required" />
               <Input label="With hint" hint="We won't share this with anyone" />
               <Input label="Disabled" disabled placeholder="Disabled" />
+              <SearchInput
+                placeholder="Search…"
+                value={searchQuery}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setSearchQuery(e.target.value)
+                }
+              />
             </div>
           </Section>
 

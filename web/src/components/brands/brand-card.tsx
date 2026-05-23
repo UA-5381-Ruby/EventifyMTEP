@@ -14,7 +14,6 @@ export function BrandCard({ brand }: BrandCardProps) {
 
   return (
     <article
-      onClick={() => navigate(`/dashboard/brands/${brand.id}`)}
       className={cn(
         'group relative flex flex-col rounded-2xl bg-white border border-neutral-100/80 p-5 cursor-pointer transition-all duration-300 ease-out',
         'hover:shadow-[0_12px_30px_-10px_rgba(0,0,0,0.06)] hover:border-neutral-200'
@@ -67,7 +66,12 @@ export function BrandCard({ brand }: BrandCardProps) {
         )}
       </div>
 
-      <Button variant="outline" size="sm" fullWidth onClick={() => navigate(`/brands/${brand.id}`)}>
+      <Button
+        variant="outline"
+        size="sm"
+        fullWidth
+        onClick={() => navigate(`/dashboard/brands/${brand.id}`)}
+      >
         View Details
       </Button>
     </article>

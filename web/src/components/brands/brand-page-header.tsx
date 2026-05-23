@@ -20,8 +20,6 @@ export function BrandPageHeader({
       ? `${total} brand${total !== 1 ? 's' : ''} total`
       : '';
 
-  const hasActivePills = !!search;
-
   return (
     <div className="bg-white border-b border-neutral-100">
       <Container>
@@ -31,23 +29,21 @@ export function BrandPageHeader({
             <p className="text-neutral-400 mt-1 text-sm">{subtitle}</p>
           </div>
 
-          {hasActivePills && (
+          {search && (
             <div className="flex flex-wrap gap-2">
-              {search && (
-                <Badge
-                  variant="outline"
-                  className="inline-flex items-center gap-1.5 text-xs font-medium bg-primary-50 text-primary-700 border-primary-200 rounded-full px-3 py-1"
+              <Badge
+                variant="outline"
+                className="inline-flex items-center gap-1.5 text-xs font-medium bg-primary-50 text-primary-700 border-primary-200 rounded-full px-3 py-1"
+              >
+                Search: {search}
+                <button
+                  onClick={onRemoveSearch}
+                  className="text-primary-400 hover:text-primary-600 transition-colors ml-0.5 focus:outline-none"
+                  aria-label="Remove search filter"
                 >
-                  Search: {search}
-                  <button
-                    onClick={onRemoveSearch}
-                    className="text-primary-400 hover:text-primary-600 transition-colors ml-0.5 focus:outline-none"
-                    aria-label="Remove search filter"
-                  >
-                    ✕
-                  </button>
-                </Badge>
-              )}
+                  ✕
+                </button>
+              </Badge>
             </div>
           )}
         </div>

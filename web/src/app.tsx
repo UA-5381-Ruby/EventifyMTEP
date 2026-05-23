@@ -8,7 +8,7 @@ import { EventListPage } from '@/pages/event-list-page.tsx';
 import { NotFoundPage } from '@/pages/not-found-page.tsx';
 import { Dashboard } from '@/pages/dashboard.tsx';
 import { BrandListPage } from '@/pages/brand-list-page.tsx';
-import { BrandProfilePage } from '@/pages/brand-dashboard-page.tsx';
+import { BrandDashboardPage } from '@/pages/brand-dashboard-page.tsx';
 
 function App() {
   return (
@@ -27,7 +27,7 @@ function App() {
 
           <Route path="/dashboard" element={<Dashboard />} />
 
-          <Route path="/dashboard/brands/:id" element={<BrandProfilePage />} />
+          <Route path="/dashboard/brands/:id" element={<BrandDashboardPage />} />
 
           <Route
             path="/profile"
