@@ -1,16 +1,17 @@
 import { useParams } from 'react-router-dom';
-import { Alert, Card, Pagination, Spinner } from '@/components/ui';
+import { Alert, Card, Pagination, Spinner, Button } from '@/components/ui';
 import { Container, PageWrapper } from '@/components/layout';
 import { EventFilters } from '@/components/events/event-filters';
 import { EventGrid } from '@/components/events/event-grid';
+import { CreateEventModal } from '@/components/events/create-event-modal';
 import { BrandDashboardHeader } from '@/components/brands/brand-dashboard-header.tsx';
 import { BrandStatCard } from '@/components/brands/brand-stat-card';
 import { BrandColorPalette } from '@/components/brands/brand-color-palette';
 import { BrandEditModal } from '@/components/brands/brand-edit-modal';
 import { useBrandDashboard } from '@/hooks/use-brand-dashboard.ts';
 import { useEventFilters } from '@/hooks/use-event-filters';
+import { useCreateEvent } from '@/hooks/use-create-event';
 import { ACTIVE_STATUSES, ITEMS_PER_PAGE, PENDING_STATUSES } from '@/constants/brand.constants';
-
 export function BrandDashboardPage() {
   const { id } = useParams<{ id: string }>();
   const {
@@ -30,6 +31,10 @@ export function BrandDashboardPage() {
   const filters = useEventFilters({
     events: brand?.events ?? [],
     itemsPerPage: ITEMS_PER_PAGE,
+  });
+
+  const createEvent = useCreateEvent(Number(id) || 0, () => {
+    window.location.reload();
   });
 
   if (isLoading) {
@@ -122,7 +127,12 @@ export function BrandDashboardPage() {
           </Card>
 
           <section className="space-y-6">
-            <h4 className="font-bold text-neutral-800 ">Events</h4>
+            <div className="flex items-center justify-between">
+              <h4 className="font-bold text-neutral-800">Events</h4>
+              <Button size="sm" onClick={createEvent.openModal}>
+                + New event
+              </Button>
+            </div>
             <EventFilters
               search={filters.search}
               status={filters.status}
@@ -169,6 +179,16 @@ export function BrandDashboardPage() {
           {saveError}
         </Alert>
       )}
+
+      <CreateEventModal
+        isOpen={createEvent.isOpen}
+        fields={createEvent.fields}
+        isSaving={createEvent.isSaving}
+        saveError={createEvent.saveError}
+        onClose={createEvent.closeModal}
+        onSave={createEvent.handleSave}
+        onChange={createEvent.handleFieldChange}
+      />
     </PageWrapper>
   );
 }
