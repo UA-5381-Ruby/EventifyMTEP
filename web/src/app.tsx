@@ -7,6 +7,7 @@ import { RegistrationPage } from '@/pages/registration-page.tsx';
 import { EventListPage } from '@/pages/event-list-page.tsx';
 import { NotFoundPage } from '@/pages/not-found-page.tsx';
 import { Dashboard } from '@/pages/dashboard.tsx';
+import { BrandPublicPage } from '@/pages/brand-public-page.tsx';
 import { BrandListPage } from '@/pages/brand-list-page.tsx';
 import { BrandDashboardPage } from '@/pages/brand-dashboard-page.tsx';
 
@@ -21,6 +22,8 @@ function App() {
         <Route path="/register" element={<RegistrationPage />} />
 
         <Route path="/events" element={<EventListPage />} />
+
+        <Route path="/brands/:id" element={<BrandPublicPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/brands" element={<BrandListPage />} />

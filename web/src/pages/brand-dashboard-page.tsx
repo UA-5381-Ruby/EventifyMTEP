@@ -1,43 +1,38 @@
-import { useParams } from 'react-router-dom';
-import { Alert, Card, Pagination, Spinner, Button } from '@/components/ui';
+import { useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { Alert, Button, Spinner } from '@/components/ui';
 import { Container, PageWrapper } from '@/components/layout';
-import { EventFilters } from '@/components/events/event-filters';
-import { EventGrid } from '@/components/events/event-grid';
-import { CreateEventModal } from '@/components/events/create-event-modal';
-import { BrandDashboardHeader } from '@/components/brands/brand-dashboard-header.tsx';
-import { BrandStatCard } from '@/components/brands/brand-stat-card';
-import { BrandColorPalette } from '@/components/brands/brand-color-palette';
+import { BrandView } from '@/components/brands/brand-view';
 import { BrandEditModal } from '@/components/brands/brand-edit-modal';
-import { useBrandDashboard } from '@/hooks/use-brand-dashboard.ts';
-import { useEventFilters } from '@/hooks/use-event-filters';
+import { CreateEventModal } from '@/components/events/create-event-modal';
+import { useAuth } from '@/hooks/use-auth';
+import { useBrandDashboard } from '@/hooks/use-brand-dashboard';
 import { useCreateEvent } from '@/hooks/use-create-event';
-import { ACTIVE_STATUSES, ITEMS_PER_PAGE, PENDING_STATUSES } from '@/constants/brand.constants';
+
 export function BrandDashboardPage() {
+  const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const {
-    brand,
-    isLoading,
-    error,
-    memberships,
-    membershipsLoading,
-    isEditOpen,
-    editFields,
-    saveError,
-    setIsEditOpen,
-    handleFieldChange,
-    handleSave,
+    brand, isLoading, error,
+    memberships, membershipsLoading,
+    isEditOpen, editFields, saveError,
+    setIsEditOpen, handleFieldChange, handleSave,
   } = useBrandDashboard(id);
 
-  const filters = useEventFilters({
-    events: brand?.events ?? [],
-    itemsPerPage: ITEMS_PER_PAGE,
-  });
+  const createEvent = useCreateEvent(Number(id) || 0, () => window.location.reload());
 
-  const createEvent = useCreateEvent(Number(id) || 0, () => {
-    window.location.reload();
-  });
+  const currentUserMembership = memberships.find((m) => m.user.id === user?.id);
+  const canManage = currentUserMembership?.role === 'owner' ||
+    currentUserMembership?.role === 'manager';
 
-  if (isLoading) {
+  useEffect(() => {
+    if (!membershipsLoading && !isLoading && !canManage) {
+      navigate(`/brands/${id}`, { replace: true });
+    }
+  }, [membershipsLoading, canManage, isLoading, id, navigate]);
+
+  if (isLoading || membershipsLoading) {
     return (
       <PageWrapper>
         <div className="flex h-96 items-center justify-center">
@@ -45,6 +40,10 @@ export function BrandDashboardPage() {
         </div>
       </PageWrapper>
     );
+  }
+
+  if (!canManage) {
+    return null;
   }
 
   if (error || !brand) {
@@ -59,107 +58,20 @@ export function BrandDashboardPage() {
     );
   }
 
-  const activeCount = brand.events.filter((e) =>
-    ACTIVE_STATUSES.has((e.status || '').toLowerCase())
-  ).length;
-  const pendingReviewCount = brand.events.filter((e) =>
-    PENDING_STATUSES.includes((e.status || '').toLowerCase())
-  ).length;
-  const primaryColor = brand.primary_color || '#6366f1';
-  const secondaryColor = brand.secondary_color || '#a855f7';
-  const ownerName = memberships.find((m) => m.role === 'owner')?.user.name;
-
   return (
-    <PageWrapper>
-      <Container className="relative overflow-hidden">
-        <div
-          className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none opacity-[0.05] transition-all duration-700"
-          style={{
-            background: `radial-gradient(circle, ${primaryColor} 0%, ${secondaryColor} 100%)`,
-          }}
-        />
-
-        <main className="relative z-10 py-10 pb-24 max-w-6xl mx-auto space-y-10">
-          <BrandDashboardHeader
-            brand={brand}
-            primaryColor={primaryColor}
-            secondaryColor={secondaryColor}
-            onEdit={() => setIsEditOpen(true)}
-          />
-
-          <Card
-            variant="bordered"
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 overflow-hidden bg-white divide-y lg:divide-y-0 lg:divide-x divide-neutral-100 p-0 rounded-2xl shadow-sm"
-          >
-            <BrandStatCard
-              label="Total Events"
-              value={String(brand.events.length)}
-              sub={`${activeCount} active`}
-              subVariant={activeCount > 0 ? 'green' : 'neutral'}
-            />
-            <BrandStatCard
-              label="Active Events"
-              value={String(activeCount)}
-              sub={activeCount > 0 ? 'Live now' : 'None live'}
-              subVariant={activeCount > 0 ? 'green' : 'neutral'}
-            />
-            <BrandStatCard
-              label="Team Members"
-              value={membershipsLoading ? '—' : String(memberships.length)}
-              sub={ownerName ? `Owner: ${ownerName}` : 'No owner assigned'}
-              isLoading={membershipsLoading}
-            />
-            <BrandStatCard
-              label="Pending Review"
-              value={String(pendingReviewCount)}
-              sub={pendingReviewCount > 0 ? 'Needs attention' : 'All clear'}
-              subVariant={pendingReviewCount > 0 ? 'amber' : 'neutral'}
-            />
-          </Card>
-
-          <Card variant="bordered" className="overflow-hidden bg-white p-0 rounded-2xl shadow-sm">
-            <BrandColorPalette
-              primaryColor={primaryColor}
-              secondaryColor={secondaryColor}
-              primaryRaw={brand.primary_color}
-              secondaryRaw={brand.secondary_color}
-            />
-          </Card>
-
-          <section className="space-y-6">
-            <div className="flex items-center justify-between">
-              <h4 className="font-bold text-neutral-800">Events</h4>
-              <Button size="sm" onClick={createEvent.openModal}>
-                + New event
-              </Button>
-            </div>
-            <EventFilters
-              search={filters.search}
-              status={filters.status}
-              sort={filters.sort}
-              pendingCount={pendingReviewCount}
-              onSearchChange={filters.handleSearchChange}
-              onStatusChange={filters.handleStatusChange}
-              onSortChange={filters.handleSortChange}
-            />
-            <EventGrid
-              events={filters.paginated}
-              isLoading={false}
-              error={null}
-              hasActiveFilters={filters.hasActiveFilters}
-              onRetry={() => {}}
-              onClearFilters={filters.clearFilters}
-            />
-            {filters.totalPages > 1 && (
-              <Pagination
-                page={filters.page}
-                totalPages={filters.totalPages}
-                onPageChange={filters.setPage}
-              />
-            )}
-          </section>
-        </main>
-      </Container>
+    <>
+      <BrandView
+        brand={brand}
+        memberships={memberships}
+        membershipsLoading={membershipsLoading}
+        canManage={canManage}
+        onEdit={() => setIsEditOpen(true)}
+        extraActions={
+          <Button size="sm" onClick={createEvent.openModal}>
+            + New event
+          </Button>
+        }
+      />
 
       <BrandEditModal
         isOpen={isEditOpen}
@@ -189,6 +101,6 @@ export function BrandDashboardPage() {
         onSave={createEvent.handleSave}
         onChange={createEvent.handleFieldChange}
       />
-    </PageWrapper>
+    </>
   );
 }

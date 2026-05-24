@@ -7,6 +7,7 @@ interface BrandDashboardHeaderProps {
   primaryColor: string;
   secondaryColor: string;
   onEdit: () => void;
+  canEdit: boolean;
 }
 
 export function BrandDashboardHeader({
@@ -14,6 +15,7 @@ export function BrandDashboardHeader({
   primaryColor,
   secondaryColor,
   onEdit,
+  canEdit,
 }: BrandDashboardHeaderProps) {
   const navigate = useNavigate();
 
@@ -85,9 +87,11 @@ export function BrandDashboardHeader({
         </div>
       </div>
 
-      <Button variant="outline" size="sm" onClick={onEdit}>
-        Edit brand settings
-      </Button>
+      {canEdit && (
+        <Button variant="outline" size="sm" onClick={onEdit}>
+          Edit brand settings
+        </Button>
+      )}
     </div>
   );
 }
