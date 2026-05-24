@@ -5,6 +5,7 @@ import ProtectedRoute from '@/components/protected-route';
 import { LoginPage } from '@/pages/login-page';
 import { RegistrationPage } from '@/pages/registration-page.tsx';
 import { EventListPage } from '@/pages/event-list-page.tsx';
+import { EventDetailPage } from '@/pages/event-detail-page';
 import { NotFoundPage } from '@/pages/not-found-page.tsx';
 import { Dashboard } from '@/pages/dashboard.tsx';
 import { BrandListPage } from '@/pages/brand-list-page.tsx';
@@ -21,6 +22,7 @@ function App() {
         <Route path="/register" element={<RegistrationPage />} />
 
         <Route path="/events" element={<EventListPage />} />
+        <Route path="/events/:id" element={<EventDetailPage />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/brands" element={<BrandListPage />} />
