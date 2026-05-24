@@ -14,6 +14,10 @@ module Api
         render json: Brand.all
       end
 
+      def mine
+        render json: current_user.brands
+      end
+
       def show
         render json: @brand, include: :events
       end

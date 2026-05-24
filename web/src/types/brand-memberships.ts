@@ -1,6 +1,6 @@
 // types/brandMemberships.ts
 
-export type UserRole = 'admin' | 'owner' | 'manager' | 'member';
+export type UserRole = 'owner' | 'manager' | 'user' | 'admin';
 
 export interface Membership {
   id: string;

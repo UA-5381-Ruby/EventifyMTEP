@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { EventListPage } from '@/pages/event-list-page.tsx';
 import * as useEventsModule from '@/hooks/use-events.ts';
-import type { Event } from '@/types/event.types';
+import type { Event } from '@/types/event.ts';
 
 jest.mock('@/hooks/use-events.ts');
 const mockUseEvents = jest.spyOn(useEventsModule, 'useEvents');

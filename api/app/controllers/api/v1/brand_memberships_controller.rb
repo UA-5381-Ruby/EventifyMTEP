@@ -21,12 +21,27 @@ module Api
       end
 
       def create
-        @membership = @brand.brand_memberships.build(create_membership_params)
+        email = create_membership_params[:user_id]
+
+        user = User.find_by(email: email)
+
+        if user.nil?
+          return render json: {
+            errors: { user_id: ["User with email #{email} not found. They must be registered first."] }
+          }, status: :not_found
+        end
+
+        @membership = @brand.brand_memberships.build(
+          user: user,
+          role: create_membership_params[:role]
+        )
+
         authorize @membership
 
         begin
           if @membership.save
-            render json: @membership, status: :created
+            render json: @membership.as_json(include: { user: { only: %i[id name email] } }),
+                   status: :created
           elsif duplicate_membership_error?
             render_duplicate_error
           else

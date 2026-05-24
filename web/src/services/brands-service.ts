@@ -11,6 +11,11 @@ export class BrandsService {
     return res.data;
   }
 
+  async getUserBrands(): Promise<Brand[]> {
+    const res = await apiClient.get<Brand[]>(`${this.endpoint}/mine`);
+    return res.data;
+  }
+
   async getBrandById(id: number): Promise<BrandWithEvents> {
     const res = await apiClient.get<BrandWithEvents>(`${this.endpoint}/${id}`);
     return res.data;

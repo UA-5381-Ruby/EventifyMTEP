@@ -36,10 +36,9 @@ export const BrandMembershipsService = {
    * @returns The created membership
    */
   async addBrandMember(brandId: string, payload: CreateMembershipRequest): Promise<Membership> {
-    const response = await apiClient.post<Membership>(
-      `/api/v1/brands/${brandId}/memberships`,
-      payload
-    );
+    const response = await apiClient.post<Membership>(`/api/v1/brands/${brandId}/memberships`, {
+      membership: payload,
+    });
     return response.data;
   },
 
@@ -55,11 +54,9 @@ export const BrandMembershipsService = {
     membershipId: string,
     role: UserRole
   ): Promise<Membership> {
-    const payload = { role };
-
     const response = await apiClient.patch<Membership>(
       `/api/v1/brands/${brandId}/memberships/${membershipId}`,
-      payload
+      { membership: { role } }
     );
     return response.data;
   },

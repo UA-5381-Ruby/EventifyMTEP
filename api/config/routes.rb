@@ -34,6 +34,9 @@ Rails.application.routes.draw do
       end
 
       resources :brands, only: [:index, :create, :show, :update, :destroy] do
+        collection do
+          get :mine
+        end
         resources :memberships, controller: 'brand_memberships', only: [:index, :create, :update, :destroy]
       end
 
