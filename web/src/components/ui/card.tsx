@@ -9,24 +9,24 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
 const paddingStyles = {
   none: '',
   sm: 'p-3',
-  md: 'p-6',
+  md: 'p-5 pt-6',
   lg: 'p-8',
 };
 
 export function Card({
-  variant = 'default',
-  padding = 'md',
-  className,
-  children,
-  ...props
-}: CardProps) {
+                       variant = 'default',
+                       padding = 'md',
+                       className,
+                       children,
+                       ...props
+                     }: CardProps) {
   return (
     <div
       className={cn(
-        'rounded-lg bg-white',
-        variant === 'default' && 'shadow-sm',
+        'rounded-2xl bg-white transition-all duration-300 ease-out',
+        variant === 'default' && 'border border-neutral-100/80 shadow-sm',
         variant === 'bordered' && 'border border-neutral-200',
-        variant === 'elevated' && 'shadow-lg',
+        variant === 'elevated' && 'shadow-[0_12px_30px_-10px_rgba(0,0,0,0.06)] border border-neutral-200/60',
         paddingStyles[padding],
         className
       )}
@@ -38,38 +38,20 @@ export function Card({
 }
 
 export function CardHeader({ className, children, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div className={cn('mb-4 flex items-center justify-between', className)} {...props}>
-      {children}
-    </div>
-  );
+  return <div className={cn('mb-4 flex items-center justify-between', className)} {...props}>{children}</div>;
 }
 
 export function CardTitle({ className, children, ...props }: HTMLAttributes<HTMLHeadingElement>) {
-  return (
-    <h3 className={cn('text-lg font-semibold text-neutral-900', className)} {...props}>
-      {children}
-    </h3>
-  );
+  return <h3 className={cn('text-lg font-semibold text-neutral-900', className)} {...props}>{children}</h3>;
 }
 
 export function CardBody({ className, children, ...props }: HTMLAttributes<HTMLDivElement>) {
-  return (
-    <div className={cn('text-neutral-700', className)} {...props}>
-      {children}
-    </div>
-  );
+  return <div className={cn('text-neutral-700', className)} {...props}>{children}</div>;
 }
 
 export function CardFooter({ className, children, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
-    <div
-      className={cn(
-        'mt-4 flex items-center justify-end gap-2 border-t border-neutral-100 pt-4',
-        className
-      )}
-      {...props}
-    >
+    <div className={cn('mt-4 flex items-center justify-end gap-2 border-t border-neutral-100 pt-4', className)} {...props}>
       {children}
     </div>
   );
