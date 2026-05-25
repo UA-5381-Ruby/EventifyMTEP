@@ -44,9 +44,7 @@ export function HeaderActions({
         ) : (
           <>
             <Button variant="primary">
-              <Link to="/login"
-                    className="text-sm font-medium text-neutral-0"
-              >
+              <Link to="/login" className="text-sm font-medium text-neutral-0">
                 Log in
               </Link>
             </Button>

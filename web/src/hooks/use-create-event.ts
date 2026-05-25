@@ -27,7 +27,10 @@ interface UseCreateEventResult {
   saveError: string | null;
   openModal: () => void;
   closeModal: () => void;
-  handleFieldChange: <K extends keyof CreateEventFields>(field: K, value: CreateEventFields[K]) => void;
+  handleFieldChange: <K extends keyof CreateEventFields>(
+    field: K,
+    value: CreateEventFields[K]
+  ) => void;
   handleSave: () => Promise<void>;
 }
 
@@ -84,7 +87,13 @@ export function useCreateEvent(brandId: number, onSuccess: () => void): UseCreat
   };
 
   return {
-    isOpen, fields, isSaving, saveError,
-    openModal, closeModal, handleFieldChange, handleSave,
+    isOpen,
+    fields,
+    isSaving,
+    saveError,
+    openModal,
+    closeModal,
+    handleFieldChange,
+    handleSave,
   };
 }
