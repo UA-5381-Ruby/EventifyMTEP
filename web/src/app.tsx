@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
 import { UIPreview } from '@/pages/ui-preview.tsx';
 
 import ProtectedRoute from '@/components/protected-route';
@@ -6,6 +6,7 @@ import { LoginPage } from '@/pages/login-page';
 import { RegistrationPage } from '@/pages/registration-page.tsx';
 import { EventListPage } from '@/pages/event-list-page.tsx';
 import { NotFoundPage } from '@/pages/not-found-page.tsx';
+import { SuperAdminPage } from '@/pages/super-admin-page.tsx';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
             path="/profile"
             element={<h1 className="bg-emerald-500">This is a profile page.</h1>}
           />
+          <Route path="/super-admin" element={<SuperAdminPage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
