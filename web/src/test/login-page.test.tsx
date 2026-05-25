@@ -86,6 +86,31 @@ describe('LoginPage', () => {
     expect(checkbox).not.toBeChecked();
   });
 
+  it('calls authService.login with rememberMe = true', async () => {
+    (authService.login as jest.Mock).mockResolvedValueOnce({});
+    renderLogin();
+
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'user@example.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), {
+      target: { value: 'secret123' },
+    });
+
+    fireEvent.click(screen.getByLabelText(/remember me/i));
+    fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
+
+    await waitFor(() => {
+      expect(authService.login).toHaveBeenCalledWith(
+        {
+          email: 'user@example.com',
+          password: 'secret123',
+        },
+        true
+      );
+    });
+  });
+
   it('navigates to /register when "Sign Up" is clicked', () => {
     renderLogin();
     fireEvent.click(screen.getByRole('button', { name: /sign up/i }));
@@ -272,14 +297,17 @@ describe('LoginPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
 
     await waitFor(() => {
-      expect(authService.login).toHaveBeenCalledWith({
-        email: 'user@example.com',
-        password: 'secret123',
-      });
+      expect(authService.login).toHaveBeenCalledWith(
+        {
+          email: 'user@example.com',
+          password: 'secret123',
+        },
+        false
+      );
     });
   });
 
-  it('navigates to /dashboard after successful login', async () => {
+  it('navigates to /events after successful login', async () => {
     (authService.login as jest.Mock).mockResolvedValueOnce({});
     renderLogin();
 
@@ -292,11 +320,11 @@ describe('LoginPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true });
+      expect(mockNavigate).toHaveBeenCalledWith('/events', { replace: true });
     });
   });
 
-  it('does not navigate to /dashboard when login throws', async () => {
+  it('does not navigate to /events when login throws', async () => {
     (authService.login as jest.Mock).mockRejectedValueOnce(new Error('Invalid credentials'));
     renderLogin();
 
@@ -311,6 +339,48 @@ describe('LoginPage', () => {
     await waitFor(() => {
       expect(authService.login).toHaveBeenCalledTimes(1);
     });
-    expect(mockNavigate).not.toHaveBeenCalledWith('/dashboard', expect.anything());
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('shows error message when login fails', async () => {
+    (authService.login as jest.Mock).mockRejectedValueOnce(new Error('Invalid credentials'));
+    renderLogin();
+
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'wrong@example.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), {
+      target: { value: 'wrongpass' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Invalid credentials');
+    });
+  });
+
+  it('clears error message on new submit attempt', async () => {
+    (authService.login as jest.Mock)
+      .mockRejectedValueOnce(new Error('Invalid credentials'))
+      .mockResolvedValueOnce({});
+    renderLogin();
+
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'wrong@example.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), {
+      target: { value: 'wrongpass' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 });

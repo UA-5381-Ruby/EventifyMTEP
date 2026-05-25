@@ -89,6 +89,35 @@ describe('RegistrationPage', () => {
     expect(checkbox).not.toBeChecked();
   });
 
+  it('calls authService.register with rememberMe = true', async () => {
+    (authService.register as jest.Mock).mockResolvedValueOnce({});
+    renderRegistration();
+
+    fireEvent.change(screen.getByTestId('input-name'), {
+      target: { value: 'John Doe' },
+    });
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'john@example.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), {
+      target: { value: 'pass1234' },
+    });
+
+    fireEvent.click(screen.getByLabelText(/remember me/i));
+    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(authService.register).toHaveBeenCalledWith(
+        {
+          name: 'John Doe',
+          email: 'john@example.com',
+          password: 'pass1234',
+        },
+        true
+      );
+    });
+  });
+
   it('navigates to /login when "Log In" is clicked', () => {
     renderRegistration();
     fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
@@ -107,15 +136,18 @@ describe('RegistrationPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
-      expect(authService.register).toHaveBeenCalledWith({
-        name: 'John Doe',
-        email: 'john@example.com',
-        password: 'pass1234',
-      });
+      expect(authService.register).toHaveBeenCalledWith(
+        {
+          name: 'John Doe',
+          email: 'john@example.com',
+          password: 'pass1234',
+        },
+        false
+      );
     });
   });
 
-  it('navigates to /dashboard after successful registration', async () => {
+  it('navigates to /events after successful registration', async () => {
     (authService.register as jest.Mock).mockResolvedValueOnce({});
     renderRegistration();
 
@@ -127,11 +159,11 @@ describe('RegistrationPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/dashboard', { replace: true });
+      expect(mockNavigate).toHaveBeenCalledWith('/events', { replace: true });
     });
   });
 
-  it('does not navigate to /dashboard when registration throws', async () => {
+  it('does not navigate to /events when registration throws', async () => {
     (authService.register as jest.Mock).mockRejectedValueOnce(new Error('Email already taken'));
     renderRegistration();
 
@@ -145,6 +177,46 @@ describe('RegistrationPage', () => {
     await waitFor(() => {
       expect(authService.register).toHaveBeenCalledTimes(1);
     });
-    expect(mockNavigate).not.toHaveBeenCalledWith('/dashboard', expect.anything());
+    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('shows error message when registration fails', async () => {
+    (authService.register as jest.Mock).mockRejectedValueOnce(new Error('Email already taken'));
+    renderRegistration();
+
+    fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'taken@example.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), { target: { value: 'pass1234' } });
+    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Email already taken');
+    });
+  });
+
+  it('clears error message on new submit attempt', async () => {
+    (authService.register as jest.Mock)
+      .mockRejectedValueOnce(new Error('Email already taken'))
+      .mockResolvedValueOnce({});
+    renderRegistration();
+
+    fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'John Doe' } });
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'taken@example.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), { target: { value: 'pass1234' } });
+    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
   });
 });

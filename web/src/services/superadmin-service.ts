@@ -12,16 +12,6 @@ export const SuperadminService = {
     return response.data;
   },
 
-  async approveEvent(eventId: string | number) {
-    const response = await apiClient.post(`/api/v1/events/${eventId}/approve`);
-    return response.data;
-  },
-
-  async rejectEvent(eventId: string | number) {
-    const response = await apiClient.post(`/api/v1/events/${eventId}/reject`);
-    return response.data;
-  },
-
   async updateUser(userId: string | number, payload: UpdateUserPayload) {
     const response = await apiClient.patch(`/api/v1/users/${userId}`, payload);
     return response.data;

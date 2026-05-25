@@ -1,6 +1,6 @@
 import MockAdapter from 'axios-mock-adapter';
 import { type AxiosError, type InternalAxiosRequestConfig } from 'axios';
-import apiClient, { tokenStorage, parseApiError } from '@/lib/api-client';
+import apiClient, { parseApiError, tokenStorage } from '@/lib/api-client';
 
 describe('apiClient', () => {
   let mock: MockAdapter;
@@ -8,6 +8,7 @@ describe('apiClient', () => {
   beforeEach(() => {
     mock = new MockAdapter(apiClient);
     localStorage.clear();
+    sessionStorage.clear();
     jest.clearAllMocks();
   });
 
@@ -19,12 +20,7 @@ describe('apiClient', () => {
     localStorage.setItem('accessToken', 'TEST_TOKEN');
 
     mock.onGet('/test').reply((config) => {
-      return [
-        200,
-        {
-          authHeader: config.headers?.Authorization,
-        },
-      ];
+      return [200, { authHeader: config.headers?.Authorization }];
     });
 
     const response = await apiClient.get('/test');
@@ -34,12 +30,7 @@ describe('apiClient', () => {
 
   it('does NOT add Authorization header when token is missing', async () => {
     mock.onGet('/test').reply((config) => {
-      return [
-        200,
-        {
-          authHeader: config.headers?.Authorization,
-        },
-      ];
+      return [200, { authHeader: config.headers?.Authorization }];
     });
 
     const response = await apiClient.get('/test');
@@ -58,24 +49,46 @@ describe('apiClient', () => {
   });
 
   describe('tokenStorage', () => {
-    it('sets, gets, and clears the token from localStorage', () => {
+    it('sets, gets, and clears the token from localStorage when remember is true', () => {
       const token = 'TEST_SECRET_TOKEN';
 
-      // Set
-      tokenStorage.set(token);
+      tokenStorage.set(token, true);
       expect(localStorage.getItem('accessToken')).toBe(token);
-
       expect(tokenStorage.get()).toBe(token);
 
       tokenStorage.clear();
       expect(localStorage.getItem('accessToken')).toBeNull();
       expect(tokenStorage.get()).toBeNull();
     });
+
+    it('sets, gets, and clears the token from sessionStorage when remember is false', () => {
+      const token = 'TEST_SECRET_TOKEN';
+
+      tokenStorage.set(token, false);
+      expect(sessionStorage.getItem('accessToken')).toBe(token);
+      expect(localStorage.getItem('accessToken')).toBeNull();
+      expect(tokenStorage.get()).toBe(token);
+
+      tokenStorage.clear();
+      expect(sessionStorage.getItem('accessToken')).toBeNull();
+      expect(tokenStorage.get()).toBeNull();
+    });
   });
 
   describe('apiClient interceptors', () => {
-    it('adds Authorization header when token exists in storage', async () => {
-      tokenStorage.set('TEST_TOKEN');
+    it('adds Authorization header when token exists in localStorage', async () => {
+      tokenStorage.set('TEST_TOKEN', true);
+
+      mock.onGet('/test').reply((config) => {
+        return [200, { authHeader: config.headers?.Authorization }];
+      });
+
+      const response = await apiClient.get('/test');
+      expect(response.data.authHeader).toBe('Bearer TEST_TOKEN');
+    });
+
+    it('adds Authorization header when token exists in sessionStorage', async () => {
+      tokenStorage.set('TEST_TOKEN', false);
 
       mock.onGet('/test').reply((config) => {
         return [200, { authHeader: config.headers?.Authorization }];
