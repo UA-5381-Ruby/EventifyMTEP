@@ -19,7 +19,7 @@ export class BrandsService {
   }
 
   async createBrand(payload: CreateBrandRequest): Promise<Brand> {
-    const res = await apiClient.post<Brand>(this.endpoint, {brand: payload});
+    const res = await apiClient.post<Brand>(this.endpoint, { brand: payload });
     return res.data;
   }
 
