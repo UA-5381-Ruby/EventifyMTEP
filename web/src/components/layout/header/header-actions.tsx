@@ -17,12 +17,12 @@ export function HeaderActions({
 }: HeaderActionsProps) {
   return (
     <div className="flex items-center gap-4">
-      <div className="flex items-center border border-neutral-300 px-3 py-1 rounded-sm">
+      <div className="flex items-center border border-neutral-300 px-3 py-1 rounded-md">
         <input type="text" placeholder="Search" className="outline-none text-sm" />
         <Search size={16} className="text-neutral-500" />
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-6">
         {isAuthenticated ? (
           <>
             <span
@@ -32,7 +32,7 @@ export function HeaderActions({
               {userName}
               <button
                 onClick={onProfile}
-                className="w-8 h-8 rounded-full bg-neutral-300 flex items-center justify-center"
+                className="w-8 h-8 rounded-full bg-neutral-300 flex items-center justify-center cursor-pointer"
               >
                 <User size={16} />
               </button>
@@ -44,7 +44,9 @@ export function HeaderActions({
         ) : (
           <>
             <Button variant="primary">
-              <Link to="/login">Log in</Link>
+              <Link to="/login" className="text-sm font-medium text-neutral-0">
+                Log in
+              </Link>
             </Button>
             <Link
               to="/register"

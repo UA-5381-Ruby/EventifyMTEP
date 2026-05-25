@@ -22,9 +22,7 @@ export function BrandStatCard({
   return (
     <div className="flex flex-col justify-between gap-3 px-6 py-5 transition-colors duration-200 hover:bg-neutral-50/40">
       <div className="space-y-1">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-neutral-400 block">
-          {label}
-        </span>
+        <span className="text-xs font-bold tracking-wider text-neutral-400 block">{label}</span>
         <div className="flex items-center h-8">
           {isLoading ? (
             <div className="h-5 w-12 rounded-md bg-neutral-100 animate-pulse" />

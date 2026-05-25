@@ -3,6 +3,7 @@ import { brandsService } from '@/services/brands-service';
 import { BrandMembershipsService } from '@/services/brand-memberships-service';
 import type { BrandWithEvents } from '@/types/brand';
 import type { Membership } from '@/types/brand-memberships';
+import type { BrandEditFields } from '@/components/brands/brand-edit-modal';
 
 interface UseBrandDashboardResult {
   brand: BrandWithEvents | null;
@@ -11,13 +12,21 @@ interface UseBrandDashboardResult {
   memberships: Membership[];
   membershipsLoading: boolean;
   isEditOpen: boolean;
-  editName: string;
-  editDesc: string;
+  editFields: BrandEditFields;
+  saveError: string | null;
   setIsEditOpen: (open: boolean) => void;
-  setEditName: (name: string) => void;
-  setEditDesc: (desc: string) => void;
+  handleFieldChange: (field: keyof BrandEditFields, value: string) => void;
   handleSave: () => Promise<void>;
 }
+
+const EMPTY_FIELDS: BrandEditFields = {
+  name: '',
+  description: '',
+  logo_url: '',
+  subdomain: '',
+  primary_color: '',
+  secondary_color: '',
+};
 
 export function useBrandDashboard(id: string | undefined): UseBrandDashboardResult {
   const [brand, setBrand] = useState<BrandWithEvents | null>(null);
@@ -26,8 +35,8 @@ export function useBrandDashboard(id: string | undefined): UseBrandDashboardResu
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [membershipsLoading, setMembershipsLoading] = useState(true);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editName, setEditName] = useState('');
-  const [editDesc, setEditDesc] = useState('');
+  const [editFields, setEditFields] = useState<BrandEditFields>(EMPTY_FIELDS);
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -48,9 +57,16 @@ export function useBrandDashboard(id: string | undefined): UseBrandDashboardResu
       if (!isMounted) return;
 
       if (brandResult.status === 'fulfilled') {
-        setBrand(brandResult.value);
-        setEditName(brandResult.value.name);
-        setEditDesc(brandResult.value.description || '');
+        const b = brandResult.value;
+        setBrand(b);
+        setEditFields({
+          name: b.name,
+          description: b.description || '',
+          logo_url: b.logo_url || '',
+          subdomain: b.subdomain,
+          primary_color: b.primary_color || '',
+          secondary_color: b.secondary_color || '',
+        });
       } else {
         setError('Brand not found.');
       }
@@ -69,17 +85,20 @@ export function useBrandDashboard(id: string | undefined): UseBrandDashboardResu
     };
   }, [id]);
 
+  const handleFieldChange = (field: keyof BrandEditFields, value: string) => {
+    setEditFields((prev) => ({ ...prev, [field]: value }));
+  };
+
   const handleSave = async () => {
     if (!brand) return;
+    setSaveError(null);
     try {
-      const updated = await brandsService.updateBrand(brand.id, {
-        name: editName,
-        description: editDesc,
-      });
+      const updated = await brandsService.updateBrand(brand.id, editFields);
       setBrand((prev) => (prev ? { ...prev, ...updated } : null));
       setIsEditOpen(false);
-    } catch {
-      alert('Update failed.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Update failed.';
+      setSaveError(message);
     }
   };
 
@@ -90,11 +109,10 @@ export function useBrandDashboard(id: string | undefined): UseBrandDashboardResu
     memberships,
     membershipsLoading,
     isEditOpen,
-    editName,
-    editDesc,
+    editFields,
+    saveError,
     setIsEditOpen,
-    setEditName,
-    setEditDesc,
+    handleFieldChange,
     handleSave,
   };
 }
