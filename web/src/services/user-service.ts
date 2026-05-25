@@ -1,5 +1,5 @@
 import apiClient, { parseApiError } from '@/lib/api-client';
-import type { User, UpdateUserRequest } from '@/types/user';
+import type { User, UpdateUserRequest, UserProfile } from '@/types/user';
 
 export const UserService = {
   /**
@@ -64,12 +64,12 @@ export const UserService = {
   },
 };
 
-// Legacy function for backward compatibility
-export const getCurrentUser = async (): Promise<User> => {
+// Legacy function for backward compatibility 
+export const getCurrentUser = async (): Promise<UserProfile> => {
   try {
-    const response = await apiClient.get<User>('/users/me');
+    const response = await apiClient.get<UserProfile>('/api/v1/users/me');
     return response.data;
   } catch (err) {
-    parseApiError(err);
+    throw parseApiError(err);
   }
 };
