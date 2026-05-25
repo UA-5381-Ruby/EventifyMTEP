@@ -1,6 +1,6 @@
 import React from 'react';
-import { SidebarNav } from './sidebar.nav';
-import { SidebarActions } from './sidebar.action';
+import { SidebarNav } from './sidebar-nav';
+import { SidebarActions } from './sidebar-action';
 
 interface SidebarProps {
     currentPath: string;
