@@ -9,6 +9,10 @@ class UserPolicy < ApplicationPolicy
     true
   end
 
+  def me?
+    user.present?
+  end
+
   def update?
     user.id == record.id || user.is_superadmin?
   end

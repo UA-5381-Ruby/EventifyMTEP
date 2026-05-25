@@ -17,6 +17,8 @@ Rails.application.routes.draw do
 
       post '/auth/register', to: 'auth#register'
       post '/auth/login', to: 'auth#login'
+      get 'users/me', to: 'users#me'
+
       resources :users, except: [:create]
 
       resources :events, only: [:index, :show, :create] do
@@ -40,6 +42,8 @@ Rails.application.routes.draw do
       post '/auth/password/reset', to: 'passwords#update', constraints: ->(req) { req.params[:token].present? }
       post '/auth/password/reset', to: 'passwords#create'
       patch '/auth/password/change', to: 'passwords#change'
+
+      
 
       get 'my_tickets', to: 'tickets#index'
 
