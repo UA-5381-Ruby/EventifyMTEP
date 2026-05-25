@@ -14,17 +14,24 @@ export function BrandDashboardPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const {
-    brand, isLoading, error,
-    memberships, membershipsLoading,
-    isEditOpen, editFields, saveError,
-    setIsEditOpen, handleFieldChange, handleSave,
+    brand,
+    isLoading,
+    error,
+    memberships,
+    membershipsLoading,
+    isEditOpen,
+    editFields,
+    saveError,
+    setIsEditOpen,
+    handleFieldChange,
+    handleSave,
   } = useBrandDashboard(id);
 
   const createEvent = useCreateEvent(Number(id) || 0, () => window.location.reload());
 
   const currentUserMembership = memberships.find((m) => m.user.id === user?.id);
-  const canManage = currentUserMembership?.role === 'owner' ||
-    currentUserMembership?.role === 'manager';
+  const canManage =
+    currentUserMembership?.role === 'owner' || currentUserMembership?.role === 'manager';
 
   useEffect(() => {
     if (!membershipsLoading && !isLoading && !canManage) {

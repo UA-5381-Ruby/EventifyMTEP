@@ -7,11 +7,12 @@ module Api
         render json: { error: e.message }, status: :bad_request
       end
 
-      skip_before_action :authorize_request, only: %i[index show]
+      skip_before_action :authorize_request, only: %i[show]
       before_action :set_brand, only: %i[show update destroy]
 
       def index
-        render json: Brand.all
+        brands = current_user.brands
+        render json: brands
       end
 
       def show

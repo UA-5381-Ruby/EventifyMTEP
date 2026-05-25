@@ -6,10 +6,6 @@ export const BRAND_SORT_OPTIONS = [
 
 export const ITEMS_PER_PAGE = 6;
 
-export const ACTIVE_STATUSES = new Set([
-  'published',
-  'published_unverified',
-  'published_on_review',
-]);
+export const ACTIVE_STATUSES = new Set(['published']);
 
 export const PENDING_STATUSES = ['draft_on_review', 'published_on_review'];

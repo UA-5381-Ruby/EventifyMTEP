@@ -73,13 +73,7 @@ export function BrandCard({ brand }: BrandCardProps) {
         )}
       </div>
 
-      <Button
-        variant="outline"
-        size="sm"
-        fullWidth
-        onClick={() => navigate(`/dashboard/brands/${brand.id}`)}
-        className="mt-auto"
-      >
+      <Button variant="outline" size="sm" fullWidth onClick={() => navigate(`/brands/${brand.id}`)}>
         View Details
       </Button>
     </article>

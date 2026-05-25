@@ -20,13 +20,13 @@ interface BrandViewProps {
 }
 
 export function BrandView({
-                            brand,
-                            memberships,
-                            membershipsLoading,
-                            canManage,
-                            onEdit,
-                            extraActions,
-                          }: BrandViewProps) {
+  brand,
+  memberships,
+  membershipsLoading,
+  canManage,
+  onEdit,
+  extraActions,
+}: BrandViewProps) {
   const filters = useEventFilters({
     events: brand.events,
     itemsPerPage: ITEMS_PER_PAGE,
@@ -47,7 +47,9 @@ export function BrandView({
       <Container className="relative overflow-hidden">
         <div
           className="absolute top-0 left-1/4 w-[500px] h-[500px] rounded-full blur-[160px] pointer-events-none opacity-[0.05] transition-all duration-700"
-          style={{ background: `radial-gradient(circle, ${primaryColor} 0%, ${secondaryColor} 100%)` }}
+          style={{
+            background: `radial-gradient(circle, ${primaryColor} 0%, ${secondaryColor} 100%)`,
+          }}
         />
 
         <main className="relative z-10 py-10 pb-24 max-w-6xl mx-auto space-y-10">
