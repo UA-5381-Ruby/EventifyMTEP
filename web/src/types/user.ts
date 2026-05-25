@@ -13,7 +13,6 @@ export interface UpdateUserRequest {
   email?: string;
 }
 
-
 export interface UserMembership {
   id: string;
   role: UserRole;

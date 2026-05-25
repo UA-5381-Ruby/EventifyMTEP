@@ -64,7 +64,7 @@ export const UserService = {
   },
 };
 
-// Legacy function for backward compatibility 
+// Legacy function for backward compatibility
 export const getCurrentUser = async (): Promise<UserProfile> => {
   try {
     const response = await apiClient.get<UserProfile>('/api/v1/users/me');
