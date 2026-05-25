@@ -10,17 +10,13 @@ interface UseBrandPublicResult {
 
 export function useBrandPublic(id: string | undefined): UseBrandPublicResult {
   const [brand, setBrand] = useState<BrandWithEvents | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(!!id);
+  const [error, setError] = useState<string | null>(id ? null : 'Missing brand ID');
 
   useEffect(() => {
-    let isMounted = true;
+    if (!id) return;
 
-    if (!id) {
-      setError('Missing brand ID');
-      setIsLoading(false);
-      return;
-    }
+    let isMounted = true;
 
     brandsService
       .getBrandById(Number(id))
