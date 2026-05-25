@@ -48,7 +48,7 @@ describe('EventsService', () => {
 
   describe('getEvents', () => {
     it('calls GET /api/v1/events with numeric params', async () => {
-      mockedGet.mockResolvedValueOnce({ data: mockPaginatedResponse });
+      mockedGet.mockResolvedValueOnce({ data: mockEventDetail });
       const params: EventQueryParams = { brand_id: 42, category_id: 5 };
 
       await EventsService.getEvents(params);
@@ -64,7 +64,7 @@ describe('EventsService', () => {
 
   describe('getEventById', () => {
     it('uses numeric ID in URL', async () => {
-      mockedGet.mockResolvedValueOnce({ data: { data: mockEventDetail } });
+      mockedGet.mockResolvedValueOnce({ data: mockEventDetail });
       await EventsService.getEventById(1);
       expect(mockedGet).toHaveBeenCalledWith('/api/v1/events/1');
     });
@@ -98,7 +98,7 @@ describe('EventsService', () => {
     });
 
     it('should fetch a single event by ID', async () => {
-      mockedGet.mockResolvedValueOnce({ data: { data: mockEventDetail } });
+      mockedGet.mockResolvedValueOnce({ data: mockEventDetail });
 
       const result = await EventsService.getEventById(1);
 

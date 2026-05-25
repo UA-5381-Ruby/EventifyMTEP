@@ -1,6 +1,9 @@
 import apiClient from '@/lib/api-client';
-import type { AxiosError } from 'axios';
-import type { Brand, BrandWithEvents, CreateBrandRequest, UpdateBrandRequest } from '@/types/brand';
+import type { Brand, BrandWithEvents, CreateBrandRequest } from '@/types/brand';
+
+interface ForbiddenError extends Error {
+  isForbidden?: boolean;
+}
 
 export class BrandsService {
   private readonly endpoint = '/api/v1/brands';
@@ -16,29 +19,27 @@ export class BrandsService {
   }
 
   async createBrand(payload: CreateBrandRequest): Promise<Brand> {
-    const res = await apiClient.post<Brand>(this.endpoint, { brand: payload });
+    const res = await apiClient.post<Brand>(this.endpoint, {brand: payload});
     return res.data;
   }
 
-  async updateBrand(id: number, payload: UpdateBrandRequest): Promise<Brand> {
+  async updateBrand(id: number, data: Partial<Brand>) {
     try {
-      const res = await apiClient.patch<Brand>(`${this.endpoint}/${id}`, { brand: payload });
+      const res = await apiClient.patch(`${this.endpoint}/${id}`, { brand: data });
       return res.data;
     } catch (error) {
-      const axiosError = error as AxiosError;
-      if (axiosError.response?.status === 403) {
+      if (error instanceof Error && (error as ForbiddenError).isForbidden) {
         throw new Error('You do not have permission to update this brand', { cause: error });
       }
       throw error;
     }
   }
 
-  async deleteBrand(id: number): Promise<void> {
+  async deleteBrand(id: number) {
     try {
-      await apiClient.delete(`${this.endpoint}/${id}`);
+      return await apiClient.delete(`${this.endpoint}/${id}`);
     } catch (error) {
-      const axiosError = error as AxiosError;
-      if (axiosError.response?.status === 403) {
+      if (error instanceof Error && (error as ForbiddenError).isForbidden) {
         throw new Error('You do not have permission to delete this brand', { cause: error });
       }
       throw error;
