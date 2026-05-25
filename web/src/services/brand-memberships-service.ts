@@ -15,7 +15,7 @@ export const BrandMembershipsService = {
    * @returns Paginated list of memberships
    */
   async getBrandMemberships(
-    brandId: string,
+    brandId: number,
     params: PaginationParams
   ): Promise<PaginatedResponse<Membership>> {
     const queryParams = new URLSearchParams();
@@ -35,7 +35,7 @@ export const BrandMembershipsService = {
    * @param payload User ID and role to assign
    * @returns The created membership
    */
-  async addBrandMember(brandId: string, payload: CreateMembershipRequest): Promise<Membership> {
+  async addBrandMember(brandId: number, payload: CreateMembershipRequest): Promise<Membership> {
     const response = await apiClient.post<Membership>(
       `/api/v1/brands/${brandId}/memberships`,
       payload
@@ -51,8 +51,8 @@ export const BrandMembershipsService = {
    * @returns The updated membership
    */
   async updateMemberRole(
-    brandId: string,
-    membershipId: string,
+    brandId: number,
+    membershipId: number,
     role: UserRole
   ): Promise<Membership> {
     const payload = { role };
@@ -69,7 +69,7 @@ export const BrandMembershipsService = {
    * @param brandId The ID of the brand
    * @param membershipId The ID of the membership to remove
    */
-  async removeMember(brandId: string, membershipId: string): Promise<void> {
+  async removeMember(brandId: number, membershipId: number): Promise<void> {
     await apiClient.delete(`/api/v1/brands/${brandId}/memberships/${membershipId}`);
   },
 };

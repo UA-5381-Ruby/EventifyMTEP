@@ -1,6 +1,6 @@
 import { Button, Alert } from '@/components/ui';
 import { EventCard, EventCardSkeleton } from '@/components/events/event-card.tsx';
-import type { Event } from '@/types/event.types';
+import type { Event } from '@/types/event';
 
 interface EventGridProps {
   events: Event[];

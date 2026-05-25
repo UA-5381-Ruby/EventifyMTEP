@@ -1,32 +1,28 @@
 import { useState } from 'react';
 import { PageWrapper, Container } from '@/components/layout';
 import { Pagination } from '@/components/ui';
-import { EventPageHeader } from '@/components/events/event-page-header.tsx';
-import { EventFilters } from '@/components/events/event-filters.tsx';
-import { EventGrid } from '@/components/events/event-grid.tsx';
-import { useEvents } from '@/hooks/use-events.ts';
-import type { EventQueryParams, EventStatus } from '@/types/event';
+import { BrandPageHeader } from '@/components/brands/brand-page-header';
+import { BrandFilters } from '@/components/brands/brand-filters';
+import { BrandGrid } from '@/components/brands/brand-grid';
+import { useBrands } from '@/hooks/use-brands';
 
 const PER_PAGE = 12;
 
-export function EventListPage() {
+export function BrandListPage() {
   const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('');
-  const [sort, setSort] = useState<EventQueryParams['sort']>('created_at');
+  const [sort, setSort] = useState('created_at');
   const [page, setPage] = useState(1);
 
-  const params: EventQueryParams = {
+  const params = {
     page,
     per_page: PER_PAGE,
     sort,
-    order: sort === 'title' ? 'asc' : 'desc',
     ...(search.trim() ? { q: search.trim() } : {}),
-    ...(status ? { status: status as EventStatus } : {}),
   };
 
-  const { events, meta, isLoading, error, refetch } = useEvents(params);
+  const { brands, total, isLoading, error, refetch } = useBrands(params);
 
-  const totalPages = meta ? Math.ceil(meta.total / meta.per_page) : 1;
+  const totalPages = total != null ? Math.ceil(total / PER_PAGE) : 1;
 
   function resetPage() {
     setPage(1);
@@ -34,53 +30,42 @@ export function EventListPage() {
 
   function clearFilters() {
     setSearch('');
-    setStatus('');
     setPage(1);
   }
 
   return (
     <PageWrapper>
       <div className="min-h-screen bg-neutral-50">
-        <EventPageHeader
-          total={meta?.total ?? null}
+        <BrandPageHeader
+          total={total}
           isLoading={isLoading}
           search={search}
-          status={status}
           onRemoveSearch={() => {
             setSearch('');
-            resetPage();
-          }}
-          onRemoveStatus={() => {
-            setStatus('');
             resetPage();
           }}
         />
 
         <Container>
           <div className="py-8">
-            <EventFilters
+            <BrandFilters
               search={search}
-              status={status}
-              sort={sort ?? 'created_at'}
+              sort={sort}
               onSearchChange={(e) => {
                 setSearch(e.target.value);
                 resetPage();
               }}
-              onStatusChange={(value) => {
-                setStatus(value);
-                resetPage();
-              }}
               onSortChange={(e) => {
-                setSort(e.target.value as EventQueryParams['sort']);
+                setSort(e.target.value);
                 resetPage();
               }}
             />
 
-            <EventGrid
-              events={events}
+            <BrandGrid
+              brands={brands}
               isLoading={isLoading}
               error={error}
-              hasActiveFilters={!!(search || status)}
+              hasActiveFilters={!!search}
               onRetry={refetch}
               onClearFilters={clearFilters}
             />

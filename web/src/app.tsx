@@ -5,7 +5,11 @@ import ProtectedRoute from '@/components/protected-route';
 import { LoginPage } from '@/pages/login-page';
 import { RegistrationPage } from '@/pages/registration-page.tsx';
 import { EventListPage } from '@/pages/event-list-page.tsx';
+import { EventDetailPage } from '@/pages/event-detail-page';
 import { NotFoundPage } from '@/pages/not-found-page.tsx';
+import { Dashboard } from '@/pages/dashboard.tsx';
+import { BrandListPage } from '@/pages/brand-list-page.tsx';
+import { BrandDashboardPage } from '@/pages/brand-dashboard-page.tsx';
 
 function App() {
   return (
@@ -18,12 +22,14 @@ function App() {
         <Route path="/register" element={<RegistrationPage />} />
 
         <Route path="/events" element={<EventListPage />} />
+        <Route path="/events/:id" element={<EventDetailPage />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route
-            path="/dashboard"
-            element={<h1 className="bg-emerald-500">This is a dashboard.</h1>}
-          />
+          <Route path="/brands" element={<BrandListPage />} />
+
+          <Route path="/dashboard" element={<Dashboard />} />
+
+          <Route path="/dashboard/brands/:id" element={<BrandDashboardPage />} />
 
           <Route
             path="/profile"

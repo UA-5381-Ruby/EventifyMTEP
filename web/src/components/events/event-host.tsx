@@ -1,0 +1,35 @@
+import type { EventDetail } from '@/types/event';
+
+interface EventHostSectionProps {
+  brand: EventDetail['brand'];
+}
+
+export function EventHostSection({ brand }: EventHostSectionProps) {
+  return (
+    <div className="py-6">
+      <p className="text-sm font-semibold text-neutral-800 mb-3">Hosted by</p>
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-lg bg-neutral-200 overflow-hidden shrink-0 flex items-center justify-center">
+          {brand?.logoUrl ? (
+            <img src={brand.logoUrl} alt={brand.name} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-xs font-bold text-neutral-500">{brand?.name?.[0] ?? 'B'}</span>
+          )}
+        </div>
+
+        <span className="text-sm font-medium text-neutral-800 flex-1">
+          {brand?.name ?? 'Unknown Brand'}
+        </span>
+
+        <div className="flex items-center gap-2">
+          <button className="text-xs border border-neutral-300 text-neutral-700 px-3 py-1.5 rounded-md hover:bg-neutral-50 transition-colors">
+            Contact
+          </button>
+          <button className="text-xs bg-neutral-900 text-white px-3 py-1.5 rounded-md hover:bg-neutral-700 transition-colors">
+            + Follow
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

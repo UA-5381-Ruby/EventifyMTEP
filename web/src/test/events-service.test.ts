@@ -98,7 +98,7 @@ describe('EventsService', () => {
     });
 
     it('should fetch a single event by ID', async () => {
-      mockedGet.mockResolvedValueOnce({ data: { data: mockEventDetail } });
+      mockedGet.mockResolvedValueOnce({ data: mockEventDetail });
 
       const result = await EventsService.getEventById(1);
 

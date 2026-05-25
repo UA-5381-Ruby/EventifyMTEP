@@ -1,4 +1,4 @@
-import { Header } from '@/components/layout/header';
+import { Header } from '@/components/layout/header/header.tsx';
 export function SuperAdminPage() {
   return (
     <div className="p-4">

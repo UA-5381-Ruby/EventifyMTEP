@@ -1,26 +1,6 @@
-import React from 'react';
 import { Container } from '@/components/layout';
-import { STATUS_OPTIONS } from '@/constants/event.constants';
-
-interface FilterPillProps {
-  children: React.ReactNode;
-  onRemove: () => void;
-}
-
-function FilterPill({ children, onRemove }: FilterPillProps) {
-  return (
-    <span className="inline-flex items-center gap-1.5 text-xs font-medium bg-primary-50 text-primary-700 border border-primary-200 rounded-full px-3 py-1">
-      {children}
-      <button
-        onClick={onRemove}
-        className="text-primary-400 hover:text-primary-600 transition-colors"
-        aria-label="Remove filter"
-      >
-        ✕
-      </button>
-    </span>
-  );
-}
+import { Badge } from '@/components/ui';
+import { STATUS_TO_TAB } from '@/constants/event.constants';
 
 interface EventPageHeaderProps {
   total: number | null;
@@ -58,11 +38,36 @@ export function EventPageHeader({
 
           {hasActivePills && (
             <div className="flex flex-wrap gap-2">
-              {search && <FilterPill onRemove={onRemoveSearch}>"{search}"</FilterPill>}
+              {search && (
+                <Badge
+                  variant="outline"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium bg-primary-50 text-primary-700 border-primary-200 rounded-full px-3 py-1"
+                >
+                  "{search}"
+                  <button
+                    onClick={onRemoveSearch}
+                    className="text-primary-400 hover:text-primary-600 transition-colors ml-0.5 focus:outline-none"
+                    aria-label="Remove search filter"
+                  >
+                    ✕
+                  </button>
+                </Badge>
+              )}
+
               {status && (
-                <FilterPill onRemove={onRemoveStatus}>
-                  {STATUS_OPTIONS.find((o) => o.value === status)?.label}
-                </FilterPill>
+                <Badge
+                  variant="outline"
+                  className="inline-flex items-center gap-1.5 text-xs font-medium bg-primary-50 text-primary-700 border-primary-200 rounded-full px-3 py-1"
+                >
+                  {STATUS_TO_TAB[status]}
+                  <button
+                    onClick={onRemoveStatus}
+                    className="text-primary-400 hover:text-primary-600 transition-colors ml-0.5 focus:outline-none"
+                    aria-label="Remove status filter"
+                  >
+                    ✕
+                  </button>
+                </Badge>
               )}
             </div>
           )}

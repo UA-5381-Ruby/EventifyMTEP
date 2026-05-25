@@ -5,23 +5,24 @@ import {
   Textarea,
   Select,
   Checkbox,
-  Radio,
   Card,
-  CardHeader,
-  CardTitle,
-  CardBody,
-  CardFooter,
   Badge,
   Alert,
   Spinner,
   Modal,
+  Pagination,
+  SearchInput,
 } from '@/components/ui';
-import { Container } from '@/components/layout';
-import { PageWrapper } from '@/components/layout';
+
+import { Container, PageWrapper } from '@/components/layout';
 
 export function UIPreview() {
   const [modalOpen, setModalOpen] = useState(false);
   const [checked, setChecked] = useState(false);
+
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const [currentPage, setCurrentPage] = useState(3);
 
   return (
     <PageWrapper>
@@ -61,6 +62,13 @@ export function UIPreview() {
               <Input label="With error" error="This field is required" />
               <Input label="With hint" hint="We won't share this with anyone" />
               <Input label="Disabled" disabled placeholder="Disabled" />
+              <SearchInput
+                placeholder="Search…"
+                value={searchQuery}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setSearchQuery(e.target.value)
+                }
+              />
             </div>
           </Section>
 
@@ -87,8 +95,8 @@ export function UIPreview() {
             </div>
           </Section>
 
-          {/* ── CHECKBOX & RADIO ── */}
-          <Section title="Checkbox & Radio">
+          {/* ── CHECKBOX ── */}
+          <Section title="Checkbox">
             <div className="flex flex-col gap-2">
               <Checkbox
                 label="I agree to the terms"
@@ -96,8 +104,6 @@ export function UIPreview() {
                 onChange={(e) => setChecked(e.target.checked)}
               />
               <Checkbox label="Disabled checkbox" disabled />
-              <Radio label="Option A" name="demo" defaultChecked />
-              <Radio label="Option B" name="demo" />
             </div>
           </Section>
 
@@ -106,16 +112,18 @@ export function UIPreview() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {(['default', 'bordered', 'elevated'] as const).map((v) => (
                 <Card key={v} variant={v}>
-                  <CardHeader>
-                    <CardTitle>Card {v}</CardTitle>
-                  </CardHeader>
-                  <CardBody>This is a {v} card component for Eventify.</CardBody>
-                  <CardFooter>
-                    <Button size="sm" variant="outline">
-                      Cancel
-                    </Button>
-                    <Button size="sm">Save</Button>
-                  </CardFooter>
+                  <div className="p-5 space-y-4">
+                    <h3 className="text-lg font-bold text-neutral-900">Card {v}</h3>
+                    <p className="text-sm text-neutral-600">
+                      This is a {v} card component for Eventify.
+                    </p>
+                    <div className="flex justify-end gap-2 pt-2">
+                      <Button size="sm" variant="outline">
+                        Cancel
+                      </Button>
+                      <Button size="sm">Save</Button>
+                    </div>
+                  </div>
                 </Card>
               ))}
             </div>
@@ -190,13 +198,23 @@ export function UIPreview() {
               </p>
             </Modal>
           </Section>
+
+          {/* ── PAGINATION ── */}
+          <Section title="Pagination">
+            <div className="max-w-md bg-white p-4 border border-neutral-100 rounded-xl">
+              <Pagination
+                page={currentPage}
+                totalPages={10}
+                onPageChange={(page) => setCurrentPage(page)}
+              />
+            </div>
+          </Section>
         </Container>
       </div>
     </PageWrapper>
   );
 }
 
-// ── Section helper component ──────────────────────────────
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mb-12">
