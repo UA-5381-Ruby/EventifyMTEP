@@ -6,6 +6,7 @@ import { LoginPage } from '@/pages/login-page';
 import { RegistrationPage } from '@/pages/registration-page.tsx';
 import { EventListPage } from '@/pages/event-list-page.tsx';
 import { NotFoundPage } from '@/pages/not-found-page.tsx';
+import UserProfilePage from './pages/user-profile-page';
 
 function App() {
   return (
@@ -26,8 +27,8 @@ function App() {
           />
 
           <Route
-            path="/profile"
-            element={<h1 className="bg-emerald-500">This is a profile page.</h1>}
+            path="/profile/settings"
+            element={<UserProfilePage></UserProfilePage>}
           />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
