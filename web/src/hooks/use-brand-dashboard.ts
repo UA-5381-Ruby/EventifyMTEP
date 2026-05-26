@@ -19,7 +19,7 @@ interface UseBrandDashboardResult {
   handleSave: () => Promise<void>;
 }
 
-const EMPTY_FIELDS: BrandEditFields = {
+const EMPTY_BRAND_FIELDS: BrandEditFields = {
   name: '',
   description: '',
   logo_url: '',
@@ -35,7 +35,7 @@ export function useBrandDashboard(id: string | undefined): UseBrandDashboardResu
   const [memberships, setMemberships] = useState<Membership[]>([]);
   const [membershipsLoading, setMembershipsLoading] = useState(true);
   const [isEditOpen, setIsEditOpen] = useState(false);
-  const [editFields, setEditFields] = useState<BrandEditFields>(EMPTY_FIELDS);
+  const [editFields, setEditFields] = useState<BrandEditFields>(EMPTY_BRAND_FIELDS);
   const [saveError, setSaveError] = useState<string | null>(null);
 
   useEffect(() => {

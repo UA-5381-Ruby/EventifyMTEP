@@ -1,20 +1,9 @@
+import React from 'react';
 import { useState } from 'react';
 import { SORT_OPTIONS } from '@/constants/event.constants';
 import type { Event } from '@/types/event';
-import { STATUS_TO_TAB, TAB_TO_STATUS } from '@/constants/event.constants';
+import { STATUS_TO_TAB, TAB_TO_STATUS, STATUS_CONFIG } from '@/constants/event.constants';
 import type { EventTabStatus } from '@/constants/event.constants';
-
-const STATUS_REGISTRY: Record<string, { group: EventTabStatus }> = {
-  draft: { group: 'Drafts' },
-  draft_on_review: { group: 'Drafts' },
-  published: { group: 'Active' },
-  rejected: { group: 'Drafts' },
-  published_unverified: { group: 'Active' },
-  published_on_review: { group: 'Active' },
-  published_rejected: { group: 'Cancelled' },
-  archived: { group: 'Archived' },
-  cancelled: { group: 'Cancelled' },
-};
 
 interface FilterableEvent {
   title: string;
@@ -39,8 +28,8 @@ export function useEventFilters<T extends FilterableEvent>({
 
   const filtered = events.filter((e) => {
     const matchSearch = e.title.toLowerCase().includes(search.toLowerCase());
-    const statusKey = (e.status || 'draft').toLowerCase();
-    const matchTab = activeTab === 'All' || STATUS_REGISTRY[statusKey]?.group === activeTab;
+    const statusKey = (e.status || 'draft') as keyof typeof STATUS_CONFIG;
+    const matchTab = activeTab === 'All' || STATUS_CONFIG[statusKey]?.group === activeTab;
     return matchSearch && matchTab;
   });
 

@@ -1,17 +1,5 @@
 import { Button, Input, Textarea, Modal } from '@/components/ui';
-
-interface BrandEditModalProps {
-  isOpen: boolean;
-  name: string;
-  description: string;
-  logoUrl: string;
-  subdomain: string;
-  primaryColor: string;
-  secondaryColor: string;
-  onClose: () => void;
-  onSave: () => void;
-  onChange: (field: keyof BrandEditFields, value: string) => void;
-}
+import { ColorField } from '@/components/brands/color-field';
 
 export interface BrandEditFields {
   name: string;
@@ -22,18 +10,15 @@ export interface BrandEditFields {
   secondary_color: string;
 }
 
-export function BrandEditModal({
-  isOpen,
-  name,
-  description,
-  logoUrl,
-  subdomain,
-  primaryColor,
-  secondaryColor,
-  onClose,
-  onSave,
-  onChange,
-}: BrandEditModalProps) {
+interface BrandEditModalProps {
+  isOpen: boolean;
+  fields: BrandEditFields;
+  onClose: () => void;
+  onSave: () => void;
+  onChange: (field: keyof BrandEditFields, value: string) => void;
+}
+
+export function BrandEditModal({ isOpen, fields, onClose, onSave, onChange }: BrandEditModalProps) {
   return (
     <Modal
       isOpen={isOpen}
@@ -54,72 +39,43 @@ export function BrandEditModal({
       <div className="space-y-4 py-2">
         <Input
           label="Brand name"
-          value={name}
+          value={fields.name}
           onChange={(e) => onChange('name', e.target.value)}
           className="text-sm"
         />
         <Input
           label="Subdomain"
-          value={subdomain}
+          value={fields.subdomain}
           onChange={(e) => onChange('subdomain', e.target.value)}
           className="text-sm"
         />
         <Textarea
           label="Description"
           rows={5}
-          value={description}
+          value={fields.description}
           onChange={(e) => onChange('description', e.target.value)}
           className="text-sm max-h-[200px] overflow-y-auto"
         />
         <Input
           label="Logo URL"
-          value={logoUrl}
+          value={fields.logo_url}
           onChange={(e) => onChange('logo_url', e.target.value)}
           className="text-sm"
           placeholder="https://..."
         />
         <div className="grid grid-cols-2 gap-3">
-          {(
-            [
-              { field: 'primary_color', label: 'Primary color', fallback: '#6366f1' },
-              { field: 'secondary_color', label: 'Secondary color', fallback: '#a855f7' },
-            ] as const
-          ).map(({ field, label, fallback }) => {
-            const value = field === 'primary_color' ? primaryColor : secondaryColor;
-            const current = value || fallback;
-
-            return (
-              <div key={field} className="space-y-1.5">
-                <label className="text-sm font-medium text-neutral-600">{label}</label>
-                <div className="flex items-center gap-2 border border-neutral-200 rounded-lg px-3 py-2 focus-within:border-primary-400 transition-colors">
-                  <input
-                    type="color"
-                    value={current}
-                    onChange={(e) => onChange(field, e.target.value)}
-                    className="w-6 h-6 rounded-md cursor-pointer bg-transparent p-0 shrink-0 border border-neutral-200 [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:border-none [&::-webkit-color-swatch]:rounded-md [&::-moz-color-swatch]:border-none [&::-moz-color-swatch]:rounded-md"
-                  />
-                  <input
-                    type="text"
-                    value={current}
-                    onChange={(e) => {
-                      const hex = e.target.value;
-                      if (/^#[0-9a-fA-F]{0,6}$/.test(hex)) {
-                        onChange(field, hex);
-                      }
-                    }}
-                    onBlur={(e) => {
-                      if (!/^#[0-9a-fA-F]{6}$/.test(e.target.value)) {
-                        onChange(field, fallback);
-                      }
-                    }}
-                    maxLength={7}
-                    className="w-full text-sm font-mono text-neutral-700 bg-transparent border-0 outline-none uppercase"
-                    placeholder={fallback}
-                  />
-                </div>
-              </div>
-            );
-          })}
+          <ColorField
+            label="Primary color"
+            value={fields.primary_color}
+            fallback="#6366f1"
+            onChange={(v) => onChange('primary_color', v)}
+          />
+          <ColorField
+            label="Secondary color"
+            value={fields.secondary_color}
+            fallback="#a855f7"
+            onChange={(v) => onChange('secondary_color', v)}
+          />
         </div>
       </div>
     </Modal>

@@ -11,7 +11,7 @@ export interface CreateEventFields {
   category_ids: number[];
 }
 
-const EMPTY_FIELDS: CreateEventFields = {
+const EMPTY_EVENT_FIELDS: CreateEventFields = {
   title: '',
   location: '',
   start_date: '',
@@ -36,12 +36,12 @@ interface UseCreateEventResult {
 
 export function useCreateEvent(brandId: number, onSuccess: () => void): UseCreateEventResult {
   const [isOpen, setIsOpen] = useState(false);
-  const [fields, setFields] = useState<CreateEventFields>(EMPTY_FIELDS);
+  const [fields, setFields] = useState<CreateEventFields>(EMPTY_EVENT_FIELDS);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
 
   const openModal = () => {
-    setFields(EMPTY_FIELDS);
+    setFields(EMPTY_EVENT_FIELDS);
     setSaveError(null);
     setIsOpen(true);
   };
