@@ -41,16 +41,19 @@ export type BadgeVariant =
   | 'error'
   | 'outline';
 
-export const STATUS_CONFIG: Record<EventStatus, { label: string; variant: BadgeVariant }> = {
-  draft: { label: 'Draft', variant: 'default' },
-  draft_on_review: { label: 'In Review', variant: 'warning' },
-  published: { label: 'Published', variant: 'success' },
-  rejected: { label: 'Rejected', variant: 'error' },
-  published_unverified: { label: 'Unverified', variant: 'secondary' },
-  published_on_review: { label: 'In Review', variant: 'warning' },
-  published_rejected: { label: 'Rejected', variant: 'error' },
-  archived: { label: 'Archived', variant: 'outline' },
-  cancelled: { label: 'Cancelled', variant: 'error' },
+export const STATUS_CONFIG: Record<
+  EventStatus,
+  { label: string; variant: BadgeVariant; group: EventTabStatus }
+> = {
+  draft: { label: 'Draft', variant: 'default', group: 'Drafts' },
+  draft_on_review: { label: 'In Review', variant: 'warning', group: 'Drafts' },
+  published: { label: 'Published', variant: 'success', group: 'Active' },
+  rejected: { label: 'Rejected', variant: 'error', group: 'Drafts' },
+  published_unverified: { label: 'Unverified', variant: 'secondary', group: 'Active' },
+  published_on_review: { label: 'In Review', variant: 'warning', group: 'Active' },
+  published_rejected: { label: 'Rejected', variant: 'error', group: 'Cancelled' },
+  archived: { label: 'Archived', variant: 'outline', group: 'Archived' },
+  cancelled: { label: 'Cancelled', variant: 'error', group: 'Cancelled' },
 };
 
 export function formatDate(iso: string) {

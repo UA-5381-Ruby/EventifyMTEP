@@ -2,14 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { brandsService } from '@/services/brands-service';
 import type { Brand } from '@/types/brand';
 
-interface UseBrandsResult {
-  brands: Brand[];
-  total: number | null;
-  isLoading: boolean;
-  error: string | null;
-  refetch: () => void;
-}
-
 interface BrandQueryParams {
   page: number;
   per_page: number;
@@ -19,6 +11,14 @@ interface BrandQueryParams {
 
 interface BrandWithCount extends Brand {
   events_count?: number;
+}
+
+interface UseBrandsResult {
+  brands: Brand[];
+  total: number | null;
+  isLoading: boolean;
+  error: string | null;
+  refetch: () => void;
 }
 
 export function useBrands(params: BrandQueryParams): UseBrandsResult {
@@ -61,6 +61,7 @@ export function useBrands(params: BrandQueryParams): UseBrandsResult {
               ((b as BrandWithCount).events_count ?? 0) - ((a as BrandWithCount).events_count ?? 0)
           );
         }
+
         setTotal(result.length);
 
         const start = (params.page - 1) * params.per_page;
