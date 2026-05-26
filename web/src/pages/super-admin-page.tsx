@@ -1,6 +1,7 @@
 import { MainLayout } from '@/components/layout/main-layout';
 import { PageWrapper } from '@/components/layout';
 
+import { Header } from '@/components/layout/header/header.tsx';
 export function SuperAdminPage() {
   return (
     <PageWrapper>

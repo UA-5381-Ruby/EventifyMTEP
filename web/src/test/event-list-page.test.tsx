@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { EventListPage } from '@/pages/event-list-page.tsx';
 import * as useEventsModule from '@/hooks/use-events.ts';
-import type { Event } from '@/types/event.types';
+import type { Event } from '@/types/event';
 
 jest.mock('@/hooks/use-events.ts');
 const mockUseEvents = jest.spyOn(useEventsModule, 'useEvents');
@@ -21,6 +21,13 @@ jest.mock('@/components/ui', () => ({
     placeholder: string;
     onChange: React.ChangeEventHandler<HTMLInputElement>;
   }) => <input placeholder={placeholder} onChange={onChange} data-testid="search-input" />,
+  SearchInput: ({
+    placeholder,
+    onChange,
+  }: {
+    placeholder: string;
+    onChange: React.ChangeEventHandler<HTMLInputElement>;
+  }) => <input placeholder={placeholder} onChange={onChange} data-testid="search-input" />,
   Select: ({
     options,
     onChange,
@@ -30,7 +37,7 @@ jest.mock('@/components/ui', () => ({
     onChange: React.ChangeEventHandler<HTMLSelectElement>;
     value: string;
   }) => (
-    <select onChange={onChange} value={value} aria-label={options[0]?.label || 'Select option'}>
+    <select onChange={onChange} value={value} aria-label="All statuses">
       {options.map((o) => (
         <option key={o.value} value={o.value}>
           {o.label}
@@ -51,12 +58,39 @@ jest.mock('@/components/ui', () => ({
       {children}
     </button>
   ),
+  Badge: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
   Spinner: () => <div data-testid="spinner">Loading…</div>,
   Alert: ({ children, title }: { children: React.ReactNode; title: string }) => (
     <div role="alert">
       <strong>{title}</strong> {children}
     </div>
   ),
+  Pagination: ({
+    page,
+    totalPages,
+    onPageChange,
+  }: {
+    page: number;
+    totalPages: number;
+    onPageChange: (p: number) => void;
+  }) => {
+    if (totalPages <= 1) return null;
+    return (
+      <div>
+        <button onClick={() => onPageChange(page - 1)} disabled={page === 1}>
+          ← Prev
+        </button>
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button key={i + 1} onClick={() => onPageChange(i + 1)}>
+            {i + 1}
+          </button>
+        ))}
+        <button onClick={() => onPageChange(page + 1)} disabled={page === totalPages}>
+          Next →
+        </button>
+      </div>
+    );
+  },
 }));
 
 jest.mock('@/components/events/event-card.tsx', () => ({
@@ -180,7 +214,7 @@ describe('EventListPage', () => {
 
     renderPage();
 
-    fireEvent.change(screen.getByLabelText('All statuses'), { target: { value: 'published' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Active' }));
 
     await waitFor(() => {
       const [calledParams] = mockUseEvents.mock.calls[mockUseEvents.mock.calls.length - 1];

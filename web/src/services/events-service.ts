@@ -15,7 +15,7 @@ export const EventsService = {
 
   async getEventById(id: number): Promise<EventDetail> {
     const response = await apiClient.get(`/api/v1/events/${id}`);
-    return response.data.data; // Обгортка Rails
+    return response.data;
   },
 
   async createEvent(payload: CreateEventRequest): Promise<Event> {
