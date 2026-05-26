@@ -49,9 +49,7 @@ export function BrandDashboardPage() {
     );
   }
 
-  if (!canManage) {
-    return null;
-  }
+  if (!canManage) return null;
 
   if (error || !brand) {
     return (
@@ -82,12 +80,7 @@ export function BrandDashboardPage() {
 
       <BrandEditModal
         isOpen={isEditOpen}
-        name={editFields.name}
-        description={editFields.description}
-        logoUrl={editFields.logo_url}
-        subdomain={editFields.subdomain}
-        primaryColor={editFields.primary_color}
-        secondaryColor={editFields.secondary_color}
+        fields={editFields}
         onClose={() => setIsEditOpen(false)}
         onChange={handleFieldChange}
         onSave={handleSave}
