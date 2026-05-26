@@ -1,4 +1,5 @@
 import React from 'react';
+import axios from 'axios';
 import { useState, useRef } from 'react';
 import { CategoriesService } from '@/services/categories-service';
 import type { Category } from '@/types/category';
@@ -44,7 +45,14 @@ export function useCategoryCreator({
   };
 
   const handleCreateCategory = async () => {
+    if (isCreatingCat) return;
+
     const name = newCatName.trim();
+    if (!/^[a-zA-Z0-9\s-]{2,30}$/.test(name)) {
+      setCatError('Invalid category name format.');
+      return;
+    }
+
     if (!name) {
       setCatError('Category name cannot be empty.');
       return;
@@ -55,13 +63,22 @@ export function useCategoryCreator({
 
     try {
       const created = await CategoriesService.createCategory({ name });
+
       setExtraCategories((prev) => [...prev, created]);
       onCreated(created.id);
+
       setNewCatName('');
       setShowCatInput(false);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to create category.';
-      setCatError(message);
+      const status = axios.isAxiosError(err) ? err.response?.status : undefined;
+
+      if (status === 409) {
+        setCatError('Category already exists.');
+      } else if (status === 422) {
+        setCatError('Invalid category name.');
+      } else {
+        setCatError(err instanceof Error ? err.message : 'Failed to create category.');
+      }
     } finally {
       setIsCreatingCat(false);
     }
