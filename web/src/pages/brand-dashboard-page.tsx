@@ -13,6 +13,7 @@ export function BrandDashboardPage() {
   const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
   const {
     brand,
     isLoading,

@@ -1,16 +1,16 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Alert, Spinner, Pagination } from '@/components/ui';
 import { Container, PageWrapper } from '@/components/layout';
 import { EventGrid } from '@/components/events/event-grid';
 import { SearchInput, Select } from '@/components/ui';
+import { BrandHeader } from '@/components/brands/brand-header';
 import { useAuth } from '@/hooks/use-auth';
 import { useBrandPublic } from '@/hooks/use-brand-public';
-import { useBrandDashboard } from '@/hooks/use-brand-dashboard';
+import { useBrandAccess } from '@/hooks/use-brand-access';
+import { useEventFilters } from '@/hooks/use-event-filters';
 import { SORT_OPTIONS } from '@/constants/event.constants';
-import { ACTIVE_STATUSES } from '@/constants/brand.constants';
-
-const PER_PAGE = 9;
+import { ACTIVE_STATUSES, ITEMS_PER_PAGE } from '@/constants/brand.constants';
 
 export function BrandPublicPage() {
   const { user } = useAuth();
@@ -18,52 +18,24 @@ export function BrandPublicPage() {
   const navigate = useNavigate();
 
   const { brand, isLoading, error } = useBrandPublic(id);
+  const { canManage, isLoading: accessLoading } = useBrandAccess(id, user?.id);
 
-  const { memberships, membershipsLoading } = useBrandDashboard(id);
-  const currentUserMembership = memberships.find((m) => m.user.id === user?.id);
-  const canManage =
-    currentUserMembership?.role === 'owner' || currentUserMembership?.role === 'manager';
-
-  const [search, setSearch] = useState('');
-  const [sort, setSort] = useState('created_at');
-  const [page, setPage] = useState(1);
-
-  useEffect(() => {
-    if (!membershipsLoading && !isLoading && canManage) {
-      navigate(`/dashboard/brands/${id}`, { replace: true });
-    }
-  }, [membershipsLoading, canManage, isLoading, id, navigate]);
-
-  const activeEvents = useMemo(
-    () => (brand?.events ?? []).filter((e) => ACTIVE_STATUSES.has(e.status)),
-    [brand]
+  const activeEvents = (brand?.events ?? []).filter((e) =>
+    ACTIVE_STATUSES.has((e.status || '').toLowerCase())
   );
 
-  const filteredEvents = useMemo(() => {
-    let result = [...activeEvents];
+  const filters = useEventFilters({
+    events: activeEvents,
+    itemsPerPage: ITEMS_PER_PAGE,
+  });
 
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter((e) => e.title.toLowerCase().includes(q));
+  useEffect(() => {
+    if (!accessLoading && !isLoading && canManage) {
+      navigate(`/dashboard/brands/${id}`, { replace: true });
     }
+  }, [accessLoading, canManage, isLoading, id, navigate]);
 
-    if (sort === 'title') {
-      result.sort((a, b) => a.title.localeCompare(b.title));
-    } else if (sort === 'start_date') {
-      result.sort((a, b) => {
-        const dateA = a.start_date ? new Date(a.start_date).getTime() : 0;
-        const dateB = b.start_date ? new Date(b.start_date).getTime() : 0;
-        return dateA - dateB;
-      });
-    }
-
-    return result;
-  }, [activeEvents, search, sort]);
-
-  const totalPages = Math.ceil(filteredEvents.length / PER_PAGE) || 1;
-  const paginated = filteredEvents.slice((page - 1) * PER_PAGE, page * PER_PAGE);
-
-  if (isLoading || membershipsLoading || canManage) {
+  if (isLoading || accessLoading || canManage) {
     return (
       <PageWrapper>
         <div className="flex h-96 items-center justify-center">
@@ -99,45 +71,14 @@ export function BrandPublicPage() {
         />
 
         <main className="relative z-10 py-10 pb-24 max-w-6xl mx-auto space-y-10">
-          <div className="flex items-start gap-4 pb-6 border-b border-neutral-100/80">
-            {brand.logo_url ? (
-              <div className="p-0.5 rounded-2xl bg-white border border-neutral-100 shadow-sm shrink-0">
-                <img
-                  src={brand.logo_url}
-                  alt={brand.name}
-                  className="w-16 h-16 rounded-[14px] object-cover"
-                />
-              </div>
-            ) : (
-              <div
-                className="w-16 h-16 rounded-2xl text-white font-bold text-2xl flex items-center justify-center shrink-0 shadow-sm"
-                style={{
-                  background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`,
-                }}
-              >
-                {brand.name.charAt(0).toUpperCase()}
-              </div>
-            )}
-
-            <div className="min-w-0 space-y-1">
-              <h1 className="text-2xl font-bold text-neutral-900 tracking-tight">{brand.name}</h1>
-
-              <a
-                href={`https://${brand.subdomain}.eventify.com`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-medium text-primary-600 hover:text-primary-700 inline-flex items-center gap-1.5 transition-colors"
-              >
-                {brand.subdomain}.eventify.com
-              </a>
-
-              {brand.description && (
-                <p className="text-sm text-neutral-500 leading-relaxed max-w-2xl pt-1">
-                  {brand.description}
-                </p>
-              )}
-            </div>
-          </div>
+          <BrandHeader
+            name={brand.name}
+            subdomain={brand.subdomain}
+            description={brand.description}
+            logoUrl={brand.logo_url}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
+          />
 
           <section className="space-y-6">
             <div className="flex items-center justify-between">
@@ -154,36 +95,31 @@ export function BrandPublicPage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <SearchInput
                 placeholder="Search events…"
-                value={search}
-                onChange={(e) => {
-                  setSearch(e.target.value);
-                  setPage(1);
-                }}
+                value={filters.search}
+                onChange={filters.handleSearchChange}
               />
               <Select
                 options={SORT_OPTIONS}
-                value={sort}
-                onChange={(e) => {
-                  setSort(e.target.value);
-                  setPage(1);
-                }}
+                value={filters.sort}
+                onChange={filters.handleSortChange}
               />
             </div>
 
             <EventGrid
-              events={paginated}
+              events={filters.paginated}
               isLoading={false}
               error={null}
-              hasActiveFilters={!!search.trim()}
+              hasActiveFilters={filters.hasActiveFilters}
               onRetry={() => {}}
-              onClearFilters={() => {
-                setSearch('');
-                setPage(1);
-              }}
+              onClearFilters={filters.clearFilters}
             />
 
-            {totalPages > 1 && (
-              <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+            {filters.totalPages > 1 && (
+              <Pagination
+                page={filters.page}
+                totalPages={filters.totalPages}
+                onPageChange={filters.setPage}
+              />
             )}
           </section>
         </main>
