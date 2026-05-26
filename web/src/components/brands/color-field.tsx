@@ -7,19 +7,25 @@ interface ColorFieldProps {
 
 export function ColorField({ label, value, fallback, onChange }: ColorFieldProps) {
   const current = value || fallback;
+  const hexInputId = `${label.toLowerCase().replace(/\s+/g, '-')}-hex`;
 
   return (
     <div className="space-y-1.5">
-      <label className="text-sm font-medium text-neutral-600">{label}</label>
+      <label htmlFor={hexInputId} className="text-sm font-medium text-neutral-600">
+        {label}
+      </label>
       <div className="flex items-center gap-2 border border-neutral-200 rounded-lg px-3 py-2 focus-within:border-primary-400 transition-colors">
         <input
           type="color"
+          aria-label={`${label} color picker`}
           value={current}
           onChange={(e) => onChange(e.target.value)}
           className="w-6 h-6 rounded-md cursor-pointer bg-transparent p-0 shrink-0 border border-neutral-200 [&::-webkit-color-swatch-wrapper]:p-0 [&::-webkit-color-swatch]:border-none [&::-webkit-color-swatch]:rounded-md [&::-moz-color-swatch]:border-none [&::-moz-color-swatch]:rounded-md"
         />
         <input
+          id={hexInputId}
           type="text"
+          aria-label={`${label} hex value`}
           value={current}
           onChange={(e) => {
             const hex = e.target.value;
