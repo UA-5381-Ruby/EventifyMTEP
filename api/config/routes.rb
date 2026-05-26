@@ -17,6 +17,8 @@ Rails.application.routes.draw do
 
       post '/auth/register', to: 'auth#register'
       post '/auth/login', to: 'auth#login'
+      get 'users/me', to: 'users#me'
+
       resources :users, except: [:create]
 
       resources :events, only: [:index, :show, :create] do

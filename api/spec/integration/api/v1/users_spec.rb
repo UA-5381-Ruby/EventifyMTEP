@@ -24,6 +24,59 @@ RSpec.describe 'Api::V1::Users', type: :request do
     end
   end
 
+  path '/api/v1/users/me' do
+    get('Get current user profile with memberships') do
+      tags 'Users'
+      security [{ bearer_auth: [] }]
+      produces 'application/json'
+
+      response('200', 'successful') do
+        schema type: :object,
+               properties: {
+                 id: { type: :integer },
+                 name: { type: :string },
+                 email: { type: :string },
+                 is_superadmin: { type: :boolean },
+                 created_at: { type: :string, format: 'date-time' },
+                 memberships: {
+                   type: :array,
+                   items: {
+                     type: :object,
+                     properties: {
+                       id: { type: :string },
+                       role: { type: :string },
+                       brand: {
+                         type: :object,
+                         properties: {
+                           id: { type: :integer },
+                           name: { type: :string },
+                           subdomain: { type: :string },
+                           description: { type: :string, nullable: true },
+                           logo_url: { type: :string, nullable: true }
+                         }
+                       }
+                     }
+                   }
+                 }
+               },
+               required: %w[id name email is_superadmin created_at memberships]
+
+        let(:user) { create(:user, name: 'Current User', email: 'me@test.com', password: 'password123') }
+        let(:brand) { create(:brand, name: 'Test Brand', subdomain: 'test-me-brand') }
+        let!(:membership) { create(:brand_membership, user: user, brand: brand, role: 'owner') }
+
+        let(:Authorization) { jwt_for(user) }
+
+        run_test!
+      end
+
+      response('401', 'unauthorized') do
+        let(:Authorization) { nil }
+        run_test!
+      end
+    end
+  end
+
   path '/api/v1/users/{id}' do
     parameter name: :id, in: :path, type: :integer, required: true, description: 'User ID'
 
