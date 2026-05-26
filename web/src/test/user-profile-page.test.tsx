@@ -9,7 +9,7 @@ jest.mock('@/hooks/use-user-profile');
 const mockUseUserProfile = jest.spyOn(useUserProfileModule, 'useUserProfile');
 
 jest.mock('@/components/ui/button', () => ({
-    Button: ({ children, onClick, disabled }: any) => (
+    Button: ({ children, onClick, disabled }: { children: React.ReactNode; onClick?: () => void; disabled?: boolean }) => (
         <button onClick={onClick} disabled={disabled}>
             {children}
         </button>
@@ -17,7 +17,7 @@ jest.mock('@/components/ui/button', () => ({
 }));
 
 jest.mock('@/components/ui/input', () => ({
-    Input: ({ label, name, value, onChange }: any) => (
+    Input: ({ label, name, value, onChange }: { label?: string; name?: string; value?: string; onChange?: React.ChangeEventHandler<HTMLInputElement> }) => (
         <div>
             <label htmlFor={name}>{label}</label>
             <input id={name} name={name} value={value} onChange={onChange} data-testid={`input-${name}`} />
@@ -26,7 +26,7 @@ jest.mock('@/components/ui/input', () => ({
 }));
 
 jest.mock('@/components/ui/alert', () => ({
-    Alert: ({ children, title, variant, onClose }: any) => (
+    Alert: ({ children, title, variant, onClose }: { children: React.ReactNode; title?: string; variant?: string; onClose?: () => void }) => (
         <div role="alert" data-testid={`alert-${variant}`}>
             <strong>{title}</strong>
             <span>{children}</span>
@@ -36,7 +36,7 @@ jest.mock('@/components/ui/alert', () => ({
 }));
 
 jest.mock('@/components/profile/profile-header', () => ({
-    ProfileHeader: ({ name }: any) => <div data-testid="profile-header">{name}</div>,
+    ProfileHeader: ({ name }: { name: string }) => <div data-testid="profile-header">{name}</div>,
 }));
 
 jest.mock('@/components/profile/brand-memberships', () => ({
