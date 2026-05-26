@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
 import { UserService } from '@/services/user-service';
+import { useNavigate } from 'react-router-dom';
 
 interface DeleteAccountSectionProps {
   userId: number;
@@ -10,12 +11,13 @@ interface DeleteAccountSectionProps {
 export function DeleteAccountSection({ userId }: DeleteAccountSectionProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const navigate = useNavigate();
 
   const handleDelete = async () => {
     setIsDeleting(true);
     try {
       await UserService.deleteUser(userId);
-      window.location.href = '/login';
+      navigate('/login');
     } catch (error) {
       console.error('Delete failed', error);
       setIsDeleting(false);

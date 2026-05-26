@@ -7,7 +7,7 @@ import { RegistrationPage } from '@/pages/registration-page.tsx';
 import { EventListPage } from '@/pages/event-list-page.tsx';
 import { EventDetailPage } from '@/pages/event-detail-page';
 import { NotFoundPage } from '@/pages/not-found-page.tsx';
-import UserProfilePage from './pages/user-profile-page';
+import UserProfilePage from '@/pages/user-profile-page';
 import { Dashboard } from '@/pages/dashboard.tsx';
 import { BrandPublicPage } from '@/pages/brand-public-page.tsx';
 import { BrandListPage } from '@/pages/brand-list-page.tsx';
