@@ -61,13 +61,9 @@ RSpec.describe 'Api::V1::Users', type: :request do
                },
                required: %w[id name email is_superadmin created_at memberships]
 
-        let(:user) { User.create!(name: 'Current User', email: 'me@test.com', password: 'password123') }
-        let(:brand) do
-          Brand.create!(name: 'Test Brand', subdomain: 'test-me-brand', primary_color: '#000000',
-                        secondary_color: '#FFFFFF')
-        end
-
-        let!(:membership) { BrandMembership.create!(user: user, brand: brand, role: 'owner') }
+        let(:user) { create(:user, name: 'Current User', email: 'me@test.com', password: 'password123') }
+        let(:brand) { create(:brand, name: 'Test Brand', subdomain: 'test-me-brand') }
+        let!(:membership) { create(:brand_membership, user: user, brand: brand, role: 'owner') }
 
         let(:Authorization) { jwt_for(user) }
 

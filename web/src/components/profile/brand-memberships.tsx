@@ -7,8 +7,7 @@ interface BrandMembershipsProps {
   memberships: UserMembership[];
 }
 
-// Маппінг ролей на стилі бейджів
-const getRoleBadgeVariant = (role: string) => {
+const getRoleBadgeVariant = (role: UserMembership['role']) => {
   switch (role) {
     case 'owner':
       return 'success';
@@ -17,7 +16,7 @@ const getRoleBadgeVariant = (role: string) => {
     case 'manager':
       return 'secondary';
     case 'member':
-      return 'default'; // neutral
+      return 'default';
     default:
       return 'default';
   }

@@ -17,7 +17,6 @@ const sizeStyles = {
 };
 
 export function Avatar({ name, src, size = 'md', className }: AvatarProps) {
-
   return (
     <div
       className={cn(

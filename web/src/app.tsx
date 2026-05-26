@@ -35,7 +35,7 @@ function App() {
 
           <Route path="/dashboard/brands/:id" element={<BrandDashboardPage />} />
 
-          <Route path="/profile/settings" element={<UserProfilePage></UserProfilePage>} />
+          <Route path="/profile/settings" element={<UserProfilePage />} />
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
+import type { ChangeEvent } from 'react';
 import { UserService, getCurrentUser } from '@/services/user-service';
 import type { UserProfile, UpdateUserRequest } from '@/types/user';
 
-// Створюємо тип для стану алерту
 type AlertState = {
   variant: 'success' | 'error';
   message: string;
@@ -35,7 +35,7 @@ export function useUserProfile() {
 
   const isDirty = user ? formData.name !== user.name || formData.email !== user.email : false;
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     if (alert) setAlert(null);
   };
