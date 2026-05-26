@@ -1,4 +1,5 @@
 import { renderHook, act, waitFor } from '@testing-library/react';
+import type { ChangeEvent } from 'react';
 import { useUserProfile } from '@/hooks/use-user-profile';
 import { UserService, getCurrentUser } from '@/services/user-service';
 import type { UserProfile } from '@/types/user';
@@ -70,7 +71,7 @@ describe('useUserProfile hook', () => {
     act(() => {
       result.current.handleInputChange({
         target: { name: 'name', value: 'New Name' },
-      } as any);
+      } as unknown as ChangeEvent<HTMLInputElement>);
     });
 
     expect(result.current.formData.name).toBe('New Name');
@@ -88,7 +89,9 @@ describe('useUserProfile hook', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => {
-      result.current.handleInputChange({ target: { name: 'name', value: 'Updated Name' } } as any);
+      result.current.handleInputChange({
+        target: { name: 'name', value: 'Updated Name' },
+      } as unknown as ChangeEvent<HTMLInputElement>);
     });
 
     await act(async () => {
@@ -114,7 +117,9 @@ describe('useUserProfile hook', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
 
     act(() => {
-      result.current.handleInputChange({ target: { name: 'name', value: 'Updated Name' } } as any);
+      result.current.handleInputChange({
+        target: { name: 'name', value: 'Updated Name' },
+      } as unknown as ChangeEvent<HTMLInputElement>);
     });
 
     await act(async () => {
@@ -134,7 +139,9 @@ describe('useUserProfile hook', () => {
 
     act(() => {
       result.current.setAlert({ variant: 'error', message: 'Some error' });
-      result.current.handleInputChange({ target: { name: 'name', value: 'Oops' } } as any);
+      result.current.handleInputChange({
+        target: { name: 'name', value: 'Oops' },
+      } as unknown as ChangeEvent<HTMLInputElement>);
     });
 
     expect(result.current.isDirty).toBe(true);
