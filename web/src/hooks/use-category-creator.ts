@@ -48,13 +48,14 @@ export function useCategoryCreator({
     if (isCreatingCat) return;
 
     const name = newCatName.trim();
-    if (!/^[a-zA-Z0-9\s-]{2,30}$/.test(name)) {
-      setCatError('Invalid category name format.');
-      return;
-    }
 
     if (!name) {
       setCatError('Category name cannot be empty.');
+      return;
+    }
+
+    if (!/^[a-zA-Z0-9\s-]{2,30}$/.test(name)) {
+      setCatError('Invalid category name format.');
       return;
     }
 
