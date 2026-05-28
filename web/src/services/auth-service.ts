@@ -39,7 +39,18 @@ function parseUserIdFromToken(token: string): number | null {
     return null;
   }
 }
+function parseIsSuperAdminFromToken(token: string): boolean {
+  try {
+    const parts = token.split('.');
+    if (parts.length < 2) return false;
 
+    const payload = JSON.parse(decodeBase64Url(parts[1]));
+
+    return !!payload.is_superadmin;
+  } catch {
+    return false;
+  }
+}
 async function init(): Promise<void> {
   const token = tokenStorage.get();
   if (!token) {

@@ -1,10 +1,15 @@
-import { Header } from '@/components/layout/header/header.tsx';
+import { MainLayout } from '@/components/layout/main-layout';
+import { PageWrapper } from '@/components/layout';
+
 export function SuperAdminPage() {
   return (
-    <div className="p-4">
-      <Header />
-      <h1 className="text-2xl font-bold">Super Admin Dashboard</h1>
-      <p>Welcome, Super Admin!</p>
-    </div>
+    <PageWrapper>
+      <MainLayout>
+        <div className="p-4">
+          <h1 className="text-2xl font-bold">Super Admin Dashboard</h1>
+          <p>Welcome, Super Admin!</p>
+        </div>
+      </MainLayout>
+    </PageWrapper>
   );
 }

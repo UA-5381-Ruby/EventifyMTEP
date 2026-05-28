@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { PageWrapper, Container } from '@/components/layout';
-import { Pagination } from '@/components/ui';
 import { EventPageHeader } from '@/components/events/event-page-header.tsx';
 import { EventFilters } from '@/components/events/event-filters.tsx';
 import { EventGrid } from '@/components/events/event-grid.tsx';
+import { EventPagination } from '@/components/events/event-pagination.tsx';
 import { useEvents } from '@/hooks/use-events.ts';
 import type { EventQueryParams, EventStatus } from '@/types/event';
 
@@ -66,8 +66,8 @@ export function EventListPage() {
                 setSearch(e.target.value);
                 resetPage();
               }}
-              onStatusChange={(value) => {
-                setStatus(value);
+              onStatusChange={(e) => {
+                setStatus(e.target.value);
                 resetPage();
               }}
               onSortChange={(e) => {
@@ -86,7 +86,7 @@ export function EventListPage() {
             />
 
             {!isLoading && (
-              <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+              <EventPagination page={page} totalPages={totalPages} onPageChange={setPage} />
             )}
           </div>
         </Container>
