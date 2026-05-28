@@ -174,7 +174,7 @@ const AuthService = {
   isSuperAdmin: (): boolean => {
     const token = tokenStorage.get();
     return token ? parseIsSuperAdminFromToken(token) : false;
-  }
+  },
 } as const;
 
 export default AuthService;
