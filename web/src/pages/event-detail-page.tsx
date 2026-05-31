@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Star, Share2 } from 'lucide-react';
 
-import { Spinner } from '@/components/ui';
+import { Spinner, Button } from '@/components/ui';
 import type { EventDetail } from '@/types/event';
 import { EventsService } from '@/services/events-service';
 
@@ -47,16 +47,16 @@ export function EventDetailPage() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen gap-4">
         <p className="text-neutral-500">Event not found.</p>
-        <button onClick={() => navigate('/events')} className="text-sm underline">
+        <Button onClick={() => navigate('/events')} className="text-sm underline">
           Back to events
-        </button>
+        </Button>
       </div>
     );
   }
 
   return (
     <PageWrapper>
-      <div className="min-h-screen bg-white max-w-lg mx-auto">
+      <div className="min-h-screen min-w-screen bg-white max-w-lg mx-auto">
         <EventHero event={eventDetail} onBack={() => navigate(-1)} />
 
         <div className="px-5 pb-10">
@@ -66,12 +66,13 @@ export function EventDetailPage() {
               {eventDetail.title}
             </h1>
             <div className="flex items-center gap-3 pt-1 shrink-0">
-              <button className="text-neutral-400 hover:text-amber-400 transition-colors">
+              <Button>+ Add to Calendar</Button>
+              <Button>
                 <Star size={20} />
-              </button>
-              <button className="text-neutral-400 hover:text-neutral-700 transition-colors">
+              </Button>
+              <Button>
                 <Share2 size={20} />
-              </button>
+              </Button>
             </div>
           </div>
 
