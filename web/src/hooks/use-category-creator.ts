@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useState, useRef } from 'react';
 import { CategoriesService } from '@/services/categories-service';
 import type { Category } from '@/types/category';
+import { DEFAULT_FOCUS_DELAY_MS } from '@/constants/ui.constants';
 
 interface UseCategoryCreatorOptions {
   onCreated: (id: number) => void;
@@ -35,7 +36,7 @@ export function useCategoryCreator({
   const handleShowCatInput = () => {
     setShowCatInput(true);
     setCatError(null);
-    setTimeout(() => catInputRef.current?.focus(), 50);
+    setTimeout(() => catInputRef.current?.focus(), DEFAULT_FOCUS_DELAY_MS);
   };
 
   const handleCancelCatCreate = () => {

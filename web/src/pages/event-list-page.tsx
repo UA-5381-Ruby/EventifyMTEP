@@ -6,8 +6,7 @@ import { EventFilters } from '@/components/events/event-filters.tsx';
 import { EventGrid } from '@/components/events/event-grid.tsx';
 import { useEvents } from '@/hooks/use-events.ts';
 import type { EventQueryParams, EventStatus } from '@/types/event';
-
-const PER_PAGE = 12;
+import { PER_PAGE } from '@/constants/ui.constants';
 
 export function EventListPage() {
   const [search, setSearch] = useState('');
@@ -26,7 +25,7 @@ export function EventListPage() {
 
   const { events, meta, isLoading, error, refetch } = useEvents(params);
 
-  const totalPages = meta ? Math.ceil(meta.total / meta.per_page) : 1;
+  const totalPages = meta?.total_pages ?? 1;
 
   function resetPage() {
     setPage(1);

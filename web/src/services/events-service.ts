@@ -20,6 +20,6 @@ export const EventsService = {
 
   async createEvent(payload: CreateEventRequest): Promise<Event> {
     const response = await apiClient.post('/api/v1/events', { event: payload });
-    return response.data.data;
+    return response.data;
   },
 };
