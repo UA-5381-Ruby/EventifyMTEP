@@ -38,7 +38,7 @@ const mockEventDetail: EventDetail = {
 
 const mockPaginatedResponse: PaginatedResponse<Event> = {
   data: [mockEvent],
-  meta: { page: 1, per_page: 20, total: 1 },
+  meta: { page: 1, per_page: 20, total: 1, total_pages: 3 },
 };
 
 describe('EventsService', () => {
