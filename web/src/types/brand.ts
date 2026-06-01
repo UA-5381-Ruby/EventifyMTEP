@@ -23,4 +23,22 @@ export interface CreateBrandRequest {
   secondary_color?: string;
 }
 
-export type UpdateBrandRequest = Partial<CreateBrandRequest>;
+export type BrandScope = 'managed' | 'subscribed' | 'discover';
+export type Tab = 'managed' | 'subscribed';
+
+export interface BrandListParams {
+  page?: number;
+  per_page?: number;
+  sort?: string;
+  q?: string;
+  scope?: BrandScope;
+}
+
+export interface BrandListResponse {
+  data: Brand[];
+  meta: {
+    current_page: number;
+    total_pages: number;
+    total_count: number;
+  };
+}

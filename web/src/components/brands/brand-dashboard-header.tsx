@@ -1,5 +1,4 @@
-import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui';
+import { Button, Back } from '@/components/ui';
 import type { BrandWithEvents } from '@/types/brand';
 
 interface BrandDashboardHeaderProps {
@@ -17,29 +16,10 @@ export function BrandDashboardHeader({
   onEdit,
   canEdit,
 }: BrandDashboardHeaderProps) {
-  const navigate = useNavigate();
-
   return (
     <div className="flex flex-col md:flex-row items-start justify-between gap-6 pb-6 border-b border-neutral-100/80">
-      <div className="flex items-start gap-4 flex-1 min-w-0">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate('/brands')}
-          aria-label="Go back"
-          className="mt-1 h-8 w-8 p-0 flex items-center justify-center rounded-xl border border-neutral-200/40 bg-white shadow-sm hover:bg-neutral-50"
-        >
-          <svg
-            className="w-4 h-4 text-neutral-600"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2.5"
-            viewBox="0 0 24 24"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-        </Button>
-
+      <Back />
+      <div className="flsex items-start gap-4 flex-1 min-w-0">
         {brand.logo_url ? (
           <div className="p-0.5 rounded-2xl bg-white border border-neutral-100 shadow-sm shrink-0">
             <img

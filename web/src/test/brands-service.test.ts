@@ -31,13 +31,11 @@ describe('BrandsService', () => {
       },
     ];
 
-    jest.mocked(apiClient.get).mockResolvedValue({
-      data: mockBrands,
-    } as AxiosResponse);
+    jest.mocked(apiClient.get).mockResolvedValue({ data: mockBrands } as AxiosResponse);
 
-    const result = await brandsService.getAllBrands();
+    const result = await brandsService.getBrands({});
 
-    expect(apiClient.get).toHaveBeenCalledWith(endpoint);
+    expect(apiClient.get).toHaveBeenCalledWith(endpoint, { params: {} });
     expect(result).toEqual(mockBrands);
   });
 
@@ -143,6 +141,13 @@ describe('BrandsService', () => {
     );
   });
 
+  it('should rethrow non-forbidden error when updating brand', async () => {
+    const networkError = new Error('Network Error');
+    jest.mocked(apiClient.patch).mockRejectedValue(networkError);
+
+    await expect(brandsService.updateBrand(1, { name: 'Test' })).rejects.toThrow('Network Error');
+  });
+
   it('should throw permission error when deleting brand without ownership', async () => {
     const forbiddenError = Object.assign(new Error('Forbidden'), { isForbidden: true });
     jest.mocked(apiClient.delete).mockRejectedValue(forbiddenError);
@@ -151,4 +156,11 @@ describe('BrandsService', () => {
       'You do not have permission to delete this brand'
     );
   });
+});
+
+it('should rethrow non-forbidden error when deleting brand', async () => {
+  const networkError = new Error('Network Error');
+  jest.mocked(apiClient.delete).mockRejectedValue(networkError);
+
+  await expect(brandsService.deleteBrand(1)).rejects.toThrow('Network Error');
 });
