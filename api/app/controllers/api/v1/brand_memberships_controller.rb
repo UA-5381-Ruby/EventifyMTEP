@@ -3,6 +3,8 @@
 module Api
   module V1
     class BrandMembershipsController < ApplicationController
+      include Paginatable
+
       before_action :set_brand
       before_action :set_membership, only: %i[update destroy]
       before_action :authorize_membership, only: %i[update destroy]
@@ -65,9 +67,13 @@ module Api
       private
 
       def set_brand
-        @brand = Brand.find(params[:brand_id])
+        permitted = params.permit(:brand_id, :page, :per_page)
+        @brand = Brand.find(permitted[:brand_id])
+        authorize @brand, :manage_memberships?
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Brand not found' }, status: :not_found
+      rescue Pundit::NotAuthorizedError
+        render json: { error: 'Forbidden' }, status: :forbidden
       end
 
       def set_membership
@@ -86,19 +92,6 @@ module Api
 
       def update_membership_params
         params.expect(membership: %i[role])
-      end
-
-      def paginate(scope)
-        total = scope.count
-        per_page = params.fetch(:per_page, 20).to_i.clamp(1, 100)
-        page = [params.fetch(:page, 1).to_i, 1].max
-
-        records = scope.order(:id).offset((page - 1) * per_page).limit(per_page)
-
-        {
-          records: records,
-          meta: { page: page, per_page: per_page, total: total }
-        }
       end
 
       def duplicate_membership_error?

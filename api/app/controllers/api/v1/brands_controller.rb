@@ -3,20 +3,30 @@
 module Api
   module V1
     class BrandsController < ApplicationController
+      include Paginatable
+
       rescue_from ActionController::ParameterMissing do |e|
         render json: { error: e.message }, status: :bad_request
       end
 
-      skip_before_action :authorize_request, only: %i[show]
-      before_action :set_brand, only: %i[show update destroy]
+      before_action :set_brand, only: %i[update destroy]
+      before_action :set_brand_public, only: %i[show]
 
       def index
-        brands = current_user.brands
-        render json: brands
+        brands = fetch_brands_by_scope(params[:scope])
+        brands = filter_by_query(brands)
+        brands = sort_brands(brands)
+
+        paginated = paginate(brands)
+
+        render json: {
+          data: paginated[:records],
+          meta: paginated[:meta]
+        }
       end
 
       def show
-        render json: @brand, include: :events
+        render json: @brand.as_json(include: { events: { only: %i[id title status start_date] } })
       end
 
       def create
@@ -59,7 +69,41 @@ module Api
 
       private
 
+      def fetch_brands_by_scope(scope)
+        case scope
+        when 'managed'
+          Brand.joins(:brand_memberships)
+               .where(brand_memberships: { user_id: current_user.id, role: %w[owner manager] })
+        when 'subscribed'
+          Brand.joins(:brand_memberships)
+               .where(brand_memberships: { user_id: current_user.id, role: 'member' })
+        when 'discover'
+          Brand.where.not(
+            id: BrandMembership.where(user_id: current_user.id).select(:brand_id)
+          )
+        else
+          current_user.brands
+        end
+      end
+
+      def filter_by_query(brands)
+        return brands unless params[:q].present?
+
+        brands.where('brands.name ILIKE ?', "%#{params[:q]}%")
+      end
+
+      def sort_brands(brands)
+        column = params[:sort].presence_in(%w[created_at name]) || 'created_at'
+        brands.order(column => :desc)
+      end
+
       def set_brand
+        @brand = current_user.brands.find(params[:id])
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: 'Brand not found' }, status: :not_found
+      end
+
+      def set_brand_public
         @brand = Brand.find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Brand not found' }, status: :not_found

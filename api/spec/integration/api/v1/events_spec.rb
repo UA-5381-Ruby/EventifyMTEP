@@ -10,35 +10,28 @@ RSpec.describe 'api/v1/events', type: :request do
     get 'Filter events by category' do
       tags 'Events'
       produces 'application/json'
-      description 'Returns events filtered by category. No authentication required.'
+      security [{ bearer_auth: [] }]
 
       parameter name: :category_id, in: :query, type: :integer, required: false
 
       response '200', 'events filtered by category' do
         schema type: :object,
                properties: {
-                 data: {
-                   type: :array,
-                   items: { '$ref' => '#/components/schemas/Event' }
-                 },
-                 meta: {
-                   type: :object,
-                   properties: {
-                     page: { type: :integer },
-                     per_page: { type: :integer },
-                     total: { type: :integer }
-                   },
-                   required: %w[page per_page total]
-                 }
+                 data: { type: :array, items: { '$ref' => '#/components/schemas/Event' } },
+                 meta: { '$ref' => '#/components/schemas/PaginationMeta' }
                },
                required: %w[data meta]
 
+        let(:user)          { create(:user) }
+        let(:Authorization) { jwt_for(user) }
+        let!(:brand)        { create(:brand) }
+        let!(:membership)   { create(:brand_membership, user: user, brand: brand, role: 'owner') }
+
         let!(:category1) { create(:category) }
         let!(:category2) { create(:category) }
-
-        let!(:event1) { create(:event, categories: [category1]) }
-        let!(:event2) { create(:event, categories: [category2]) }
-        let!(:event3) { create(:event, categories: [category1, category2]) }
+        let!(:event1)    { create(:event, brand: brand, categories: [category1]) }
+        let!(:event2)    { create(:event, brand: brand, categories: [category2]) }
+        let!(:event3)    { create(:event, brand: brand, categories: [category1, category2]) }
 
         let(:category_id) { category1.id }
 
@@ -113,6 +106,7 @@ RSpec.describe 'api/v1/events', type: :request do
         schema '$ref' => '#/components/schemas/Event'
 
         let(:brand) { create(:brand) }
+        let!(:membership) { create(:brand_membership, user: user, brand: brand, role: 'owner') }
 
         let(:body) do
           {
@@ -125,23 +119,15 @@ RSpec.describe 'api/v1/events', type: :request do
             }
           }
         end
-
         run_test!
       end
 
       response '422', 'validation failed' do
         schema '$ref' => '#/components/schemas/ValidationErrors'
+        let(:brand) { create(:brand) }
+        let!(:membership) { create(:brand_membership, user: user, brand: brand, role: 'owner') }
 
-        let(:body) do
-          {
-            event: {
-              title: '',
-              location: '',
-              brand_id: nil
-            }
-          }
-        end
-
+        let(:body) { { event: { title: '', location: '', brand_id: brand.id } } }
         run_test!
       end
       it 'is invalid if end_date is before start_date' do
@@ -173,10 +159,9 @@ RSpec.describe 'api/v1/events', type: :request do
 
       response '200', 'event found' do
         schema '$ref' => '#/components/schemas/Event'
-
         let(:brand) { create(:brand) }
+        let!(:membership) { create(:brand_membership, user: user, brand: brand, role: 'owner') }
         let(:id) { create(:event, brand: brand).id }
-
         run_test!
       end
 
