@@ -10,6 +10,7 @@ import UserProfilePage from '@/pages/user-profile-page';
 import { Dashboard } from '@/pages/dashboard.tsx';
 import { BrandPublicPage } from '@/pages/brand-public-page.tsx';
 import { BrandDashboardPage } from '@/pages/brand-dashboard-page.tsx';
+import { SuperAdminPage } from '@/pages/super-admin-page.tsx';
 import { BrandDiscoverPage } from '@/pages/brand-discover-page.tsx';
 import { MyBrandsPage } from '@/pages/my-brands-page.tsx';
 
@@ -18,7 +19,6 @@ function App() {
     <Router>
       <Routes>
         <Route path="/test/preview" element={<UIPreview />} />
-
         <Route path="/" element={<Navigate to="/events" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegistrationPage />} />
@@ -29,6 +29,7 @@ function App() {
         <Route path="/brands/:id" element={<BrandPublicPage />} />
 
         <Route element={<ProtectedRoute />}>
+          <Route path="/superadmin" element={<SuperAdminPage />} />
           <Route path="/brands" element={<BrandDiscoverPage />} />
           <Route path="/my-brands" element={<MyBrandsPage />} />
 
