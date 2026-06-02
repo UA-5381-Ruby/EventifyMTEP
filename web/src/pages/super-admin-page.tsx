@@ -1,7 +1,8 @@
-
+import { useNavigate } from 'react-router-dom';
 import { PageWrapper } from '@/components/layout';
 
 export function SuperAdminPage() {
+  const navigate = useNavigate();
   const stats = [
     { title: 'Total events', value: '11' },
     { title: 'Total Users', value: '11' },
@@ -18,7 +19,9 @@ export function SuperAdminPage() {
 
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold">Admin Panel</h1>
-          <button className="bg-black text-white text-xs px-4 py-2 font-medium hover:bg-gray-800 transition-colors">
+          <button
+            onClick={() => navigate('/activity-log')}
+            className="bg-black text-white text-xs px-4 py-2 font-medium hover:bg-gray-800 transition-colors">
             View Log activity page
           </button>
         </div>
