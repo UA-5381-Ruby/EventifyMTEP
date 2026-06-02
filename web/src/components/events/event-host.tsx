@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { EventDetail } from '@/types/event';
-import { Button } from '../ui';
+import { Button } from '@/components/ui/button';
 
 interface EventHostSectionProps {
   brand: EventDetail['brand'];

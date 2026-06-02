@@ -2,7 +2,7 @@ import { Calendar, Clock, Ticket, Users } from 'lucide-react';
 import { formatDate, formatTimeRange } from '@/utils/date';
 import type { EventDetail } from '@/types/event';
 
-import { Button } from '../ui';
+import { Button } from '@/components/ui/button';
 
 interface EventDateTimeSectionProps {
   event: EventDetail;
