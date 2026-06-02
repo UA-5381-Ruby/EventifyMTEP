@@ -1,6 +1,6 @@
 import React from 'react';
-import { Button, Select, Badge, SearchInput } from '@/components/ui';
-import { SORT_OPTIONS, STATUS_TABS } from '@/constants/event.constants'; // ← from constants
+import { Select, Badge, SearchInput, Tabs } from '@/components/ui';
+import { SORT_OPTIONS, STATUS_TABS } from '@/constants/event.constants';
 
 interface EventFiltersProps {
   search: string;
@@ -29,24 +29,7 @@ export function EventFilters({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <div className="flex flex-wrap gap-1 bg-neutral-50 p-1 rounded-xl w-fit" role="tablist">
-          {STATUS_TABS.map((tab) => {
-            const isActive = status === tab.value;
-            return (
-              <Button
-                key={tab.value}
-                size="sm"
-                variant={isActive ? 'outline' : 'ghost'}
-                onClick={() => onStatusChange(tab.value)}
-                className={`text-xs px-4 py-1.5 h-auto font-medium rounded-lg transition-all duration-200 ${
-                  !isActive && 'text-neutral-400 hover:text-neutral-600 hover:bg-transparent'
-                }`}
-              >
-                {tab.label}
-              </Button>
-            );
-          })}
-        </div>
+        <Tabs tabs={STATUS_TABS} activeValue={status} onChange={onStatusChange} />
 
         {pendingCount > 0 && (
           <Badge variant="warning" className="text-[10px]">

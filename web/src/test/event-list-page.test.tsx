@@ -93,6 +93,88 @@ jest.mock('@/components/ui', () => ({
   },
 }));
 
+jest.mock('@/components/events/event-grid.tsx', () => ({
+  EventGrid: ({
+    events,
+    isLoading,
+    error,
+    onRetry,
+    onClearFilters,
+  }: {
+    events: { title: string }[];
+    isLoading: boolean;
+    error: string | null;
+    onRetry: () => void;
+    onClearFilters: () => void;
+  }) => {
+    if (isLoading) return <div data-testid="spinner">Loading…</div>;
+    if (error)
+      return (
+        <div role="alert">
+          <strong>Error</strong> {error}
+          <button onClick={onRetry}>Try again</button>
+        </div>
+      );
+    if (!events.length) return <div>No events found</div>;
+    return (
+      <div>
+        {events.map((e) => (
+          <div key={e.title} data-testid="event-card">
+            {e.title}
+          </div>
+        ))}
+        <button onClick={onClearFilters}>Clear filters</button>
+      </div>
+    );
+  },
+}));
+
+jest.mock('@/components/events/event-filters.tsx', () => ({
+  EventFilters: ({
+    search,
+    onSearchChange,
+    onSortChange,
+    onStatusChange,
+  }: {
+    search: string;
+    onSearchChange: React.ChangeEventHandler<HTMLInputElement>;
+    onSortChange: React.ChangeEventHandler<HTMLSelectElement>;
+    onStatusChange: (value: string) => void;
+  }) => (
+    <div>
+      <input
+        data-testid="search-input"
+        placeholder="Search by title…"
+        value={search}
+        onChange={onSearchChange}
+      />
+      <select aria-label="Sort" onChange={onSortChange}>
+        <option value="created_at">Newest first</option>
+        <option value="title">Title A–Z</option>
+      </select>
+      <button onClick={() => onStatusChange('published')}>Active</button>
+    </div>
+  ),
+}));
+
+jest.mock('@/components/events/event-page-header.tsx', () => ({
+  EventPageHeader: ({
+    total,
+    onRemoveSearch,
+    onRemoveStatus,
+  }: {
+    total: number | null;
+    onRemoveSearch: () => void;
+    onRemoveStatus: () => void;
+  }) => (
+    <div>
+      {total !== null && <span>{total} events found</span>}
+      <button onClick={onRemoveSearch}>Remove search</button>
+      <button onClick={onRemoveStatus}>Remove status</button>
+    </div>
+  ),
+}));
+
 jest.mock('@/components/events/event-card.tsx', () => ({
   EventCard: ({ event }: { event: { title: string } }) => (
     <div data-testid="event-card">{event.title}</div>
@@ -119,7 +201,7 @@ const mockEvents: Event[] = [
   { id: 2, title: 'Art Expo', start_date: '2026-10-15T10:00:00Z', status: 'draft', brand_id: 102 },
 ];
 
-const mockMeta = { page: 1, per_page: 12, total: 2 };
+const mockMeta = { page: 1, per_page: 12, total: 2, total_pages: 1 };
 
 function renderPage() {
   return render(
@@ -139,6 +221,55 @@ describe('EventListPage', () => {
 
     expect(screen.getByText('Loading…')).toBeInTheDocument();
     expect(screen.queryByTestId('event-card')).not.toBeInTheDocument();
+  });
+
+  it('clears filters when onClearFilters is called', async () => {
+    mockUseEvents.mockReturnValue({ ...baseState, events: mockEvents, meta: mockMeta });
+
+    renderPage();
+    fireEvent.click(screen.getByText('Clear filters'));
+
+    await waitFor(() => {
+      const [calledParams] = mockUseEvents.mock.calls[mockUseEvents.mock.calls.length - 1];
+      expect(calledParams.page).toBe(1);
+    });
+  });
+
+  it('clears search when onRemoveSearch is called', async () => {
+    mockUseEvents.mockReturnValue({ ...baseState, events: mockEvents, meta: mockMeta });
+
+    renderPage();
+    fireEvent.click(screen.getByText('Remove search'));
+
+    await waitFor(() => {
+      const [calledParams] = mockUseEvents.mock.calls[mockUseEvents.mock.calls.length - 1];
+      expect(calledParams.q).toBeUndefined();
+    });
+  });
+
+  it('clears status when onRemoveStatus is called', async () => {
+    mockUseEvents.mockReturnValue({ ...baseState, events: mockEvents, meta: mockMeta });
+
+    renderPage();
+    fireEvent.click(screen.getByText('Remove status'));
+
+    await waitFor(() => {
+      const [calledParams] = mockUseEvents.mock.calls[mockUseEvents.mock.calls.length - 1];
+      expect(calledParams.status).toBeUndefined();
+    });
+  });
+
+  it('resets to page 1 when sort changes', async () => {
+    mockUseEvents.mockReturnValue({ ...baseState, events: mockEvents, meta: mockMeta });
+
+    renderPage();
+    fireEvent.change(screen.getByLabelText('Sort'), { target: { value: 'title' } });
+
+    await waitFor(() => {
+      const [calledParams] = mockUseEvents.mock.calls[mockUseEvents.mock.calls.length - 1];
+      expect(calledParams.sort).toBe('title');
+      expect(calledParams.page).toBe(1);
+    });
   });
 
   it('shows an error alert when fetch fails', () => {
@@ -235,7 +366,7 @@ describe('EventListPage', () => {
     mockUseEvents.mockReturnValue({
       ...baseState,
       events: mockEvents,
-      meta: { page: 1, per_page: 12, total: 30 },
+      meta: { page: 1, per_page: 12, total: 30, total_pages: 3 },
     });
 
     renderPage();
@@ -250,7 +381,7 @@ describe('EventListPage', () => {
     mockUseEvents.mockReturnValue({
       ...baseState,
       events: mockEvents,
-      meta: { page: 1, per_page: 12, total: 30 },
+      meta: { page: 1, per_page: 12, total: 30, total_pages: 3 },
     });
 
     renderPage();
@@ -262,7 +393,7 @@ describe('EventListPage', () => {
     mockUseEvents.mockReturnValue({
       ...baseState,
       events: mockEvents,
-      meta: { page: 1, per_page: 12, total: 30 },
+      meta: { page: 1, per_page: 12, total: 30, total_pages: 3 },
     });
 
     renderPage();
