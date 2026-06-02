@@ -26,7 +26,7 @@ function decodeBase64Url(value: string): string {
   return new TextDecoder().decode(bytes);
 }
 
-function parseUserIdFromToken(token: string): number | null {
+export function parseUserIdFromToken(token: string): number | null {
   try {
     const parts = token.split('.');
     if (parts.length < 2) {

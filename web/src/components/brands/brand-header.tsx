@@ -1,3 +1,5 @@
+import { Back } from '@/components/ui/back';
+
 interface BrandHeaderProps {
   name: string;
   subdomain: string;
@@ -17,6 +19,7 @@ export function BrandHeader({
 }: BrandHeaderProps) {
   return (
     <div className="flex items-start gap-4 pb-6 border-b border-neutral-100/80">
+      <Back />
       {logoUrl ? (
         <div className="p-0.5 rounded-2xl bg-white border border-neutral-100 shadow-sm shrink-0">
           <img src={logoUrl} alt={name} className="w-16 h-16 rounded-[14px] object-cover" />

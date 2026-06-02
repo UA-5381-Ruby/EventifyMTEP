@@ -26,6 +26,16 @@ RSpec.configure do |config|
           }
         },
         schemas: {
+          PaginationMeta: {
+            type: :object,
+            properties: {
+              current_page: { type: :integer },
+              per_page: { type: :integer },
+              total_count: { type: :integer },
+              total_pages: { type: :integer }
+            },
+            required: %w[current_page per_page total_count total_pages]
+          },
 
           User: {
             type: :object,
@@ -198,11 +208,12 @@ RSpec.configure do |config|
               meta: {
                 type: :object,
                 properties: {
-                  page: { type: :integer, example: 1 },
-                  per_page: { type: :integer, example: 20 },
-                  total: { type: :integer, example: 100 }
+                  current_page: { type: :integer },
+                  per_page: { type: :integer },
+                  total_count: { type: :integer },
+                  total_pages: { type: :integer }
                 },
-                required: %w[page per_page total]
+                required: %w[current_page per_page total_count total_pages]
               }
             },
             required: %w[data meta]

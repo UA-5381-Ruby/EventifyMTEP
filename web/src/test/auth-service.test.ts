@@ -1,4 +1,5 @@
 import AuthService from '@/services/auth-service';
+import { parseUserIdFromToken } from '@/services/auth-service';
 import apiClient, { tokenStorage } from '@/lib/api-client';
 jest.mock('@/lib/api-client', () => ({
   __esModule: true,
@@ -206,6 +207,11 @@ describe('subscribe', () => {
 
     expect(listener).not.toHaveBeenCalled();
   });
+});
+
+it('returns null for malformed token', () => {
+  const result = parseUserIdFromToken('notajwt');
+  expect(result).toBeNull();
 });
 
 describe('init', () => {
