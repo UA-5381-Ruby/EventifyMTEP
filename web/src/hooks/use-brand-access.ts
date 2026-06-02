@@ -12,15 +12,16 @@ export function useBrandAccess(
   id: string | undefined,
   userId: number | undefined
 ): UseBrandAccessResult {
+  const brandId = id && !Number.isNaN(Number(id)) ? Number(id) : null;
+
   const [memberships, setMemberships] = useState<Membership[]>([]);
-  const [isLoading, setIsLoading] = useState(!!id);
+  const [isLoading, setIsLoading] = useState(brandId !== null);
 
   useEffect(() => {
-    if (!id) return;
-
+    if (brandId === null) return;
     let isMounted = true;
 
-    BrandMembershipsService.getBrandMemberships(Number(id), {})
+    BrandMembershipsService.getBrandMemberships(brandId, {})
       .then((data) => {
         if (isMounted) setMemberships(data.data);
       })
@@ -34,7 +35,7 @@ export function useBrandAccess(
     return () => {
       isMounted = false;
     };
-  }, [id]);
+  }, [brandId]);
 
   const currentUserMembership = memberships.find((m) => m.user.id === userId);
   const canManage =

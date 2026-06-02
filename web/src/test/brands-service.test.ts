@@ -1,5 +1,5 @@
 import type { AxiosResponse } from 'axios';
-import type { CreateBrandRequest } from '@/types/brand.ts';
+import type { CreateBrandRequest } from '@/types/brand';
 
 jest.mock('@/lib/api-client.ts', () => ({
   __esModule: true,
@@ -31,14 +31,23 @@ describe('BrandsService', () => {
       },
     ];
 
-    jest.mocked(apiClient.get).mockResolvedValue({
+    const mockResponse = {
       data: mockBrands,
+      meta: {
+        current_page: 1,
+        total_pages: 3,
+        total_count: 30,
+      },
+    };
+
+    jest.mocked(apiClient.get).mockResolvedValue({
+      data: mockResponse,
     } as AxiosResponse);
 
-    const result = await brandsService.getAllBrands();
+    const result = await brandsService.getBrands({});
 
-    expect(apiClient.get).toHaveBeenCalledWith(endpoint);
-    expect(result).toEqual(mockBrands);
+    expect(apiClient.get).toHaveBeenCalledWith(endpoint, { params: {} });
+    expect(result).toEqual(mockResponse);
   });
 
   it('should fetch brand by id with events', async () => {
@@ -143,6 +152,12 @@ describe('BrandsService', () => {
     );
   });
 
+  it('should rethrow non-forbidden error when updating brand', async () => {
+    const networkError = new Error('Network Error');
+    jest.mocked(apiClient.patch).mockRejectedValue(networkError);
+
+    await expect(brandsService.updateBrand(1, { name: 'Test' })).rejects.toBe(networkError);
+  });
   it('should throw permission error when deleting brand without ownership', async () => {
     const forbiddenError = Object.assign(new Error('Forbidden'), { isForbidden: true });
     jest.mocked(apiClient.delete).mockRejectedValue(forbiddenError);
@@ -151,4 +166,11 @@ describe('BrandsService', () => {
       'You do not have permission to delete this brand'
     );
   });
+});
+
+it('should rethrow non-forbidden error when deleting brand', async () => {
+  const networkError = new Error('Network Error');
+  jest.mocked(apiClient.delete).mockRejectedValue(networkError);
+
+  await expect(brandsService.deleteBrand(1)).rejects.toBe(networkError);
 });

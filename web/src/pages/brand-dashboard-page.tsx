@@ -9,17 +9,19 @@ import { useAuth } from '@/hooks/use-auth';
 import { useBrandDashboard } from '@/hooks/use-brand-dashboard';
 import { useCreateEvent } from '@/hooks/use-create-event';
 
+import { useBrandAccess } from '@/hooks/use-brand-access';
+
 export function BrandDashboardPage() {
   const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
+  const { canManage, memberships, isLoading: membershipsLoading } = useBrandAccess(id, user?.id);
+
   const {
     brand,
     isLoading,
     error,
-    memberships,
-    membershipsLoading,
     isEditOpen,
     editFields,
     saveError,
@@ -29,10 +31,6 @@ export function BrandDashboardPage() {
   } = useBrandDashboard(id);
 
   const createEvent = useCreateEvent(Number(id) || 0, () => window.location.reload());
-
-  const currentUserMembership = memberships.find((m) => m.user.id === user?.id);
-  const canManage =
-    currentUserMembership?.role === 'owner' || currentUserMembership?.role === 'manager';
 
   useEffect(() => {
     if (!membershipsLoading && !isLoading && !canManage) {
