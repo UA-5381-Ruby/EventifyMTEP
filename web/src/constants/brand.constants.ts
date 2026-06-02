@@ -1,3 +1,5 @@
+import type { Tab } from '@/types/brand';
+
 export const BRAND_SORT_OPTIONS = [
   { value: 'created_at', label: 'Newest first' },
   { value: 'name', label: 'Name (A–Z)' },
@@ -19,7 +21,7 @@ export const EMPTY_BRAND_FIELDS = {
   secondary_color: '',
 };
 
-export const BRAND_TABS = [
+export const BRAND_TABS: { label: string; value: Tab }[] = [
   { label: 'My Brands', value: 'managed' },
   { label: 'Subscribed', value: 'subscribed' },
 ];

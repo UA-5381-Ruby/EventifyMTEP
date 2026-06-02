@@ -54,7 +54,7 @@ describe('Header', () => {
 
   it('calls logout and navigates to /login when logout is clicked', () => {
     renderHeader();
-    fireEvent.click(screen.getByText('Logout'));
+    fireEvent.click(screen.getByRole('button', { name: /logout/i }));
 
     expect(AuthService.logout).toHaveBeenCalledTimes(1);
     expect(mockNavigate).toHaveBeenCalledWith('/login', { replace: true });
@@ -64,7 +64,7 @@ describe('Header', () => {
     jest.mocked(tokenStorage.get).mockReturnValue('some-token');
 
     renderHeader();
-    fireEvent.click(screen.getByText('Profile'));
+    fireEvent.click(screen.getByRole('button', { name: /profile/i }));
 
     expect(mockNavigate).toHaveBeenCalledWith('/profile/settings');
   });
@@ -73,7 +73,7 @@ describe('Header', () => {
     jest.mocked(tokenStorage.get).mockReturnValue(null);
 
     renderHeader();
-    fireEvent.click(screen.getByText('Profile'));
+    fireEvent.click(screen.getByRole('button', { name: /profile/i }));
 
     expect(mockNavigate).toHaveBeenCalledWith('/register');
   });

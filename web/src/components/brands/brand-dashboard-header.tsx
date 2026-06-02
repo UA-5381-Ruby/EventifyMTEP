@@ -19,7 +19,7 @@ export function BrandDashboardHeader({
   return (
     <div className="flex flex-col md:flex-row items-start justify-between gap-6 pb-6 border-b border-neutral-100/80">
       <Back />
-      <div className="flsex items-start gap-4 flex-1 min-w-0">
+      <div className="flex items-start gap-4 flex-1 min-w-0">
         {brand.logo_url ? (
           <div className="p-0.5 rounded-2xl bg-white border border-neutral-100 shadow-sm shrink-0">
             <img
