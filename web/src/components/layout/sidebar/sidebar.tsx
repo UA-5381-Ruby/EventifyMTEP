@@ -9,10 +9,7 @@ interface SidebarProps {
   onToggleMenu?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({
-  onNavigate = () => { },
-  onToggleMenu,
-}) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => {}, onToggleMenu }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [currentPath, setActivePage] = useState<string>('dashboard');
   const handleToggleMenu = () => {

@@ -14,14 +14,13 @@ export function SuperAdminPage() {
 
   return (
     <PageWrapper>
-
       <div className="p-6 max-w-6xl mx-auto text-gray-800">
-
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold">Admin Panel</h1>
           <button
             onClick={() => navigate('/activity-log')}
-            className="bg-black text-white text-xs px-4 py-2 font-medium hover:bg-gray-800 transition-colors">
+            className="bg-black text-white text-xs px-4 py-2 font-medium hover:bg-gray-800 transition-colors"
+          >
             View Log activity page
           </button>
         </div>
@@ -38,18 +37,32 @@ export function SuperAdminPage() {
         <div className="mb-12">
           <div className="flex justify-between items-end mb-4">
             <h2 className="text-lg font-bold">Events Pending Approval</h2>
-            <a href="#" className="text-sm text-gray-600 hover:underline">View All</a>
+            <a href="#" className="text-sm text-gray-600 hover:underline">
+              View All
+            </a>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse border border-gray-300 text-sm bg-white">
               <thead>
                 <tr className="bg-gray-200">
-                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold w-1/6">Name</th>
-                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold w-1/6">Start Date</th>
-                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold w-1/6">Status</th>
-                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold w-1/6">Created By</th>
-                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold w-1/6">Location</th>
-                  <th className="border border-gray-300 px-4 py-3 text-center font-semibold w-1/3">Actions</th>
+                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold w-1/6">
+                    Name
+                  </th>
+                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold w-1/6">
+                    Start Date
+                  </th>
+                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold w-1/6">
+                    Status
+                  </th>
+                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold w-1/6">
+                    Created By
+                  </th>
+                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold w-1/6">
+                    Location
+                  </th>
+                  <th className="border border-gray-300 px-4 py-3 text-center font-semibold w-1/3">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -80,7 +93,9 @@ export function SuperAdminPage() {
         <div>
           <div className="flex justify-between items-end mb-2">
             <h2 className="text-lg font-bold">User Preview</h2>
-            <a href="#" className="text-sm text-gray-600 hover:underline">Manage Members</a>
+            <a href="#" className="text-sm text-gray-600 hover:underline">
+              Manage Members
+            </a>
           </div>
 
           <div className="border border-gray-300 p-6 bg-white">
@@ -118,7 +133,6 @@ export function SuperAdminPage() {
             </div>
           </div>
         </div>
-
       </div>
     </PageWrapper>
   );

@@ -12,7 +12,8 @@ import { Dashboard } from '@/pages/dashboard.tsx';
 import { BrandPublicPage } from '@/pages/brand-public-page.tsx';
 import { BrandListPage } from '@/pages/brand-list-page.tsx';
 import { BrandDashboardPage } from '@/pages/brand-dashboard-page.tsx';
-import { SuperAdminPage } from '@/pages/super-admin-page.tsx'; <Route path="/superadmin" element={<SuperAdminPage />} />
+import { SuperAdminPage } from '@/pages/super-admin-page.tsx';
+<Route path="/superadmin" element={<SuperAdminPage />} />;
 
 function App() {
   return (
@@ -37,7 +38,6 @@ function App() {
           <Route path="/dashboard/brands/:id" element={<BrandDashboardPage />} />
 
           <Route path="/profile/settings" element={<UserProfilePage />} />
-
         </Route>
         <Route path="*" element={<NotFoundPage />} />
       </Routes>

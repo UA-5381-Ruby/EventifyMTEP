@@ -2,7 +2,7 @@ import React from 'react';
 import { Header } from './header/header.tsx';
 import { Footer } from './footer';
 import { cn } from '@/lib/utils.ts';
-import { Sidebar } from "@/components/layout/sidebar/sidebar.tsx";
+import { Sidebar } from '@/components/layout/sidebar/sidebar.tsx';
 
 interface PageWrapperProps {
   children: React.ReactNode;

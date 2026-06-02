@@ -22,11 +22,15 @@ interface SidebarNavProps {
   onSelect: (id: string) => void;
 }
 
-export const SidebarNav: React.FC<SidebarNavProps> = ({ currentPath, onNavigate, isCollapsed, onSelect }) => {
+export const SidebarNav: React.FC<SidebarNavProps> = ({
+  currentPath,
+  onNavigate,
+  isCollapsed,
+  onSelect,
+}) => {
   return (
     <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
       {navItems.map((item) => {
-
         const isActive = currentPath === item.href;
         return (
           <button
