@@ -16,12 +16,12 @@ export const SidebarActions: React.FC<SidebarActionsProps> = ({
       style={{
         padding: '24px',
         display: 'flex',
-        flexDirection: 'row', // Выстраиваем элементы в одну линию
-        justifyContent: isCollapsed ? 'center' : 'space-between', // Центруем гамбургер при згортанні, інакше розносимо по краях
-        alignItems: 'center', // Выравниваем по вертикали
+        flexDirection: 'row', 
+        justifyContent: isCollapsed ? 'center' : 'space-between',
+        alignItems: 'center', 
       }}
     >
-      {/* Надпись показывается только если сайдбар НЕ свернут */}
+     
       {!isCollapsed && (
         <button
           onClick={onBack}
@@ -43,7 +43,7 @@ export const SidebarActions: React.FC<SidebarActionsProps> = ({
         </button>
       )}
 
-      {/* Гамбургер-меню */}
+     
       <button
         onClick={onToggleMenu}
         style={{
