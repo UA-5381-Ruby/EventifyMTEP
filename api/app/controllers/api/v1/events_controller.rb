@@ -34,10 +34,24 @@ module Api
       private
 
       def build_event
+        brand = authorize_brand_access!
+
+        Event.new(event_base_params.merge(brand: brand, status: 'draft')).tap do |event|
+          event.category_ids = event_params[:category_ids] if event_params[:category_ids].present?
+        end
+      end
+
+      def authorize_brand_access!
         brand = current_user.brands.find(event_params[:brand_id])
-        event = Event.new(event_params.except(:category_ids).merge(brand: brand, status: 'draft'))
-        event.category_ids = event_params[:category_ids] if event_params[:category_ids].present?
-        event
+        membership = brand.brand_memberships.find_by(user_id: current_user.id)
+
+        raise Pundit::NotAuthorizedError unless membership&.role.in?(%w[owner manager])
+
+        brand
+      end
+
+      def event_base_params
+        event_params.except(:category_ids)
       end
 
       def set_event
@@ -92,7 +106,9 @@ module Api
         events.joins(:categories).where(categories: { id: index_params[:category_id] })
       end
 
+      # Call this central method instead of reaching out to raw `params` multiple times
       def index_params
+        # Explicitly mark these keys as allowed on the root params context
         @index_params ||= params.permit(:from, :to, :q, :sort, :order, :page, :per_page, :status, :brand_id,
                                         :category_id)
       end

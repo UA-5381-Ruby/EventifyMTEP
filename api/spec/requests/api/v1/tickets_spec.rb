@@ -46,7 +46,7 @@ RSpec.describe 'api/v1/tickets', type: :request do
           create(:ticket, user: user, event: event2, is_active: false)
         end
 
-        let(:page) { 1 }
+        let(:current_page) { 1 }
         let(:per_page) { 20 }
 
         run_test!

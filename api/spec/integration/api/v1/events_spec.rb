@@ -127,7 +127,15 @@ RSpec.describe 'api/v1/events', type: :request do
         let(:brand) { create(:brand) }
         let!(:membership) { create(:brand_membership, user: user, brand: brand, role: 'owner') }
 
-        let(:body) { { event: { title: '', location: '', brand_id: brand.id } } }
+        let(:body) do
+          {
+            event: {
+              title: '',
+              location: '',
+              brand_id: brand.id
+            }
+          }
+        end
         run_test!
       end
       it 'is invalid if end_date is before start_date' do

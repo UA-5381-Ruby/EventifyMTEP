@@ -67,8 +67,8 @@ module Api
       private
 
       def set_brand
-        permitted = params.permit(:brand_id, :page, :per_page)
-        @brand = Brand.find(permitted[:brand_id])
+        @brand = Brand.find(params[:brand_id])
+
         authorize @brand, :manage_memberships?
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Brand not found' }, status: :not_found

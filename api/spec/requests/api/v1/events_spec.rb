@@ -8,6 +8,8 @@ RSpec.describe 'api/v1/events', type: :request do
   let!(:category) { create(:category) }
   let!(:membership) { create(:brand_membership, user: user, brand: brand, role: 'owner') }
 
+  # CRITICAL: Build the raw token payload string that your ApplicationController handles
+  # Replace this calculation with your true token encryption helper method if necessary
   let(:Authorization) { jwt_for(user) }
 
   let(:id) { create(:event, brand: brand, categories: [category]).id }
