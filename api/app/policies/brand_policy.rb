@@ -14,6 +14,10 @@ class BrandPolicy < ApplicationPolicy
   end
 
   def show_brand_memberships?
+    manage_memberships?
+  end
+
+  def manage_memberships?
     return false if user.nil?
 
     user.is_superadmin? || record.brand_memberships.exists?(user_id: user.id)

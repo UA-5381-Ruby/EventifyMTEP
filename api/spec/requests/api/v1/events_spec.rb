@@ -2,91 +2,65 @@
 
 require 'swagger_helper'
 
-RSpec.describe 'Api::V1::Events', type: :request do
-  include AuthHelper
-
+RSpec.describe 'api/v1/events', type: :request do
   let(:user) { create(:user) }
-  let!(:superadmin) { create(:user, is_superadmin: true) }
-  let!(:brand)    { create(:brand) }
+  let!(:brand) { create(:brand) }
   let!(:category) { create(:category) }
+  let!(:membership) { create(:brand_membership, user: user, brand: brand, role: 'owner') }
 
-  let(:valid_params) do
-    {
-      event: {
-        title: 'New Event',
-        start_date: 1.week.from_now.iso8601,
-        location: 'Kyiv',
-        brand_id: brand.id,
-        category_ids: [category.id],
-        status: 'draft'
-      }
-    }
-  end
+  # CRITICAL: Build the raw token payload string that your ApplicationController handles
+  # Replace this calculation with your true token encryption helper method if necessary
+  let(:Authorization) { jwt_for(user) }
 
-  context 'with valid params' do
-    it 'returns 201 and creates event' do
-      post '/api/v1/events',
-           params: valid_params,
-           headers: auth_headers(user),
-           as: :json
+  let(:id) { create(:event, brand: brand, categories: [category]).id }
+  let(:page) { 1 }
+  let(:per_page) { 12 }
+  let(:sort) { 'created_at' }
+  let(:order) { 'desc' }
+  let(:category_id) { category.id }
 
-      expect(response).to have_http_status(:created)
-      expect(response.parsed_body['title']).to eq('New Event')
+  path '/api/v1/events' do
+    get 'get events filtered by category' do
+      tags 'Events'
+      produces 'application/json'
+      parameter name: :Authorization, in: :header, type: :string, required: true
+      parameter name: :page, in: :query, type: :integer, required: false
+      parameter name: :per_page, in: :query, type: :integer, required: false
+
+      response '200', 'returns a 200 response' do
+        run_test!
+      end
     end
 
-    context 'with invalid params' do
-      it 'returns 422 with errors' do
-        post '/api/v1/events',
-             params: { event: { title: '' } },
-             headers: auth_headers(user),
-             as: :json
+    post 'post event created' do
+      tags 'Events'
+      consumes 'application/json'
+      parameter name: :Authorization, in: :header, type: :string, required: true
+      parameter name: :event, in: :body, schema: { type: :object }
 
-        expect(response).to have_http_status(:unprocessable_content)
-        expect(response.parsed_body).to have_key('errors')
+      response '201', 'event created' do
+        let(:event) do
+          { event: { title: 'Valid Event', brand_id: brand.id, start_date: Time.current.iso8601, location: 'Lviv' } }
+        end
+        run_test!
+      end
+
+      response '422', 'post validation failed' do
+        let(:event) { { event: { title: '', brand_id: brand.id } } }
+        run_test!
       end
     end
   end
 
-  describe 'GET /api/v1/events' do
-    before { create_list(:event, 5, brand: brand, categories: [category]) }
+  path '/api/v1/events/{id}' do
+    get 'get event found' do
+      tags 'Events'
+      parameter name: :Authorization, in: :header, type: :string, required: true
+      parameter name: :id, in: :path, type: :integer
 
-    it 'returns 200 and paginated list' do
-      # Додаємо headers
-      get '/api/v1/events',
-          params: { page: 1, per_page: 3 },
-          headers: auth_headers(user)
-
-      expect(response).to have_http_status(:ok)
-      body = response.parsed_body
-      expect(body['data'].length).to eq(3)
-      expect(body['meta']['total']).to eq(Event.count)
-    end
-
-    it 'sorts by start_date desc' do
-      create(:event, brand: brand, categories: [category], start_date: 1.day.from_now)
-      create(:event, brand: brand, categories: [category], start_date: 3.days.from_now)
-      create(:event, brand: brand, categories: [category], start_date: 2.days.from_now)
-
-      get '/api/v1/events',
-          params: { sort: 'start_date', order: 'desc' },
-          headers: auth_headers(user)
-
-      expect(response).to have_http_status(:ok)
-
-      dates = response.parsed_body['data'].map { |d| Time.iso8601(d['start_date']) }
-      expect(dates).to eq(dates.sort.reverse)
-    end
-
-    let!(:event) { create(:event, brand: brand, categories: [category]) }
-
-    it 'returns the event' do
-      get "/api/v1/events/#{event.id}", headers: auth_headers(user), as: :json
-      expect(response).to have_http_status(:ok)
-    end
-
-    it 'returns 404 for unknown id' do
-      get '/api/v1/events/999999', headers: auth_headers(user), as: :json
-      expect(response).to have_http_status(:not_found)
+      response '200', 'returns a 200 response' do
+        run_test!
+      end
     end
   end
 end

@@ -7,19 +7,18 @@ import { BrandGrid } from '@/components/brands/brand-grid';
 import { useBrands } from '@/hooks/use-brands';
 import { PER_PAGE } from '@/constants/ui.constants';
 
-export function BrandListPage() {
+export function BrandDiscoverPage() {
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState('created_at');
   const [page, setPage] = useState(1);
 
-  const params = {
+  const { brands, total, isLoading, error, refetch } = useBrands({
     page,
     per_page: PER_PAGE,
     sort,
+    scope: 'discover',
     ...(search.trim() ? { q: search.trim() } : {}),
-  };
-
-  const { brands, total, isLoading, error, refetch } = useBrands(params);
+  });
 
   const totalPages = total != null ? Math.ceil(total / PER_PAGE) : 1;
 

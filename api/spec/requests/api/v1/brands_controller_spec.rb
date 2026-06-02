@@ -7,9 +7,15 @@ RSpec.describe Api::V1::BrandsController, type: :controller do
   let(:valid_params) { { name: 'Test Brand' } }
   let(:user) { instance_double('User') }
 
+  let(:brands_association) { instance_double('ActiveRecord::Associations::CollectionProxy') }
+
   before do
     allow(controller).to receive(:authorize_request).and_return(true)
     allow(controller).to receive(:current_user).and_return(user)
+
+    allow(user).to receive(:brands).and_return(brands_association)
+    allow(brands_association).to receive(:find).with('1').and_return(brand)
+    allow(brands_association).to receive(:find).with(1).and_return(brand)
 
     allow(Brand).to receive(:find).and_return(brand)
     allow(Brand).to receive(:find_by).and_return(brand)

@@ -6,7 +6,13 @@ class EventPolicy < ApplicationPolicy
   end
 
   def create?
-    user&.is_superadmin
+    return false unless user
+
+    user.is_superadmin? ||
+      user.brand_memberships.exists?(
+        brand_id: record.brand_id,
+        role: %w[owner manager]
+      )
   end
 
   def update?

@@ -1,16 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
 import { brandsService } from '@/services/brands-service';
-import type { Brand } from '@/types/brand';
+import type { Brand, BrandScope } from '@/types/brand';
 
 interface BrandQueryParams {
   page: number;
   per_page: number;
   sort?: string;
   q?: string;
-}
-
-interface BrandWithCount extends Brand {
-  events_count?: number;
+  scope?: BrandScope;
 }
 
 interface UseBrandsResult {
@@ -28,6 +25,8 @@ export function useBrands(params: BrandQueryParams): UseBrandsResult {
   const [error, setError] = useState<string | null>(null);
   const [tick, setTick] = useState(0);
 
+  const { page, per_page, sort, q, scope } = params;
+
   const refetch = useCallback(() => setTick((t) => t + 1), []);
 
   useEffect(() => {
@@ -37,35 +36,19 @@ export function useBrands(params: BrandQueryParams): UseBrandsResult {
       try {
         setIsLoading(true);
         setError(null);
-        const data = await brandsService.getAllBrands();
+
+        const response = await brandsService.getBrands({
+          page,
+          per_page,
+          sort,
+          q,
+          scope,
+        });
 
         if (!isMounted) return;
 
-        let result = [...data];
-
-        if (params.q) {
-          const q = params.q.toLowerCase();
-          result = result.filter(
-            (b) =>
-              b.name.toLowerCase().includes(q) ||
-              b.subdomain.toLowerCase().includes(q) ||
-              (b.description || '').toLowerCase().includes(q)
-          );
-        }
-
-        if (params.sort === 'name') {
-          result.sort((a, b) => a.name.localeCompare(b.name));
-        } else if (params.sort === 'events_count') {
-          result.sort(
-            (a, b) =>
-              ((b as BrandWithCount).events_count ?? 0) - ((a as BrandWithCount).events_count ?? 0)
-          );
-        }
-
-        setTotal(result.length);
-
-        const start = (params.page - 1) * params.per_page;
-        setBrands(result.slice(start, start + params.per_page));
+        setBrands(response.data);
+        setTotal(response.meta.total_count);
       } catch {
         if (isMounted) setError('Failed to load brands.');
       } finally {
@@ -78,7 +61,7 @@ export function useBrands(params: BrandQueryParams): UseBrandsResult {
     return () => {
       isMounted = false;
     };
-  }, [params.page, params.per_page, params.sort, params.q, tick]);
+  }, [page, per_page, sort, q, scope, tick]);
 
   return { brands, total, isLoading, error, refetch };
 }

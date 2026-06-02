@@ -12,8 +12,11 @@ RSpec.describe 'api/v1/brands', type: :request do
       security [{ bearer_auth: [] }]
 
       response '200', 'brands listed' do
-        schema type: :array, items: { '$ref' => '#/components/schemas/Brand' }
-
+        schema type: :object,
+               properties: {
+                 data: { type: :array, items: { '$ref' => '#/components/schemas/Brand' } },
+                 meta: { '$ref' => '#/components/schemas/PaginationMeta' }
+               }
         before do
           @user = create(:user)
           brands = create_list(:brand, 2)

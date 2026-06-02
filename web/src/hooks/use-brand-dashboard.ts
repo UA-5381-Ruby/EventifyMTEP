@@ -1,16 +1,13 @@
 import { useState, useEffect } from 'react';
 import { brandsService } from '@/services/brands-service';
-import { BrandMembershipsService } from '@/services/brand-memberships-service';
 import type { BrandWithEvents } from '@/types/brand';
-import type { Membership } from '@/types/brand-memberships';
 import type { BrandEditFields } from '@/components/brands/brand-edit-modal';
+import { EMPTY_BRAND_FIELDS } from '@/constants/brand.constants.ts';
 
-interface UseBrandDashboardResult {
+export interface UseBrandDashboardResult {
   brand: BrandWithEvents | null;
   isLoading: boolean;
   error: string | null;
-  memberships: Membership[];
-  membershipsLoading: boolean;
   isEditOpen: boolean;
   editFields: BrandEditFields;
   saveError: string | null;
@@ -19,21 +16,10 @@ interface UseBrandDashboardResult {
   handleSave: () => Promise<void>;
 }
 
-const EMPTY_BRAND_FIELDS: BrandEditFields = {
-  name: '',
-  description: '',
-  logo_url: '',
-  subdomain: '',
-  primary_color: '',
-  secondary_color: '',
-};
-
 export function useBrandDashboard(id: string | undefined): UseBrandDashboardResult {
   const [brand, setBrand] = useState<BrandWithEvents | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [memberships, setMemberships] = useState<Membership[]>([]);
-  const [membershipsLoading, setMembershipsLoading] = useState(true);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [editFields, setEditFields] = useState<BrandEditFields>(EMPTY_BRAND_FIELDS);
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -41,23 +27,16 @@ export function useBrandDashboard(id: string | undefined): UseBrandDashboardResu
   useEffect(() => {
     let isMounted = true;
 
-    const fetchAll = async () => {
+    const fetch = async () => {
       if (!id) {
         setError('Missing brand ID');
         setIsLoading(false);
         return;
       }
 
-      const brandId = Number(id);
-      const [brandResult, membershipsResult] = await Promise.allSettled([
-        brandsService.getBrandById(brandId),
-        BrandMembershipsService.getBrandMemberships(brandId, {}),
-      ]);
-
-      if (!isMounted) return;
-
-      if (brandResult.status === 'fulfilled') {
-        const b = brandResult.value;
+      try {
+        const b = await brandsService.getBrandById(Number(id));
+        if (!isMounted) return;
         setBrand(b);
         setEditFields({
           name: b.name,
@@ -67,19 +46,14 @@ export function useBrandDashboard(id: string | undefined): UseBrandDashboardResu
           primary_color: b.primary_color || '',
           secondary_color: b.secondary_color || '',
         });
-      } else {
-        setError('Brand not found.');
+      } catch {
+        if (isMounted) setError('Brand not found.');
+      } finally {
+        if (isMounted) setIsLoading(false);
       }
-
-      if (membershipsResult.status === 'fulfilled') {
-        setMemberships(membershipsResult.value.data);
-      }
-
-      setIsLoading(false);
-      setMembershipsLoading(false);
     };
 
-    fetchAll();
+    fetch();
     return () => {
       isMounted = false;
     };
@@ -97,8 +71,7 @@ export function useBrandDashboard(id: string | undefined): UseBrandDashboardResu
       setBrand((prev) => (prev ? { ...prev, ...updated } : null));
       setIsEditOpen(false);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Update failed.';
-      setSaveError(message);
+      setSaveError(error instanceof Error ? error.message : 'Update failed.');
     }
   };
 
@@ -106,8 +79,6 @@ export function useBrandDashboard(id: string | undefined): UseBrandDashboardResu
     brand,
     isLoading,
     error,
-    memberships,
-    membershipsLoading,
     isEditOpen,
     editFields,
     saveError,
