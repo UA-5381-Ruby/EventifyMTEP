@@ -16,12 +16,11 @@ export const SidebarActions: React.FC<SidebarActionsProps> = ({
       style={{
         padding: '24px',
         display: 'flex',
-        flexDirection: 'row', 
+        flexDirection: 'row',
         justifyContent: isCollapsed ? 'center' : 'space-between',
-        alignItems: 'center', 
+        alignItems: 'center',
       }}
     >
-     
       {!isCollapsed && (
         <button
           onClick={onBack}
@@ -43,7 +42,6 @@ export const SidebarActions: React.FC<SidebarActionsProps> = ({
         </button>
       )}
 
-     
       <button
         onClick={onToggleMenu}
         style={{
