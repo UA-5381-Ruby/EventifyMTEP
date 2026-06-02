@@ -1,10 +1,20 @@
+import { useState } from 'react';
 import type { EventDetail } from '@/types/event';
+import { Button } from '@/components/ui/button';
 
 interface EventHostSectionProps {
   brand: EventDetail['brand'];
 }
 
 export function EventHostSection({ brand }: EventHostSectionProps) {
+  const [following, setFollowing] = useState(false);
+  const [followingVariant, setFollowingVariant] = useState<'primary' | 'secondary'>('secondary');
+
+  const processFollow = () => {
+    setFollowingVariant(following ? 'secondary' : 'primary');
+    setFollowing(!following);
+  };
+
   return (
     <div className="py-6">
       <p className="text-sm font-semibold text-neutral-800 mb-3">Hosted by</p>
@@ -22,12 +32,10 @@ export function EventHostSection({ brand }: EventHostSectionProps) {
         </span>
 
         <div className="flex items-center gap-2">
-          <button className="text-xs border border-neutral-300 text-neutral-700 px-3 py-1.5 rounded-md hover:bg-neutral-50 transition-colors">
-            Contact
-          </button>
-          <button className="text-xs bg-neutral-900 text-white px-3 py-1.5 rounded-md hover:bg-neutral-700 transition-colors">
-            + Follow
-          </button>
+          <Button>Contact</Button>
+          <Button variant={followingVariant} onClick={processFollow}>
+            {following ? 'Following' : '+ Follow'}
+          </Button>
         </div>
       </div>
     </div>

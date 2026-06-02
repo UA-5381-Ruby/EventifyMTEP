@@ -2,6 +2,8 @@ import { Calendar, Clock, Ticket, Users } from 'lucide-react';
 import { formatDate, formatTimeRange } from '@/utils/date';
 import type { EventDetail } from '@/types/event';
 
+import { Button } from '@/components/ui/button';
+
 interface EventDateTimeSectionProps {
   event: EventDetail;
 }
@@ -21,19 +23,16 @@ export function EventDateTimeSection({ event }: EventDateTimeSectionProps) {
           <Clock size={14} className="shrink-0 text-neutral-400" />
           <span>{timeRange}</span>
         </div>
-        <button className="text-xs text-amber-500 font-medium hover:underline">
-          + Add to Calendar
-        </button>
       </div>
 
       <div className="flex flex-col items-end gap-2 shrink-0">
-        <button className="flex items-center gap-2 bg-amber-400 hover:bg-amber-500 transition-colors text-white font-semibold text-sm px-5 py-2.5 rounded-lg shadow-sm">
+        <Button>
           <Ticket size={14} />
           Buy Tickets
-        </button>
+        </Button>
         <div className="flex items-center gap-1.5 text-xs text-neutral-500">
           <Users size={12} />
-          <span>210/300 tickets</span>
+          <span>80 tickets remaining</span>
         </div>
       </div>
     </div>
