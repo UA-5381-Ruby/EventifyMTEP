@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui';
 import { useCategories } from '@/hooks/use-categories';
 import { useCategoryCreator } from '@/hooks/use-category-creator';
@@ -11,12 +11,11 @@ interface CategoryPickerProps {
 export function CategoryPicker({ selectedIds, onChange }: CategoryPickerProps) {
   const { categories } = useCategories();
 
-  const toggleCategory = (id: number) => {
-    const next = selectedIds.includes(id)
-      ? selectedIds.filter((c) => c !== id)
-      : [...selectedIds, id];
-    onChange(next);
-  };
+  const selectedIdsRef = useRef(selectedIds);
+
+  useEffect(() => {
+    selectedIdsRef.current = selectedIds;
+  }, [selectedIds]);
 
   const {
     extraCategories,
@@ -31,8 +30,22 @@ export function CategoryPicker({ selectedIds, onChange }: CategoryPickerProps) {
     handleCreateCategory,
     handleCatKeyDown,
   } = useCategoryCreator({
-    onCreated: (id) => onChange([...selectedIds, id]),
+    onCreated: (id) => {
+      const currentIds = selectedIdsRef.current;
+      if (!currentIds.includes(id)) {
+        onChange([...currentIds, id]);
+      }
+    },
   });
+
+  const toggleCategory = (id: number) => {
+    if (isCreatingCat) return;
+
+    const next = selectedIds.includes(id)
+      ? selectedIds.filter((c) => c !== id)
+      : [...selectedIds, id];
+    onChange(next);
+  };
 
   const allCategories = useMemo(
     () => [...categories, ...extraCategories],
@@ -75,7 +88,8 @@ export function CategoryPicker({ selectedIds, onChange }: CategoryPickerProps) {
                 key={cat.id}
                 type="button"
                 onClick={() => toggleCategory(cat.id)}
-                className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
+                disabled={isCreatingCat} // Вимикаємо кнопки під час створення
+                className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors disabled:opacity-75 ${
                   selected
                     ? 'bg-primary-600 text-white border-primary-600'
                     : 'bg-white text-neutral-600 border-neutral-200 hover:border-primary-300'
