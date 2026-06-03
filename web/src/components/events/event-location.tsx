@@ -7,6 +7,8 @@ import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
+import { MapService } from '@/services/map-service';
+
 const DefaultIcon = L.icon({
   iconUrl: icon,
   shadowUrl: iconShadow,
@@ -28,27 +30,15 @@ export function EventLocationSection({ location }: EventLocationSectionProps) {
   useEffect(() => {
     if (isOnline || !location) return;
 
-    const fetchCoordinates = async () => {
-      try {
-        // OpenStreetMap's free Nominatim Geocoding API
-        const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(location)}`
-        );
-        const data = await response.json();
-
-        if (data && data.length > 0) {
-          setCoords([parseFloat(data[0].lat), parseFloat(data[0].lon)]);
-          setError(false);
-        } else {
-          setError(true);
-        }
-      } catch (err) {
+    MapService.getCoordinates(location)
+      .then(({ lat, lon }) => {
+        setCoords([lat, lon]);
+        setError(false);
+      })
+      .catch((err) => {
         console.error('Error fetching coordinates:', err);
         setError(true);
-      }
-    };
-
-    fetchCoordinates();
+      });
   }, [location, isOnline]);
 
   return (
