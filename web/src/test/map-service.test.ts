@@ -32,7 +32,8 @@ describe('MapService.getCoordinates', () => {
     await MapService.getCoordinates('Lviv, Ukraine');
 
     expect(mockFetch).toHaveBeenCalledWith(
-      'https://nominatim.openstreetmap.org/search?format=json&q=Lviv%2C%20Ukraine'
+      'https://nominatim.openstreetmap.org/search?format=json&q=Lviv%2C%20Ukraine',
+      { signal: AbortSignal.timeout(5000) }
     );
   });
 
@@ -56,5 +57,25 @@ describe('MapService.getCoordinates', () => {
     mockFetch.mockRejectedValueOnce(new Error('Network error'));
 
     await expect(MapService.getCoordinates('Kyiv')).rejects.toThrow('Network error');
+  });
+
+  it('throws when the response is not an array', async () => {
+    mockFetchResolving({ lat: '50.4501', lon: '30.5234' }); // object, not array
+
+    await expect(MapService.getCoordinates('Kyiv')).rejects.toThrow('No coordinates found');
+  });
+
+  it('throws when lat or lon properties are missing', async () => {
+    mockFetchResolving([{ lat: '50.4501' }]); // missing lon
+
+    await expect(MapService.getCoordinates('Kyiv')).rejects.toThrow();
+  });
+
+  it('handles non-numeric coordinate strings gracefully', async () => {
+    mockFetchResolving([{ lat: 'invalid', lon: '30.5234' }]);
+
+    const result = await MapService.getCoordinates('Kyiv');
+
+    expect(result.lat).toBeNaN(); // or verify error is thrown if validation added
   });
 });

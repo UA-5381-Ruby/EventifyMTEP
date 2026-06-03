@@ -7,18 +7,13 @@ const BASE_URL = 'https://nominatim.openstreetmap.org/search';
 
 export const MapService = {
   async getCoordinates(location: string): Promise<Coordinates> {
-    const response = await fetch(
-      `${BASE_URL}?format=json&q=${encodeURIComponent(location)}`,
-      {
-        signal: AbortSignal.timeout(5000), // 5 second timeout
-      }
-    );
+    const response = await fetch(`${BASE_URL}?format=json&q=${encodeURIComponent(location)}`, {
+      signal: AbortSignal.timeout(5000), // 5 second timeout
+    });
 
     if (!response.ok) {
       throw new Error(`Geocoding request failed: ${response.status}`);
     }
-
-    const data = await response.json();
 
     const data = await response.json();
 
