@@ -32,7 +32,7 @@ describe('MapService.getCoordinates', () => {
     await MapService.getCoordinates('Lviv, Ukraine');
 
     expect(mockFetch).toHaveBeenCalledWith(
-      'https://nominatim.openstreetmap.org/search?format=json&q=Lviv%2C%20Ukraine',
+      `${import.meta.env.VITE_MAP_API_BASE_URL}?format=json&q=Lviv%2C%20Ukraine`,
       { signal: AbortSignal.timeout(5000) }
     );
   });
