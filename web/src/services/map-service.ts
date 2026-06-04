@@ -1,15 +1,13 @@
-export interface Coordinates {
-  lat: number;
-  lon: number;
-}
-
-const BASE_URL = 'https://nominatim.openstreetmap.org/search';
+import { type Coordinates } from '@/types/map';
 
 export const MapService = {
   async getCoordinates(location: string): Promise<Coordinates> {
-    const response = await fetch(`${BASE_URL}?format=json&q=${encodeURIComponent(location)}`, {
-      signal: AbortSignal.timeout(5000), // 5 second timeout
-    });
+    const response = await fetch(
+      `${import.meta.env.VITE_MAP_API_BASE_URL}?format=json&q=${encodeURIComponent(location)}`,
+      {
+        signal: AbortSignal.timeout(5000), // 5 second timeout
+      }
+    );
 
     if (!response.ok) {
       throw new Error(`Geocoding request failed: ${response.status}`);
