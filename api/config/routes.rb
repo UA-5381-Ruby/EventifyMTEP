@@ -1,4 +1,4 @@
-﻿# frozen_string_literal: true
+# frozen_string_literal: true
 
 Rails.application.routes.draw do
   if Rails.env.development? || Rails.env.test?

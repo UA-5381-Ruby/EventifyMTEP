@@ -12,7 +12,7 @@ Rails.application.configure do
   config.enable_reloading = false
 
   # Set FRONTEND_URL for mailer tests
-  ENV['FRONTEND_URL'] = 'http://localhost:5173'
+  ENV['FRONTEND_URL'] ||= 'http://localhost:5173'
 
   # Eager loading loads your entire application. When running a single test locally,
   # this is usually not necessary, and can slow down your test suite. However, it's
