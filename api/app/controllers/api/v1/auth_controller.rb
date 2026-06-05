@@ -10,8 +10,7 @@ module Api
         user = User.new(user_params)
 
         if user.save
-          token = user.generate_token_for(:email_verification)
-          UserMailer.email_verification(user, token).deliver_later
+          token = MailerService.send_email_verification(user)
 
           DeleteUnconfirmedUserJob.set(wait: 24.hours).perform_later(user.id)
 

@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+﻿# frozen_string_literal: true
 
 module Api
   module V1
@@ -14,8 +14,7 @@ module Api
         user = User.find_by('LOWER(email) = ?', email)
 
         if user
-          token = user.generate_token_for(:password_reset)
-          UserMailer.reset_password(user, token).deliver_later
+          token = MailerService.send_reset_password(user)
         end
 
         render json: { message: 'If your email exists, you will receive reset instructions' }, status: :ok
@@ -26,6 +25,7 @@ module Api
         user = User.find_by_token_for(:password_reset, params[:token])
 
         return render json: { error: 'Invalid or expired token' }, status: :bad_request if user.nil?
+
         if params[:new_password].blank?
           return render json: { error: 'New password cannot be blank' },
                         status: :unprocessable_content
