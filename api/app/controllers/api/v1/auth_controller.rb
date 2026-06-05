@@ -10,8 +10,11 @@ module Api
         user = User.new(user_params)
 
         if user.save
-          token = JwtService.encode(user_id: user.id, password_salt: user.password_salt)
-          render json: { token: token, user: user_as_json(user) }, status: :created
+          MailerService.send_email_verification(user)
+
+          DeleteUnconfirmedUserJob.set(wait: 24.hours).perform_later(user.id)
+
+          render json: { message: 'Account created! Please check your email to verify your account.' }, status: :created
         else
           render json: { errors: user.errors.full_messages }, status: :unprocessable_content
         end
@@ -19,18 +22,29 @@ module Api
 
       # POST /auth/login
       def login
-        email = params[:email].to_s.strip.downcase
-        user = User.find_by('LOWER(email) = ?', email)
+        user = find_user_by_email
 
-        if user&.authenticate(params[:password])
-          token = JwtService.encode(user_id: user.id, password_salt: user.password_salt)
-          render json: { token: token, user: user_as_json(user) }, status: :ok
-        else
-          render json: { error: 'Invalid email or password' }, status: :unauthorized
+        unless user&.authenticate(params[:password])
+          return render json: { error: 'Invalid email or password' }, status: :unauthorized
         end
+
+        unless user.email_confirmed?
+          return render json: { error: 'Please verify your email address to log in.' }, status: :forbidden
+        end
+
+        render json: auth_success_payload(user), status: :ok
       end
 
       private
+
+      def find_user_by_email
+        User.find_by('LOWER(email) = ?', params[:email].to_s.strip.downcase)
+      end
+
+      def auth_success_payload(user)
+        token = JwtService.encode(user_id: user.id, password_salt: user.password_salt)
+        { token: token, user: user_as_json(user) }
+      end
 
       def user_params
         attributes = %i[name email password]

@@ -8,15 +8,21 @@ class User < ApplicationRecord
   has_many :tickets, dependent: :destroy
 
   validates :name, presence: true
-
   validates :password, presence: true, length: { minimum: 6 }, if: -> { new_record? || !password.nil? }
-
   validates :email,
             presence: true,
             uniqueness: { case_sensitive: false },
             format: { with: /\A[^@\s]+@[^@\s]+\.[^@\s]+\z/, message: 'must be a valid email address' }
 
-  generates_token_for :password_reset, expires_in: 2.days do
+  generates_token_for :email_verification, expires_in: 24.hours do
+    email
+  end
+
+  generates_token_for :password_reset, expires_in: 10.minutes do
     password_salt&.last(10)
+  end
+
+  def email_confirmed?
+    is_confirmed == true
   end
 end

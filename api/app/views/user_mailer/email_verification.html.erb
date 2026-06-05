@@ -1,0 +1,13 @@
+<h1>Verify Your Email Address</h1>
+
+<p>Hello <%= @user.name %>,</p>
+
+<p>Thank you for signing up for Eventify! Please verify your email address by clicking the link below:</p>
+
+<p><a href="<%= @verify_link %>"><%= @verify_link %></a></p>
+
+<p>This link will expire in 24 hours.</p>
+
+<p>If you did not create this account, you can safely ignore this email.</p>
+
+<p>Best regards,<br>The Eventify Team</p>
