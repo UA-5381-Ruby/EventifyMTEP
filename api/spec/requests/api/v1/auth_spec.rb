@@ -1,8 +1,14 @@
-﻿# frozen_string_literal: true
+# frozen_string_literal: true
 
 require 'rails_helper'
 
 RSpec.describe 'Auth Endpoints', type: :request do
+  include ActiveSupport::Testing::TimeHelpers
+
+  before do
+    ENV['FRONTEND_URL'] = 'http://localhost:5173'
+  end
+
   describe 'POST /api/v1/auth/register' do
     let(:params) do
       {
@@ -21,9 +27,9 @@ RSpec.describe 'Auth Endpoints', type: :request do
     end
 
     it 'queues the email verification mailer' do
-      expect {
+      expect do
         post '/api/v1/auth/register', params: { user: params }
-      }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+      end.to have_enqueued_job(ActionMailer::MailDeliveryJob)
     end
 
     it 'returns error when email is duplicate' do
@@ -63,9 +69,9 @@ RSpec.describe 'Auth Endpoints', type: :request do
 
   describe 'POST /api/v1/auth/confirm_email' do
     let(:user) { create(:user, is_confirmed: false) }
-    let(:token) { user.generate_token_for(:email_verification) }
 
-    it 'confirms the user email' do
+    it 'confirms the user email with valid token' do
+      token = user.generate_token_for(:email_verification)
       post '/api/v1/auth/confirm_email', params: { token: token }
 
       expect(response).to have_http_status(:ok)
@@ -80,7 +86,12 @@ RSpec.describe 'Auth Endpoints', type: :request do
     end
 
     it 'returns error for expired token' do
-      travel 25.hours do
+      # Create user and token
+      user = create(:user, is_confirmed: false)
+      token = user.generate_token_for(:email_verification)
+
+      # Travel 25 hours into the future
+      travel_to(25.hours.from_now) do
         post '/api/v1/auth/confirm_email', params: { token: token }
       end
 
@@ -90,13 +101,19 @@ RSpec.describe 'Auth Endpoints', type: :request do
 end
 
 RSpec.describe 'Password Reset Endpoints', type: :request do
+  include ActiveSupport::Testing::TimeHelpers
+
+  before do
+    ENV['FRONTEND_URL'] = 'http://localhost:5173'
+  end
+
   describe 'POST /api/v1/auth/password/reset' do
     let(:user) { create(:user) }
 
     it 'queues the reset password mailer for existing user' do
-      expect {
+      expect do
         post '/api/v1/auth/password/reset', params: { email: user.email }
-      }.to have_enqueued_job(ActionMailer::MailDeliveryJob)
+      end.to have_enqueued_job(ActionMailer::MailDeliveryJob)
     end
 
     it 'returns generic message for non-existent email' do
@@ -115,10 +132,10 @@ RSpec.describe 'Password Reset Endpoints', type: :request do
 
   describe 'POST /api/v1/auth/password/reset?token=...' do
     let(:user) { create(:user, password: 'oldpassword') }
-    let(:token) { user.generate_token_for(:password_reset) }
 
     it 'updates password with valid token' do
-      post '/api/v1/auth/password/reset?token=' + token, params: { new_password: 'newpassword' }
+      token = user.generate_token_for(:password_reset)
+      post "/api/v1/auth/password/reset?token=#{token}", params: { new_password: 'newpassword' }
 
       expect(response).to have_http_status(:ok)
       expect(user.reload.authenticate('newpassword')).to be_truthy
@@ -131,14 +148,14 @@ RSpec.describe 'Password Reset Endpoints', type: :request do
     end
 
     it 'returns error for blank password' do
-      post '/api/v1/auth/password/reset?token=' + token, params: { new_password: '' }
+      token = user.generate_token_for(:password_reset)
+      post "/api/v1/auth/password/reset?token=#{token}", params: { new_password: '' }
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(json_response[:error]).to include('blank')
     end
   end
 end
-
 
 def json_response
   JSON.parse(response.body).with_indifferent_access

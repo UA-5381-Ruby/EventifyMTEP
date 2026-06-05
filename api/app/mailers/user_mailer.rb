@@ -1,4 +1,4 @@
-﻿# frozen_string_literal: true
+# frozen_string_literal: true
 
 class UserMailer < ApplicationMailer
   def email_verification(user, signed_id)
@@ -8,7 +8,7 @@ class UserMailer < ApplicationMailer
     mail(
       to: @user.email,
       subject: 'Verify your email address',
-      content_type: "text/html"
+      content_type: 'text/html'
     )
   end
 

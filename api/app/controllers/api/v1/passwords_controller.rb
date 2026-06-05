@@ -1,4 +1,4 @@
-﻿# frozen_string_literal: true
+# frozen_string_literal: true
 
 module Api
   module V1
@@ -13,9 +13,7 @@ module Api
         email = params[:email].to_s.strip.downcase
         user = User.find_by('LOWER(email) = ?', email)
 
-        if user
-          token = MailerService.send_reset_password(user)
-        end
+        MailerService.send_reset_password(user) if user
 
         render json: { message: 'If your email exists, you will receive reset instructions' }, status: :ok
       end

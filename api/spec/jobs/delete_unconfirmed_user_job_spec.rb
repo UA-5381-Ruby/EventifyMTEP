@@ -1,4 +1,4 @@
-﻿# frozen_string_literal: true
+# frozen_string_literal: true
 
 require 'rails_helper'
 
@@ -7,7 +7,6 @@ RSpec.describe DeleteUnconfirmedUserJob, type: :job do
 
   it 'destroys unconfirmed user' do
     described_class.perform_now(user.id)
-
     expect(User.find_by(id: user.id)).to be_nil
   end
 

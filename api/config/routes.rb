@@ -4,6 +4,7 @@ Rails.application.routes.draw do
   if Rails.env.development? || Rails.env.test?
     mount Rswag::Ui::Engine => '/api-docs'
     mount Rswag::Api::Engine => '/api-docs'
+    mount LetterOpenerWeb::Engine, at: '/letter_opener' if Rails.env.development?
   end
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
