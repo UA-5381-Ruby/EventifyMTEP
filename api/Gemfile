@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+﻿# frozen_string_literal: true
 
 source 'https://rubygems.org'
 ruby '3.4.8'
@@ -36,6 +36,10 @@ group :development, :test do
   gem 'rubocop', require: false
   gem 'ruby-lint', require: false
   gem 'ruby-lsp', require: false
+end
+
+group :development do
+  gem 'letter_opener_web'
 end
 
 group :test do

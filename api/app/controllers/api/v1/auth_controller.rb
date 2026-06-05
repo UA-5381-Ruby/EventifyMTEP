@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+﻿# frozen_string_literal: true
 
 module Api
   module V1
@@ -10,8 +10,12 @@ module Api
         user = User.new(user_params)
 
         if user.save
-          token = JwtService.encode(user_id: user.id, password_salt: user.password_salt)
-          render json: { token: token, user: user_as_json(user) }, status: :created
+          token = user.generate_token_for(:email_verification)
+          UserMailer.email_verification(user, token).deliver_later
+
+          DeleteUnconfirmedUserJob.set(wait: 24.hours).perform_later(user.id)
+
+          render json: { message: 'Account created! Please check your email to verify your account.' }, status: :created
         else
           render json: { errors: user.errors.full_messages }, status: :unprocessable_content
         end
@@ -23,6 +27,10 @@ module Api
         user = User.find_by('LOWER(email) = ?', email)
 
         if user&.authenticate(params[:password])
+          unless user.email_confirmed?
+            return render json: { error: 'Please verify your email address to log in.' }, status: :forbidden
+          end
+
           token = JwtService.encode(user_id: user.id, password_salt: user.password_salt)
           render json: { token: token, user: user_as_json(user) }, status: :ok
         else
