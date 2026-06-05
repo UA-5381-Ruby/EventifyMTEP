@@ -1,8 +1,11 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+﻿import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { UIPreview } from '@/pages/ui-preview.tsx';
 import ProtectedRoute from '@/components/protected-route';
 import { LoginPage } from '@/pages/login-page';
 import { RegistrationPage } from '@/pages/registration-page.tsx';
+import { VerifyEmailPage } from '@/pages/verify-email-page.tsx';
+import { ForgotPasswordPage } from '@/pages/forgot-password-page.tsx';
+import { ResetPasswordPage } from '@/pages/reset-password-page.tsx';
 import { EventListPage } from '@/pages/event-list-page.tsx';
 import { EventDetailPage } from '@/pages/event-detail-page';
 import { NotFoundPage } from '@/pages/not-found-page.tsx';
@@ -22,6 +25,9 @@ function App() {
         <Route path="/" element={<Navigate to="/events" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegistrationPage />} />
+        <Route path="/verify-email" element={<VerifyEmailPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
 
         <Route path="/events" element={<EventListPage />} />
         <Route path="/events/:id" element={<EventDetailPage />} />
