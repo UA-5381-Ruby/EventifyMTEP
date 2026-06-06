@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input, Button, Checkbox } from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
 import authService from '@/services/auth-service';
-import {Eye, EyeOff} from "lucide-react";
+import { Eye, EyeOff } from 'lucide-react';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -63,7 +63,7 @@ export function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 bottom-2.5 text-neutral-400 hover:text-neutral-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm"
+                    className="absolute right-3 bottom-2.5 text-neutral-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff /> : <Eye />}
@@ -119,6 +119,6 @@ export function LoginPage() {
           </div>
         </div>
       </PageWrapper>
-  </>
+    </>
   );
 }

@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
 import authService from '@/services/auth-service';
-import { CircleCheck, XCircle, CircleAlert  } from 'lucide-react';
+import { CircleCheck, XCircle, CircleAlert } from 'lucide-react';
 
 type VerificationState = 'loading' | 'success' | 'error' | 'expired';
 
@@ -49,7 +49,9 @@ export function VerifyEmailPage() {
                   <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin" />
                 </div>
                 <h1 className="text-2xl font-bold text-neutral-900 mb-2">Verifying Email</h1>
-                <p className="text-neutral-600">Please wait while we verify your email address...</p>
+                <p className="text-neutral-600">
+                  Please wait while we verify your email address...
+                </p>
               </>
             )}
 
@@ -108,7 +110,8 @@ export function VerifyEmailPage() {
                 </div>
                 <h1 className="text-2xl font-bold text-yellow-900 mb-2">Link Expired</h1>
                 <p className="text-yellow-800 mb-6">
-                  This verification link has expired. Please register again to receive a new verification email.
+                  This verification link has expired. Please register again to receive a new
+                  verification email.
                 </p>
                 <Button
                   onClick={() => navigate('/registration')}

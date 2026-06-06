@@ -25,11 +25,6 @@ describe('RegistrationPage', () => {
     expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
   });
 
-  it('renders the "Remember me" checkbox', () => {
-    renderRegistration();
-    expect(screen.getByLabelText(/remember me/i)).toBeInTheDocument();
-  });
-
   it('renders the "Log In" button', () => {
     renderRegistration();
     expect(screen.getByRole('button', { name: /^log in$/i })).toBeInTheDocument();
@@ -75,49 +70,6 @@ describe('RegistrationPage', () => {
     expect(screen.getByTestId('input-password')).toHaveAttribute('type', 'password');
   });
 
-  it('"Remember me" checkbox is unchecked by default', () => {
-    renderRegistration();
-    expect(screen.getByLabelText(/remember me/i)).not.toBeChecked();
-  });
-
-  it('toggles "Remember me" checkbox on click', () => {
-    renderRegistration();
-    const checkbox = screen.getByLabelText(/remember me/i);
-    fireEvent.click(checkbox);
-    expect(checkbox).toBeChecked();
-    fireEvent.click(checkbox);
-    expect(checkbox).not.toBeChecked();
-  });
-
-  it('calls authService.register with rememberMe = true', async () => {
-    (authService.register as jest.Mock).mockResolvedValueOnce({});
-    renderRegistration();
-
-    fireEvent.change(screen.getByTestId('input-name'), {
-      target: { value: 'John Doe' },
-    });
-    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
-      target: { value: 'john@example.com' },
-    });
-    fireEvent.change(screen.getByTestId('input-password'), {
-      target: { value: 'pass1234' },
-    });
-
-    fireEvent.click(screen.getByLabelText(/remember me/i));
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
-
-    await waitFor(() => {
-      expect(authService.register).toHaveBeenCalledWith(
-        {
-          name: 'John Doe',
-          email: 'john@example.com',
-          password: 'pass1234',
-        },
-        true
-      );
-    });
-  });
-
   it('navigates to /login when "Log In" is clicked', () => {
     renderRegistration();
     fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
@@ -136,48 +88,12 @@ describe('RegistrationPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
-      expect(authService.register).toHaveBeenCalledWith(
-        {
-          name: 'John Doe',
-          email: 'john@example.com',
-          password: 'pass1234',
-        },
-        false
-      );
+      expect(authService.register).toHaveBeenCalledWith({
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'pass1234',
+      });
     });
-  });
-
-  it('navigates to /events after successful registration', async () => {
-    (authService.register as jest.Mock).mockResolvedValueOnce({});
-    renderRegistration();
-
-    fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'John Doe' } });
-    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
-      target: { value: 'john@example.com' },
-    });
-    fireEvent.change(screen.getByTestId('input-password'), { target: { value: 'pass1234' } });
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
-
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/events', { replace: true });
-    });
-  });
-
-  it('does not navigate to /events when registration throws', async () => {
-    (authService.register as jest.Mock).mockRejectedValueOnce(new Error('Email already taken'));
-    renderRegistration();
-
-    fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'John Doe' } });
-    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
-      target: { value: 'taken@example.com' },
-    });
-    fireEvent.change(screen.getByTestId('input-password'), { target: { value: 'pass1234' } });
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
-
-    await waitFor(() => {
-      expect(authService.register).toHaveBeenCalledTimes(1);
-    });
-    expect(mockNavigate).not.toHaveBeenCalled();
   });
 
   it('shows error message when registration fails', async () => {

@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, type ChangeEvent, type SyntheticEvent } from 'react';
+﻿import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Input, Button } from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
@@ -10,24 +10,15 @@ type ResetPasswordState = 'form' | 'loading' | 'success' | 'error';
 export function ResetPasswordPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const token = searchParams.get('token') ?? '';
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [state, setState] = useState<ResetPasswordState>('form');
-  const [token, setToken] = useState('');
+  const [error, setError] = useState(() => (token ? '' : 'No reset token provided.'));
+  const [state, setState] = useState<ResetPasswordState>(() => (token ? 'form' : 'error'));
   const [validationError, setValidationError] = useState('');
-
-  useEffect(() => {
-    const resetToken = searchParams.get('token');
-    if (!resetToken) {
-      setError('No reset token provided.');
-      setState('error');
-    } else {
-      setToken(resetToken);
-    }
-  }, [searchParams]);
 
   const validateForm = (): boolean => {
     if (!password) {
@@ -83,7 +74,8 @@ export function ResetPasswordPage() {
               </div>
               <h1 className="text-2xl font-bold text-green-900 mb-2">Password Reset!</h1>
               <p className="text-green-800 mb-6">
-                Your password has been successfully reset. You can now log in with your new password.
+                Your password has been successfully reset. You can now log in with your new
+                password.
               </p>
               <Button
                 onClick={() => navigate('/login')}
@@ -177,7 +169,9 @@ export function ResetPasswordPage() {
                   type={showConfirmPassword ? 'text' : 'password'}
                   placeholder="Confirm new password"
                   value={confirmPassword}
-                  onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setConfirmPassword(e.target.value)
+                  }
                   autoComplete="new-password"
                   disabled={state === 'loading'}
                   className="pr-10"

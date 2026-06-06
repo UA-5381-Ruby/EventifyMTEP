@@ -21,6 +21,7 @@ export function RegistrationPage() {
 
     try {
       await authService.register({ name, email, password });
+
       setRegistrationSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
@@ -38,17 +39,12 @@ export function RegistrationPage() {
               <div className="text-center space-y-6">
                 <div className="bg-green-50 border border-green-200 rounded-lg p-6">
                   <div className="text-4xl mb-3"></div>
-                  <h1 className="text-2xl font-bold text-green-900 mb-2">
-                    Account Created!
-                  </h1>
-                  <p className="text-green-800 mb-4">
-                    We''ve sent a verification email to:
-                  </p>
-                  <p className="text-lg font-semibold text-green-900 mb-6">
-                    {email}
-                  </p>
+                  <h1 className="text-2xl font-bold text-green-900 mb-2">Account Created!</h1>
+                  <p className="text-green-800 mb-4">We've sent a verification email to:</p>
+                  <p className="text-lg font-semibold text-green-900 mb-6">{email}</p>
                   <p className="text-sm text-green-700 mb-6">
-                    Please check your inbox and click the verification link to activate your account. The link will expire in 24 hours.
+                    Please check your inbox and click the verification link to activate your
+                    account. The link will expire in 24 hours.
                   </p>
                   <p className="text-xs text-green-600">
                     Didn't receive the email? Check your spam folder or contact support.
