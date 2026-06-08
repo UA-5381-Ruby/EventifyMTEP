@@ -183,7 +183,7 @@ export function ResetPasswordPage() {
                   className="absolute right-3 bottom-2.5 text-neutral-400 hover:text-neutral-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 rounded-sm"
                   aria-label={showConfirmPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? <EyeOff /> : <Eye />}
+                  {showConfirmPassword ? <EyeOff /> : <Eye />}
                 </button>
               </div>
 
