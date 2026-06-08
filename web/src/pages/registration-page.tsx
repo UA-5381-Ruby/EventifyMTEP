@@ -12,6 +12,8 @@ export function RegistrationPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
 
@@ -19,9 +21,14 @@ export function RegistrationPage() {
     e.preventDefault();
     setError('');
 
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
+      return;
+    }
+
     try {
       await authService.register({ name, email, password });
-
+      authService.logout();
       setRegistrationSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Registration failed. Please try again.');
@@ -38,8 +45,13 @@ export function RegistrationPage() {
             <div className="w-full md:w-[55%] bg-white md:rounded-r-[3.5rem] p-8 sm:p-12 flex flex-col justify-center relative z-20 shrink-0 shadow-[12px_0_40px_rgba(59,130,246,0.08)] border-r border-blue-50/50">
               <div className="text-center space-y-6">
                 <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-                  <div className="text-4xl mb-3"></div>
-                  <h1 className="text-2xl font-bold text-green-900 mb-2">Account Created!</h1>
+                  <h1
+                    className="text-2xl font-bold text-green-900 mb-2"
+                    tabIndex={-1}
+                    ref={(el) => el?.focus()}
+                  >
+                    Account Created!
+                  </h1>
                   <p className="text-green-800 mb-4">We've sent a verification email to:</p>
                   <p className="text-lg font-semibold text-green-900 mb-6">{email}</p>
                   <p className="text-sm text-green-700 mb-6">
@@ -120,6 +132,31 @@ export function RegistrationPage() {
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff /> : <Eye />}
+                </button>
+              </div>
+
+              <div className="space-y-1.5 relative">
+                <Input
+                  label="Confirm Password"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  placeholder="Confirm password"
+                  value={confirmPassword}
+                  onChange={(e: ChangeEvent<HTMLInputElement>) =>
+                    setConfirmPassword(e.target.value)
+                  }
+                  autoComplete="new-password"
+                  className="pr-10"
+                  required
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((v) => !v)}
+                  className="absolute right-3 bottom-2.5 text-neutral-400 hover:text-neutral-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm"
+                  aria-label={
+                    showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'
+                  }
+                >
+                  {showConfirmPassword ? <EyeOff /> : <Eye />}
                 </button>
               </div>
 
