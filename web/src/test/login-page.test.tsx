@@ -216,4 +216,27 @@ describe('LoginPage', () => {
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
   });
+
+  it('shows generic fallback error when login rejects with a non-Error value', async () => {
+    (authService.login as jest.Mock).mockRejectedValueOnce('plain string rejection');
+    renderLogin();
+
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'user@example.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), {
+      target: { value: 'secret123' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Login failed. Please try again.');
+    });
+  });
+
+  it('navigates to /forgot-password when "Forgot Password?" is clicked', () => {
+    renderLogin();
+    fireEvent.click(screen.getByRole('button', { name: /forgot password/i }));
+    expect(mockNavigate).toHaveBeenCalledWith('/forgot-password');
+  });
 });

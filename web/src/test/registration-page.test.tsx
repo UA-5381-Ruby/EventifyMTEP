@@ -135,4 +135,40 @@ describe('RegistrationPage', () => {
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
   });
+
+  it('shows generic fallback error when register rejects with a non-Error value', async () => {
+    (authService.register as jest.Mock).mockRejectedValueOnce('plain string rejection');
+    renderRegistration();
+
+    fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Bob' } });
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'b@b.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), { target: { value: 'pass' } });
+    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Registration failed. Please try again.');
+    });
+  });
+
+  it('navigates to /login when "Go to Login" is clicked on the success screen', async () => {
+    (authService.register as jest.Mock).mockResolvedValueOnce({});
+    renderRegistration();
+
+    fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'Bob' } });
+    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
+      target: { value: 'b@b.com' },
+    });
+    fireEvent.change(screen.getByTestId('input-password'), { target: { value: 'pass' } });
+    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /go to login/i })).toBeInTheDocument();
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: /go to login/i }));
+
+    expect(mockNavigate).toHaveBeenCalledWith('/login');
+  });
 });
