@@ -1,4 +1,4 @@
-﻿import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { UIPreview } from '@/pages/ui-preview.tsx';
 import ProtectedRoute from '@/components/protected-route';
 import { LoginPage } from '@/pages/login-page';
