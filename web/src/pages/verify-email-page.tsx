@@ -84,7 +84,7 @@ export function VerifyEmailPage() {
                 <p className="text-red-800 mb-6">{errorMessage}</p>
                 <div className="space-y-2">
                   <Button
-                    onClick={() => navigate('/registration')}
+                    onClick={() => navigate('/register')}
                     fullWidth
                     variant="outline"
                     className="border-blue-500 text-blue-500 hover:bg-blue-50"
@@ -114,7 +114,7 @@ export function VerifyEmailPage() {
                   verification email.
                 </p>
                 <Button
-                  onClick={() => navigate('/registration')}
+                  onClick={() => navigate('/register')}
                   fullWidth
                   variant="outline"
                   className="border-neutral-300 text-neutral-700 hover:bg-gray-50"
