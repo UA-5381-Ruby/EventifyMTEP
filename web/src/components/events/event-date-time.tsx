@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { Calendar, Clock, Ticket, Users } from 'lucide-react';
 import { formatDate, formatTimeRange } from '@/utils/date';
 import type { EventDetail } from '@/types/event';
 
 import { Button } from '@/components/ui/button';
+
+import { PaymentService } from '@/services/payment-service';
 
 interface EventDateTimeSectionProps {
   event: EventDetail;
@@ -10,6 +13,21 @@ interface EventDateTimeSectionProps {
 
 export function EventDateTimeSection({ event }: EventDateTimeSectionProps) {
   const timeRange = formatTimeRange(event.start_date, event.end_date);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleBuyTickets = async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const { pageUrl } = await PaymentService.createInvoice(event.id);
+      window.location.href = pageUrl;
+    } catch {
+      setError('Could not initiate payment. Please try again.');
+      setIsLoading(false);
+    }
+  };
 
   return (
     <div className="flex gap-4 py-6">
@@ -26,14 +44,17 @@ export function EventDateTimeSection({ event }: EventDateTimeSectionProps) {
       </div>
 
       <div className="flex flex-col items-end gap-2 shrink-0">
-        <Button>
-          <Ticket size={14} />
-          Buy Tickets
+        <Button onClick={handleBuyTickets} isLoading={isLoading}>
+          {!isLoading && <Ticket size={14} />}
+          {isLoading ? 'Redirecting…' : 'Buy Tickets'}
         </Button>
         <div className="flex items-center gap-1.5 text-xs text-neutral-500">
           <Users size={12} />
           <span>80 tickets remaining</span>
         </div>
+        {error && (
+          <p className="text-xs text-error-500 text-right max-w-40">{error}</p>
+        )}
       </div>
     </div>
   );

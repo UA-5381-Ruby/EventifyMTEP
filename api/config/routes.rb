@@ -15,6 +15,9 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
+      resources :payments, only: [:create]
+      post "payments/webhook", to: "payments#webhook"
+
       post '/auth/register', to: 'auth#register'
       post '/auth/login', to: 'auth#login'
       post '/auth/confirm_email', to: 'confirmations#create'
