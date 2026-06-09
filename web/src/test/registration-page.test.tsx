@@ -5,6 +5,31 @@ import authService from '@/services/auth-service';
 
 const renderRegistration = () => render(<RegistrationPage />);
 
+const fillForm = ({
+  name = 'Bob',
+  email = 'b@b.com',
+  password = 'pass1234',
+  confirmPassword = 'pass1234',
+} = {}) => {
+  fireEvent.change(screen.getByRole('textbox', { name: /^name$/i }), {
+    target: { value: name },
+  });
+  fireEvent.change(screen.getByRole('textbox', { name: /e-mail address/i }), {
+    target: { value: email },
+  });
+  fireEvent.change(screen.getByLabelText(/^password$/i), {
+    target: { value: password },
+  });
+  fireEvent.change(screen.getByLabelText(/^confirm password$/i), {
+    target: { value: confirmPassword },
+  });
+};
+
+const fillAndSubmit = (overrides?: Parameters<typeof fillForm>[0]) => {
+  fillForm(overrides);
+  fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+};
+
 describe('RegistrationPage', () => {
   beforeEach(() => jest.clearAllMocks());
 
@@ -13,21 +38,17 @@ describe('RegistrationPage', () => {
     expect(screen.getByRole('heading', { name: /registration/i })).toBeInTheDocument();
   });
 
-  it('renders name, email, and password inputs', () => {
+  it('renders name, email, password, and confirm password inputs', () => {
     renderRegistration();
-    expect(screen.getByTestId('input-name')).toBeInTheDocument();
-    expect(screen.getByTestId('input-e-mail-address')).toBeInTheDocument();
-    expect(screen.getByTestId('input-password')).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /^name$/i })).toBeInTheDocument();
+    expect(screen.getByRole('textbox', { name: /e-mail address/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/^password$/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^confirm password$/i)).toBeInTheDocument();
   });
 
   it('renders the submit button', () => {
     renderRegistration();
     expect(screen.getByRole('button', { name: /create account/i })).toBeInTheDocument();
-  });
-
-  it('renders the "Remember me" checkbox', () => {
-    renderRegistration();
-    expect(screen.getByLabelText(/remember me/i)).toBeInTheDocument();
   });
 
   it('renders the "Log In" button', () => {
@@ -37,85 +58,66 @@ describe('RegistrationPage', () => {
 
   it('updates name field on change', () => {
     renderRegistration();
-    const input = screen.getByTestId('input-name');
+    const input = screen.getByRole('textbox', { name: /^name$/i });
     fireEvent.change(input, { target: { value: 'John Doe' } });
     expect(input).toHaveValue('John Doe');
   });
 
   it('updates email field on change', () => {
     renderRegistration();
-    const input = screen.getByTestId('input-e-mail-address');
+    const input = screen.getByRole('textbox', { name: /e-mail address/i });
     fireEvent.change(input, { target: { value: 'john@example.com' } });
     expect(input).toHaveValue('john@example.com');
   });
 
   it('updates password field on change', () => {
     renderRegistration();
-    const input = screen.getByTestId('input-password');
+    const input = screen.getByLabelText(/^password$/i);
+    fireEvent.change(input, { target: { value: 'pass1234' } });
+    expect(input).toHaveValue('pass1234');
+  });
+
+  it('updates confirm password field on change', () => {
+    renderRegistration();
+    const input = screen.getByLabelText(/^confirm password$/i);
     fireEvent.change(input, { target: { value: 'pass1234' } });
     expect(input).toHaveValue('pass1234');
   });
 
   it('password field is of type password by default', () => {
     renderRegistration();
-    expect(screen.getByTestId('input-password')).toHaveAttribute('type', 'password');
+    expect(screen.getByLabelText(/^password$/i)).toHaveAttribute('type', 'password');
   });
 
-  it('toggles password to visible when eye button is clicked', () => {
+  it('confirm password field is of type password by default', () => {
     renderRegistration();
-    fireEvent.click(screen.getByRole('button', { name: /show password/i }));
-    expect(screen.getByTestId('input-password')).toHaveAttribute('type', 'text');
-    expect(screen.getByTestId('eye-off-icon')).toBeInTheDocument();
+    expect(screen.getByLabelText(/^confirm password$/i)).toHaveAttribute('type', 'password');
+  });
+
+  it('toggles password to visible when show-password button is clicked', () => {
+    renderRegistration();
+    fireEvent.click(screen.getByRole('button', { name: /^show password$/i }));
+    expect(screen.getByLabelText(/^password$/i)).toHaveAttribute('type', 'text');
   });
 
   it('toggles password back to hidden on second click', () => {
     renderRegistration();
-    fireEvent.click(screen.getByRole('button', { name: /show password/i }));
-    fireEvent.click(screen.getByRole('button', { name: /hide password/i }));
-    expect(screen.getByTestId('input-password')).toHaveAttribute('type', 'password');
+    fireEvent.click(screen.getByRole('button', { name: /^show password$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^hide password$/i }));
+    expect(screen.getByLabelText(/^password$/i)).toHaveAttribute('type', 'password');
   });
 
-  it('"Remember me" checkbox is unchecked by default', () => {
+  it('toggles confirm password to visible when show-confirm-password button is clicked', () => {
     renderRegistration();
-    expect(screen.getByLabelText(/remember me/i)).not.toBeChecked();
+    fireEvent.click(screen.getByRole('button', { name: /^show confirm password$/i }));
+    expect(screen.getByLabelText(/^confirm password$/i)).toHaveAttribute('type', 'text');
   });
 
-  it('toggles "Remember me" checkbox on click', () => {
+  it('toggles confirm password back to hidden on second click', () => {
     renderRegistration();
-    const checkbox = screen.getByLabelText(/remember me/i);
-    fireEvent.click(checkbox);
-    expect(checkbox).toBeChecked();
-    fireEvent.click(checkbox);
-    expect(checkbox).not.toBeChecked();
-  });
-
-  it('calls authService.register with rememberMe = true', async () => {
-    (authService.register as jest.Mock).mockResolvedValueOnce({});
-    renderRegistration();
-
-    fireEvent.change(screen.getByTestId('input-name'), {
-      target: { value: 'John Doe' },
-    });
-    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
-      target: { value: 'john@example.com' },
-    });
-    fireEvent.change(screen.getByTestId('input-password'), {
-      target: { value: 'pass1234' },
-    });
-
-    fireEvent.click(screen.getByLabelText(/remember me/i));
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
-
-    await waitFor(() => {
-      expect(authService.register).toHaveBeenCalledWith(
-        {
-          name: 'John Doe',
-          email: 'john@example.com',
-          password: 'pass1234',
-        },
-        true
-      );
-    });
+    fireEvent.click(screen.getByRole('button', { name: /^show confirm password$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^hide confirm password$/i }));
+    expect(screen.getByLabelText(/^confirm password$/i)).toHaveAttribute('type', 'password');
   });
 
   it('navigates to /login when "Log In" is clicked', () => {
@@ -124,75 +126,97 @@ describe('RegistrationPage', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/login');
   });
 
-  it('calls authService.register with correct data on submit', async () => {
+  it('shows error and does not call register when passwords do not match', async () => {
+    renderRegistration();
+    fillAndSubmit({ confirmPassword: 'different' });
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Passwords do not match.');
+    });
+    expect(authService.register).not.toHaveBeenCalled();
+  });
+
+  it('clears password mismatch error on next submit when passwords match', async () => {
     (authService.register as jest.Mock).mockResolvedValueOnce({});
     renderRegistration();
 
-    fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'John Doe' } });
-    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
-      target: { value: 'john@example.com' },
-    });
-    fireEvent.change(screen.getByTestId('input-password'), { target: { value: 'pass1234' } });
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+    fillAndSubmit({ confirmPassword: 'wrong' });
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
 
-    await waitFor(() => {
-      expect(authService.register).toHaveBeenCalledWith(
-        {
-          name: 'John Doe',
-          email: 'john@example.com',
-          password: 'pass1234',
-        },
-        false
-      );
-    });
+    fillAndSubmit();
+    await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
   });
 
-  it('navigates to /events after successful registration', async () => {
+  it('calls authService.register with correct data when passwords match', async () => {
     (authService.register as jest.Mock).mockResolvedValueOnce({});
     renderRegistration();
-
-    fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'John Doe' } });
-    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
-      target: { value: 'john@example.com' },
+    fillAndSubmit({
+      name: 'John Doe',
+      email: 'john@example.com',
+      password: 'pass1234',
+      confirmPassword: 'pass1234',
     });
-    fireEvent.change(screen.getByTestId('input-password'), { target: { value: 'pass1234' } });
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/events', { replace: true });
+      expect(authService.register).toHaveBeenCalledWith({
+        name: 'John Doe',
+        email: 'john@example.com',
+        password: 'pass1234',
+      });
     });
   });
 
-  it('does not navigate to /events when registration throws', async () => {
-    (authService.register as jest.Mock).mockRejectedValueOnce(new Error('Email already taken'));
+  it('calls authService.logout after successful registration to clear the session', async () => {
+    (authService.register as jest.Mock).mockResolvedValueOnce({});
     renderRegistration();
-
-    fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'John Doe' } });
-    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
-      target: { value: 'taken@example.com' },
-    });
-    fireEvent.change(screen.getByTestId('input-password'), { target: { value: 'pass1234' } });
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+    fillAndSubmit();
 
     await waitFor(() => {
-      expect(authService.register).toHaveBeenCalledTimes(1);
+      expect(authService.logout).toHaveBeenCalledTimes(1);
     });
-    expect(mockNavigate).not.toHaveBeenCalled();
+  });
+
+  it('shows success screen with the submitted email after registration', async () => {
+    (authService.register as jest.Mock).mockResolvedValueOnce({});
+    renderRegistration();
+    fillAndSubmit({ email: 'john@example.com' });
+
+    await waitFor(() => {
+      expect(screen.getByRole('heading', { name: /account created/i })).toBeInTheDocument();
+      expect(screen.getByText('john@example.com')).toBeInTheDocument();
+    });
+  });
+
+  it('navigates to /login when "Go to Login" is clicked on the success screen', async () => {
+    (authService.register as jest.Mock).mockResolvedValueOnce({});
+    renderRegistration();
+    fillAndSubmit();
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: /go to login/i })).toBeInTheDocument()
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /go to login/i }));
+    expect(mockNavigate).toHaveBeenCalledWith('/login');
   });
 
   it('shows error message when registration fails', async () => {
     (authService.register as jest.Mock).mockRejectedValueOnce(new Error('Email already taken'));
     renderRegistration();
-
-    fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'John Doe' } });
-    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
-      target: { value: 'taken@example.com' },
-    });
-    fireEvent.change(screen.getByTestId('input-password'), { target: { value: 'pass1234' } });
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+    fillAndSubmit();
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent('Email already taken');
+    });
+  });
+
+  it('shows generic fallback error when register rejects with a non-Error value', async () => {
+    (authService.register as jest.Mock).mockRejectedValueOnce('plain string rejection');
+    renderRegistration();
+    fillAndSubmit();
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Registration failed. Please try again.');
     });
   });
 
@@ -202,21 +226,10 @@ describe('RegistrationPage', () => {
       .mockResolvedValueOnce({});
     renderRegistration();
 
-    fireEvent.change(screen.getByTestId('input-name'), { target: { value: 'John Doe' } });
-    fireEvent.change(screen.getByTestId('input-e-mail-address'), {
-      target: { value: 'taken@example.com' },
-    });
-    fireEvent.change(screen.getByTestId('input-password'), { target: { value: 'pass1234' } });
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
+    fillAndSubmit();
+    await waitFor(() => expect(screen.getByRole('alert')).toBeInTheDocument());
 
-    await waitFor(() => {
-      expect(screen.getByRole('alert')).toBeInTheDocument();
-    });
-
-    fireEvent.click(screen.getByRole('button', { name: /create account/i }));
-
-    await waitFor(() => {
-      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
-    });
+    fillAndSubmit();
+    await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
   });
 });
