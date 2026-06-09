@@ -11,19 +11,22 @@ module Api
         paginated = paginate(filtered_events)
 
         render json: {
-          data: paginated[:records],
+          data: paginated[:records].as_json(methods: [:banner_url]),
           meta: paginated[:meta]
         }
       end
 
       def show
-        render json: @event.as_json(include: event_serialization_includes), status: :ok
+        render json: @event.as_json(
+          methods: [:banner_url],
+          include: event_serialization_includes
+        ), status: :ok
       end
 
       def create
         @event = build_event
         if @event.save
-          render json: @event, status: :created
+          render json: @event.as_json(methods: [:banner_url]), status: :created
         else
           render json: { errors: @event.errors }, status: :unprocessable_content
         end
@@ -35,10 +38,18 @@ module Api
 
       def build_event
         brand = authorize_brand_access!
+        attrs = process_banner_upload(event_base_params.to_h)
 
-        Event.new(event_base_params.merge(brand: brand, status: 'draft')).tap do |event|
+        Event.new(attrs.merge(brand: brand, status: 'draft')).tap do |event|
           event.category_ids = event_params[:category_ids] if event_params[:category_ids].present?
         end
+      end
+
+      def process_banner_upload(attrs)
+        if attrs[:banner].present? && attrs[:banner].is_a?(ActionDispatch::Http::UploadedFile)
+          attrs[:banner] = S3BucketService.new.upload(attrs[:banner], folder: 'events/banners')
+        end
+        attrs
       end
 
       def authorize_brand_access!
@@ -72,7 +83,7 @@ module Api
       def event_params
         params.expect(event: [
                         :title, :description, :location, :start_date,
-                        :end_date, :status, :brand_id, { category_ids: [] }
+                        :end_date, :status, :brand_id, :banner, { category_ids: [] }
                       ])
       end
 
@@ -106,9 +117,7 @@ module Api
         events.joins(:categories).where(categories: { id: index_params[:category_id] })
       end
 
-      # Call this central method instead of reaching out to raw `params` multiple times
       def index_params
-        # Explicitly mark these keys as allowed on the root params context
         @index_params ||= params.permit(:from, :to, :q, :sort, :order, :page, :per_page, :status, :brand_id,
                                         :category_id)
       end
