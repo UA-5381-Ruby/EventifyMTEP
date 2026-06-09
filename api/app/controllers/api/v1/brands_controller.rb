@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+
 module Api
   module V1
     class BrandsController < ApplicationController
@@ -137,3 +139,4 @@ module Api
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
