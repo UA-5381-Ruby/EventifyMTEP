@@ -8,6 +8,8 @@ class Brand < ApplicationRecord
   has_many :users, through: :brand_memberships
   has_many :events, dependent: :destroy
 
+  before_destroy :remove_logo_from_s3
+
   validates :name,
             presence: true,
             length: { maximum: 100 }
@@ -31,4 +33,14 @@ class Brand < ApplicationRecord
               with: HEX_COLOR_REGEX,
               message: 'must be a valid hex color code'
             }
+
+  def logo_url
+    S3BucketService.new.file_url(logo) if logo.present?
+  end
+
+  private
+
+  def remove_logo_from_s3
+    S3BucketService.new.delete(logo) if logo.present?
+  end
 end
