@@ -5,7 +5,7 @@ type SpinnerSize = 'sm' | 'md' | 'lg' | 'xl';
 interface SpinnerProps {
   size?: SpinnerSize;
   className?: string;
-  label?: string; // для accessibility
+  label?: string;
 }
 
 const sizeStyles: Record<SpinnerSize, string> = {
