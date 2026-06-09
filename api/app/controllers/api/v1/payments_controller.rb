@@ -1,43 +1,44 @@
+# frozen_string_literal: true
+
 module Api
   module V1
     class PaymentsController < ApplicationController
-      skip_before_action :verify_authenticity_token, only: [:webhook]
+      # skip_before_action :verify_authenticity_token, only: [:webhook]
 
       def create
         event = Event.find(params[:event_id])
 
         result = MonobankService.create_invoice(
-          amount_uah:   event.price,
+          # amount_uah:   event.price,
+          amount_uah:   100,  # UAH are converted to kopiykas in the service, so this is 100 UAH for testing
           order_id:     "event-#{event.id}-user-#{current_user.id}",
-          redirect_url: "#{ENV['FRONTEND_URL']}/payment/callback",
-          webhook_url:  "#{ENV['BACKEND_URL']}/api/payments/webhook"
+          event:        event,
+          redirect_url: "http://localhost:5173/payment/callback",
+          webhook_url:  "#{ENV['BACKEND_URL']}/api/v1/payments/webhook"
         )
 
         if result["pageUrl"]
-          # Persist a pending order so you can match the webhook later
-          Order.create!(
-            user:       current_user,
-            event:      event,
-            invoice_id: result["invoiceId"],
-            status:     "pending"
-          )
-          render json: { pageUrl: result["pageUrl"] }
+          # Store invoice_id temporarily so we can match it in the webhook
+          # We'll create the actual Ticket only after payment is confirmed
+          render json: { pageUrl: result["pageUrl"], invoiceId: result["invoiceId"] }
         else
           render json: { error: result["errCode"] }, status: :unprocessable_entity
         end
       end
 
       def webhook
-        body = request.raw_post
+        payload = JSON.parse(request.raw_post)
 
-        # Optional but recommended: verify ECDSA signature
-        # x_sign = request.headers["X-Sign"]
-        # MonobankSignatureVerifier.verify!(body, x_sign)
+        if payload["status"] == "success"
+          # Parse event_id and user_id back from the reference we set
+          reference = payload["reference"]  # "event-1-user-2"
+          _, event_id, _, user_id = reference.split("-")
 
-        payload = JSON.parse(body)
-        order   = Order.find_by!(invoice_id: payload["invoiceId"])
+          user  = User.find(user_id)
+          event = Event.find(event_id)
 
-        order.update!(status: payload["status"])  # "success", "failure", "reversed"
+          user.tickets.create!(event: event)
+        end
 
         head :ok
       end
