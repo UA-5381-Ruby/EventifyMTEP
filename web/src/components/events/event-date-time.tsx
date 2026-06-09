@@ -52,9 +52,7 @@ export function EventDateTimeSection({ event }: EventDateTimeSectionProps) {
           <Users size={12} />
           <span>80 tickets remaining</span>
         </div>
-        {error && (
-          <p className="text-xs text-error-500 text-right max-w-40">{error}</p>
-        )}
+        {error && <p className="text-xs text-error-500 text-right max-w-40">{error}</p>}
       </div>
     </div>
   );
