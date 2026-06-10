@@ -48,7 +48,7 @@ events_data = [
     # CHANGED: 'category' -> 'categories' (accepts an array of objects)
     categories: [conference_category, networking_category],
     status: :published,
-    price_cents: 10000
+    price_cents: 10_000
   },
   {
     title: 'Past Meetup',
@@ -58,7 +58,7 @@ events_data = [
     brand: brand,
     categories: [education_category],
     status: :archived,
-    price_cents: 15000
+    price_cents: 15_000
   },
   {
     title: 'Current Workshop',
@@ -68,7 +68,7 @@ events_data = [
     brand: brand,
     categories: [workshop_category],
     status: :published,
-    price_cents: 25000
+    price_cents: 25_000
   }
 ]
 

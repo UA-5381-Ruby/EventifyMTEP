@@ -20,7 +20,7 @@ class MonobankService
     private
 
     def connection
-      Faraday.new(url: ENV['MONOBANK_BASE_URL']) do |f|
+      Faraday.new(url: ENV.fetch('MONOBANK_BASE_URL', nil)) do |f|
         f.request :json
         f.response :json
       end

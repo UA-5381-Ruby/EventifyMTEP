@@ -1,20 +1,23 @@
 import { useState } from 'react';
-import { Calendar, Clock, Ticket, Users } from 'lucide-react';
+import { Calendar, Clock, Ticket, Users, CircleCheck } from 'lucide-react';
 import { formatDate, formatTimeRange } from '@/utils/date';
 import type { EventDetail } from '@/types/event';
 
 import { Button } from '@/components/ui/button';
 
 import { PaymentService } from '@/services/payment-service';
+import { useTicketStatus } from '@/hooks/use-ticket-status';
 
-interface EventDateTimeSectionProps {
+interface EventBookingSectionProps {
   event: EventDetail;
 }
 
-export function EventDateTimeSection({ event }: EventDateTimeSectionProps) {
+export function EventBookingSection({ event }: EventBookingSectionProps) {
   const timeRange = formatTimeRange(event.start_date, event.end_date);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const { hasBoughtTicket, isCheckingTicket } = useTicketStatus(event.id);
 
   const handleBuyTickets = async () => {
     setIsLoading(true);
@@ -44,10 +47,21 @@ export function EventDateTimeSection({ event }: EventDateTimeSectionProps) {
       </div>
 
       <div className="flex flex-col items-end gap-2 shrink-0">
-        <Button onClick={handleBuyTickets} isLoading={isLoading}>
-          {!isLoading && <Ticket size={14} />}
-          {isLoading ? 'Redirecting…' : 'Buy Tickets'}
-        </Button>
+        {hasBoughtTicket ? (
+          <Button variant="outline" disabled>
+            <CircleCheck size={14} />
+            Ticket Bought
+          </Button>
+        ) : (
+          <Button
+            onClick={handleBuyTickets}
+            isLoading={isLoading || isCheckingTicket}
+            disabled={isCheckingTicket}
+          >
+            {!isLoading && !isCheckingTicket && <Ticket size={14} />}
+            {isCheckingTicket ? 'Checking…' : isLoading ? 'Redirecting…' : 'Buy Tickets'}
+          </Button>
+        )}
         <div className="flex items-center gap-1.5 text-xs text-neutral-500">
           <Users size={12} />
           <span>80 tickets remaining</span>
