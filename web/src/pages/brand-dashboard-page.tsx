@@ -4,11 +4,11 @@ import { Alert, Button, Spinner } from '@/components/ui';
 import { Container, PageWrapper } from '@/components/layout';
 import { BrandView } from '@/components/brands/brand-view';
 import { BrandEditModal } from '@/components/brands/brand-edit-modal';
+import { InviteMemberSection} from "@/components/brands/invite-member-section.tsx";
 import { CreateEventModal } from '@/components/events/create-event-modal';
 import { useAuth } from '@/hooks/use-auth';
 import { useBrandDashboard } from '@/hooks/use-brand-dashboard';
 import { useCreateEvent } from '@/hooks/use-create-event';
-
 import { useBrandAccess } from '@/hooks/use-brand-access';
 
 export function BrandDashboardPage() {
@@ -84,6 +84,10 @@ export function BrandDashboardPage() {
         onChange={handleFieldChange}
         onSave={handleSave}
       />
+
+      <div className="mt-6">
+        <InviteMemberSection brandId={Number(id)} />
+      </div>
 
       {saveError && (
         <Alert variant="error" title="Failed to save">

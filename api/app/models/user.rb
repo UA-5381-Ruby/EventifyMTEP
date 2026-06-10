@@ -22,6 +22,10 @@ class User < ApplicationRecord
     password_salt&.last(10)
   end
 
+  generates_token_for :brand_invitation, expires_in: 7.days do
+    "#{email}"
+  end
+
   def email_confirmed?
     is_confirmed == true
   end
