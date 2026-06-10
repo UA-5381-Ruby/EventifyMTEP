@@ -1,9 +1,6 @@
 # frozen_string_literal: true
 
 class MonobankService
-  # TODO: Move to ENV vars
-  BASE_URL = 'https://api.monobank.ua'
-
   class << self
     def create_invoice(amount_uah:, order_id:, event:, redirect_url:, webhook_url:)
       response = connection.post('/api/merchant/invoice/create') do |req|
@@ -23,7 +20,7 @@ class MonobankService
     private
 
     def connection
-      Faraday.new(url: BASE_URL) do |f|
+      Faraday.new(url: ENV['MONOBANK_BASE_URL']) do |f|
         f.request :json
         f.response :json
       end
@@ -41,7 +38,7 @@ class MonobankService
           comment: "Ticket for #{event.title}",
           basketOrder: [basket_item(event, amount_kop)]
         },
-        redirectUrl: redirect_url.presence || 'http://localhost:5173/payment/callback',
+        redirectUrl: "#{ENV.fetch('FRONTEND_BASE_URL', nil)}/events/#{event.id}",
         webHookUrl: webhook_url.presence,
         validity: 3600
       }

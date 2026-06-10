@@ -13,8 +13,8 @@ module Api
           amount_uah: 100, # UAH are converted to kopiykas in the service, so this is 100 UAH for testing
           order_id: "event-#{event.id}-user-#{current_user.id}",
           event: event,
-          redirect_url: 'http://localhost:5173/payment/callback',
-          webhook_url: "#{ENV.fetch('BACKEND_URL', nil)}/api/v1/payments/webhook"
+          redirect_url: "#{ENV.fetch('FRONTEND_BASE_URL', nil)}/events/#{event.id}",
+          webhook_url: "#{ENV.fetch('BACKEND_BASE_URL', nil)}/api/v1/payments/webhook"
         )
 
         if result['pageUrl']
