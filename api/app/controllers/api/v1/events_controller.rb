@@ -5,6 +5,7 @@ module Api
     class EventsController < ApplicationController
       include Paginatable
 
+      before_action :require_authentication!, only: %i[create]
       before_action :set_event, only: [:show]
 
       def index
@@ -56,7 +57,7 @@ module Api
 
       def set_event
         @event = Event.includes(:brand, :categories)
-                      .where(brand: current_user.brands)
+                      .merge(accessible_events)
                       .find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Event not found' }, status: :not_found
@@ -83,9 +84,22 @@ module Api
       end
 
       def base_events
-        scope = Event.includes(:brand, :categories)
-                     .where(brand: current_user.brands)
+        scope = Event.includes(:brand, :categories).merge(accessible_events)
         apply_filters(scope)
+      end
+
+      def accessible_events
+        if current_user&.is_superadmin?
+          Event.all
+        elsif current_user
+          managed_brand_ids = BrandMembership
+                              .where(user_id: current_user.id, role: %w[owner manager])
+                              .select(:brand_id)
+          Event.where(brand_id: managed_brand_ids)
+               .or(Event.where(status: %i[published cancelled]))
+        else
+          Event.where(status: %i[published cancelled])
+        end
       end
 
       def apply_filters(scope)
@@ -106,9 +120,7 @@ module Api
         events.joins(:categories).where(categories: { id: index_params[:category_id] })
       end
 
-      # Call this central method instead of reaching out to raw `params` multiple times
       def index_params
-        # Explicitly mark these keys as allowed on the root params context
         @index_params ||= params.permit(:from, :to, :q, :sort, :order, :page, :per_page, :status, :brand_id,
                                         :category_id)
       end

@@ -9,6 +9,7 @@ module Api
         render json: { error: e.message }, status: :bad_request
       end
 
+      before_action :require_authentication!
       before_action :set_brand, only: %i[update destroy]
       before_action :set_brand_public, only: %i[show]
 
