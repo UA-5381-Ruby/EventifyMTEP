@@ -18,6 +18,7 @@ Rails.application.routes.draw do
       post '/auth/register', to: 'auth#register'
       post '/auth/login', to: 'auth#login'
       post '/auth/confirm_email', to: 'confirmations#create'
+      post '/auth/resend_confirmation', to: 'confirmations#resend'
 
       get 'users/me', to: 'users#me'
       resources :users, except: [:create]

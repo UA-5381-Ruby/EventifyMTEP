@@ -134,6 +134,17 @@ async function confirmEmail(token: string): Promise<void> {
 }
 
 /**
+ * POST /api/v1/auth/resend_confirmation
+ */
+async function resendEmailVerification(email: string): Promise<void> {
+  try {
+    await apiClient.post('/api/v1/auth/resend_confirmation', { email });
+  } catch (err) {
+    parseApiError(err);
+  }
+}
+
+/**
  * Clears credentials from storage and resets the auth state.
  * Call this on explicit logout *and* on 401 responses (e.g. expired token).
  */
@@ -177,6 +188,7 @@ const AuthService = {
   logout,
 
   confirmEmail,
+  resendEmailVerification,
   requestPasswordReset,
   confirmPasswordReset,
 

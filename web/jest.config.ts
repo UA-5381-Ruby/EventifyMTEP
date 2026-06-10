@@ -11,7 +11,6 @@ const config: Config = {
         jsc: {
           transform: {
             react: { runtime: 'automatic' },
-            // Ось цей блок вирішує проблему з import.meta
             optimizer: {
               globals: {
                 vars: {
@@ -23,7 +22,6 @@ const config: Config = {
           parser: {
             syntax: 'typescript',
             tsx: true,
-            // Дозволяємо динамічні імпорти, якщо вони є
             dynamicImport: true,
           },
         },
@@ -37,6 +35,15 @@ const config: Config = {
     '^@/(.*)$': '<rootDir>/src/$1',
     '\\.(css|svg|png|jpg|jpeg|gif|webp)$': 'identity-obj-proxy',
   },
+  coveragePathIgnorePatterns: [
+    '/node_modules/',
+    'src/components/ui/',
+    'src/constants/',
+    'src/components/layout/sidebar',
+    'src/components/layout/header',
+    'src/components/layout/footer',
+    'src/components/layout/scroll-to-top',
+  ],
 };
 
 export default config;

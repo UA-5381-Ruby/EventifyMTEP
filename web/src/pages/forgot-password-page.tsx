@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Input, Button } from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
 import authService from '@/services/auth-service';
-import { MailCheck  } from 'lucide-react';
+import { MailCheck } from 'lucide-react';
 
 type ForgotPasswordState = 'form' | 'loading' | 'success';
 
@@ -40,7 +40,8 @@ export function ForgotPasswordPage() {
               </div>
               <h1 className="text-2xl font-bold text-neutral-900 mb-2">Check Your Email</h1>
               <p className="text-neutral-600 mb-2">
-                If an account exists for <strong>{email}</strong>, you will receive a password reset link in your inbox.
+                If an account exists for <strong>{email}</strong>, you will receive a password reset
+                link in your inbox.
               </p>
               <p className="text-sm text-neutral-500 mb-6">
                 The link will expire in 15 minutes. Check your spam folder if you don't see it.
@@ -81,7 +82,9 @@ export function ForgotPasswordPage() {
 
         <div className="w-full max-w-md rounded-2xl overflow-hidden bg-white shadow-lg border border-gray-200 relative z-10">
           <div className="p-8 sm:p-12">
-            <h1 className="text-2xl font-bold text-neutral-900 text-center mb-2">Forgot Password?</h1>
+            <h1 className="text-2xl font-bold text-neutral-900 text-center mb-2">
+              Forgot Password?
+            </h1>
             <p className="text-sm text-neutral-600 text-center mb-6">
               Enter your email address and we'll send you a link to reset your password.
             </p>

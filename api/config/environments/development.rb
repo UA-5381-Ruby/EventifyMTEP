@@ -34,7 +34,6 @@ Rails.application.configure do
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
 
-  Resend.api_key = ENV['RESEND_API_KEY']
   config.action_mailer.delivery_method = :resend
 
   # Make template changes take effect immediately.

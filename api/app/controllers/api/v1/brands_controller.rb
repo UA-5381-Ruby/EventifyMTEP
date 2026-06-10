@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+
 module Api
   module V1
     class BrandsController < ApplicationController
@@ -21,17 +23,21 @@ module Api
         paginated = paginate(brands)
 
         render json: {
-          data: paginated[:records],
+          data: paginated[:records].as_json(methods: [:logo_url]),
           meta: paginated[:meta]
         }
       end
 
       def show
-        render json: @brand.as_json(include: { events: { only: %i[id title status start_date] } })
+        render json: @brand.as_json(
+          methods: [:logo_url],
+          include: { events: { only: %i[id title status start_date] } }
+        )
       end
 
       def create
-        brand = Brand.new(brand_params)
+        attrs = process_logo_upload(brand_params.to_h)
+        brand = Brand.new(attrs)
 
         ActiveRecord::Base.transaction do
           brand.save!
@@ -42,7 +48,7 @@ module Api
           )
         end
 
-        render json: brand, status: :created
+        render json: brand.as_json(methods: [:logo_url]), status: :created
       rescue ActiveRecord::RecordInvalid => e
         render json: { errors: e.record.errors.full_messages },
                status: :unprocessable_content
@@ -51,8 +57,10 @@ module Api
       def update
         authorize @brand
 
-        if @brand.update(brand_params)
-          render json: @brand, status: :ok
+        attrs = process_logo_upload(brand_params.to_h)
+
+        if @brand.update(attrs)
+          render json: @brand.as_json(methods: [:logo_url]), status: :ok
         else
           render json: { errors: @brand.errors.full_messages },
                  status: :unprocessable_content
@@ -69,6 +77,13 @@ module Api
       end
 
       private
+
+      def process_logo_upload(attrs)
+        if attrs[:logo].present? && attrs[:logo].is_a?(ActionDispatch::Http::UploadedFile)
+          attrs[:logo] = S3BucketService.new.upload(attrs[:logo], folder: 'brands/logos')
+        end
+        attrs
+      end
 
       def fetch_brands_by_scope(scope)
         case scope
@@ -115,7 +130,7 @@ module Api
           brand: %i[
             name
             description
-            logo_url
+            logo
             subdomain
             primary_color
             secondary_color
@@ -125,3 +140,4 @@ module Api
     end
   end
 end
+# rubocop:enable Metrics/ClassLength

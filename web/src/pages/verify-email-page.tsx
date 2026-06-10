@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
 import authService from '@/services/auth-service';
-import { CircleCheck, XCircle, CircleAlert  } from 'lucide-react';
+import { CircleCheck, XCircle, CircleAlert } from 'lucide-react';
 
 type VerificationState = 'loading' | 'success' | 'error' | 'expired';
 
@@ -12,6 +12,7 @@ export function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
   const [state, setState] = useState<VerificationState>('loading');
   const [errorMessage, setErrorMessage] = useState('');
+  const [resendState, setResendState] = useState<'idle' | 'loading' | 'sent'>('idle');
 
   useEffect(() => {
     const verifyEmail = async () => {
@@ -36,6 +37,38 @@ export function VerifyEmailPage() {
     verifyEmail();
   }, [searchParams]);
 
+  const handleResend = async () => {
+    const token = searchParams.get('token');
+    if (!token || resendState === 'loading') return;
+
+    setResendState('loading');
+    try {
+      await authService.resendEmailVerification(token);
+      setResendState('sent');
+    } catch {
+      setResendState('idle');
+    }
+  };
+
+  const ResendLink = () => (
+    <p className="text-sm text-neutral-500 mt-4">
+      {resendState === 'sent' ? (
+        <span className="text-green-600">Verification email sent!</span>
+      ) : (
+        <>
+          Didn't receive the email?{' '}
+          <button
+            onClick={handleResend}
+            disabled={resendState === 'loading'}
+            className="text-blue-500 underline hover:no-underline disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {resendState === 'loading' ? 'Sending...' : 'Resend'}
+          </button>
+        </>
+      )}
+    </p>
+  );
+
   return (
     <PageWrapper>
       <div className="min-h-screen bg-slate-50 relative flex items-center justify-center p-4 sm:p-6 overflow-hidden">
@@ -49,7 +82,9 @@ export function VerifyEmailPage() {
                   <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-500 rounded-full animate-spin" />
                 </div>
                 <h1 className="text-2xl font-bold text-neutral-900 mb-2">Verifying Email</h1>
-                <p className="text-neutral-600">Please wait while we verify your email address...</p>
+                <p className="text-neutral-600">
+                  Please wait while we verify your email address...
+                </p>
               </>
             )}
 
@@ -70,6 +105,7 @@ export function VerifyEmailPage() {
                 >
                   Go to Login
                 </Button>
+                <ResendLink />
               </>
             )}
 
@@ -82,7 +118,7 @@ export function VerifyEmailPage() {
                 <p className="text-red-800 mb-6">{errorMessage}</p>
                 <div className="space-y-2">
                   <Button
-                    onClick={() => navigate('/registration')}
+                    onClick={() => navigate('/register')}
                     fullWidth
                     variant="outline"
                     className="border-blue-500 text-blue-500 hover:bg-blue-50"
@@ -98,6 +134,7 @@ export function VerifyEmailPage() {
                     Go to Login
                   </Button>
                 </div>
+                <ResendLink />
               </>
             )}
 
@@ -108,16 +145,18 @@ export function VerifyEmailPage() {
                 </div>
                 <h1 className="text-2xl font-bold text-yellow-900 mb-2">Link Expired</h1>
                 <p className="text-yellow-800 mb-6">
-                  This verification link has expired. Please register again to receive a new verification email.
+                  This verification link has expired. Please register again to receive a new
+                  verification email.
                 </p>
                 <Button
-                  onClick={() => navigate('/registration')}
+                  onClick={() => navigate('/register')}
                   fullWidth
                   variant="outline"
                   className="border-neutral-300 text-neutral-700 hover:bg-gray-50"
                 >
                   Register Again
                 </Button>
+                <ResendLink />
               </>
             )}
           </div>
