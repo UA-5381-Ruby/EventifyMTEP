@@ -20,18 +20,8 @@ module Api
       end
 
       def webhook
-        # Verify ECDSA signature
-        x_sign_header = request.headers['X-Sign']
-        unless MonobankService.verify_webhook_signature(request.raw_post, x_sign_header)
-          return render json: { error: 'Invalid signature' }, status: :unauthorized
-        end
-
-        # Parse JSON payload
-        begin
-          payload = JSON.parse(request.raw_post)
-        rescue JSON::ParserError
-          return render json: { error: 'Invalid JSON' }, status: :bad_request
-        end
+        payload = handle_webhook_payload
+        return payload if payload.is_a?(ActionDispatch::Response)
 
         return head :ok unless payload['status'] == 'success'
 
@@ -42,6 +32,32 @@ module Api
       end
 
       private
+
+      def handle_webhook_payload
+        return parse_dev_webhook_payload if Rails.env.development?
+
+        verify_production_webhook_signature
+        parse_webhook_payload
+      end
+
+      def parse_dev_webhook_payload
+        JSON.parse(request.raw_post)
+      rescue JSON::ParserError
+        render json: { error: 'Invalid JSON' }, status: :bad_request
+      end
+
+      def verify_production_webhook_signature
+        x_sign_header = request.headers['X-Sign']
+        return if MonobankService.verify_webhook_signature(request.raw_post, x_sign_header)
+
+        render json: { error: 'Invalid signature' }, status: :unauthorized
+      end
+
+      def parse_webhook_payload
+        JSON.parse(request.raw_post)
+      rescue JSON::ParserError
+        render json: { error: 'Invalid JSON' }, status: :bad_request
+      end
 
       def validate_event_for_purchase(event)
         unless event.published?
@@ -82,21 +98,21 @@ module Api
       end
 
       def create_ticket_for_user_and_event(user, event)
-        return if user.tickets.exists?(event: event)
-
         begin
-          user.tickets.create!(event: event)
-          event.decrement!(:available_tickets_count) if event.available_tickets_count.positive?
-          # TicketMailer.confirmation(ticket).deliver_later
+          ticket = nil
+          ActiveRecord::Base.transaction do
+            ticket = user.tickets.create!(event: event)
+            event.decrement!(:available_tickets_count) if event.available_tickets_count.positive?
+          end
         rescue ActiveRecord::RecordNotUnique
-          # Ticket already exists (duplicate webhook call), treat as success
+          return
         end
 
         nil
       end
 
       def invoice_params(event)
-        raise ArgumentError, 'Cannot create invoice for free event' if event.price_cents <= 0
+        raise ArgumentError, 'Cannot create invoice for free event' if event.price_cents.negative?
 
         {
           amount_cents: event.price_cents,
