@@ -4,7 +4,7 @@ class MailerService
   # Send email verification and return the signed token
   def self.send_email_verification(user)
     token = user.generate_token_for(:email_verification)
-    UserMailer.email_verification(user, token).deliver_later
+    UserMailer.email_verification(user, token).deliver_now
     token
   end
 
