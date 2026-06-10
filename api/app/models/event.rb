@@ -93,6 +93,7 @@ class Event < ApplicationRecord
   validates :location, presence: true, length: { maximum: 200 }
   validates :start_date, presence: true
   validates :status, presence: true
+  validates :price_cents, numericality: { greater_than_or_equal_to: 0 }
 
   scope :from_date, ->(date) { where(start_date: date..) if date.present? }
   scope :to_date, ->(date) { where(start_date: ..date) if date.present? }

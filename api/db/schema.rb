@@ -73,6 +73,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_05_125122) do
     t.text "description"
     t.datetime "end_date"
     t.string "location"
+    t.integer "price_cents", default: 0, null: false
     t.datetime "start_date"
     t.enum "status", default: "draft", enum_type: "event_status"
     t.string "title", null: false
@@ -81,6 +82,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_05_125122) do
     t.index ["start_date"], name: "index_events_on_start_date"
     t.index ["status"], name: "index_events_on_status"
     t.index ["title"], name: "index_events_on_title"
+    t.check_constraint "price_cents >= 0", name: "price_cents_non_negative"
   end
 
   create_table "tickets", force: :cascade do |t|

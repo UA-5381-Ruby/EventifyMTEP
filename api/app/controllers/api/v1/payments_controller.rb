@@ -3,14 +3,11 @@
 module Api
   module V1
     class PaymentsController < ApplicationController
-      # skip_before_action :verify_authenticity_token, only: [:webhook]
-
       def create
         event = Event.find(params[:event_id])
 
         result = MonobankService.create_invoice(
-          # amount_uah:   event.price,
-          amount_uah: 100, # UAH are converted to kopiykas in the service, so this is 100 UAH for testing
+          amount_cents: event.price_cents,
           order_id: "event-#{event.id}-user-#{current_user.id}",
           event: event,
           redirect_url: "#{ENV.fetch('FRONTEND_BASE_URL', nil)}/events/#{event.id}",

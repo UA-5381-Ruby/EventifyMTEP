@@ -2,11 +2,11 @@
 
 class MonobankService
   class << self
-    def create_invoice(amount_uah:, order_id:, event:, redirect_url:, webhook_url:)
+    def create_invoice(amount_cents:, order_id:, event:, redirect_url:, webhook_url:)
       response = connection.post('/api/merchant/invoice/create') do |req|
         req.headers['X-Token'] = Rails.application.credentials.monobank[:api_token]
         req.body = invoice_body(
-          amount_uah: amount_uah,
+          amount_cents: amount_cents,
           order_id: order_id,
           event: event,
           redirect_url: redirect_url,
@@ -26,19 +26,17 @@ class MonobankService
       end
     end
 
-    def invoice_body(amount_uah:, order_id:, event:, redirect_url:, webhook_url:)
-      amount_kop = (amount_uah * 100).to_i
-
+    def invoice_body(amount_cents:, order_id:, event:, redirect_url:, webhook_url:)
       {
-        amount: amount_kop,
+        amount: amount_cents,
         ccy: 980,
         merchantPaymInfo: {
           reference: order_id.to_s,
           destination: "Ticket for #{event.title}",
           comment: "Ticket for #{event.title}",
-          basketOrder: [basket_item(event, amount_kop)]
+          basketOrder: [basket_item(event, amount_cents)]
         },
-        redirectUrl: "#{ENV.fetch('FRONTEND_BASE_URL', nil)}/events/#{event.id}",
+        redirectUrl: redirect_url,
         webHookUrl: webhook_url.presence,
         validity: 3600
       }

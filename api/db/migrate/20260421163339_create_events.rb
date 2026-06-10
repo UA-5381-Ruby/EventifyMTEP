@@ -20,11 +20,13 @@ class CreateEvents < ActiveRecord::Migration[8.1]
       t.datetime :start_date
       t.datetime :end_date
       t.enum :status, enum_type: 'event_status', default: 'draft'
+      t.integer :price_cents, null: false, default: 0
 
       t.timestamps
     end
     add_index :events, :start_date
     add_index :events, :status
     add_index :events, :title
+    add_check_constraint :events, 'price_cents >= 0', name: 'price_cents_non_negative'
   end
 end
