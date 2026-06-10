@@ -3,39 +3,101 @@
 module Api
   module V1
     class PaymentsController < ApplicationController
+      skip_before_action :authorize_request, only: [:webhook]
+
       def create
         event = Event.find(params[:event_id])
-        result = MonobankService.create_invoice(invoice_params(event))
 
-        if result['pageUrl']
-          render json: { pageUrl: result['pageUrl'], invoiceId: result['invoiceId'] }
-        else
-          render json: { error: result['errCode'] }, status: :unprocessable_entity
-        end
+        error_response = validate_event_for_purchase(event)
+        return error_response if error_response
+
+        create_and_render_invoice(event)
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: 'Event not found' }, status: :not_found
+      rescue StandardError => e
+        Rails.logger.error("Payment creation failed: #{e.message}")
+        render json: { error: 'Payment service unavailable' }, status: :service_unavailable
       end
 
       def webhook
-        payload = JSON.parse(request.raw_post)
-
-        if payload['status'] == 'success'
-          reference = payload['reference']
-          _, event_id, _, user_id = reference.split('-')
-
-          user  = User.find(user_id)
-          event = Event.find(event_id)
-
-          unless user.tickets.exists?(event: event)
-            user.tickets.create!(event: event)
-            # TicketMailer.confirmation(ticket).deliver_later
-          end
+        # Verify ECDSA signature
+        x_sign_header = request.headers['X-Sign']
+        unless MonobankService.verify_webhook_signature(request.raw_post, x_sign_header)
+          return render json: { error: 'Invalid signature' }, status: :unauthorized
         end
+
+        # Parse JSON payload
+        begin
+          payload = JSON.parse(request.raw_post)
+        rescue JSON::ParserError
+          return render json: { error: 'Invalid JSON' }, status: :bad_request
+        end
+
+        return head :ok unless payload['status'] == 'success'
+
+        error_response = process_successful_payment(payload)
+        return error_response if error_response
 
         head :ok
       end
 
       private
 
+      def validate_event_for_purchase(event)
+        unless event.published?
+          return render json: { error: 'Event not available for purchase' }, status: :unprocessable_entity
+        end
+
+        if current_user.tickets.exists?(event: event)
+          return render json: { error: 'You already have a ticket for this event' }, status: :unprocessable_entity
+        end
+
+        nil
+      end
+
+      def create_and_render_invoice(event)
+        result = MonobankService.create_invoice(**invoice_params(event))
+
+        if result['pageUrl']
+          render json: { pageUrl: result['pageUrl'], invoiceId: result['invoiceId'] }
+        else
+          render json: { error: result['errCode'] || 'Invoice creation failed' }, status: :unprocessable_entity
+        end
+      end
+
+      def process_successful_payment(payload)
+        reference = payload['reference']
+        parts = reference.split('-')
+        return render json: { error: 'Invalid reference format' }, status: :bad_request if parts.length < 4
+
+        _, event_id, _, user_id = parts
+
+        user = User.find_by(id: user_id)
+        return render json: { error: 'User not found' }, status: :not_found unless user
+
+        event = Event.find_by(id: event_id)
+        return render json: { error: 'Event not found' }, status: :not_found unless event
+
+        create_ticket_for_user_and_event(user, event)
+      end
+
+      def create_ticket_for_user_and_event(user, event)
+        return if user.tickets.exists?(event: event)
+
+        begin
+          user.tickets.create!(event: event)
+          event.decrement!(:available_tickets_count) if event.available_tickets_count.positive?
+          # TicketMailer.confirmation(ticket).deliver_later
+        rescue ActiveRecord::RecordNotUnique
+          # Ticket already exists (duplicate webhook call), treat as success
+        end
+
+        nil
+      end
+
       def invoice_params(event)
+        raise ArgumentError, 'Cannot create invoice for free event' if event.price_cents <= 0
+
         {
           amount_cents: event.price_cents,
           order_id: "event-#{event.id}-user-#{current_user.id}",

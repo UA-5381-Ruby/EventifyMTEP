@@ -33,6 +33,7 @@ export interface EventDetail extends Event {
     id: number;
     name: string;
   }[];
+  available_tickets_count: number;
 }
 
 export interface EventQueryParams {

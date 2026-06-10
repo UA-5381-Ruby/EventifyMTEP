@@ -68,6 +68,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_05_125122) do
   end
 
   create_table "events", force: :cascade do |t|
+    t.integer "available_tickets_count", default: 0, null: false
     t.bigint "brand_id", null: false
     t.datetime "created_at", null: false
     t.text "description"
@@ -82,6 +83,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_05_125122) do
     t.index ["start_date"], name: "index_events_on_start_date"
     t.index ["status"], name: "index_events_on_status"
     t.index ["title"], name: "index_events_on_title"
+    t.check_constraint "available_tickets_count >= 0", name: "available_tickets_count_non_negative"
     t.check_constraint "price_cents >= 0", name: "price_cents_non_negative"
   end
 

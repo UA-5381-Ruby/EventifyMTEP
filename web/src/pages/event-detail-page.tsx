@@ -57,7 +57,7 @@ export function EventDetailPage() {
   return (
     <PageWrapper>
       <div className="min-h-screen min-w-screen bg-white max-w-lg mx-auto">
-        <EventHero event={eventDetail} onBack={() => navigate(-1)} />
+        <EventHero event={eventDetail} onBack={() => navigate('/events')} />
 
         <div className="px-5 pb-10">
           {/* Title + actions */}

@@ -64,7 +64,7 @@ export function EventBookingSection({ event }: EventBookingSectionProps) {
         )}
         <div className="flex items-center gap-1.5 text-xs text-neutral-500">
           <Users size={12} />
-          <span>80 tickets remaining</span>
+          <span>{event.available_tickets_count} tickets remaining</span>
         </div>
         {error && <p className="text-xs text-error-500 text-right max-w-40">{error}</p>}
       </div>
