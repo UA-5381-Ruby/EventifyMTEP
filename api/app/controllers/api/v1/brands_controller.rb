@@ -88,23 +88,15 @@ module Api
         file = attrs[:logo]
 
         if file.present? && file.is_a?(ActionDispatch::Http::UploadedFile)
-          allowed_types = %w[
-            image/jpeg 
-            image/png 
-            image/webp 
-            image/gif 
-            image/svg+xml
-          ]
+          allowed_types = %w[image/jpeg image/png image/webp image/gif image/svg+xml]
+
           unless file.content_type.in?(allowed_types)
             raise MediaUploadError, 'Invalid logo format. Allowed types: JPG, PNG, WEBP, GIF, SVG.'
           end
 
-          if file.size > 5.megabytes
-            raise MediaUploadError, 'Logo file size must be under 5MB.'
-          end
+          raise MediaUploadError, 'Logo file size must be under 5MB.' if file.size > 5.megabytes
 
           s3_key = S3BucketService.new.upload(file, folder: 'brands/logos')
-
           raise MediaUploadError, 'Failed to upload logo to cloud storage. Please try again.' if s3_key.nil?
 
           attrs[:logo] = s3_key

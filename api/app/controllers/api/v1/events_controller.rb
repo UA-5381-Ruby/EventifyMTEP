@@ -58,29 +58,20 @@ module Api
         file = attrs[:banner]
 
         if file.present? && file.is_a?(ActionDispatch::Http::UploadedFile)
-          allowed_types = %w[
-            image/jpeg
-            image/png
-            image/webp
-            image/gif
-            image/svg+xml
-          ]
+          allowed_types = %w[image/jpeg image/png image/webp image/gif image/svg+xml]
 
           unless file.content_type.in?(allowed_types)
             raise MediaUploadError, 'Invalid banner format. Allowed types: JPG, PNG, WEBP, GIF, SVG.'
           end
 
-          if file.size > 5.megabytes
-            raise MediaUploadError, 'Banner file size must be under 5MB.'
-          end
+          raise MediaUploadError, 'Banner file size must be under 5MB.' if file.size > 5.megabytes
 
           s3_key = S3BucketService.new.upload(file, folder: 'events/banners')
-
           raise MediaUploadError, 'Failed to upload banner to cloud storage. Please try again.' if s3_key.nil?
 
           attrs[:banner] = s3_key
         end
-        
+
         attrs
       end
 
