@@ -1,1 +1,3 @@
-Resend.api_key = ENV['RESEND_API_KEY']
+# frozen_string_literal: true
+
+Resend.api_key = ENV.fetch('RESEND_API_KEY', nil)
