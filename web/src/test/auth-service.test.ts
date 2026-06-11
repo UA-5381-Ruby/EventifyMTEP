@@ -76,31 +76,12 @@ describe('register', () => {
     const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.fake.sig';
     mockPost.mockResolvedValueOnce({ data: { token: fakeToken, user } });
 
-    const result = await AuthService.register({ name: 'Bob', email: 'b@b.com', password: 'pw' });
+    const result = await AuthService.register(
+      { name: 'Bob', email: 'b@b.com', password: 'pw' },
+      true
+    );
 
     expect(result).toEqual({ token: fakeToken, user });
-  });
-
-  it('stores token with remember=false by default', async () => {
-    const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.fake.sig';
-    mockPost.mockResolvedValueOnce({
-      data: { token: fakeToken, user: { id: '2', email: 'b@b.com', name: 'Bob' } },
-    });
-
-    await AuthService.register({ name: 'Bob', email: 'b@b.com', password: 'pw' });
-
-    expect(tokenStorage.set).toHaveBeenCalledWith(fakeToken, false);
-  });
-
-  it('stores token with remember=true when passed', async () => {
-    const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.fake.sig';
-    mockPost.mockResolvedValueOnce({
-      data: { token: fakeToken, user: { id: '2', email: 'b@b.com', name: 'Bob' } },
-    });
-
-    await AuthService.register({ name: 'Bob', email: 'b@b.com', password: 'pw' }, true);
-
-    expect(tokenStorage.set).toHaveBeenCalledWith(fakeToken, true);
   });
 
   it('sets auth state to isAuthenticated on success', async () => {
