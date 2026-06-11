@@ -1,9 +1,17 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+
 module Api
   module V1
     class EventsController < ApplicationController
       include Paginatable
+
+      class MediaUploadError < StandardError; end
+
+      rescue_from MediaUploadError do |e|
+        render json: { errors: [e.message] }, status: :unprocessable_content
+      end
 
       before_action :set_event, only: [:show]
 
@@ -46,9 +54,24 @@ module Api
       end
 
       def process_banner_upload(attrs)
-        if attrs[:banner].present? && attrs[:banner].is_a?(ActionDispatch::Http::UploadedFile)
-          attrs[:banner] = S3BucketService.new.upload(attrs[:banner], folder: 'events/banners')
+        attrs = attrs.with_indifferent_access
+        file = attrs[:banner]
+
+        if file.present? && file.is_a?(ActionDispatch::Http::UploadedFile)
+          allowed_types = %w[image/jpeg image/png image/webp image/gif image/svg+xml]
+
+          unless file.content_type.in?(allowed_types)
+            raise MediaUploadError, 'Invalid banner format. Allowed types: JPG, PNG, WEBP, GIF, SVG.'
+          end
+
+          raise MediaUploadError, 'Banner file size must be under 5MB.' if file.size > 5.megabytes
+
+          s3_key = S3BucketService.new.upload(file, folder: 'events/banners')
+          raise MediaUploadError, 'Failed to upload banner to cloud storage. Please try again.' if s3_key.nil?
+
+          attrs[:banner] = s3_key
         end
+
         attrs
       end
 
@@ -124,3 +147,4 @@ module Api
     end
   end
 end
+# rubocop:enable Metrics/ClassLength
