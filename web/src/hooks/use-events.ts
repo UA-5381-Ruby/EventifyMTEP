@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { EventsService } from '@/services/events-service';
-import type { Event, PaginationMeta, EventQueryParams } from '@/types/event';
+import type { Event, PaginationMeta, EventQueryParams, EventStatus } from '@/types/event';
 
 interface UseEventsState {
   events: Event[];
@@ -17,6 +17,7 @@ export function useEvents(params: EventQueryParams) {
     error: null,
   });
   const [refetchIndex, setRefetchIndex] = useState(0);
+  const [allStatuses, setAllStatuses] = useState<EventStatus[]>([]);
 
   const { page, per_page, sort, order, q, status, brand_id, category_id, search } = params;
 
@@ -39,7 +40,12 @@ export function useEvents(params: EventQueryParams) {
         });
 
         if (isMounted) {
+          const unique = [
+            ...new Set(response.data.map((e) => e.status).filter(Boolean)),
+          ] as EventStatus[];
+
           setState({ events: response.data, meta: response.meta, isLoading: false, error: null });
+          setAllStatuses(unique);
         }
       } catch (err: unknown) {
         if (isMounted) {
@@ -59,6 +65,7 @@ export function useEvents(params: EventQueryParams) {
 
   return {
     ...state,
+    allStatuses,
     refetch: () => setRefetchIndex((prev) => prev + 1),
   };
 }

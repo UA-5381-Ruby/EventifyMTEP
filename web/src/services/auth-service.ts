@@ -98,9 +98,14 @@ function subscribe(listener: AuthStateListener): () => void {
 /**
  * POST /api/v1/auth/register
  */
-async function register(payload: RegisterRequest): Promise<void> {
+async function register(payload: RegisterRequest): Promise<AuthResponse> {
   try {
-    await apiClient.post('/api/v1/auth/register', payload);
+    const { data } = await apiClient.post<AuthResponse>('/api/v1/auth/register', payload);
+
+    tokenStorage.set(data.token, false);
+    setAuthState({ user: data.user, isAuthenticated: true });
+
+    return data;
   } catch (err) {
     parseApiError(err);
   }

@@ -7,6 +7,7 @@ interface EventFiltersProps {
   status: string;
   sort: string;
   pendingCount?: number;
+  tabs?: typeof STATUS_TABS;
   onSearchChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onStatusChange: (value: string) => void;
   onSortChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -17,6 +18,7 @@ export function EventFilters({
   status,
   sort,
   pendingCount = 0,
+  tabs = STATUS_TABS,
   onSearchChange,
   onStatusChange,
   onSortChange,
@@ -29,7 +31,7 @@ export function EventFilters({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <Tabs tabs={STATUS_TABS} activeValue={status} onChange={onStatusChange} />
+        <Tabs tabs={tabs} activeValue={status} onChange={onStatusChange} />
 
         {pendingCount > 0 && (
           <Badge variant="warning" className="text-[10px]">
