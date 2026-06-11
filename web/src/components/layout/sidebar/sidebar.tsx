@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { SidebarNav } from '@/components/layout/sidebar/sidebar-nav';
 import { SidebarActions } from '@/components/layout/sidebar/sidebar-action';
+import { useAuth } from '@/hooks/use-auth';
+import { useBrandMembership } from '@/hooks/use-brand-membership';
 
 interface SidebarProps {
   currentPath?: string;
@@ -9,15 +11,27 @@ interface SidebarProps {
   onToggleMenu?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => {}, onToggleMenu }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => { }, onToggleMenu }) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [currentPath, setActivePage] = useState<string>('dashboard');
+  const { user } = useAuth();
+  const { isAnyBrandManager } = useBrandMembership();
+
+  const isSuperAdmin = user?.is_superadmin || false;
+  const brandRole = isAnyBrandManager ? 'admin' : undefined;
+
+  const isAuthorized = isSuperAdmin || brandRole === 'admin';
+
   const handleToggleMenu = () => {
     setIsCollapsed((prev) => !prev);
     if (onToggleMenu) {
       onToggleMenu();
     }
   };
+
+  if (!isAuthorized) {
+    return null;
+  }
 
   return (
     <aside
@@ -41,6 +55,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => {}, onToggl
         onNavigate={onNavigate}
         isCollapsed={isCollapsed}
         onSelect={setActivePage}
+        isSuperAdmin={isSuperAdmin}
+        role={brandRole}
       />
     </aside>
   );
