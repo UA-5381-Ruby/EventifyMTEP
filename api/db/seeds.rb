@@ -12,6 +12,7 @@ user = User.find_or_create_by!(email: 'admin@test.com') do |u|
   u.name = 'admin'
   u.password = 'password123'
   u.is_superadmin = true
+  u.is_confirmed = true
 end
 
 # Create brand
