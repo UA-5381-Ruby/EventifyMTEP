@@ -188,6 +188,7 @@ const baseState = {
   isLoading: false,
   error: null,
   refetch: jest.fn(),
+  allStatuses: [],
 };
 
 const mockEvents: Event[] = [

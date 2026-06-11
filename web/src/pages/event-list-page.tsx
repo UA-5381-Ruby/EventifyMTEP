@@ -24,13 +24,13 @@ export function EventListPage() {
     ...(status ? { status: status as EventStatus } : {}),
   };
 
-  const { events, meta, isLoading, error, refetch, allStatuses = [] } = useEvents(params);
+  const { events, meta, isLoading, error, refetch, allStatuses } = useEvents(params);
 
   const availableTabs = useMemo(() => {
+    if (allStatuses === null) return []; // ще завантажується — нічого не показуємо
     if (!allStatuses.length) return STATUS_TABS;
 
     const presentGroups = new Set(allStatuses.map((s) => STATUS_CONFIG[s]?.group));
-
     return STATUS_TABS.filter(
       (tab) => tab.value === '' || presentGroups.has(STATUS_TO_TAB[tab.value])
     );

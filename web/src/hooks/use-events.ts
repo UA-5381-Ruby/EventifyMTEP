@@ -17,7 +17,7 @@ export function useEvents(params: EventQueryParams) {
     error: null,
   });
   const [refetchIndex, setRefetchIndex] = useState(0);
-  const [allStatuses, setAllStatuses] = useState<EventStatus[]>([]);
+  const [allStatuses, setAllStatuses] = useState<EventStatus[] | null>(null);
 
   const { page, per_page, sort, order, q, status, brand_id, category_id, search } = params;
 
@@ -40,12 +40,13 @@ export function useEvents(params: EventQueryParams) {
         });
 
         if (isMounted) {
-          const unique = [
-            ...new Set(response.data.map((e) => e.status).filter(Boolean)),
-          ] as EventStatus[];
-
           setState({ events: response.data, meta: response.meta, isLoading: false, error: null });
-          setAllStatuses(unique);
+          if (!status) {
+            const unique = [
+              ...new Set(response.data.map((e) => e.status).filter(Boolean)),
+            ] as EventStatus[];
+            setAllStatuses(unique);
+          }
         }
       } catch (err: unknown) {
         if (isMounted) {
