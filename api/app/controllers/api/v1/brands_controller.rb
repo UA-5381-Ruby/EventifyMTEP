@@ -7,8 +7,14 @@ module Api
     class BrandsController < ApplicationController
       include Paginatable
 
+      class MediaUploadError < StandardError; end
+
       rescue_from ActionController::ParameterMissing do |e|
         render json: { error: e.message }, status: :bad_request
+      end
+
+      rescue_from MediaUploadError do |e|
+        render json: { errors: [e.message] }, status: :unprocessable_content
       end
 
       before_action :set_brand, only: %i[update destroy]
@@ -78,9 +84,32 @@ module Api
       private
 
       def process_logo_upload(attrs)
-        if attrs[:logo].present? && attrs[:logo].is_a?(ActionDispatch::Http::UploadedFile)
-          attrs[:logo] = S3BucketService.new.upload(attrs[:logo], folder: 'brands/logos')
+        attrs = attrs.with_indifferent_access
+        file = attrs[:logo]
+
+        if file.present? && file.is_a?(ActionDispatch::Http::UploadedFile)
+          allowed_types = %w[
+            image/jpeg 
+            image/png 
+            image/webp 
+            image/gif 
+            image/svg+xml
+          ]
+          unless file.content_type.in?(allowed_types)
+            raise MediaUploadError, 'Invalid logo format. Allowed types: JPG, PNG, WEBP, GIF, SVG.'
+          end
+
+          if file.size > 5.megabytes
+            raise MediaUploadError, 'Logo file size must be under 5MB.'
+          end
+
+          s3_key = S3BucketService.new.upload(file, folder: 'brands/logos')
+
+          raise MediaUploadError, 'Failed to upload logo to cloud storage. Please try again.' if s3_key.nil?
+
+          attrs[:logo] = s3_key
         end
+
         attrs
       end
 
