@@ -1,4 +1,3 @@
-import React from 'react';
 import { useAuth } from '@/hooks/use-auth';
 import { useBrandMembership } from '@/hooks/use-brand-membership';
 
@@ -12,10 +11,9 @@ interface SidebarNavProps {
 }
 
 const SUPERADMIN_ITEMS = [
-  { label: 'SuperAdmin Dash', href: '/dashboard' },
   { label: 'Brands', href: '/brands' },
   { label: 'Users', href: '/users' },
-  { label: 'Login Page', href: '/login' },
+  { label: 'Logs Page', href: '/login' },
 ];
 
 const ADMIN_ITEMS = [
