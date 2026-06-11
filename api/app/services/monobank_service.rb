@@ -112,6 +112,8 @@ class MonobankService
 
     def perform_signature_verification(raw_body, signature)
       public_key = fetch_public_key
+      return false if public_key.nil?
+
       public_key.verify('SHA256', signature, raw_body)
     rescue OpenSSL::PKey::EC::Point::Error, OpenSSL::PKey::PKeyError => e
       Rails.logger.error("Signature verify error: #{e.class} - #{e.message}")

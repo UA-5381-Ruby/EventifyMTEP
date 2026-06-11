@@ -34,9 +34,9 @@ module Api
       private
 
       def handle_webhook_payload
-        return parse_dev_webhook_payload if Rails.env.development?
+        signature_result = verify_production_webhook_signature
+        return signature_result if signature_result.is_a?(ActionDispatch::Response)
 
-        verify_production_webhook_signature
         parse_webhook_payload
       end
 
@@ -48,7 +48,7 @@ module Api
 
       def verify_production_webhook_signature
         x_sign_header = request.headers['X-Sign']
-        return if MonobankService.verify_webhook_signature(request.raw_post, x_sign_header)
+        return nil if MonobankService.verify_webhook_signature(request.raw_post, x_sign_header)
 
         render json: { error: 'Invalid signature' }, status: :unauthorized
       end
