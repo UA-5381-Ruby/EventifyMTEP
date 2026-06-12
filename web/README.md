@@ -4,8 +4,8 @@ Frontend for Eventify (Multi-Tenant Event Platform).
 
 ## Overview
 
-`web/` contains a React + TypeScript client scaffold built with Vite.
-It currently provides the base project structure, routing setup, Tailwind v4 integration, and a Jest + Testing Library test setup.
+`web/` contains the React + TypeScript client built with Vite.
+It currently includes authentication flows, event discovery/detail pages, brand pages, protected dashboard routes, Tailwind v4 styling, and a Jest + Testing Library setup.
 
 The backend API lives in [`../api/`](../api/README.md), and broader project docs are in [`../docs/`](../docs/README.md).
 
@@ -18,6 +18,7 @@ The backend API lives in [`../api/`](../api/README.md), and broader project docs
 - Tailwind CSS v4 (`@tailwindcss/vite`)
 - Jest + Testing Library
 - ESLint + Prettier
+- StyleLint
 
 ## Prerequisites
 
@@ -31,10 +32,13 @@ The backend API lives in [`../api/`](../api/README.md), and broader project docs
 ```bash
 cd web
 npm install
+cp .env.example .env
 npm run dev
 ```
 
 Default local URL (Vite): `http://localhost:5173`
+
+For local API calls, keep the Rails backend running on `http://localhost:3000`.
 
 ## Available scripts
 
@@ -46,19 +50,28 @@ Default local URL (Vite): `http://localhost:5173`
 - `npm run test:coverage` - Run tests with coverage output
 - `npm run lint` - Run ESLint
 - `npm run lint:fix` - Run ESLint with auto-fix
+- `npm run lint:css` - Run StyleLint for CSS files
+- `npm run lint:css:fix` - Run StyleLint with auto-fix for CSS files
 - `npm run format` - Format files with Prettier
 - `npm run format:check` - Check formatting with Prettier
+- `npm run check` - Run format, lint, formatting check, and tests in sequence
 
 ## Current implementation status
 
 - App entry point is implemented in [`src/main.tsx`](./src/main.tsx).
-- Router is configured in [`src/App.tsx`](./src/App.tsx) with a single `/` route.
+- Router is configured in [`src/app.tsx`](./src/app.tsx) with auth, event, brand, dashboard, and fallback routes.
 - Tailwind CSS is enabled in [`src/styles/index.css`](./src/styles/index.css).
 - Test tooling is configured in [`jest.config.ts`](./jest.config.ts) and [`src/test/setup.ts`](./src/test/setup.ts).
-- A sample test exists at [`src/test/example.test.tsx`](./src/test/example.test.tsx).
-- Feature folders (`components`, `pages`, `services`, `hooks`, `types`, `utils`) are present and ready for implementation.
+- Example tests exist under [`src/test/`](./src/test), such as [`src/test/login-page.test.tsx`](./src/test/login-page.test.tsx).
+- Auth bootstrap is initialized in [`src/main.tsx`](./src/main.tsx) via [`src/services/auth-service.ts`](./src/services/auth-service.ts) before rendering.
+- Feature folders (`components`, `pages`, `services`, `hooks`, `types`, `utils`) are in active use.
+
+## Code standards
+
+- File names under `src/` use `KEBAB_CASE` (enforced by ESLint check-file plugin).
+- Folder names under `src/` use `KEBAB_CASE` (enforced by ESLint check-file plugin).
 
 ## Notes
 
 - Vite alias `@` maps to `src/` (see [`vite.config.ts`](./vite.config.ts)).
-- No production UI flows or API integrations are fully implemented yet.
+- Vite dev server proxies `/api` to `http://localhost:3000` (see [`vite.config.ts`](./vite.config.ts)).
