@@ -1,5 +1,13 @@
 # Eventify Design System
 
+This reference is aligned with the current frontend implementation in `web/`.
+
+Primary sources:
+
+- `web/tailwind.config.js`
+- `web/src/styles/index.css`
+- `web/src/components/ui/`
+
 ## Color Palette
 
 | Token           | Value     | Usage                       |
@@ -32,6 +40,8 @@
 | `p-8` | 32px  |
 
 ## Components
+
+The UI primitives live in `web/src/components/ui/` and are re-exported through `web/src/components/ui/index.ts`.
 
 ### Button
 
@@ -75,4 +85,5 @@
 - Components: PascalCase (`Button`, `CardHeader`)
 - Props: camelCase (`isLoading`, `fullWidth`)
 - CSS classes: Tailwind only (no custom inline styles)
-- Files: `ComponentName.tsx`
+- Files under `src/`: `kebab-case` (for example `button.tsx`, `login-page.tsx`)
+- Folders under `src/`: `kebab-case`

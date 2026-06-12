@@ -4,23 +4,31 @@ Current repository scope only
 Guest
 - As a guest, I can register a new account: POST /api/v1/auth/register
 - As a guest, I can log in and receive a JWT token: POST /api/v1/auth/login
+- As a guest, I can verify my email from a signed link: POST /api/v1/auth/confirm_email
+- As a guest, I can request a new verification email: POST /api/v1/auth/resend_confirmation
 - As a guest, I can request a password reset email: POST /api/v1/auth/password/reset
 - As a guest, I can confirm a password reset by sending a new password with a reset token: POST /api/v1/auth/password/reset?token=...
-- As a guest, I can browse the list of brands: GET /api/v1/brands
-- As a guest, I can view a single brand and its events: GET /api/v1/brands/:id
 - As a guest, I can browse the event list: GET /api/v1/events
+- As a guest, I can view a public event detail: GET /api/v1/events/:id
 - As a guest, I can filter the event list by supported query parameters: GET /api/v1/events?params
+- As a guest, I can view categories linked to an event: GET /api/v1/events/:event_id/categories
+- As a payment provider, I can send payment webhooks: POST /api/v1/payments/webhook
 
 Authenticated user
+- As an authenticated user, I can list brands visible to me: GET /api/v1/brands
+- As an authenticated user, I can view a single brand and its events: GET /api/v1/brands/:id
 - As an authenticated user, I can list users: GET /api/v1/users
+- As an authenticated user, I can view my own profile with memberships: GET /api/v1/users/me
 - As an authenticated user, I can view a user profile: GET /api/v1/users/:id
 - As an authenticated user, I can update my own profile: PATCH /api/v1/users/:id
 - As an authenticated user, I can delete my own profile: DELETE /api/v1/users/:id
+- As an authenticated user, I can change my password: PATCH /api/v1/auth/password/change
 - As an authenticated user, I can view a single event: GET /api/v1/events/:id
 - As an authenticated user, I can list categories: GET /api/v1/categories
 - As an authenticated user, I can create a category: POST /api/v1/categories
 - As an authenticated user, I can view categories linked to an event: GET /api/v1/events/:event_id/categories
 - As an authenticated user, I can create a brand and become its owner: POST /api/v1/brands
+- As an authenticated user, I can create a payment invoice for an event: POST /api/v1/payments
 - As an authenticated user, I can view my tickets: GET /api/v1/tickets or GET /api/v1/my_tickets
 - As an authenticated user, I can create a ticket for an event: POST /api/v1/tickets
 - As an authenticated user, I can view one of my tickets: GET /api/v1/tickets/:id
@@ -52,11 +60,13 @@ Superadmin
 - As a superadmin, I can update or delete any brand: PATCH/DELETE /api/v1/brands/:id
 - As a superadmin, I can manage any brand membership: GET/POST/PATCH/DELETE /api/v1/brands/:brand_id/memberships...
 
+Currently implemented but still evolving
+- Email confirmation and resend confirmation
+- Payments and payment webhooks
+
 Not currently implemented
-- Email confirmation
 - Refresh tokens and logout
 - Event subscriptions
-- Payments
 - Brand approval requests
 - Dedicated admin moderation endpoints
 
