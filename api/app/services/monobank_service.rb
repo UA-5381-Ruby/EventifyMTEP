@@ -1,6 +1,13 @@
 # frozen_string_literal: true
 
 class MonobankService
+  CURRENCY_CODE         = 980  # 980 stands for UAH, default for Monobank
+  INVOICE_VALIDITY      = 3600
+  SIGNATURE_ALGORITHM   = 'SHA256'
+  PUBLIC_KEY_CACHE_KEY  = 'monobank_public_key'
+  PUBLIC_KEY_CACHE_TTL  = 24.hours
+  BASKET_ITEM_UNIT      = 'шт.'
+
   module Helpers
     private
 
@@ -51,7 +58,7 @@ class MonobankService
     def invoice_body(amount_cents:, order_id:, event:, redirect_url:, webhook_url:)
       {
         amount: amount_cents,
-        ccy: 980,
+        ccy: CURRENCY_CODE,
         merchantPaymInfo: {
           reference: order_id.to_s,
           destination: "Ticket for #{event.title}",
@@ -60,7 +67,7 @@ class MonobankService
         },
         redirectUrl: redirect_url,
         webHookUrl: webhook_url.presence,
-        validity: 3600
+        validity: INVOICE_VALIDITY
       }
     end
 
@@ -70,7 +77,7 @@ class MonobankService
         qty: 1,
         sum: amount_kop,
         total: amount_kop,
-        unit: 'шт.'
+        unit: BASKET_ITEM_UNIT
       }
     end
   end
@@ -114,7 +121,7 @@ class MonobankService
       public_key = fetch_public_key
       return false if public_key.nil?
 
-      public_key.verify('SHA256', signature, raw_body)
+      public_key.verify(SIGNATURE_ALGORITHM, signature, raw_body)
     rescue OpenSSL::PKey::EC::Point::Error, OpenSSL::PKey::PKeyError => e
       Rails.logger.error("Signature verify error: #{e.class} - #{e.message}")
       retry_signature_verification(raw_body, signature)
@@ -123,15 +130,15 @@ class MonobankService
     def retry_signature_verification(raw_body, signature)
       clear_public_key_cache
       public_key = fetch_public_key
-      public_key.verify('SHA256', signature, raw_body)
+      public_key.verify(SIGNATURE_ALGORITHM, signature, raw_body)
     end
 
     def fetch_public_key
-      cached_key = Rails.cache.read('monobank_public_key')
+      cached_key = Rails.cache.read(PUBLIC_KEY_CACHE_KEY)
       return cached_key if cached_key.present?
 
       public_key = request_public_key_from_api
-      Rails.cache.write('monobank_public_key', public_key, expires_in: 24.hours)
+      Rails.cache.write(PUBLIC_KEY_CACHE_KEY, public_key, expires_in: PUBLIC_KEY_CACHE_TTL)
       public_key
     end
 
@@ -154,7 +161,7 @@ class MonobankService
     end
 
     def clear_public_key_cache
-      Rails.cache.delete('monobank_public_key')
+      Rails.cache.delete(PUBLIC_KEY_CACHE_KEY)
     end
 
     private
