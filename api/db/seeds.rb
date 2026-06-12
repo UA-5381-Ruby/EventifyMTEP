@@ -12,6 +12,7 @@ user = User.find_or_create_by!(email: 'admin@test.com') do |u|
   u.name = 'admin'
   u.password = 'password123'
   u.is_superadmin = true
+  u.is_confirmed = true
 end
 
 # Create brand
@@ -46,7 +47,9 @@ events_data = [
     brand: brand,
     # CHANGED: 'category' -> 'categories' (accepts an array of objects)
     categories: [conference_category, networking_category],
-    status: :published
+    status: :published,
+    price_cents: 10_000,
+    available_tickets_count: 100
   },
   {
     title: 'Past Meetup',
@@ -55,7 +58,9 @@ events_data = [
     location: 'Lviv',
     brand: brand,
     categories: [education_category],
-    status: :archived
+    status: :archived,
+    price_cents: 15_000,
+    available_tickets_count: 250
   },
   {
     title: 'Current Workshop',
@@ -64,7 +69,9 @@ events_data = [
     location: 'Online',
     brand: brand,
     categories: [workshop_category],
-    status: :published
+    status: :published,
+    price_cents: 25_000,
+    available_tickets_count: 50
   }
 ]
 

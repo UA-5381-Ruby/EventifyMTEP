@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_07_212405) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_12_122952) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -74,6 +74,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_07_212405) do
     t.text "description"
     t.datetime "end_date"
     t.string "location"
+    t.integer "price_cents"
     t.datetime "start_date"
     t.enum "status", default: "draft", enum_type: "event_status"
     t.string "title", null: false
