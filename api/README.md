@@ -94,6 +94,12 @@ Interactive Swagger UI is mounted only in development and test environments.
 
 The generated OpenAPI file lives at [`swagger/v1/swagger.yaml`](swagger/v1/swagger.yaml).
 
+In development, sent emails can also be previewed at:
+
+| Tool | URL |
+| ---- | --- |
+| Letter Opener Web | http://localhost:3000/letter_opener |
+
 ### Regenerate Swagger after request spec changes
 
 ```bash
@@ -108,25 +114,28 @@ The routes below are derived from `config/routes.rb` and the current controllers
 | ------ | ---- | ------ | ----- |
 | POST | `/api/v1/auth/register` | Public | Register a new user and return a JWT. |
 | POST | `/api/v1/auth/login` | Public | Authenticate and return a JWT. |
+| POST | `/api/v1/auth/confirm_email` | Public | Verify a user's email with the signed token sent by email. |
+| POST | `/api/v1/auth/resend_confirmation` | Public | Resend the verification email for an unconfirmed account. |
 | POST | `/api/v1/auth/password/reset` | Public | Request password reset email, or confirm reset when `token` is provided as a query parameter. |
 | PATCH | `/api/v1/auth/password/change` | Authenticated | Change password for an authenticated user. |
+| GET | `/api/v1/users/me` | Authenticated | Return the current user profile together with brand memberships. |
 | GET | `/api/v1/users` | Authenticated | List users. |
 | GET | `/api/v1/users/:id` | Authenticated | Show a user profile. |
 | PATCH/PUT | `/api/v1/users/:id` | Authenticated | Update a user; restricted by policy. |
 | DELETE | `/api/v1/users/:id` | Authenticated | Delete a user; restricted by policy. |
 | GET | `/api/v1/events` | Public | Paginated event list with filtering and sorting. |
-| GET | `/api/v1/events/:id` | Authenticated | Show a single event with brand and categories. |
+| GET | `/api/v1/events/:id` | Public | Show a single event with brand and categories when it is visible to the current visitor. |
 | POST | `/api/v1/events` | Authenticated | Create an event; current policy limits this to superadmins. |
 | POST | `/api/v1/events/:id/submit` | Authenticated | Submit an event for review. |
 | POST | `/api/v1/events/:id/cancel` | Authenticated | Cancel an event and deactivate active tickets. |
 | POST | `/api/v1/events/:id/approve` | Authenticated | Approve an event; superadmin only. |
 | POST | `/api/v1/events/:id/reject` | Authenticated | Reject an event; superadmin only. |
-| GET | `/api/v1/events/:event_id/categories` | Authenticated | List categories attached to an event. |
-| POST | `/api/v1/events/:event_id/categories` | Authenticated | Attach a category to an event. |
-| DELETE | `/api/v1/events/:event_id/categories/:category_id` | Authenticated | Remove a category from an event. |
-| GET | `/api/v1/brands` | Public | List brands. |
+| GET | `/api/v1/events/:event_id/categories` | Public | List categories attached to an event. |
+| POST | `/api/v1/events/:event_id/categories` | Authenticated | Attach a category to an event; restricted to event managers/owners and superadmins. |
+| DELETE | `/api/v1/events/:event_id/categories/:category_id` | Authenticated | Remove a category from an event; restricted to event managers/owners and superadmins. |
+| GET | `/api/v1/brands` | Authenticated | List brands available to the current user, with optional scope and search filters. |
 | POST | `/api/v1/brands` | Authenticated | Create a brand and assign the creator as owner. |
-| GET | `/api/v1/brands/:id` | Public | Show a brand and its events. |
+| GET | `/api/v1/brands/:id` | Authenticated | Show a brand and its events. |
 | PATCH/PUT | `/api/v1/brands/:id` | Authenticated | Update a brand; owner or superadmin. |
 | DELETE | `/api/v1/brands/:id` | Authenticated | Delete a brand; owner or superadmin. |
 | GET | `/api/v1/brands/:brand_id/memberships` | Authenticated | List brand members with pagination. |
@@ -135,6 +144,8 @@ The routes below are derived from `config/routes.rb` and the current controllers
 | DELETE | `/api/v1/brands/:brand_id/memberships/:id` | Authenticated | Remove a membership, while preserving at least one owner. |
 | GET | `/api/v1/categories` | Authenticated | List categories. |
 | POST | `/api/v1/categories` | Authenticated | Create a category. |
+| POST | `/api/v1/payments` | Authenticated | Create a payment invoice for an event purchase. |
+| POST | `/api/v1/payments/webhook` | Public | Receive payment provider webhook callbacks and issue tickets after successful payment. |
 | GET | `/api/v1/my_tickets` | Authenticated | Alias for the current user's ticket list. |
 | GET | `/api/v1/tickets` | Authenticated | List the current user's tickets with filters. |
 | POST | `/api/v1/tickets` | Authenticated | Create a ticket for the current user. |
