@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class MonobankService
-  CURRENCY_CODE         = 980  # 980 stands for UAH, default for Monobank
+  CURRENCY_CODE         = 980 # 980 stands for UAH, default for Monobank
   INVOICE_VALIDITY      = 3600
   SIGNATURE_ALGORITHM   = 'SHA256'
   PUBLIC_KEY_CACHE_KEY  = 'monobank_public_key'
