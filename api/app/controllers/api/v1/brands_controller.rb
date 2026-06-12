@@ -13,6 +13,7 @@ module Api
         render json: { error: e.message }, status: :bad_request
       end
 
+      before_action :require_authentication!
       rescue_from MediaUploadError do |e|
         render json: { errors: [e.message] }, status: :unprocessable_content
       end
@@ -101,7 +102,6 @@ module Api
 
           attrs[:logo] = s3_key
         end
-
         attrs
       end
 

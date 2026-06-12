@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/ClassLength
-
 module Api
   module V1
     class EventsController < ApplicationController
@@ -13,10 +11,11 @@ module Api
         render json: { errors: [e.message] }, status: :unprocessable_content
       end
 
+      before_action :require_authentication!, only: %i[create]
       before_action :set_event, only: [:show]
 
       def index
-        paginated = paginate(filtered_events)
+        paginated = paginate(EventFilter.new(index_params, current_user).call)
 
         render json: {
           data: paginated[:records].as_json(methods: [:banner_url]),
@@ -90,7 +89,7 @@ module Api
 
       def set_event
         @event = Event.includes(:brand, :categories)
-                      .where(brand: current_user.brands)
+                      .merge(EventFilter.new(index_params, current_user).send(:accessible_events))
                       .find(params[:id])
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Event not found' }, status: :not_found
@@ -106,38 +105,9 @@ module Api
       def event_params
         params.expect(event: [
                         :title, :description, :location, :start_date,
-                        :end_date, :status, :brand_id, :banner, { category_ids: [] }
+                        :end_date, :status, :brand_id, :banner, :price_cents, :available_tickets_count,
+                        { category_ids: [] }
                       ])
-      end
-
-      def filtered_events
-        events = base_events
-        events = events.where(exact_match_params) if exact_match_params.any?
-        filter_by_category(events)
-      end
-
-      def base_events
-        scope = Event.includes(:brand, :categories)
-                     .where(brand: current_user.brands)
-        apply_filters(scope)
-      end
-
-      def apply_filters(scope)
-        scope
-          .from_date(index_params[:from])
-          .to_date(index_params[:to])
-          .search_title(index_params[:q])
-          .sorted_by(index_params[:sort], index_params[:order])
-      end
-
-      def exact_match_params
-        index_params.slice(:brand_id, :status).to_h.compact_blank
-      end
-
-      def filter_by_category(events)
-        return events if index_params[:category_id].blank?
-
-        events.joins(:categories).where(categories: { id: index_params[:category_id] })
       end
 
       def index_params
@@ -147,4 +117,3 @@ module Api
     end
   end
 end
-# rubocop:enable Metrics/ClassLength

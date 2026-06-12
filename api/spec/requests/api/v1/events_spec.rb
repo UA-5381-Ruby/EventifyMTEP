@@ -40,7 +40,12 @@ RSpec.describe 'api/v1/events', type: :request do
 
       response '201', 'event created' do
         let(:event) do
-          { event: { title: 'Valid Event', brand_id: brand.id, start_date: Time.current.iso8601, location: 'Lviv' } }
+          { event: { title: 'Valid Event',
+                     brand_id: brand.id,
+                     start_date: Time.current.iso8601,
+                     location: 'Lviv',
+                     price_cents: 100,
+                     available_tickets_count: 100 } }
         end
         run_test!
       end

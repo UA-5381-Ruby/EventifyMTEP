@@ -7,11 +7,39 @@ import { CircleCheck, XCircle, CircleAlert } from 'lucide-react';
 
 type VerificationState = 'loading' | 'success' | 'error' | 'expired';
 
+function ResendLink({
+  resendState,
+  onResend,
+}: {
+  resendState: 'idle' | 'loading' | 'sent';
+  onResend: () => void;
+}) {
+  return (
+    <p className="text-sm text-neutral-500 mt-4">
+      {resendState === 'sent' ? (
+        <span className="text-green-600">Verification email sent!</span>
+      ) : (
+        <>
+          Didn't receive the email?{' '}
+          <button
+            onClick={onResend}
+            disabled={resendState === 'loading'}
+            className="text-blue-500 underline hover:no-underline disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {resendState === 'loading' ? 'Sending...' : 'Resend'}
+          </button>
+        </>
+      )}
+    </p>
+  );
+}
+
 export function VerifyEmailPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [state, setState] = useState<VerificationState>('loading');
   const [errorMessage, setErrorMessage] = useState('');
+  const [resendState, setResendState] = useState<'idle' | 'loading' | 'sent'>('idle');
 
   useEffect(() => {
     const verifyEmail = async () => {
@@ -35,6 +63,19 @@ export function VerifyEmailPage() {
 
     verifyEmail();
   }, [searchParams]);
+
+  const handleResend = async () => {
+    const token = searchParams.get('token');
+    if (!token || resendState === 'loading') return;
+
+    setResendState('loading');
+    try {
+      await authService.resendEmailVerification(token);
+      setResendState('sent');
+    } catch {
+      setResendState('idle');
+    }
+  };
 
   return (
     <PageWrapper>
@@ -72,6 +113,7 @@ export function VerifyEmailPage() {
                 >
                   Go to Login
                 </Button>
+                <ResendLink resendState={resendState} onResend={handleResend} />
               </>
             )}
 
@@ -100,6 +142,7 @@ export function VerifyEmailPage() {
                     Go to Login
                   </Button>
                 </div>
+                <ResendLink resendState={resendState} onResend={handleResend} />
               </>
             )}
 
@@ -121,6 +164,7 @@ export function VerifyEmailPage() {
                 >
                   Register Again
                 </Button>
+                <ResendLink resendState={resendState} onResend={handleResend} />
               </>
             )}
           </div>

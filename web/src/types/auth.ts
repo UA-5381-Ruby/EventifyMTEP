@@ -24,5 +24,5 @@ export interface AuthResponse {
 export interface AuthState {
   user: AuthUser | null;
   isAuthenticated: boolean;
-  isLoading: boolean;
+  isLoading?: boolean;
 }

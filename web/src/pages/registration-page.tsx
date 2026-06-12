@@ -16,7 +16,18 @@ export function RegistrationPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [resendState, setResendState] = useState<'idle' | 'loading' | 'sent'>('idle');
 
+  const handleResend = async () => {
+    if (resendState === 'loading') return;
+    setResendState('loading');
+    try {
+      await authService.resendEmailVerification(email);
+      setResendState('sent');
+    } catch {
+      setResendState('idle');
+    }
+  };
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
@@ -59,7 +70,20 @@ export function RegistrationPage() {
                     account. The link will expire in 24 hours.
                   </p>
                   <p className="text-xs text-green-600">
-                    Didn't receive the email? Check your spam folder or contact support.
+                    {resendState === 'sent' ? (
+                      <span>Verification email sent! Check your inbox.</span>
+                    ) : (
+                      <>
+                        Didn't receive the email?{' '}
+                        <button
+                          onClick={handleResend}
+                          disabled={resendState === 'loading'}
+                          className="underline hover:no-underline disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {resendState === 'loading' ? 'Sending...' : 'Resend'}
+                        </button>
+                      </>
+                    )}
                   </p>
                 </div>
 

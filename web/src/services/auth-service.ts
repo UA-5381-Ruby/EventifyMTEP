@@ -98,11 +98,11 @@ function subscribe(listener: AuthStateListener): () => void {
 /**
  * POST /api/v1/auth/register
  */
-async function register(payload: RegisterRequest, remember = false): Promise<AuthResponse> {
+async function register(payload: RegisterRequest): Promise<AuthResponse> {
   try {
     const { data } = await apiClient.post<AuthResponse>('/api/v1/auth/register', payload);
 
-    tokenStorage.set(data.token, remember);
+    tokenStorage.set(data.token, false);
     setAuthState({ user: data.user, isAuthenticated: true });
 
     return data;
@@ -133,6 +133,17 @@ async function login(payload: LoginRequest, remember = false): Promise<AuthRespo
 async function confirmEmail(token: string): Promise<void> {
   try {
     await apiClient.post('/api/v1/auth/confirm_email', { token });
+  } catch (err) {
+    parseApiError(err);
+  }
+}
+
+/**
+ * POST /api/v1/auth/resend_confirmation
+ */
+async function resendEmailVerification(email: string): Promise<void> {
+  try {
+    await apiClient.post('/api/v1/auth/resend_confirmation', { email });
   } catch (err) {
     parseApiError(err);
   }
@@ -182,6 +193,7 @@ const AuthService = {
   logout,
 
   confirmEmail,
+  resendEmailVerification,
   requestPasswordReset,
   confirmPasswordReset,
 
