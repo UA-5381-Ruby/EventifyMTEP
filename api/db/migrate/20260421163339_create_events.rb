@@ -7,6 +7,7 @@ class CreateEvents < ActiveRecord::Migration[8.1]
   # Creates a native Postgres enum type `event_status` with predefined statuses.
   # Includes a `status` column backed by the enum (default `draft`), timestamps,
   # and indexes on `start_date`, `status`, and `title`.
+  # rubocop:disable Metrics/AbcSize
   def change
     create_enum :event_status,
                 %w[draft draft_on_review published rejected published_unverified published_on_review
@@ -20,11 +21,16 @@ class CreateEvents < ActiveRecord::Migration[8.1]
       t.datetime :start_date
       t.datetime :end_date
       t.enum :status, enum_type: 'event_status', default: 'draft'
+      t.integer :price_cents, null: false, default: 0
+      t.integer :available_tickets_count, null: false, default: 0
 
       t.timestamps
     end
     add_index :events, :start_date
     add_index :events, :status
     add_index :events, :title
+    add_check_constraint :events, 'price_cents >= 0', name: 'price_cents_non_negative'
+    add_check_constraint :events, 'available_tickets_count >= 0', name: 'available_tickets_count_non_negative'
   end
+  # rubocop:enable Metrics/AbcSize
 end
