@@ -8,6 +8,8 @@ FactoryBot.define do
     end_date   { 1.week.from_now + 2.hours }
     location   { 'Kyiv, Ukraine' }
     status     { :draft }
+    price_cents { 1000 }
+    available_tickets_count { 100 }
     association :brand
 
     after(:create) do |event, evaluator|

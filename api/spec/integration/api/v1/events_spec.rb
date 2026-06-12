@@ -115,7 +115,9 @@ RSpec.describe 'api/v1/events', type: :request do
               location: 'Kyiv',
               start_date: 1.week.from_now.iso8601,
               end_date: (1.week.from_now + 1.day).iso8601,
-              brand_id: brand.id
+              brand_id: brand.id,
+              price_cents: 1000,
+              available_tickets_count: 100
             }
           }
         end

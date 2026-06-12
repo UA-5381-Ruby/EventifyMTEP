@@ -118,7 +118,9 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
       categories: [Category.find_or_create_by!(name: 'Music')],
       title: title,
       location: 'Loc',
-      start_date: Time.current
+      start_date: Time.current,
+      price_cents: 100,
+      available_tickets_count: 100
     )
   end
 
