@@ -5,8 +5,8 @@ import { Eye, EyeOff } from 'lucide-react';
 import { AuthCard } from '@/components/auth/auth-card';
 
 import authService from '@/services/auth-service';
-import {ResetPasswordSuccess} from "@/components/auth/reset-password/reset-password-success.tsx";
-import {ResetPasswordError} from "@/components/auth/reset-password/reset-password-error.tsx";
+import { ResetPasswordSuccess } from '@/components/auth/reset-password/reset-password-success.tsx';
+import { ResetPasswordError } from '@/components/auth/reset-password/reset-password-error.tsx';
 
 type ResetPasswordState = 'form' | 'loading' | 'success' | 'error';
 
@@ -24,10 +24,11 @@ export function ResetPasswordPage() {
   const [state, setState] = useState<ResetPasswordState>(() => (token ? 'form' : 'error'));
 
   const validateForm = (): boolean => {
-    if (!password) return setValidationError('Password is required'), false;
-    if (password.length < 6) return setValidationError('Password must be at least 6 characters'), false;
-    if (!confirmPassword) return setValidationError('Please confirm your password'), false;
-    if (password !== confirmPassword) return setValidationError('Passwords do not match'), false;
+    if (!password) return (setValidationError('Password is required'), false);
+    if (password.length < 6)
+      return (setValidationError('Password must be at least 6 characters'), false);
+    if (!confirmPassword) return (setValidationError('Please confirm your password'), false);
+    if (password !== confirmPassword) return (setValidationError('Passwords do not match'), false);
     return true;
   };
 
@@ -48,8 +49,18 @@ export function ResetPasswordPage() {
     }
   };
 
-  if (state === 'success') return <AuthCard centered><ResetPasswordSuccess /></AuthCard>;
-  if (state === 'error') return <AuthCard centered><ResetPasswordError message={error} /></AuthCard>;
+  if (state === 'success')
+    return (
+      <AuthCard centered>
+        <ResetPasswordSuccess />
+      </AuthCard>
+    );
+  if (state === 'error')
+    return (
+      <AuthCard centered>
+        <ResetPasswordError message={error} />
+      </AuthCard>
+    );
 
   return (
     <AuthCard>
@@ -85,9 +96,7 @@ export function ResetPasswordPage() {
             type={showConfirmPassword ? 'text' : 'password'}
             placeholder="Confirm new password"
             value={confirmPassword}
-            onChange={(e: ChangeEvent<HTMLInputElement>) =>
-              setConfirmPassword(e.target.value)
-            }
+            onChange={(e: ChangeEvent<HTMLInputElement>) => setConfirmPassword(e.target.value)}
             autoComplete="new-password"
             disabled={state === 'loading'}
             className="pr-10"

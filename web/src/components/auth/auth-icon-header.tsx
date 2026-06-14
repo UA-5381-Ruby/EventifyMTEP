@@ -11,16 +11,18 @@ interface AuthIconHeaderProps {
 }
 
 export function AuthIconHeader({
-                                 icon,
-                                 iconBg,
-                                 title,
-                                 titleColor = 'text-neutral-900',
-                                 description,
-                                 descriptionColor = 'text-neutral-600',
-                               }: AuthIconHeaderProps) {
+  icon,
+  iconBg,
+  title,
+  titleColor = 'text-neutral-900',
+  description,
+  descriptionColor = 'text-neutral-600',
+}: AuthIconHeaderProps) {
   return (
     <>
-      <div className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${iconBg} mb-4`}>
+      <div
+        className={`inline-flex items-center justify-center w-16 h-16 rounded-full ${iconBg} mb-4`}
+      >
         {icon}
       </div>
       <h1 className={`text-2xl font-bold ${titleColor} mb-2`}>{title}</h1>

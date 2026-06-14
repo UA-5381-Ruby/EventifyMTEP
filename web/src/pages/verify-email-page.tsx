@@ -12,25 +12,26 @@ type VerificationState = 'loading' | 'success' | 'error' | 'expired';
 
 export function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
-  const [state, setState] = useState<VerificationState>('loading');
-  const [errorMessage, setErrorMessage] = useState('');
   const token = searchParams.get('token');
+
+  const [state, setState] = useState<VerificationState>(token ? 'loading' : 'error');
+  const [errorMessage, setErrorMessage] = useState(token ? '' : 'No verification token provided.');
+
   const { resendState, handleResend } = useResendVerification(token);
 
   useEffect(() => {
-    if (!token) {
-      setErrorMessage('No verification token provided.');
-      setState('error');
-      return;
-    }
+    if (!token) return;
 
-    authService.confirmEmail(token).then(() => {
-      setState('success');
-    }).catch((err) => {
-      const message = err instanceof Error ? err.message : 'Verification failed';
-      setErrorMessage(message);
-      setState(message.toLowerCase().includes('expired') ? 'expired' : 'error');
-    });
+    authService
+      .confirmEmail(token)
+      .then(() => {
+        setState('success');
+      })
+      .catch((err) => {
+        const message = err instanceof Error ? err.message : 'Verification failed';
+        setErrorMessage(message);
+        setState(message.toLowerCase().includes('expired') ? 'expired' : 'error');
+      });
   }, [token]);
 
   const resendProps = { resendState, onResend: handleResend };

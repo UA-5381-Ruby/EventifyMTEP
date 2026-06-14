@@ -54,7 +54,11 @@ export function ForgotPasswordPage() {
             Back to Login
           </Button>
           <Button
-            onClick={() => { setEmail(''); setError(''); setState('form'); }}
+            onClick={() => {
+              setEmail('');
+              setError('');
+              setState('form');
+            }}
             fullWidth
             variant="outline"
             className="border-neutral-300 text-neutral-700 hover:bg-gray-50"
