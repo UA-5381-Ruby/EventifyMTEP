@@ -1,0 +1,41 @@
+# syntax=docker/dockerfile:1
+
+# Development-only Dockerfile for the Rails API.
+# The production image lives in api/Dockerfile (Kamal / Thruster based).
+# This file is used exclusively by docker-compose.yml.
+
+ARG RUBY_VERSION=3.4.8
+FROM docker.io/library/ruby:${RUBY_VERSION}-slim
+
+WORKDIR /rails
+
+# Install system dependencies required to build native gems and run Rails.
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      build-essential \
+      curl \
+      git \
+      libpq-dev \
+      libvips \
+      libyaml-dev \
+      pkg-config \
+      postgresql-client && \
+    rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Copy Gemfile first to cache the bundle layer independently of source changes.
+COPY Gemfile Gemfile.lock ./
+
+# Install all gem groups (development + test included).
+RUN bundle install
+
+# Copy vendor directory if it exists (for vendored gems / patches).
+COPY vendor/ ./vendor/
+
+# Copy the rest of the application source.
+COPY . .
+
+# Expose the default Rails development port.
+EXPOSE 3000
+
+# The actual start command is overridden by docker-compose.yml (db:prepare + server).
+CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "3000"]
