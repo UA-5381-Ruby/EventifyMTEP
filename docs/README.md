@@ -5,8 +5,8 @@ This directory contains project-level documentation for `EventifyMTEP`.
 ## Files in this directory
 
 - [`README.md`](README.md) — documentation index for the `docs/` directory.
-- [`SETUP.md`](SETUP.md) — local development setup instructions for the Rails API and React web app.
-- [`ENV_USAGE.md`](ENV_USAGE.md) — environment variable reference for local development.
+- [`SETUP.md`](SETUP.md) — local development setup instructions for the Rails API, React web app, and Docker Compose.
+- [`ENV_USAGE.md`](ENV_USAGE.md) — environment variable reference for local development and Docker Compose.
 - [`DB.md`](DB.md) — database overview and DBML-style schema reference.
 - [`Event_Platform_API_v1.1.md`](Event_Platform_API_v1.1.md) — repository-aligned API summary based on the current implementation.
 - [`design-system.md`](design-system.md) — frontend design tokens and reusable UI component conventions.
@@ -16,8 +16,8 @@ This directory contains project-level documentation for `EventifyMTEP`.
 
 ## How to use these docs
 
-- Start with [`SETUP.md`](SETUP.md) if you are preparing a local environment.
-- Read [`ENV_USAGE.md`](ENV_USAGE.md) when creating `api/.env` and `web/.env`.
+- Start with [`SETUP.md`](SETUP.md) if you are preparing a local environment — it covers both direct local setup and Docker Compose.
+- Read [`ENV_USAGE.md`](ENV_USAGE.md) when creating `api/.env`, `web/.env`, and the root `.env` for Docker Compose.
 - Use [`DB.md`](DB.md) and [`Event_Platform_API_v1.1.md`](Event_Platform_API_v1.1.md) as quick references while developing.
 - Open [`../api/README.md`](../api/README.md) for API-specific commands and the current route summary.
 - Open [`../web/README.md`](../web/README.md) for frontend setup, scripts, and routing architecture.
