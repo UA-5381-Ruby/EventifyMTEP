@@ -5,9 +5,24 @@ categories = %w[Concert Workshop Conference Networking Education]
 categories.each do |category_name|
   Category.find_or_create_by!(name: category_name)
 end
+User.find_or_create_by!(email: 'superadmin@test.com') do |u|
+  u.name = 'Superadmin'
+  u.password = 'password123'
+  u.is_superadmin = true
+  u.is_confirmed = true
+end
 
-# Create admin user
-# CHANGED: 'username' -> 'name', 'is_admin' -> 'is_superadmin', relying on email for uniqueness
+admin_user = User.find_or_create_by!(email: 'admin@test.com') do |u|
+  u.name = 'Admin'
+  u.password = 'password123'
+  u.is_superadmin = false
+  u.is_confirmed = true
+end
+
+BrandMembership.find_or_create_by!(user: admin_user, brand: brand) do |m|
+  m.role = 'admin'
+end
+
 user = User.find_or_create_by!(email: 'admin@test.com') do |u|
   u.name = 'admin'
   u.password = 'password123'
