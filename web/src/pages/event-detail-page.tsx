@@ -7,7 +7,7 @@ import type { EventDetail } from '@/types/event';
 import { EventsService } from '@/services/events-service';
 
 import { EventHero } from '@/components/events/event-hero';
-import { EventDateTimeSection } from '@/components/events/event-date-time';
+import { EventBookingSection } from '@/components/events/event-booking-section';
 import { EventLocationSection } from '@/components/events/event-location';
 import { EventHostSection } from '@/components/events/event-host';
 import { EventDescriptionSection } from '@/components/events/event-description';
@@ -57,7 +57,7 @@ export function EventDetailPage() {
   return (
     <PageWrapper>
       <div className="min-h-screen min-w-screen bg-white max-w-lg mx-auto">
-        <EventHero event={eventDetail} onBack={() => navigate(-1)} />
+        <EventHero event={eventDetail} onBack={() => navigate('/events')} />
 
         <div className="px-5 pb-10">
           {/* Title + actions */}
@@ -77,7 +77,7 @@ export function EventDetailPage() {
           </div>
 
           <div className="divide-y divide-neutral-100">
-            <EventDateTimeSection event={eventDetail} />
+            <EventBookingSection event={eventDetail} />
             <EventLocationSection location={eventDetail.location} />
             <EventHostSection brand={eventDetail.brand} />
             <EventDescriptionSection description={eventDetail.description} />

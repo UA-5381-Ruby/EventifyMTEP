@@ -39,9 +39,12 @@ For the schema overview, see [`DB.md`](DB.md).
 
 | Method | Path | Access | Purpose |
 | ------ | ---- | ------ | ------- |
-| POST | `/api/v1/auth/register` | Public | Create a user and return a JWT token. |
+| POST | `/api/v1/auth/register` | Public | Create a user and send a confirmation email. |
 | POST | `/api/v1/auth/login` | Public | Authenticate with email and password and return a JWT token. |
+| POST | `/api/v1/auth/confirm_email` | Public | Verify a user's email with a signed token. |
+| POST | `/api/v1/auth/resend_confirmation` | Public | Resend an email-verification message for an unconfirmed user. |
 | POST | `/api/v1/auth/password/reset` | Public | Request a password reset email, or confirm a reset when `token` is passed as a query parameter. |
+| PATCH | `/api/v1/auth/password/change` | Authenticated | Change password for the currently authenticated user. |
 
 ### Register request body
 
@@ -88,6 +91,7 @@ POST /api/v1/auth/password/reset?token=<signed_token>
 
 | Method | Path | Access | Notes |
 | ------ | ---- | ------ | ----- |
+| GET | `/api/v1/users/me` | Authenticated | Returns the current user profile with brand memberships. |
 | GET | `/api/v1/users` | Authenticated | Lists users. |
 | GET | `/api/v1/users/:id` | Authenticated | Shows a user profile. |
 | PATCH/PUT | `/api/v1/users/:id` | Authenticated | Allowed for the same user or a superadmin. |
@@ -97,9 +101,9 @@ POST /api/v1/auth/password/reset?token=<signed_token>
 
 | Method | Path | Access | Notes |
 | ------ | ---- | ------ | ----- |
-| GET | `/api/v1/brands` | Public | Lists brands. |
+| GET | `/api/v1/brands` | Authenticated | Lists brands visible to the current user, with optional scope filters. |
 | POST | `/api/v1/brands` | Authenticated | Creates a brand and assigns the creator as `owner`. |
-| GET | `/api/v1/brands/:id` | Public | Shows a brand and its associated events. |
+| GET | `/api/v1/brands/:id` | Authenticated | Shows a brand and its associated events. |
 | PATCH/PUT | `/api/v1/brands/:id` | Authenticated | Allowed for brand owners and superadmins. |
 | DELETE | `/api/v1/brands/:id` | Authenticated | Allowed for brand owners and superadmins. |
 
@@ -123,7 +127,7 @@ Additional application rules:
 | Method | Path | Access | Notes |
 | ------ | ---- | ------ | ----- |
 | GET | `/api/v1/events` | Public | Returns a paginated event list with filters and sorting. |
-| GET | `/api/v1/events/:id` | Authenticated | Returns one event including brand and category data. |
+| GET | `/api/v1/events/:id` | Public | Returns one event including brand and category data when the event is visible to the requester. |
 | POST | `/api/v1/events` | Authenticated | Current policy allows only superadmins to create events. |
 
 ### Event list filters
@@ -147,7 +151,7 @@ Additional application rules:
 
 | Method | Path | Access | Notes |
 | ------ | ---- | ------ | ----- |
-| GET | `/api/v1/events/:event_id/categories` | Authenticated | Lists categories linked to an event. |
+| GET | `/api/v1/events/:event_id/categories` | Public | Lists categories linked to an event. |
 | POST | `/api/v1/events/:event_id/categories` | Authenticated | Owner, manager, or superadmin can link a category. |
 | DELETE | `/api/v1/events/:event_id/categories/:category_id` | Authenticated | Owner, manager, or superadmin can remove a category. |
 
@@ -239,6 +243,13 @@ Application rules:
 - QR codes are generated automatically on ticket creation
 - ticket responses include nested event data and, when present, event feedback
 
+## Payments
+
+| Method | Path | Access | Notes |
+| ------ | ---- | ------ | ----- |
+| POST | `/api/v1/payments` | Authenticated | Creates a payment invoice for an event purchase. |
+| POST | `/api/v1/payments/webhook` | Public | Handles payment-provider callbacks and issues tickets on successful payments. |
+
 ## Response patterns
 
 List endpoints commonly return:
@@ -273,22 +284,19 @@ The current implementation effectively uses these roles:
 
 High-level rules from current policies:
 
-- public access is limited to registration, login, password reset, brand listing/show, and event listing
+- public access includes registration, login, email confirmation, password reset, payment webhook, event listing/show, and event-category listing
 - most other endpoints require a valid JWT
 - brand ownership controls brand mutation
 - brand managers can manage some memberships and event category assignments
 - only superadmins can approve or reject events and currently create events directly
 
-## Not implemented in the current repository
+## Partially implemented or in progress
 
-The following items appeared in earlier planning notes but are not implemented in the code currently checked in:
+The following items appeared in earlier planning notes and remain partially implemented or pending:
 
-- email confirmation endpoints
 - refresh token or logout endpoints
 - event subscriptions
-- payment workflows and payment webhooks
 - brand request moderation endpoints
 - dedicated admin namespaces for event moderation
-- separate `/users/me` endpoints
 
 If these features are added later, this document should be updated alongside the routes, controllers, policies, tests, and Swagger output.

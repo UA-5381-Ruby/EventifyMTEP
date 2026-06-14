@@ -1,6 +1,6 @@
 # Development Setup Guide
 
-This guide focuses on the environment required by the current repository state. The active application is the Rails API in `api/`.
+This guide covers local setup for the current repository state: the Rails API in `api/` and the React frontend in `web/`.
 
 ## What you need
 
@@ -9,6 +9,8 @@ According to `.tool-versions`, `api/Gemfile`, and the current Rails configuratio
 - Ruby `3.4.8`
 - Bundler
 - PostgreSQL
+- Node.js `24.15.0` (from `web/package.json`)
+- npm
 - Git
 - build tools required for native gems such as `pg`
 
@@ -23,15 +25,32 @@ From a terminal:
 
 ```bash
 git clone https://github.com/UA-5381-Ruby/EventifyMTEP.git
-cd EventifyMTEP/api
+cd EventifyMTEP
+
+cd api
 bundle install
 cp .env.example .env
 bin/rails secret
 bin/rails db:prepare
-bin/rails server -p 3000
+
+cd ../web
+npm install
+cp .env.example .env
 ```
 
 After running `bin/rails secret`, copy the generated value into `JWT_SECRET_KEY` inside `api/.env`.
+
+Run API and web in separate terminals:
+
+```bash
+cd api
+bin/rails server -p 3000
+```
+
+```bash
+cd web
+npm run dev
+```
 
 ## Linux or WSL setup
 
@@ -106,6 +125,15 @@ The currently documented variables are:
 - `DB_PORT`
 - `JWT_SECRET_KEY`
 - `SWAGGER_SERVER_URL`
+- `MONOBANK_API_TOKEN`
+- `MONOBANK_BASE_URL`
+- `FRONTEND_BASE_URL`
+- `BACKEND_BASE_URL`
+
+The web app environment example currently includes:
+
+- `VITE_API_BASE_URL`
+- `VITE_MAP_API_BASE_URL`
 
 See [`ENV_USAGE.md`](ENV_USAGE.md) for details.
 
@@ -138,6 +166,15 @@ What these commands do:
 - `bundle exec rake test:all` runs Minitest, regenerates Swagger, then runs RSpec.
 - `bin/rubocop` runs the linter configured in the bundle.
 - `RAILS_ENV=test bundle exec rake rswag:specs:swaggerize` refreshes the generated OpenAPI file.
+
+For frontend checks, from `web/`:
+
+```bash
+npm run test
+npm run lint
+npm run lint:css
+npm run build
+```
 
 ## Swagger and local verification
 
