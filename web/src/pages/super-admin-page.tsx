@@ -75,7 +75,8 @@ export function SuperAdminPage() {
           totalBrands: fetchedBrands.length,
           totalEvents: fetchedEvents.length,
           pendingApproval: pending.length,
-          rejectedEvents: fetchedEvents.filter((e: PendingEvent) => e?.status === 'rejected').length,
+          rejectedEvents: fetchedEvents.filter((e: PendingEvent) => e?.status === 'rejected')
+            .length,
           reportedUsers: 0,
         });
       } catch (error) {
