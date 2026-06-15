@@ -38,6 +38,11 @@ Copy the generated secret into `JWT_SECRET_KEY` in `api/.env`. See [`../docs/ENV
 bin/rails db:prepare
 ```
 
+#### Optional: Reset the database
+```bash
+rails db:drop db:create db:migrate db:seed
+```
+
 Optional maintenance commands:
 
 ```bash
