@@ -14,6 +14,8 @@ This document summarizes the current database model for the Rails API.
 - Event status is stored as a PostgreSQL enum.
 - A user can only hold one ticket per event; that rule is enforced by a unique index.
 - The application models `Ticket` → `EventFeedback` as a one-to-one relation (`has_one` / `belongs_to`), although the current database schema only adds a non-unique index on `event_feedbacks.ticket_id`.
+- `users.is_confirmed` is used by email-verification flows before login is allowed.
+- `events.banner`, `events.price_cents`, and `events.available_tickets_count` support media and paid-ticket workflows.
 
 ```dbml
 // ==========================================
@@ -41,6 +43,7 @@ Table users {
   name varchar
   email varchar [unique, not null]
   password_digest varchar [not null]
+  is_confirmed boolean [not null, default: false]
   is_superadmin boolean [not null, default: false]
   created_at timestamp [not null]
   updated_at timestamp [not null]
@@ -51,7 +54,7 @@ Table brands {
   name varchar [not null]
   subdomain varchar [unique, not null]
   description text
-  logo_url varchar
+  logo varchar
   primary_color varchar [not null, default: '#000000']
   secondary_color varchar [not null, default: '#FFFFFF']
   created_at timestamp [not null]
@@ -91,6 +94,9 @@ Table events {
   start_date timestamp
   end_date timestamp
   status event_status [default: 'draft']
+  banner varchar
+  price_cents integer
+  available_tickets_count integer
   created_at timestamp [not null]
   updated_at timestamp [not null]
 }

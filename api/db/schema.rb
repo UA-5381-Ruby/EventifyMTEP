@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_05_125122) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_12_124658) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -32,7 +32,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_05_125122) do
   create_table "brands", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
-    t.string "logo_url"
+    t.string "logo"
     t.string "name", null: false
     t.string "primary_color", default: "#000000", null: false
     t.string "secondary_color", default: "#FFFFFF", null: false
@@ -68,11 +68,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_05_125122) do
   end
 
   create_table "events", force: :cascade do |t|
+    t.integer "available_tickets_count"
+    t.string "banner"
     t.bigint "brand_id", null: false
     t.datetime "created_at", null: false
     t.text "description"
     t.datetime "end_date"
     t.string "location"
+    t.integer "price_cents"
     t.datetime "start_date"
     t.enum "status", default: "draft", enum_type: "event_status"
     t.string "title", null: false

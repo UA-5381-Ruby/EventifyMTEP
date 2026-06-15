@@ -1,6 +1,6 @@
 import React from 'react';
-import { useState } from 'react';
-import { SORT_OPTIONS } from '@/constants/event.constants';
+import { useState, useMemo } from 'react';
+import { SORT_OPTIONS, STATUS_TABS } from '@/constants/event.constants';
 import type { Event } from '@/types/event';
 import { STATUS_TO_TAB, TAB_TO_STATUS, STATUS_CONFIG } from '@/constants/event.constants';
 import type { EventTabStatus } from '@/constants/event.constants';
@@ -25,6 +25,19 @@ export function useEventFilters<T extends FilterableEvent>({
   const [search, setSearch] = useState('');
   const [sort, setSort] = useState(SORT_OPTIONS[0]?.value ?? '');
   const [page, setPage] = useState(1);
+
+  const availableTabs = useMemo(() => {
+    const presentGroups = new Set(
+      events.map((e) => {
+        const statusKey = (e.status || 'draft') as keyof typeof STATUS_CONFIG;
+        return STATUS_CONFIG[statusKey]?.group;
+      })
+    );
+
+    return STATUS_TABS.filter(
+      (tab) => tab.value === '' || presentGroups.has(STATUS_TO_TAB[tab.value])
+    );
+  }, [events]);
 
   const filtered = events.filter((e) => {
     const matchSearch = e.title.toLowerCase().includes(search.toLowerCase());
@@ -80,6 +93,7 @@ export function useEventFilters<T extends FilterableEvent>({
     page,
     paginated,
     totalPages,
+    availableTabs,
     hasActiveFilters: !!(search || activeTab !== 'All'),
     status: TAB_TO_STATUS[activeTab],
     handleSearchChange,

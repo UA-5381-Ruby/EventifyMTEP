@@ -30,10 +30,12 @@ const mockResponse = {
 describe('useEvents', () => {
   beforeEach(() => jest.clearAllMocks());
 
-  it('starts with isLoading true', () => {
+  it('starts with isLoading true', async () => {
     mockGetEvents.mockResolvedValue(mockResponse);
     const { result } = renderHook(() => useEvents(defaultParams));
     expect(result.current.isLoading).toBe(true);
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
   });
 
   it('returns events and meta on success', async () => {

@@ -4,14 +4,17 @@ source 'https://rubygems.org'
 ruby '3.4.8'
 
 gem 'aasm'
+gem 'aws-sdk-s3'
 gem 'bcrypt', '~> 3.1.7'
 gem 'bootsnap', require: false
 gem 'brakeman', '~> 8.0', groups: %i[development test]
 gem 'bundler-audit', '~> 0.9.3', groups: %i[development test]
 gem 'devise'
 gem 'dotenv-rails', groups: %i[development test]
+gem 'faraday'
 gem 'jwt', '>= 3.2.0'
 gem 'net-imap', '>= 0.6.4'
+gem 'openssl'
 gem 'pg', '~> 1.1'
 gem 'puma', '~> 8.0'
 gem 'pundit'
@@ -20,6 +23,7 @@ gem 'rack-cors'
 gem 'rails'
 gem 'rails-controller-testing'
 gem 'rails-i18n'
+gem 'resend'
 gem 'rswag-api'
 gem 'rswag-ui'
 gem 'rubocop-performance', '~> 1.26'

@@ -1,9 +1,9 @@
-import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
+﻿import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button, Checkbox } from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
-import { ForgotPasswordModal, ResetPasswordModal, EyeIcon, EyeOffIcon } from '@/components/auth';
 import authService from '@/services/auth-service';
+import { Eye, EyeOff } from 'lucide-react';
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -13,9 +13,6 @@ export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
-
-  const [isForgotOpen, setIsForgotOpen] = useState(false);
-  const [isResetOpen, setIsResetOpen] = useState(false);
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -66,10 +63,10 @@ export function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 bottom-2.5 text-neutral-400 hover:text-neutral-600 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm"
+                    className="absolute right-3 bottom-2.5 text-neutral-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-sm"
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
-                    {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                    {showPassword ? <EyeOff /> : <Eye />}
                   </button>
                 </div>
 
@@ -81,7 +78,7 @@ export function LoginPage() {
                   />
                   <button
                     type="button"
-                    onClick={() => setIsForgotOpen(true)}
+                    onClick={() => navigate('/forgot-password')}
                     className="text-sm font-medium text-neutral-500 hover:text-neutral-800 transition-colors"
                   >
                     Forgot Password?
@@ -122,25 +119,6 @@ export function LoginPage() {
           </div>
         </div>
       </PageWrapper>
-
-      <ForgotPasswordModal
-        isOpen={isForgotOpen}
-        onClose={() => setIsForgotOpen(false)}
-        onNavigateToLogin={() => setIsForgotOpen(false)}
-        onSuccess={(submittedEmail) => {
-          console.log(`Link sent to: ${submittedEmail}`);
-          setIsForgotOpen(false);
-          setIsResetOpen(true);
-        }}
-      />
-
-      <ResetPasswordModal
-        isOpen={isResetOpen}
-        onClose={() => setIsResetOpen(false)}
-        onResetComplete={() => {
-          setIsResetOpen(false);
-        }}
-      />
     </>
   );
 }

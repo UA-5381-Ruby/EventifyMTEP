@@ -1,12 +1,21 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
+
 module Api
   module V1
     class BrandsController < ApplicationController
       include Paginatable
 
+      class MediaUploadError < StandardError; end
+
       rescue_from ActionController::ParameterMissing do |e|
         render json: { error: e.message }, status: :bad_request
+      end
+
+      before_action :require_authentication!
+      rescue_from MediaUploadError do |e|
+        render json: { errors: [e.message] }, status: :unprocessable_content
       end
 
       before_action :set_brand, only: %i[update destroy]
@@ -20,17 +29,21 @@ module Api
         paginated = paginate(brands)
 
         render json: {
-          data: paginated[:records],
+          data: paginated[:records].as_json(methods: [:logo_url]),
           meta: paginated[:meta]
         }
       end
 
       def show
-        render json: @brand.as_json(include: { events: { only: %i[id title status start_date] } })
+        render json: @brand.as_json(
+          methods: [:logo_url],
+          include: { events: { only: %i[id title status start_date] } }
+        )
       end
 
       def create
-        brand = Brand.new(brand_params)
+        attrs = process_logo_upload(brand_params.to_h)
+        brand = Brand.new(attrs)
 
         ActiveRecord::Base.transaction do
           brand.save!
@@ -41,7 +54,7 @@ module Api
           )
         end
 
-        render json: brand, status: :created
+        render json: brand.as_json(methods: [:logo_url]), status: :created
       rescue ActiveRecord::RecordInvalid => e
         render json: { errors: e.record.errors.full_messages },
                status: :unprocessable_content
@@ -50,8 +63,10 @@ module Api
       def update
         authorize @brand
 
-        if @brand.update(brand_params)
-          render json: @brand, status: :ok
+        attrs = process_logo_upload(brand_params.to_h)
+
+        if @brand.update(attrs)
+          render json: @brand.as_json(methods: [:logo_url]), status: :ok
         else
           render json: { errors: @brand.errors.full_messages },
                  status: :unprocessable_content
@@ -68,6 +83,27 @@ module Api
       end
 
       private
+
+      def process_logo_upload(attrs)
+        attrs = attrs.with_indifferent_access
+        file = attrs[:logo]
+
+        if file.present? && file.is_a?(ActionDispatch::Http::UploadedFile)
+          allowed_types = %w[image/jpeg image/png image/webp image/gif image/svg+xml]
+
+          unless file.content_type.in?(allowed_types)
+            raise MediaUploadError, 'Invalid logo format. Allowed types: JPG, PNG, WEBP, GIF, SVG.'
+          end
+
+          raise MediaUploadError, 'Logo file size must be under 5MB.' if file.size > 5.megabytes
+
+          s3_key = S3BucketService.new.upload(file, folder: 'brands/logos')
+          raise MediaUploadError, 'Failed to upload logo to cloud storage. Please try again.' if s3_key.nil?
+
+          attrs[:logo] = s3_key
+        end
+        attrs
+      end
 
       def fetch_brands_by_scope(scope)
         case scope
@@ -114,7 +150,7 @@ module Api
           brand: %i[
             name
             description
-            logo_url
+            logo
             subdomain
             primary_color
             secondary_color
@@ -124,3 +160,4 @@ module Api
     end
   end
 end
+# rubocop:enable Metrics/ClassLength

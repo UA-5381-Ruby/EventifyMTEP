@@ -1,9 +1,5 @@
 # frozen_string_literal: true
 
-# TODO: Confirm whether event titles must be unique within a brand; if required,
-# add a scoped uniqueness validation for `title`.
-# TODO: Confirm whether every event must have at least one category; if required,
-# add a validation to enforce category presence.
 class Event < ApplicationRecord
   ALLOWED_SORT_COLUMNS = %w[created_at updated_at title start_date status].freeze
   private_constant :ALLOWED_SORT_COLUMNS
@@ -15,6 +11,8 @@ class Event < ApplicationRecord
   has_many :event_categories, dependent: :destroy
   has_many :categories, through: :event_categories
   has_many :tickets, dependent: :destroy
+
+  before_destroy :remove_banner_from_s3
 
   aasm column: :status, enum: true do
     state :draft, initial: true
@@ -63,10 +61,18 @@ class Event < ApplicationRecord
     title.present? && location.present? && start_date.present?
   end
 
+  def banner_url
+    S3BucketService.new.file_url(banner) if banner.present?
+  end
+
   private
 
   def deactivate_tickets!
     tickets.where(is_active: true).update_all(is_active: false)
+  end
+
+  def remove_banner_from_s3
+    S3BucketService.new.delete(banner) if banner.present?
   end
 
   enum :status, {
@@ -80,6 +86,7 @@ class Event < ApplicationRecord
     archived: 'archived',
     cancelled: 'cancelled'
   }
+
   validate :end_date_after_start_date
 
   def end_date_after_start_date
@@ -89,10 +96,13 @@ class Event < ApplicationRecord
 
     errors.add(:end_date, 'must be after start date')
   end
+
   validates :title, presence: true, length: { maximum: 120 }
   validates :location, presence: true, length: { maximum: 200 }
   validates :start_date, presence: true
   validates :status, presence: true
+  validates :price_cents, numericality: { greater_than_or_equal_to: 0 }
+  validates :available_tickets_count, numericality: { greater_than_or_equal_to: 0 }
 
   scope :from_date, ->(date) { where(start_date: date..) if date.present? }
   scope :to_date, ->(date) { where(start_date: ..date) if date.present? }

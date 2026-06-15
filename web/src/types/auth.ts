@@ -13,6 +13,7 @@ export interface AuthUser {
   id: number;
   email: string;
   name: string;
+  is_superadmin?: boolean;
 }
 
 export interface AuthResponse {
@@ -23,4 +24,5 @@ export interface AuthResponse {
 export interface AuthState {
   user: AuthUser | null;
   isAuthenticated: boolean;
+  isLoading?: boolean;
 }

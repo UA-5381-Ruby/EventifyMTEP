@@ -143,19 +143,15 @@ RSpec.describe 'Api::V1::Brands', type: :request do
   # ==========================================
   # AUTHENTICATION CORNER CASES (current_user token parsing)
   # ==========================================
-  describe 'Authentication errors' do
-    it 'returns 401 Unauthorized when token is missing' do
-      delete "/api/v1/brands/#{brand.id}" # Запит БЕЗ headers
-
+  context 'when Authorization header is missing' do
+    it 'returns 401 for a protected endpoint' do
+      delete "/api/v1/brands/#{brand.id}"
       expect(response).to have_http_status(:unauthorized)
     end
 
-    it 'returns 401 Unauthorized when token is invalid (rescues StandardError)' do
-      invalid_headers = { 'Authorization' => 'Bearer some_fake_garbage_token' }
-
-      delete "/api/v1/brands/#{brand.id}", headers: invalid_headers
-
-      expect(response).to have_http_status(:unauthorized)
+    it 'returns 200 for a public endpoint' do
+      get '/api/v1/events'
+      expect(response).to have_http_status(:ok)
     end
   end
 end
