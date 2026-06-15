@@ -103,7 +103,7 @@ export function BrandView({
           <section className="space-y-6">
             <div className="flex items-center justify-between">
               <h4 className="font-bold text-neutral-800">Events</h4>
-              {extraActions}
+              {extraActions && <div className="flex items-center gap-2">{extraActions}</div>}
             </div>
             <EventFilters
               search={filters.search}

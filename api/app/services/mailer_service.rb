@@ -18,4 +18,10 @@ class MailerService
     UserMailer.reset_password(user, token).deliver_later
     token
   end
+
+  def self.send_brand_invitation(email, brand, role)
+    token = InvitationTokenService.encode(email: email, brand_id: brand.id, role: role)
+    UserMailer.brand_invitation(email, brand, token).deliver_later
+    token
+  end
 end

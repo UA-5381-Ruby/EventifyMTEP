@@ -13,7 +13,7 @@ module Api
         @unrelated_user = create_user('unrelated@example.com')
 
         @owner_membership = BrandMembership.create!(brand: @brand, user: @owner_user, role: 'owner')
-        @member_membership = BrandMembership.create!(brand: @brand, user: @member_user, role: 'user')
+        @member_membership = BrandMembership.create!(brand: @brand, user: @member_user, role: 'member')
 
         @base_url = "/api/v1/brands/#{@brand.id}/memberships"
       end
@@ -42,7 +42,6 @@ module Api
       end
     end
 
-    # -------- INDEX --------
     class BrandMembershipsIndexTest < BrandMembershipsBaseTest
       test 'should return paginated list of memberships with user data' do
         get @base_url,
@@ -64,7 +63,6 @@ module Api
       end
     end
 
-    # -------- CREATE --------
     class BrandMembershipsCreateTest < BrandMembershipsBaseTest
       test 'should create a new brand membership' do
         assert_difference('BrandMembership.count', 1) do
@@ -90,7 +88,6 @@ module Api
       end
     end
 
-    # -------- UPDATE --------
     class BrandMembershipsUpdateTest < BrandMembershipsBaseTest
       test 'should allow updating membership role' do
         patch "#{@base_url}/#{@member_membership.id}",
@@ -104,7 +101,7 @@ module Api
 
       test 'should not allow downgrading the last owner' do
         patch "#{@base_url}/#{@owner_membership.id}",
-              params: { membership: { role: 'user' } },
+              params: { membership: { role: 'member' } },
               headers: auth_headers(@owner_user),
               as: :json
 
@@ -120,16 +117,15 @@ module Api
         BrandMembership.create!(brand: @brand, user: @new_user, role: 'owner')
 
         patch "#{@base_url}/#{@owner_membership.id}",
-              params: { membership: { role: 'user' } },
+              params: { membership: { role: 'member' } },
               headers: auth_headers(@owner_user),
               as: :json
 
         assert_response :ok
-        assert_equal 'user', @owner_membership.reload.role
+        assert_equal 'member', @owner_membership.reload.role
       end
     end
 
-    # -------- DESTROY --------
     class BrandMembershipsDestroyTest < BrandMembershipsBaseTest
       test 'should allow destroying a regular membership' do
         assert_difference('BrandMembership.count', -1) do
@@ -155,7 +151,6 @@ module Api
       end
     end
 
-    # -------- NOT FOUND ERRORS --------
     class BrandMembershipsErrorsTest < BrandMembershipsBaseTest
       test 'should return 404 if brand is not found' do
         get '/api/v1/brands/9999999/memberships',
@@ -181,7 +176,6 @@ module Api
       end
     end
 
-    # -------- AUTHORIZATION ERRORS --------
     class BrandMembershipsAuthorizationTest < BrandMembershipsBaseTest
       test 'should return forbidden for index if user has no access to brand' do
         get @base_url,
@@ -193,7 +187,7 @@ module Api
 
       test 'should return forbidden for create if user is not authorized (e.g. regular member)' do
         post @base_url,
-             params: { membership: { user_id: @new_user.id, role: 'user' } },
+             params: { membership: { user_id: @new_user.id, role: 'member' } },
              headers: auth_headers(@member_user),
              as: :json
 
