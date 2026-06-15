@@ -11,7 +11,6 @@ export const useBrandMembership = (targetBrandId?: string) => {
 
   useEffect(() => {
     if (!user?.id) {
-      setIsLoading(false);
       return;
     }
 
