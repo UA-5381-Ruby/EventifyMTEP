@@ -113,7 +113,6 @@ export function AcceptInvitationPage() {
               </Button>
             </>
           )}
-
         </div>
       </div>
     </PageWrapper>
