@@ -17,6 +17,7 @@ export function EventBookingSection({ event }: EventBookingSectionProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [quantity, setQuantity] = useState<number>(1);
   const { hasBoughtTicket, isCheckingTicket } = useTicketStatus(event.id);
 
   const handleBuyTickets = async () => {
@@ -24,7 +25,7 @@ export function EventBookingSection({ event }: EventBookingSectionProps) {
     setError(null);
 
     try {
-      const { pageUrl } = await PaymentService.createInvoice(event.id);
+      const { pageUrl } = await PaymentService.createInvoice(event.id, quantity);
       window.location.href = pageUrl;
     } catch {
       setError('Could not initiate payment. Please try again.');
@@ -47,6 +48,21 @@ export function EventBookingSection({ event }: EventBookingSectionProps) {
       </div>
 
       <div className="flex flex-col items-end gap-2 shrink-0">
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+            className="px-2 py-1 border rounded"
+          >
+            −
+          </button>
+          <span className="text-sm w-4 text-center">{quantity}</span>
+          <button
+            onClick={() => setQuantity((q) => Math.min(10, q + 1))}
+            className="px-2 py-1 border rounded"
+          >
+            +
+          </button>
+        </div>
         {hasBoughtTicket ? (
           <Button variant="outline" disabled>
             <CircleCheck size={14} />

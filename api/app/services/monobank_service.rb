@@ -1,12 +1,13 @@
 # frozen_string_literal: true
 
 class MonobankService
-  CURRENCY_CODE         = 980 # 980 stands for UAH, default for Monobank
-  INVOICE_VALIDITY      = 3600
-  SIGNATURE_ALGORITHM   = 'SHA256'
-  PUBLIC_KEY_CACHE_KEY  = 'monobank_public_key'
-  PUBLIC_KEY_CACHE_TTL  = 24.hours
-  BASKET_ITEM_UNIT      = 'шт.'
+  CURRENCY_CODE        = 980 # 980 stands for UAH, default for Monobank
+  INVOICE_VALIDITY     = 3600
+  SIGNATURE_ALGORITHM  = 'SHA256'
+  PUBLIC_KEY_CACHE_KEY = 'monobank_public_key'
+  PUBLIC_KEY_CACHE_TTL = 24.hours
+  BASKET_ITEM_UNIT     = 'шт.'
+  MAX_QUANTITY         = 10
 
   module Helpers
     private
@@ -20,7 +21,7 @@ class MonobankService
         raise KeyError
       end
 
-      pubkey = response.body.fetch('pubkey')
+      pubkey = response.body['key'] || response.body['pubkey']
       raise KeyError if pubkey.blank?
 
       pubkey
@@ -30,7 +31,6 @@ class MonobankService
       decoded = Base64.decode64(pubkey)
       OpenSSL::PKey::EC.new(decoded)
     rescue OpenSSL::PKey::PKeyError
-      # Try without decoding in case it's already a raw PEM
       OpenSSL::PKey::EC.new(pubkey)
     end
 
@@ -55,7 +55,14 @@ class MonobankService
       )
     end
 
-    def invoice_body(amount_cents:, order_id:, event:, redirect_url:, webhook_url:)
+    def invoice_body(invoice_attrs)
+      amount_cents = invoice_attrs.fetch(:amount_cents)
+      order_id = invoice_attrs.fetch(:order_id)
+      event = invoice_attrs.fetch(:event)
+      quantity = invoice_attrs.fetch(:quantity)
+      redirect_url = invoice_attrs.fetch(:redirect_url)
+      webhook_url = invoice_attrs.fetch(:webhook_url)
+
       {
         amount: amount_cents,
         ccy: CURRENCY_CODE,
@@ -63,7 +70,7 @@ class MonobankService
           reference: order_id.to_s,
           destination: "Ticket for #{event.title}",
           comment: "Ticket for #{event.title}",
-          basketOrder: [basket_item(event, amount_cents)]
+          basketOrder: [basket_item(event, amount_cents, quantity)]
         },
         redirectUrl: redirect_url,
         webHookUrl: webhook_url.presence,
@@ -71,12 +78,12 @@ class MonobankService
       }
     end
 
-    def basket_item(event, amount_kop)
+    def basket_item(event, total_amount_kop, quantity)
       {
         name: event.title,
-        qty: 1,
-        sum: amount_kop,
-        total: amount_kop,
+        qty: quantity,
+        sum: total_amount_kop / quantity, # price per unit in kopecks
+        total: total_amount_kop,
         unit: BASKET_ITEM_UNIT
       }
     end
@@ -85,16 +92,10 @@ class MonobankService
   extend Helpers
 
   class << self
-    def create_invoice(amount_cents:, order_id:, event:, redirect_url:, webhook_url:)
+    def create_invoice(invoice_attrs)
       response = connection.post('/api/merchant/invoice/create') do |req|
-        req.headers['X-Token'] = Rails.application.credentials.monobank[:api_token]
-        req.body = invoice_body(
-          amount_cents: amount_cents,
-          order_id: order_id,
-          event: event,
-          redirect_url: redirect_url,
-          webhook_url: webhook_url
-        )
+        req.headers['X-Token'] = api_token
+        req.body = invoice_body(invoice_attrs)
       end
 
       response.body
@@ -144,7 +145,7 @@ class MonobankService
 
     def request_public_key_from_api
       response = connection.get('/api/merchant/pubkey') do |req|
-        req.headers['X-Token'] = Rails.application.credentials.monobank[:api_token]
+        req.headers['X-Token'] = api_token
       end
 
       pubkey = extract_public_key(response)
@@ -165,6 +166,10 @@ class MonobankService
     end
 
     private
+
+    def api_token
+      ENV.fetch('MONOBANK_API_TOKEN', nil)
+    end
 
     def connection
       Faraday.new(url: ENV.fetch('MONOBANK_BASE_URL', nil)) do |f|
