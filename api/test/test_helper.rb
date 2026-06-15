@@ -9,6 +9,9 @@ SimpleCov.start 'rails' do
 end
 
 ENV['RAILS_ENV'] ||= 'test'
+ENV['AWS_REGION'] ||= 'us-east-1'
+ENV['AWS_ACCESS_KEY_ID'] ||= 'fake_key'
+ENV['AWS_SECRET_ACCESS_KEY'] ||= 'fake_secret'
 require_relative '../config/environment'
 require 'rails/test_help'
 
@@ -37,4 +40,20 @@ if Rails.env.test?
   end
 
   S3BucketService.prepend(S3BucketServiceTestStub)
+end
+
+ActiveSupport.on_load(:active_record) do
+  if defined?(Ticket)
+    module TicketTestExtension
+      def upload_qr_code_to_s3
+        self.qr_image_key = "tickets/test-qr-#{SecureRandom.hex(4)}.png"
+      end
+
+      def delete_qr_code_from_s3?
+        true
+      end
+    end
+
+    Ticket.prepend(TicketTestExtension)
+  end
 end

@@ -11,7 +11,7 @@ class Ticket < ApplicationRecord
 
   before_validation :generate_qr_code, on: :create
   before_create :upload_qr_code_to_s3
-  before_destroy :remove_qr_code_from_s3
+  before_destroy :delete_qr_code_from_s3
 
   scope :search_by_event, lambda { |query|
     return all if query.blank?
@@ -47,7 +47,7 @@ class Ticket < ApplicationRecord
     throw :abort
   end
 
-  def remove_qr_code_from_s3
+  def delete_qr_code_from_s3
     S3BucketService.new.delete(qr_image_key) if qr_image_key.present?
   end
 
