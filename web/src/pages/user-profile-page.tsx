@@ -1,4 +1,3 @@
-import React from 'react';
 import { PageWrapper } from '@/components/layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';

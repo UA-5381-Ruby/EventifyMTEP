@@ -18,6 +18,7 @@ import { BrandDiscoverPage } from '@/pages/brand-discover-page.tsx';
 import { MyBrandsPage } from '@/pages/my-brands-page.tsx';
 import { SuperAdminRoute } from '@/components/super-admin-route';
 import { BrandManagerRoute } from '@/components/brand-admin-route';
+import { AcceptInvitationPage } from '@/pages/accept-invitation-page.tsx';
 
 function App() {
   return (

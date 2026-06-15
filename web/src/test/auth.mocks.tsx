@@ -1,7 +1,7 @@
 import React from 'react';
 
 export const mockNavigate = jest.fn();
-
+export const mockUseSearchParams = jest.fn(() => [new URLSearchParams(), jest.fn()]);
 let errorSpy: jest.SpyInstance;
 
 beforeEach(() => {
@@ -14,6 +14,7 @@ afterEach(() => {
 
 jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
+  useSearchParams: mockUseSearchParams, // ← без обгортки
   MemoryRouter: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
 

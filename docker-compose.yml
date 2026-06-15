@@ -1,0 +1,61 @@
+volumes:
+  db_data:
+
+services:
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    env_file:
+      - ./api/.env
+    environment:
+      POSTGRES_USER:     ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB:       ${DB_NAME}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - ./api/.env
+    environment:
+      DB_HOST: db
+      RAILS_ENV: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./api:/rails
+      - /rails/vendor
+    command: >
+      bash -c "
+        bundle exec rails db:prepare &&
+        bundle exec rails server -b 0.0.0.0 -p 3000
+      "
+
+  web:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+      target: development
+    restart: unless-stopped
+    env_file:
+      - ./web/.env
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./web:/app
+      - /app/node_modules
+    depends_on:
+      - api
