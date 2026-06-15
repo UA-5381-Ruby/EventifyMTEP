@@ -12,6 +12,8 @@ ENV['RAILS_ENV'] ||= 'test'
 ENV['AWS_REGION'] ||= 'us-east-1'
 ENV['AWS_ACCESS_KEY_ID'] ||= 'fake_key'
 ENV['AWS_SECRET_ACCESS_KEY'] ||= 'fake_secret'
+ENV['AWS_BUCKET_NAME'] ||= 'test_bucket'
+
 require_relative '../config/environment'
 require 'rails/test_help'
 

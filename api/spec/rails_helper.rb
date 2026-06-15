@@ -8,6 +8,7 @@ ENV['RAILS_ENV'] ||= 'test'
 ENV['AWS_REGION'] ||= 'us-east-1'
 ENV['AWS_ACCESS_KEY_ID'] ||= 'fake_access_key'
 ENV['AWS_SECRET_ACCESS_KEY'] ||= 'fake_secret_key'
+ENV['AWS_BUCKET_NAME'] ||= 'test_bucket'
 require_relative '../config/environment'
 # Prevent database truncation if the environment is production
 abort('The Rails environment is running in production mode!') if Rails.env.production?
