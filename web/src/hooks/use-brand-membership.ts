@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import type { Membership } from "@/types/brand-memberships";
+import { BrandMembershipsService } from "@/services/brand-memberships-service";
 
 export const useBrandMembership = (targetBrandId?: string) => {
     const { user } = useAuth();
@@ -14,21 +15,10 @@ export const useBrandMembership = (targetBrandId?: string) => {
             return;
         }
 
-        const fetchMemberships = async () => {
+        const loadMembershipsData = async () => {
             try {
                 setIsLoading(true);
-                const token = localStorage.getItem("token");
-
-                const response = await fetch(
-                    `/api/v1/users/${user.id}/brand_memberships`,
-                    {
-                        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
-                    }
-                );
-
-                if (!response.ok) throw new Error("Fetch error");
-                const data = await response.json();
-
+                const data = await BrandMembershipsService.getUserMemberships(user.id);
                 setMemberships(data);
             } catch (err) {
                 setError(err instanceof Error ? err : new Error("Unknown error"));
@@ -37,9 +27,8 @@ export const useBrandMembership = (targetBrandId?: string) => {
             }
         };
 
-        fetchMemberships();
+        loadMembershipsData();
     }, [user?.id]);
-
     const isAnyBrandManager = memberships.some(
         (m) => m.role === 'admin' || m.role === 'owner'
     );

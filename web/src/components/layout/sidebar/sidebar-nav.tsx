@@ -1,5 +1,6 @@
 import { useAuth } from '@/hooks/use-auth';
 import { useBrandMembership } from '@/hooks/use-brand-membership';
+import { useNavigate } from 'react-router-dom';
 
 interface SidebarNavProps {
   currentPath?: string;
@@ -27,12 +28,13 @@ const ADMIN_ITEMS = [
 
 export function SidebarNav({
   currentPath = '/dashboard',
-  onNavigate = () => { },
+  //onNavigate = () => { },
   isCollapsed = false,
   onSelect = () => { },
   isSuperAdmin,
   role,
 }: SidebarNavProps) {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { isAnyBrandManager } = useBrandMembership();
 
@@ -48,7 +50,8 @@ export function SidebarNav({
   const items = effectiveIsSuperAdmin ? SUPERADMIN_ITEMS : ADMIN_ITEMS;
 
   const handleItemClick = (href: string, label: string) => {
-    onNavigate(href);
+    navigate(href);
+
     onSelect(label);
   };
 

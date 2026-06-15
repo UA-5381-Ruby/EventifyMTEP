@@ -1,16 +1,16 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface SidebarActionsProps {
-  onBack: () => void;
   onToggleMenu?: () => void;
   isCollapsed: boolean;
 }
 
 export const SidebarActions: React.FC<SidebarActionsProps> = ({
-  onBack,
   onToggleMenu,
   isCollapsed,
 }) => {
+  const navigate = useNavigate();
   return (
     <div
       style={{
@@ -23,7 +23,7 @@ export const SidebarActions: React.FC<SidebarActionsProps> = ({
     >
       {!isCollapsed && (
         <button
-          onClick={onBack}
+          onClick={() => navigate('/events')}
           style={{
             display: 'flex',
             alignItems: 'center',

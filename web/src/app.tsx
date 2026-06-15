@@ -16,6 +16,8 @@ import { BrandDashboardPage } from '@/pages/brand-dashboard-page.tsx';
 import { SuperAdminPage } from '@/pages/super-admin-page.tsx';
 import { BrandDiscoverPage } from '@/pages/brand-discover-page.tsx';
 import { MyBrandsPage } from '@/pages/my-brands-page.tsx';
+import { SuperAdminRoute } from '@/components/super-admin-route';
+import { BrandManagerRoute } from '@/components/brand-admin-route';
 
 function App() {
   return (
@@ -35,12 +37,18 @@ function App() {
         <Route path="/brands/:id" element={<BrandPublicPage />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/superadmin" element={<SuperAdminPage />} />
+          <Route element={<SuperAdminRoute />}>
+            <Route path="/superadmin" element={<SuperAdminPage />} />
+          </Route>
+
           <Route path="/brands" element={<BrandDiscoverPage />} />
           <Route path="/my-brands" element={<MyBrandsPage />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/brands/:id" element={<BrandDashboardPage />} />
+          <Route element={<BrandManagerRoute />}>
+            <Route path="/dashboard/brands/:id" element={<BrandDashboardPage />} />
+          </Route>
+
 
           <Route path="/profile/settings" element={<UserProfilePage />} />
         </Route>
