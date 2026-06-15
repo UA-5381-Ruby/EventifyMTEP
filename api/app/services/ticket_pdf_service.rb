@@ -46,33 +46,23 @@ class TicketPdfService
   end
 
   def render_event_info(pdf)
-    pdf.fill_color MUTED_COLOR
-    pdf.text 'Date & Time', size: 9, style: :bold
-    pdf.fill_color TEXT_COLOR
-    pdf.text formatted_date, size: 11
-    pdf.move_down 8
+    render_info_block(pdf, 'Date & Time', formatted_date)
+    render_info_block(pdf, 'Location', @event.location.to_s)
+    render_info_block(pdf, 'Attendee', @user.name.to_s)
+    render_info_block(pdf, 'Ticket ID', @ticket.qr_code, size: 9)
+  end
 
+  def render_info_block(pdf, label, value, size: 11)
     pdf.fill_color MUTED_COLOR
-    pdf.text 'Location', size: 9, style: :bold
+    pdf.text label, size: 9, style: :bold
     pdf.fill_color TEXT_COLOR
-    pdf.text @event.location.to_s, size: 11
+    pdf.text value, size: size
     pdf.move_down 8
-
-    pdf.fill_color MUTED_COLOR
-    pdf.text 'Attendee', size: 9, style: :bold
-    pdf.fill_color TEXT_COLOR
-    pdf.text @user.name.to_s, size: 11
-    pdf.move_down 8
-
-    pdf.fill_color MUTED_COLOR
-    pdf.text 'Ticket ID', size: 9, style: :bold
-    pdf.fill_color TEXT_COLOR
-    pdf.text @ticket.qr_code, size: 9
   end
 
   def render_qr_code(pdf)
     pdf.move_down 4
-    pdf.print_qr_code(@ticket.qr_code, extent: 120, pos: [pdf.bounds.width / 2 - 60, pdf.cursor])
+    pdf.print_qr_code(@ticket.qr_code, extent: 120, pos: [(pdf.bounds.width / 2) - 60, pdf.cursor])
     pdf.move_down 130
     pdf.fill_color MUTED_COLOR
     pdf.text 'Scan to verify your ticket', size: 8, align: :center
@@ -88,6 +78,6 @@ class TicketPdfService
   def formatted_date
     start_date = @event.start_date&.strftime('%A, %B %-d, %Y • %H:%M')
     end_date   = @event.end_date&.strftime('%H:%M')
-    end_date   ? "#{start_date} – #{end_date}" : start_date.to_s
+    end_date ? "#{start_date} – #{end_date}" : start_date.to_s
   end
 end

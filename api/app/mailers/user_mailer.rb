@@ -28,11 +28,11 @@ class UserMailer < ApplicationMailer
 
     attachments["ticket-#{ticket.qr_code}.pdf"] = {
       mime_type: 'application/pdf',
-      content:   pdf
+      content: pdf
     }
 
     mail(
-      to:      @user.email,
+      to: @user.email,
       subject: "Your ticket for #{@event.title}"
     )
   end
