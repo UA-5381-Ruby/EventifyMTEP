@@ -53,20 +53,20 @@ export function SuperAdminPage() {
           apiClient.get('/api/v1/events').catch(() => ({ data: [] })),
         ]);
 
-        const fetchedUsers = Array.isArray(usersRes.data)
+        const fetchedUsers: UserPreview[] = Array.isArray(usersRes.data)
           ? usersRes.data
           : usersRes.data?.users || [];
         const fetchedBrands = Array.isArray(brandsRes.data)
           ? brandsRes.data
           : brandsRes.data?.brands || [];
-        const fetchedEvents = Array.isArray(eventsRes.data)
+        const fetchedEvents: PendingEvent[] = Array.isArray(eventsRes.data)
           ? eventsRes.data
           : eventsRes.data?.events || [];
 
         setUsers(fetchedUsers);
 
         const pending = fetchedEvents.filter(
-          (e: any) => e?.status === 'pending' || e?.status === 'Pending'
+          (e: PendingEvent) => e?.status === 'pending' || e?.status === 'Pending'
         );
         setPendingEvents(pending);
 
@@ -75,7 +75,7 @@ export function SuperAdminPage() {
           totalBrands: fetchedBrands.length,
           totalEvents: fetchedEvents.length,
           pendingApproval: pending.length,
-          rejectedEvents: fetchedEvents.filter((e: any) => e?.status === 'rejected').length,
+          rejectedEvents: fetchedEvents.filter((e: PendingEvent) => e?.status === 'rejected').length,
           reportedUsers: 0,
         });
       } catch (error) {
