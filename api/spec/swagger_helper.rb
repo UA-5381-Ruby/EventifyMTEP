@@ -144,6 +144,7 @@ RSpec.configure do |config|
               user_id: { type: :integer, example: 5 },
               event_id: { type: :integer, example: 10 },
               qr_code: { type: :string, example: '550e8400-e29b-41d4-a716-446655440000' },
+              qr_code_url: { type: :string, example: 'https://cdn.example.com/tickets/qr/example.png', nullable: true },
               is_active: { type: :boolean, example: true },
               created_at: { type: :string, format: 'date-time' },
               updated_at: { type: :string, format: 'date-time' },

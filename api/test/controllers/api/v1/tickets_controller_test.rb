@@ -24,6 +24,8 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :created
     assert response.parsed_body.key?('qr_code')
+    assert response.parsed_body.key?('qr_code_url')
+    assert response.parsed_body['qr_code_url'].present?
   end
 
   test 'should not allow duplicate registration for same event' do
@@ -57,6 +59,7 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
     assert_response :ok
     assert_equal @ticket.id, response.parsed_body['id']
     assert response.parsed_body.key?('qr_code')
+    assert response.parsed_body.key?('qr_code_url')
   end
 
   test 'should return 404 for non-existent ticket' do

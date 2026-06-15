@@ -20,6 +20,13 @@ RSpec.describe 'Tickets Integration', type: :integration do
         expect(ticket1.qr_code).not_to eq(ticket2.qr_code)
       end
 
+      it 'stores QR image key and exposes a public URL' do
+        ticket = create(:ticket, user: user, event: event)
+
+        expect(ticket.qr_image_key).to start_with('tickets/qr/')
+        expect(ticket.qr_code_url).to include(ticket.qr_image_key)
+      end
+
       it 'sets is_active to true by default' do
         ticket = create(:ticket, user: user, event: event)
         expect(ticket.is_active).to be true
