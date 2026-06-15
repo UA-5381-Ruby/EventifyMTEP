@@ -49,7 +49,6 @@ function App() {
             <Route path="/dashboard/brands/:id" element={<BrandDashboardPage />} />
           </Route>
 
-
           <Route path="/profile/settings" element={<UserProfilePage />} />
         </Route>
 

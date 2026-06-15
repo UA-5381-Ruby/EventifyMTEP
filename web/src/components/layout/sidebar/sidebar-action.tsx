@@ -6,10 +6,7 @@ interface SidebarActionsProps {
   isCollapsed: boolean;
 }
 
-export const SidebarActions: React.FC<SidebarActionsProps> = ({
-  onToggleMenu,
-  isCollapsed,
-}) => {
+export const SidebarActions: React.FC<SidebarActionsProps> = ({ onToggleMenu, isCollapsed }) => {
   const navigate = useNavigate();
   return (
     <div

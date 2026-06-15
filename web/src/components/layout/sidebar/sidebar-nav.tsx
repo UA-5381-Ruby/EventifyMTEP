@@ -30,7 +30,7 @@ export function SidebarNav({
   currentPath = '/dashboard',
   //onNavigate = () => { },
   isCollapsed = false,
-  onSelect = () => { },
+  onSelect = () => {},
   isSuperAdmin,
   role,
 }: SidebarNavProps) {
@@ -38,8 +38,9 @@ export function SidebarNav({
   const { user } = useAuth();
   const { isAnyBrandManager } = useBrandMembership();
 
-  const effectiveIsSuperAdmin = isSuperAdmin !== undefined ? isSuperAdmin : user?.is_superadmin || false;
-  const effectiveRole = role !== undefined ? role : (isAnyBrandManager ? 'admin' : '');
+  const effectiveIsSuperAdmin =
+    isSuperAdmin !== undefined ? isSuperAdmin : user?.is_superadmin || false;
+  const effectiveRole = role !== undefined ? role : isAnyBrandManager ? 'admin' : '';
 
   const isAuthorized = effectiveIsSuperAdmin || effectiveRole === 'admin';
 

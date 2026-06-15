@@ -50,16 +50,24 @@ export function SuperAdminPage() {
         const [usersRes, brandsRes, eventsRes] = await Promise.all([
           apiClient.get('/api/v1/users').catch(() => ({ data: [] })),
           apiClient.get('/api/v1/brands').catch(() => ({ data: [] })),
-          apiClient.get('/api/v1/events').catch(() => ({ data: [] }))
+          apiClient.get('/api/v1/events').catch(() => ({ data: [] })),
         ]);
 
-        const fetchedUsers = Array.isArray(usersRes.data) ? usersRes.data : (usersRes.data?.users || []);
-        const fetchedBrands = Array.isArray(brandsRes.data) ? brandsRes.data : (brandsRes.data?.brands || []);
-        const fetchedEvents = Array.isArray(eventsRes.data) ? eventsRes.data : (eventsRes.data?.events || []);
+        const fetchedUsers = Array.isArray(usersRes.data)
+          ? usersRes.data
+          : usersRes.data?.users || [];
+        const fetchedBrands = Array.isArray(brandsRes.data)
+          ? brandsRes.data
+          : brandsRes.data?.brands || [];
+        const fetchedEvents = Array.isArray(eventsRes.data)
+          ? eventsRes.data
+          : eventsRes.data?.events || [];
 
         setUsers(fetchedUsers);
 
-        const pending = fetchedEvents.filter((e: any) => e?.status === 'pending' || e?.status === 'Pending');
+        const pending = fetchedEvents.filter(
+          (e: any) => e?.status === 'pending' || e?.status === 'Pending'
+        );
         setPendingEvents(pending);
 
         setStats({
@@ -70,7 +78,6 @@ export function SuperAdminPage() {
           rejectedEvents: fetchedEvents.filter((e: any) => e?.status === 'rejected').length,
           reportedUsers: 0,
         });
-
       } catch (error) {
         console.error(error);
       } finally {
@@ -87,9 +94,9 @@ export function SuperAdminPage() {
     try {
       await apiClient.delete(`/api/v1/users/${userId}`);
 
-      setUsers(prevUsers => prevUsers.filter(user => user.id !== userId));
+      setUsers((prevUsers) => prevUsers.filter((user) => user.id !== userId));
 
-      setStats(prev => ({ ...prev, totalUsers: prev.totalUsers - 1 }));
+      setStats((prev) => ({ ...prev, totalUsers: prev.totalUsers - 1 }));
     } catch (error) {
       console.error(error);
       alert('Could not delete user. Make sure you have superadmin rights.');
@@ -140,26 +147,36 @@ export function SuperAdminPage() {
         <div className="mb-12">
           <div className="flex justify-between items-end mb-4">
             <h2 className="text-lg font-bold">Events Pending Approval</h2>
-            <button className="text-sm text-gray-600 hover:underline">
-              View All
-            </button>
+            <button className="text-sm text-gray-600 hover:underline">View All</button>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full border-collapse border border-gray-300 text-sm bg-white">
               <thead>
                 <tr className="bg-gray-200">
                   <th className="border border-gray-300 px-4 py-3 text-left font-semibold">Name</th>
-                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold">Start Date</th>
-                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold">Status</th>
-                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold">Created By</th>
-                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold">Location</th>
-                  <th className="border border-gray-300 px-4 py-3 text-center font-semibold">Actions</th>
+                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold">
+                    Start Date
+                  </th>
+                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold">
+                    Status
+                  </th>
+                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold">
+                    Created By
+                  </th>
+                  <th className="border border-gray-300 px-4 py-3 text-left font-semibold">
+                    Location
+                  </th>
+                  <th className="border border-gray-300 px-4 py-3 text-center font-semibold">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {pendingEvents.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="text-center py-4 text-gray-500">No events pending approval.</td>
+                    <td colSpan={6} className="text-center py-4 text-gray-500">
+                      No events pending approval.
+                    </td>
                   </tr>
                 ) : (
                   pendingEvents.map((event) => (
@@ -196,9 +213,7 @@ export function SuperAdminPage() {
         <div>
           <div className="flex justify-between items-end mb-2">
             <h2 className="text-lg font-bold">User Preview</h2>
-            <button className="text-sm text-gray-600 hover:underline">
-              Manage Members
-            </button>
+            <button className="text-sm text-gray-600 hover:underline">Manage Members</button>
           </div>
 
           <div className="border border-gray-300 p-6 bg-white">
