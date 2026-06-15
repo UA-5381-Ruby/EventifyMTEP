@@ -18,4 +18,22 @@ class UserMailer < ApplicationMailer
     @reset_link = "#{frontend_url}/reset-password?token=#{signed_id}"
     mail(to: @user.email, subject: 'Reset your password')
   end
+
+  def ticket_confirmation(user, ticket)
+    @user   = user
+    @ticket = ticket
+    @event  = ticket.event
+
+    pdf = TicketPdfService.generate(ticket)
+
+    attachments["ticket-#{ticket.qr_code}.pdf"] = {
+      mime_type: 'application/pdf',
+      content:   pdf
+    }
+
+    mail(
+      to:      @user.email,
+      subject: "Your ticket for #{@event.title}"
+    )
+  end
 end

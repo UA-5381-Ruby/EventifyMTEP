@@ -18,4 +18,8 @@ class MailerService
     UserMailer.reset_password(user, token).deliver_later
     token
   end
+
+  def self.send_ticket_confirmation(ticket)
+    UserMailer.ticket_confirmation(ticket.user, ticket).deliver_later
+  end
 end

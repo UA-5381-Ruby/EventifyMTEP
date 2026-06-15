@@ -97,12 +97,14 @@ module Api
         cache_key = "processed_invoice_#{invoice_id}"
         return if Rails.cache.exist?(cache_key)
 
+        tickets = []
         ActiveRecord::Base.transaction do
-          quantity.times { user.tickets.create!(event: event) }
+          quantity.times { tickets << user.tickets.create!(event: event) }
           event.decrement!(:available_tickets_count, quantity)
         end
 
         Rails.cache.write(cache_key, true, expires_in: 24.hours)
+        tickets.each { |ticket| MailerService.send_ticket_confirmation(ticket) }
       rescue ActiveRecord::RecordInvalid => e
         Rails.logger.error("Ticket creation failed: #{e.message}")
       end
