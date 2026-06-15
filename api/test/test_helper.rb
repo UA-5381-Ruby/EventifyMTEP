@@ -28,3 +28,13 @@ module ActiveSupport
     # Add more helper methods to be used by all tests here...
   end
 end
+
+if Rails.env.test?
+  module S3BucketServiceTestStub
+    def upload_body(_body, folder:, extension:, **)
+      "#{folder}/#{SecureRandom.uuid}#{extension}"
+    end
+  end
+
+  S3BucketService.prepend(S3BucketServiceTestStub)
+end
