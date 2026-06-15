@@ -57,11 +57,55 @@ The current `web/.env.example` defines these variables:
 - Set `MONOBANK_API_TOKEN` and `MONOBANK_BASE_URL` when testing payment flows.
 - In `web/.env`, keep `VITE_API_BASE_URL` aligned with your backend URL.
 
+## Docker Compose environment
+
+When running the full stack with Docker Compose, an additional `.env` file is required in the **repository root** (`EventifyMTEP/.env`). This file is read by Docker Compose itself for variable interpolation in `docker-compose.yml` and is separate from `api/.env`.
+
+### Create the root `.env` file
+
+```bash
+cp .env.example .env
+```
+
+### Root `.env` variables
+
+The root `.env.example` defines these variables:
+
+| Variable | Purpose |
+| -------- | ------- |
+| `DB_USERNAME` | PostgreSQL superuser name used by the `db` container and passed to Rails via `api/.env`. |
+| `DB_PASSWORD` | PostgreSQL superuser password used by the `db` container. |
+| `DB_NAME` | Name of the development database created on first container start. |
+
+> **Note:** `DB_USERNAME` and `DB_PASSWORD` must match the values in `api/.env` so that the Rails API can connect to the containerized PostgreSQL instance.
+
+### Recommended Docker local values
+
+```env
+DB_USERNAME=your_postgres_username
+DB_PASSWORD=your_postgres_password
+DB_NAME=api_development
+```
+
+### How the values flow
+
+```
+EventifyMTEP/.env
+  └── docker-compose.yml (db service POSTGRES_USER / POSTGRES_PASSWORD / POSTGRES_DB)
+        └── db container (PostgreSQL initializes with these credentials)
+
+api/.env
+  └── api container (Rails reads DB_USERNAME, DB_PASSWORD, DB_HOST=db, DB_PORT=5432)
+```
+
+Both files must define `DB_USERNAME` and `DB_PASSWORD` with the same values.
+
 ## Team rules
 
 - Never commit your real `api/.env` file.
 - Never commit your real `web/.env` file.
+- Never commit the root `.env` file.
 - Update `api/.env.example` whenever a new required variable is introduced.
 - Update `web/.env.example` whenever a new required frontend variable is introduced.
+- Update `.env.example` in the repository root whenever a Docker Compose variable is added.
 - Keep documentation and setup instructions in sync with the example file.
-

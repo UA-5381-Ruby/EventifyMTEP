@@ -16,7 +16,7 @@ According to `.tool-versions`, `api/Gemfile`, and the current Rails configuratio
 
 Optional but useful:
 
-- Docker, if you want to experiment with the production-oriented `api/Dockerfile`
+- Docker and Docker Compose, for running the full stack in containers (see [Docker Compose setup](#docker-compose-setup) below)
 - an editor with Ruby support such as JetBrains RubyMine or VS Code
 
 ## Quick start
@@ -193,17 +193,119 @@ http://localhost:3000/api-docs
 
 Swagger UI is mounted only in development and test environments.
 
-## Optional Docker usage
+## Docker Compose setup
 
-The repository includes `api/Dockerfile`, but it is explicitly designed for production-style builds rather than day-to-day local development.
+Docker Compose is the recommended way to run the full stack locally without installing Ruby, Node.js, or PostgreSQL on your machine. It orchestrates three containers: `db` (PostgreSQL), `api` (Rails), and `web` (Vite + React).
 
-If you want to build it manually from `api/`:
+### Prerequisites
+
+- Docker Desktop (macOS or Windows) or Docker Engine with the Compose plugin (Linux)
+
+### First-time setup
+
+**1. Create the root environment file**
 
 ```bash
-docker build -t eventify-api .
+cp .env.example .env
 ```
 
-The image expects production configuration, including a Rails master key, so local Rails commands remain the recommended development workflow.
+Open `.env` and fill in your local PostgreSQL credentials:
+
+```env
+DB_USERNAME=your_username
+DB_PASSWORD=your_password
+DB_NAME=api_development
+```
+
+**2. Create the API environment file**
+
+```bash
+cp api/.env.example api/.env
+```
+
+Edit `api/.env`. At minimum set `DB_USERNAME` and `DB_PASSWORD` to the same values as in the root `.env`, and generate a JWT secret:
+
+```bash
+# If Ruby is available locally:
+cd api && bin/rails secret
+
+# Otherwise use OpenSSL:
+openssl rand -hex 64
+```
+
+Copy the output into `JWT_SECRET_KEY` inside `api/.env`.
+
+**3. Create the web environment file**
+
+```bash
+cp web/.env.example web/.env
+```
+
+For local Docker usage, `web/.env` should contain:
+
+```env
+VITE_API_BASE_URL=http://localhost:3000
+```
+
+**4. Build and start all containers**
+
+```bash
+docker compose up --build
+```
+
+On the first run Docker will pull images, install gems and npm packages, create the database, and run migrations automatically before starting the Rails server.
+
+### Accessing the services
+
+| Service | URL |
+| ------- | --- |
+| Rails API | <http://localhost:3000> |
+| Swagger UI | <http://localhost:3000/api-docs> |
+| Vite dev server | <http://localhost:5173> |
+
+### Daily workflow
+
+```bash
+# Start all containers in the background
+docker compose up -d
+
+# Follow logs for all services
+docker compose logs -f
+
+# Follow logs for a single service
+docker compose logs -f api
+
+# Stop all containers (data is preserved)
+docker compose down
+
+# Stop and delete all data (full reset)
+docker compose down -v
+```
+
+### Running commands inside containers
+
+```bash
+# Rails console
+docker compose exec api bundle exec rails console
+
+# Run migrations
+docker compose exec api bundle exec rails db:migrate
+
+# Run the API test suite
+docker compose exec api bundle exec rspec
+
+# Run frontend linting
+docker compose exec web npm run lint
+```
+
+### Docker file overview
+
+| File | Purpose |
+| ---- | ------- |
+| `docker-compose.yml` | Orchestrates `db`, `api`, and `web` services |
+| `api/Dockerfile.dev` | Development image for the Rails API (used by Compose) |
+| `api/Dockerfile` | Production image for the Rails API (used by Kamal) |
+| `web/Dockerfile` | Multi-stage image for the Vite frontend |
 
 ## Editor support
 
