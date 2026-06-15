@@ -5,7 +5,7 @@ class BrandMembership < ApplicationRecord
   belongs_to :brand
   validate :ensure_at_least_one_owner_on_update, on: :update
   before_destroy :ensure_at_least_one_owner_on_destroy
-  validates :role, presence: true, inclusion: { in: %w[owner manager user] }
+  validates :role, presence: true, inclusion: { in: %w[owner manager member] }
   validates :user_id, uniqueness: { scope: :brand_id }
 
   private

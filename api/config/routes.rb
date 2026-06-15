@@ -42,6 +42,12 @@ Rails.application.routes.draw do
 
       resources :brands, only: [:index, :create, :show, :update, :destroy] do
         resources :memberships, controller: 'brand_memberships', only: [:index, :create, :update, :destroy]
+
+        resources :invitations, only: [:create] do
+          collection do
+            post :accept
+          end
+        end
       end
 
       post '/auth/password/reset', to: 'passwords#update', constraints: ->(req) { req.params[:token].present? }
