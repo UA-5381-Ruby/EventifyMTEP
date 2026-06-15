@@ -1,5 +1,5 @@
 ﻿import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Input, Button, Checkbox } from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
 import authService from '@/services/auth-service';
@@ -7,6 +7,7 @@ import { Eye, EyeOff } from 'lucide-react';
 
 export function LoginPage() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -20,7 +21,9 @@ export function LoginPage() {
 
     try {
       await authService.login({ email, password }, rememberMe);
-      navigate('/events', { replace: true });
+
+      const redirectTo = searchParams.get('redirect');
+      navigate(redirectTo ? decodeURIComponent(redirectTo) : '/events', { replace: true });
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
     }

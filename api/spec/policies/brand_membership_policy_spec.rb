@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# spec/policies/brand_membership_policy_spec.rb
 require 'swagger_helper'
 
 RSpec.describe BrandMembershipPolicy, type: :policy do
@@ -14,11 +13,8 @@ RSpec.describe BrandMembershipPolicy, type: :policy do
   let(:non_member) { create(:user) }
 
   before do
-    # Додаємо member до бренду
-    create(:brand_membership, brand: brand, user: member, role: 'user')
+    create(:brand_membership, brand: brand, user: member, role: 'member')
   end
-
-  # --- Тести для show_brand_memberships? ---
 
   it 'denies show_brand_memberships? when user is nil' do
     policy = BrandPolicy.new(nil, brand)
@@ -43,13 +39,13 @@ RSpec.describe BrandMembershipPolicy, type: :policy do
   before do
     create(:brand_membership, brand: brand, user: owner, role: 'owner')
     create(:brand_membership, brand: brand, user: manager, role: 'manager')
-    create(:brand_membership, brand: brand, user: regular_user, role: 'user')
+    create(:brand_membership, brand: brand, user: regular_user, role: 'member')
   end
 
   describe '#create?' do
     context 'when current user is a manager' do
-      it "permits inviting users with 'user' role" do
-        new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'user')
+      it "permits inviting users with 'member' role" do
+        new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'member')
         expect(BrandMembershipPolicy.new(manager, new_brand_membership)).to permit_action(:create)
       end
 
@@ -65,15 +61,15 @@ RSpec.describe BrandMembershipPolicy, type: :policy do
         expect(BrandMembershipPolicy.new(owner, new_brand_membership)).to permit_action(:create)
       end
 
-      it "permits inviting users with 'user' role" do
-        new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'user')
+      it "permits inviting users with 'member' role" do
+        new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'member')
         expect(BrandMembershipPolicy.new(owner, new_brand_membership)).to permit_action(:create)
       end
     end
 
     context 'when current user is a regular user' do
       it 'does not permit inviting anyone' do
-        new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'user')
+        new_brand_membership = build(:brand_membership, brand: brand, user: new_user, role: 'member')
         expect(BrandMembershipPolicy.new(regular_user, new_brand_membership)).not_to permit_action(:create)
       end
     end
@@ -81,13 +77,13 @@ RSpec.describe BrandMembershipPolicy, type: :policy do
 
   describe '#update?' do
     context 'when current user is a manager' do
-      it "permits updating a 'user' role" do
-        membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
+      it "permits updating a 'member' role" do
+        membership = create(:brand_membership, brand: brand, user: new_user, role: 'member')
         expect(BrandMembershipPolicy.new(manager, membership)).to permit_action(:update)
       end
 
       it "does not permit updating someone to 'owner' role" do
-        membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
+        membership = create(:brand_membership, brand: brand, user: new_user, role: 'member')
         membership.role = 'owner'
         expect(BrandMembershipPolicy.new(manager, membership)).not_to permit_action(:update)
       end
@@ -95,7 +91,7 @@ RSpec.describe BrandMembershipPolicy, type: :policy do
 
     context 'when current user is an owner' do
       it 'permits updating any role' do
-        membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
+        membership = create(:brand_membership, brand: brand, user: new_user, role: 'member')
         membership.role = 'owner'
         expect(BrandMembershipPolicy.new(owner, membership)).to permit_action(:update)
       end
@@ -104,8 +100,8 @@ RSpec.describe BrandMembershipPolicy, type: :policy do
 
   describe '#destroy?' do
     context 'when current user is a manager' do
-      it "permits destroying a 'user' membership" do
-        membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
+      it "permits destroying a 'member' membership" do
+        membership = create(:brand_membership, brand: brand, user: new_user, role: 'member')
         expect(BrandMembershipPolicy.new(manager, membership)).to permit_action(:destroy)
       end
 
@@ -130,7 +126,7 @@ RSpec.describe BrandMembershipPolicy, type: :policy do
 
     context 'when current user is a regular user' do
       it 'does not permit destroying any membership' do
-        membership = create(:brand_membership, brand: brand, user: new_user, role: 'user')
+        membership = create(:brand_membership, brand: brand, user: new_user, role: 'member')
         expect(BrandMembershipPolicy.new(regular_user, membership)).not_to permit_action(:destroy)
       end
     end

@@ -43,55 +43,53 @@ export function InviteMemberModal({ brandId, isOpen, onClose }: Props) {
   };
 
   return (
-      <Modal isOpen={isOpen} onClose={handleClose} title="Invite team member">
-        <p className="text-sm text-neutral-500 mb-4">
-          They'll receive an email with a link to join.
-        </p>
+    <Modal isOpen={isOpen} onClose={handleClose} title="Invite team member">
+      <p className="text-sm text-neutral-500 mb-4">They'll receive an email with a link to join.</p>
 
-        <div className="space-y-4">
-          <Input
-              label="Email"
-              type="email"
-              placeholder="colleague@example.com"
-              value={email}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-              disabled={status === 'loading'}
-          />
+      <div className="space-y-4">
+        <Input
+          label="Email"
+          type="email"
+          placeholder="colleague@example.com"
+          value={email}
+          onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+          disabled={status === 'loading'}
+        />
 
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-neutral-700">Role</label>
-            <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                disabled={status === 'loading'}
-                className="w-full h-10 px-3 rounded-lg border border-neutral-200 text-sm text-neutral-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {ROLES.map((r) => (
-                  <option key={r} value={r}>{r}</option>
-              ))}
-            </select>
-          </div>
-
-          {status === 'success' && (
-              <p className="text-sm text-green-700">Invitation sent successfully.</p>
-          )}
-          {status === 'error' && (
-              <p className="text-sm text-red-700">{error}</p>
-          )}
-        </div>
-
-        <div className="flex justify-end gap-3 mt-6">
-          <Button variant="ghost" onClick={handleClose} disabled={status === 'loading'}>
-            Cancel
-          </Button>
-          <Button
-              onClick={handleSubmit}
-              disabled={status === 'loading' || !email.trim()}
-              className="bg-blue-600 hover:bg-blue-700 text-white"
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-neutral-700">Role</label>
+          <select
+            value={role}
+            onChange={(e) => setRole(e.target.value)}
+            disabled={status === 'loading'}
+            className="w-full h-10 px-3 rounded-lg border border-neutral-200 text-sm text-neutral-900 bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            {status === 'loading' ? 'Sending...' : 'Send invite'}
-          </Button>
+            {ROLES.map((r) => (
+              <option key={r} value={r}>
+                {r}
+              </option>
+            ))}
+          </select>
         </div>
-      </Modal>
+
+        {status === 'success' && (
+          <p className="text-sm text-green-700">Invitation sent successfully.</p>
+        )}
+        {status === 'error' && <p className="text-sm text-red-700">{error}</p>}
+      </div>
+
+      <div className="flex justify-end gap-3 mt-6">
+        <Button variant="ghost" onClick={handleClose} disabled={status === 'loading'}>
+          Cancel
+        </Button>
+        <Button
+          onClick={handleSubmit}
+          disabled={status === 'loading' || !email.trim()}
+          className="bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          {status === 'loading' ? 'Sending...' : 'Send invite'}
+        </Button>
+      </div>
+    </Modal>
   );
 }

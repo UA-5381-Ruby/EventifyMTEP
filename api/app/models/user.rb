@@ -23,7 +23,7 @@ class User < ApplicationRecord
   end
 
   generates_token_for :brand_invitation, expires_in: 7.days do
-    "#{email}"
+    email.to_s
   end
 
   def email_confirmed?

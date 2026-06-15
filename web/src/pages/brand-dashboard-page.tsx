@@ -1,10 +1,10 @@
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Alert, Button, Spinner } from '@/components/ui';
 import { Container, PageWrapper } from '@/components/layout';
 import { BrandView } from '@/components/brands/brand-view';
 import { BrandEditModal } from '@/components/brands/brand-edit-modal';
-import { InviteMemberSection} from "@/components/brands/invite-member-section.tsx";
+import { InviteMemberModal } from '@/components/brands/invite-member-modal';
 import { CreateEventModal } from '@/components/events/create-event-modal';
 import { useAuth } from '@/hooks/use-auth';
 import { useBrandDashboard } from '@/hooks/use-brand-dashboard';
@@ -17,6 +17,7 @@ export function BrandDashboardPage() {
   const navigate = useNavigate();
 
   const { canManage, memberships, isLoading: membershipsLoading } = useBrandAccess(id, user?.id);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
 
   const {
     brand,
@@ -29,8 +30,8 @@ export function BrandDashboardPage() {
     handleFieldChange,
     handleSave,
   } = useBrandDashboard(id);
-
-  const createEvent = useCreateEvent(Number(id) || 0, () => window.location.reload());
+  const brandId = Number(id);
+  const createEvent = useCreateEvent(brandId, () => window.location.reload());
 
   useEffect(() => {
     if (!membershipsLoading && !isLoading && !canManage) {
@@ -71,9 +72,14 @@ export function BrandDashboardPage() {
         canManage={canManage}
         onEdit={() => setIsEditOpen(true)}
         extraActions={
-          <Button size="sm" onClick={createEvent.openModal}>
-            + New event
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button size="sm" variant="outline" onClick={() => setIsInviteOpen(true)}>
+              + Invite member
+            </Button>
+            <Button size="sm" onClick={createEvent.openModal}>
+              + New event
+            </Button>
+          </div>
         }
       />
 
@@ -85,9 +91,11 @@ export function BrandDashboardPage() {
         onSave={handleSave}
       />
 
-      <div className="mt-6">
-        <InviteMemberSection brandId={Number(id)} />
-      </div>
+      <InviteMemberModal
+        brandId={brandId}
+        isOpen={isInviteOpen}
+        onClose={() => setIsInviteOpen(false)}
+      />
 
       {saveError && (
         <Alert variant="error" title="Failed to save">

@@ -13,7 +13,7 @@ module InvitationTokenService
   def self.decode(token)
     Rails.application.message_verifier(SALT).verified(token)
   rescue ActiveSupport::MessageVerifier::InvalidSignature,
-    ActiveSupport::MessageExpired
+         ActiveSupport::MessageExpired
     nil
   end
 end
