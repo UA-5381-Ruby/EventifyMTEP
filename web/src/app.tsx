@@ -49,7 +49,7 @@ function App() {
           <Route element={<BrandManagerRoute />}>
             <Route path="/dashboard/brands/:id" element={<BrandDashboardPage />} />
           </Route>
-
+          <Route path="/accept-invitation" element={<AcceptInvitationPage />} />
           <Route path="/profile/settings" element={<UserProfilePage />} />
         </Route>
 
