@@ -6,7 +6,7 @@ import { BrandMembershipsService } from '@/services/brand-memberships-service';
 export const useBrandMembership = (targetBrandId?: string) => {
   const { user } = useAuth();
   const [memberships, setMemberships] = useState<Membership[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(!!user?.id);
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
