@@ -5,7 +5,9 @@ import { Pagination, Tabs } from '@/components/ui';
 import { BrandPageHeader } from '@/components/brands/brand-page-header';
 import { BrandFilters } from '@/components/brands/brand-filters';
 import { BrandGrid } from '@/components/brands/brand-grid';
+import { CreateBrandModal } from '@/components/brands/create-brand-modal';
 import { useBrands } from '@/hooks/use-brands';
+import { useCreateBrand } from '@/hooks/use-create-brand';
 import { PER_PAGE } from '@/constants/ui.constants';
 import { BRAND_TABS } from '@/constants/brand.constants';
 import type { Tab } from '@/types/brand.ts';
@@ -42,6 +44,10 @@ export function MyBrandsPage() {
   const active = isManagedTab
     ? { search: managedSearch, sort: managedSort, page: managedPage, data: managed }
     : { search: subscribedSearch, sort: subscribedSort, page: subscribedPage, data: subscribed };
+
+  const createBrand = useCreateBrand(() => {
+    active.data.refetch();
+  });
 
   const totalPages = active.data.total != null ? Math.ceil(active.data.total / PER_PAGE) : 1;
 
@@ -96,6 +102,7 @@ export function MyBrandsPage() {
             }
             resetPage();
           }}
+          onCreateClick={createBrand.openModal}
         />
 
         <Container>
@@ -128,6 +135,16 @@ export function MyBrandsPage() {
           </div>
         </Container>
       </div>
+
+      <CreateBrandModal
+        isOpen={createBrand.isOpen}
+        fields={createBrand.fields}
+        isSaving={createBrand.isSaving}
+        saveError={createBrand.saveError}
+        onClose={createBrand.closeModal}
+        onSave={createBrand.handleSave}
+        onChange={createBrand.handleFieldChange}
+      />
     </PageWrapper>
   );
 }
