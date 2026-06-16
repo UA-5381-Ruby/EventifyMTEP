@@ -4,10 +4,11 @@ import { ColorField } from '@/components/brands/color-field';
 export interface BrandEditFields {
   name: string;
   description: string;
-  logo_url: string;
   subdomain: string;
   primary_color: string;
   secondary_color: string;
+  logo: File | null;
+  logo_url?: string;
 }
 
 interface BrandEditModalProps {
@@ -15,10 +16,16 @@ interface BrandEditModalProps {
   fields: BrandEditFields;
   onClose: () => void;
   onSave: () => void;
-  onChange: (field: keyof BrandEditFields, value: string) => void;
+  onChange: (field: keyof BrandEditFields, value: string | File | null) => void;
 }
 
 export function BrandEditModal({ isOpen, fields, onClose, onSave, onChange }: BrandEditModalProps) {
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    onChange('logo', file);
+  };
+
   return (
     <Modal
       isOpen={isOpen}
@@ -56,13 +63,40 @@ export function BrandEditModal({ isOpen, fields, onClose, onSave, onChange }: Br
           onChange={(e) => onChange('description', e.target.value)}
           className="text-sm max-h-[200px] overflow-y-auto"
         />
-        <Input
-          label="Logo URL"
-          value={fields.logo_url}
-          onChange={(e) => onChange('logo_url', e.target.value)}
-          className="text-sm"
-          placeholder="https://..."
-        />
+
+        <div>
+          <label className="block text-sm font-medium text-neutral-700 mb-1">
+            Brand Logo
+          </label>
+
+          {!fields.logo && fields.logo_url && (
+            <div className="mb-2">
+              <img
+                src={fields.logo_url}
+                alt="Current brand logo"
+                className="h-12 w-12 object-cover rounded-md border border-neutral-200"
+              />
+            </div>
+          )}
+
+          <input
+            type="file"
+            accept="image/jpeg, image/png, image/webp, image/gif, image/svg+xml"
+            onChange={handleFileChange}
+            className="block w-full text-sm text-neutral-500
+              file:mr-4 file:py-2 file:px-4
+              file:rounded-md file:border-0
+              file:text-sm file:font-medium
+              file:bg-primary-50 file:text-primary-700
+              hover:file:bg-primary-100 transition-colors"
+          />
+          {fields.logo && (
+            <p className="mt-1 text-xs text-neutral-500">
+              New file selected: {fields.logo.name}
+            </p>
+          )}
+        </div>
+
         <div className="grid grid-cols-2 gap-3">
           <ColorField
             label="Primary color"
