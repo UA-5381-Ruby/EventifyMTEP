@@ -154,26 +154,27 @@ RSpec.describe 'api/v1/tickets', type: :request do
         run_test!
       end
 
-      response '422', 'validation failed - user already registered for event' do
-        schema '$ref' => '#/components/schemas/ValidationErrors'
+      # Instead of an error, the button is disabled on frontend
+      # response '422', 'validation failed - user already registered for event' do
+      #   schema '$ref' => '#/components/schemas/ValidationErrors'
 
-        let(:brand) { create(:brand) }
-        let(:event) { create(:event, brand: brand, start_date: 1.week.from_now, end_date: 1.week.from_now + 1.day) }
+      #   let(:brand) { create(:brand) }
+      #   let(:event) { create(:event, brand: brand, start_date: 1.week.from_now, end_date: 1.week.from_now + 1.day) }
 
-        before do
-          create(:ticket, user: user, event: event)
-        end
+      #   before do
+      #     create(:ticket, user: user, event: event)
+      #   end
 
-        let(:body) do
-          {
-            ticket: {
-              event_id: event.id
-            }
-          }
-        end
+      #   let(:body) do
+      #     {
+      #       ticket: {
+      #         event_id: event.id
+      #       }
+      #     }
+      #   end
 
-        run_test!
-      end
+      #   run_test!
+      # end
 
       response '401', 'unauthorized' do
         schema '$ref' => '#/components/schemas/Unauthorized'

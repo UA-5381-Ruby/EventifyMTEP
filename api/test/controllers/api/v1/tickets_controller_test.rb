@@ -28,18 +28,20 @@ class TicketsControllerTest < ActionDispatch::IntegrationTest
     assert response.parsed_body['qr_code_url'].present?
   end
 
-  test 'should not allow duplicate registration for same event' do
-    event = @ticket.event
+  # Since we allowed for a single user to buy multiple tickets
+  # this test seems to be redundant
+  # test 'should not allow duplicate registration for same event' do
+  #   event = @ticket.event
 
-    post_with_auth '/api/v1/tickets', @user, params: { ticket: { event_id: event.id } }
+  #   post_with_auth '/api/v1/tickets', @user, params: { ticket: { event_id: event.id } }
 
-    assert_response :unprocessable_content
-    errors = response.parsed_body['errors']
+  #   assert_response :unprocessable_content
+  #   errors = response.parsed_body['errors']
 
-    # errors це об'єкт типу { "base" => ["User is already..."] }
-    error_messages = errors.values.join
-    assert_includes error_messages, 'already registered'
-  end
+  #   # errors це об'єкт типу { "base" => ["User is already..."] }
+  #   error_messages = errors.values.join
+  #   assert_includes error_messages, 'already registered'
+  # end
 
   test 'should return my tickets' do
     other_user = create_user(email: "other-#{SecureRandom.hex(4)}@example.com")
