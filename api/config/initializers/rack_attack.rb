@@ -8,7 +8,7 @@ module Rack
     end
 
     # Prevent registration spam
-    throttle('api/v1/auth/register', limit: 20, period: 1.hour) do |req|
+    throttle('api/v1/auth/register', limit: 3, period: 1.hour) do |req|
       req.ip if req.path == '/api/v1/auth/register' && req.post?
     end
 
