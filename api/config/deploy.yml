@@ -71,7 +71,6 @@ aliases:
 volumes:
   - "api_storage:/rails/storage"
 
-
 # Configure the image builder.
 builder:
   arch: amd64
