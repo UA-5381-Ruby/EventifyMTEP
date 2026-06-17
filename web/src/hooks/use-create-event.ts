@@ -8,6 +8,8 @@ export interface CreateEventFields {
   start_date: string;
   end_date: string;
   description: string;
+  price_cents: number;
+  available_tickets_count: number;
   category_ids: number[];
 }
 
@@ -17,6 +19,8 @@ const EMPTY_EVENT_FIELDS: CreateEventFields = {
   start_date: '',
   end_date: '',
   description: '',
+  price_cents: 0,
+  available_tickets_count: 0,
   category_ids: [],
 };
 
@@ -72,6 +76,10 @@ export function useCreateEvent(brandId: number, onSuccess: () => void): UseCreat
         brand_id: brandId,
         ...(fields.description.trim() ? { description: fields.description.trim() } : {}),
         ...(fields.end_date ? { end_date: fields.end_date } : {}),
+        ...(fields.price_cents > 0 ? { price_cents: fields.price_cents } : {}),
+        ...(fields.available_tickets_count > 0
+          ? { available_tickets_count: fields.available_tickets_count }
+          : {}),
         ...(fields.category_ids.length > 0 ? { category_ids: fields.category_ids } : {}),
       };
 

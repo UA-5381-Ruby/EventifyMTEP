@@ -1,0 +1,7 @@
+<h2>You're going to <%= @event.title %>!</h2>
+<p>Hi <%= @user.name %>,</p>
+<p>Your ticket is attached to this email as a PDF. Present the QR code at the entrance.</p>
+<p><strong>Event:</strong> <%= @event.title %></p>
+<p><strong>Date:</strong> <%= @event.start_date&.strftime('%A, %B %-d, %Y at %H:%M') %></p>
+<p><strong>Location:</strong> <%= @event.location %></p>
+<p>See you there!</p>
