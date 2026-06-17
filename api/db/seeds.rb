@@ -41,7 +41,6 @@ BrandMembership.find_or_create_by!(user: user, brand: brand) do |m|
   m.role = 'owner'
 end
 
-
 BrandMembership.find_or_create_by!(user: admin_user, brand: brand) do |m|
   m.role = 'admin'
 end
