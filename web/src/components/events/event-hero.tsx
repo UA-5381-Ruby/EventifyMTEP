@@ -16,7 +16,11 @@ export function EventHero({ event, onBack }: EventHeroProps) {
         <ArrowLeft size={16} className="text-neutral-700" />
       </button>
 
-      <div className="w-full h-full bg-neutral-200" />
+      {event.banner_url ? (
+        <img src={event.banner_url} alt={event.title} className="w-full h-full object-cover" />
+      ) : (
+        <div className="w-full h-full bg-neutral-200" />
+      )}
 
       {event.categories?.length > 0 && (
         <div className="absolute bottom-4 left-4">

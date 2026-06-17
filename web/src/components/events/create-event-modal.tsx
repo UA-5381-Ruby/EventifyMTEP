@@ -53,7 +53,7 @@ export function CreateEventModal({
         </>
       }
     >
-      <div className="space-y-4 py-2">
+      <div className="space-y-4 py-2 max-h-[60vh] overflow-auto pr-2">
         {saveError && (
           <Alert variant="error" title="Error">
             {saveError}
@@ -132,6 +132,35 @@ export function CreateEventModal({
           className="text-sm"
           placeholder="What is this event about?"
         />
+
+        <div className="grid grid-cols-2 gap-3">
+          <Input
+            type="number"
+            label="Price (UAH)"
+            value={fields.price_cents ? (fields.price_cents / 100).toFixed(2) : ''}
+            onChange={(e) => {
+              const value = e.target.value;
+              const cents = value ? Math.round(parseFloat(value) * 100) : 0;
+              onChange('price_cents', Number.isNaN(cents) ? 0 : cents);
+            }}
+            className="text-sm"
+            min={0}
+            step="0.01"
+            placeholder="0.00"
+          />
+          <Input
+            type="number"
+            label="Available tickets"
+            value={fields.available_tickets_count === 0 ? '' : fields.available_tickets_count}
+            onChange={(e) =>
+              onChange('available_tickets_count', e.target.value ? Number(e.target.value) : 0)
+            }
+            className="text-sm"
+            min={0}
+            step={1}
+            placeholder="0"
+          />
+        </div>
 
         <CategoryPicker
           selectedIds={fields.category_ids}

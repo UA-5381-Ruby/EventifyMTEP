@@ -17,6 +17,7 @@ export function EventBookingSection({ event }: EventBookingSectionProps) {
   const timeRange = formatTimeRange(event.start_date, event.end_date);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState<number>(1);
 
   const { hasBoughtTicket, ticket, isCheckingTicket } = useTicketStatus(event.id);
 
@@ -25,7 +26,7 @@ export function EventBookingSection({ event }: EventBookingSectionProps) {
     setError(null);
 
     try {
-      const { pageUrl } = await PaymentService.createInvoice(event.id);
+      const { pageUrl } = await PaymentService.createInvoice(event.id, quantity);
       window.location.href = pageUrl;
     } catch {
       setError('Could not initiate payment. Please try again.');
@@ -55,14 +56,35 @@ export function EventBookingSection({ event }: EventBookingSectionProps) {
               Ticket Bought
             </Button>
           ) : (
-            <Button
-              onClick={handleBuyTickets}
-              isLoading={isLoading || isCheckingTicket}
-              disabled={isCheckingTicket}
-            >
-              {!isLoading && !isCheckingTicket && <Ticket size={14} />}
-              {isCheckingTicket ? 'Checking…' : isLoading ? 'Redirecting…' : 'Buy Tickets'}
-            </Button>
+            <>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  className="px-2 py-1 border rounded"
+                >
+                  −
+                </button>
+                <span className="text-sm w-4 text-center">{quantity}</span>
+                <button
+                  onClick={() =>
+                    setQuantity((q) =>
+                      Math.min(Math.min(10, Math.max(1, event.available_tickets_count)), q + 1)
+                    )
+                  }
+                  className="px-2 py-1 border rounded"
+                >
+                  +
+                </button>
+              </div>
+              <Button
+                onClick={handleBuyTickets}
+                isLoading={isLoading || isCheckingTicket}
+                disabled={isCheckingTicket}
+              >
+                {!isLoading && !isCheckingTicket && <Ticket size={14} />}
+                {isCheckingTicket ? 'Checking…' : isLoading ? 'Redirecting…' : 'Buy Tickets'}
+              </Button>
+            </>
           )}
           <div className="flex items-center gap-1.5 text-xs text-neutral-500">
             <Users size={12} />
