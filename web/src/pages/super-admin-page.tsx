@@ -52,9 +52,6 @@ export function SuperAdminPage() {
   const [users, setUsers] = useState<UserPreview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    fetchDashboardData();
-  }, []);
 
   const fetchDashboardData = async () => {
     try {
@@ -99,6 +96,9 @@ export function SuperAdminPage() {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+    fetchDashboardData();
+  }, []);
 
   const openDeleteModal = (user: UserPreview) => {
     setDeleteModal({
