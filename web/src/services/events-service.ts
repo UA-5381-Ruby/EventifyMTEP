@@ -15,6 +15,7 @@ export const EventsService = {
 
   async getEventById(id: number): Promise<EventDetail> {
     const response = await apiClient.get(`/api/v1/events/${id}`);
+    console.log('Fetched event detail:', response.data);
     return response.data;
   },
 
