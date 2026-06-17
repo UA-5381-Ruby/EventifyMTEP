@@ -33,8 +33,8 @@ class BrandMembershipPolicy < ApplicationPolicy
     # Superadmins and Owners can remove anyone
     return true if user.is_superadmin? || current_user_role == 'owner'
 
-    # Managers can remove 'users', but cannot remove 'owners' or other 'managers'
-    return record.role == 'user' if current_user_role == 'manager'
+    # Managers can remove 'members', but cannot remove 'owners' or other 'managers'
+    return record.role == 'member' if current_user_role == 'manager'
 
     false
   end

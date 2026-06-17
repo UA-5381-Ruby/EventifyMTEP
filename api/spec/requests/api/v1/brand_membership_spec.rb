@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# spec/requests/api/v1/brand_memberships_spec.rb
-
 require 'swagger_helper'
 
 RSpec.describe 'Api::V1::BrandMemberships', type: :request do
@@ -42,9 +40,8 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
       end
     end
 
-    # --- НОВІ ТЕСТИ ДЛЯ PATCH ---
     context 'when updating a regular member' do
-      let!(:regular_member) { create(:brand_membership, brand: brand, user: other_user, role: 'user') }
+      let!(:regular_member) { create(:brand_membership, brand: brand, user: other_user, role: 'member') }
 
       it 'successfully updates the role to manager' do
         patch "/api/v1/brands/#{brand.id}/memberships/#{regular_member.id}",
@@ -63,7 +60,6 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
               as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
-        # Використовуємо to_s на випадок, якщо контролер формує помилки нестандартно
         expect(JSON.parse(response.body)['errors'].to_s).to include('is not included in the list')
       end
     end
@@ -82,7 +78,7 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
     end
 
     context 'when deleting a non-owner member' do
-      let!(:regular_member) { create(:brand_membership, brand: brand, user: other_user, role: 'user') }
+      let!(:regular_member) { create(:brand_membership, brand: brand, user: other_user, role: 'member') }
 
       it 'successfully deletes the membership' do
         expect do
@@ -90,7 +86,6 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
                  headers: headers
         end.to change(BrandMembership, :count).by(-1)
 
-        # Перевірте, що повертає ваш контролер: :no_content (204) або :ok (200)
         expect(response).to have_http_status(:no_content).or have_http_status(:ok)
       end
     end
@@ -111,7 +106,7 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
 
   describe 'POST /api/v1/brands/:brand_id/memberships' do
     context 'when the user is already a member of the brand (RecordNotUnique)' do
-      let!(:existing_brand_membership) { create(:brand_membership, brand: brand, user: other_user, role: 'user') }
+      let!(:existing_brand_membership) { create(:brand_membership, brand: brand, user: other_user, role: 'member') }
 
       it 'returns 422 instead of 500' do
         post "/api/v1/brands/#{brand.id}/memberships",
@@ -120,12 +115,10 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
              as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
-        # Ваш кастомний обробник помилок, як ми розібралися раніше
         expect(JSON.parse(response.body)['errors']['base']).to include('User is already a member of this brand')
       end
     end
 
-    # --- НОВІ ТЕСТИ ДЛЯ POST ---
     context 'with valid parameters' do
       let(:new_user) { create(:user) }
 
@@ -137,7 +130,6 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
                as: :json
         end.to change(BrandMembership, :count).by(1)
 
-        # Перевірте: ваш контролер повертає :created (201) чи :ok (200)?
         expect(response).to have_http_status(:created).or have_http_status(:ok)
       end
     end
@@ -157,7 +149,7 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
 
       it 'returns 422 when user_id is missing' do
         post "/api/v1/brands/#{brand.id}/memberships",
-             params: { membership: { role: 'user' } },
+             params: { membership: { role: 'member' } },
              headers: headers,
              as: :json
 

@@ -36,4 +36,15 @@ class UserMailer < ApplicationMailer
       subject: "Your ticket for #{@event.title}"
     )
   end
+
+  def brand_invitation(email, brand, token)
+    @brand = brand
+    @accept_link = "#{ENV.fetch('FRONTEND_URL')}/accept-invitation?token=#{token}&brand_id=#{brand.id}"
+
+    mail(
+      to: email,
+      subject: "You're invited to join #{brand.name}",
+      content_type: 'text/html'
+    )
+  end
 end

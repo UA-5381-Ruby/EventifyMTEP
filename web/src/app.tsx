@@ -16,6 +16,8 @@ import { BrandDashboardPage } from '@/pages/brand-dashboard-page.tsx';
 import { SuperAdminPage } from '@/pages/super-admin-page.tsx';
 import { BrandDiscoverPage } from '@/pages/brand-discover-page.tsx';
 import { MyBrandsPage } from '@/pages/my-brands-page.tsx';
+import { MyTicketsPage } from '@/pages/my-tickets-page.tsx';
+import { AcceptInvitationPage } from '@/pages/accept-invitation-page.tsx';
 
 function App() {
   return (
@@ -38,9 +40,11 @@ function App() {
           <Route path="/superadmin" element={<SuperAdminPage />} />
           <Route path="/brands" element={<BrandDiscoverPage />} />
           <Route path="/my-brands" element={<MyBrandsPage />} />
+          <Route path="/my-tickets" element={<MyTicketsPage />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/dashboard/brands/:id" element={<BrandDashboardPage />} />
+          <Route path="/accept-invitation" element={<AcceptInvitationPage />} />
 
           <Route path="/profile/settings" element={<UserProfilePage />} />
         </Route>

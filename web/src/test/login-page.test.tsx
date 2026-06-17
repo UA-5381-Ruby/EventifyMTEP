@@ -1,12 +1,16 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { mockNavigate } from './auth.mocks';
+import { mockNavigate, mockUseSearchParams } from './auth.mocks';
 import { LoginPage } from '@/pages/login-page';
 import authService from '@/services/auth-service';
 
 const renderLogin = () => render(<LoginPage />);
 
 describe('LoginPage', () => {
-  beforeEach(() => jest.clearAllMocks());
+  beforeEach(() => {
+    mockNavigate.mockClear();
+    mockUseSearchParams.mockClear();
+    (authService.login as jest.Mock).mockClear();
+  });
 
   it('renders the heading', () => {
     renderLogin();
@@ -140,7 +144,12 @@ describe('LoginPage', () => {
     });
   });
 
-  it('navigates to /events after successful login', async () => {
+  it('navigates to redirect URL after successful login when ?redirect param is present', async () => {
+    mockUseSearchParams.mockReturnValue([
+      new URLSearchParams('redirect=%2Faccept-invitation%3Ftoken%3Dabc%26brand_id%3D3'),
+      jest.fn(),
+    ]);
+
     (authService.login as jest.Mock).mockResolvedValueOnce({});
     renderLogin();
 
@@ -153,8 +162,12 @@ describe('LoginPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /^log in$/i }));
 
     await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/events', { replace: true });
+      expect(mockNavigate).toHaveBeenCalledWith('/accept-invitation?token=abc&brand_id=3', {
+        replace: true,
+      });
     });
+
+    mockUseSearchParams.mockReturnValue([new URLSearchParams(), jest.fn()]);
   });
 
   it('does not navigate to /events when login throws', async () => {
