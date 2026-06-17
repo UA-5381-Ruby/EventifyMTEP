@@ -11,20 +11,20 @@ module Api
         paginated = paginate(filtered_tickets)
 
         render json: {
-          data: paginated[:records].as_json(include: ticket_serialization_includes),
+          data: paginated[:records].as_json(**ticket_json_options),
           meta: paginated[:meta]
         }, status: :ok
       end
 
       def show
-        render json: @ticket.as_json(include: ticket_serialization_includes), status: :ok
+        render json: @ticket.as_json(**ticket_json_options), status: :ok
       end
 
       def create
         @ticket = @current_user.tickets.build(ticket_params)
 
         if @ticket.save
-          render json: @ticket.as_json(include: ticket_serialization_includes), status: :created
+          render json: @ticket.as_json(**ticket_json_options), status: :created
         else
           render json: { errors: @ticket.errors.messages }, status: :unprocessable_content
         end
@@ -35,7 +35,7 @@ module Api
 
       def update
         if @ticket.update(ticket_update_params)
-          render json: @ticket.as_json(include: ticket_serialization_includes), status: :ok
+          render json: @ticket.as_json(**ticket_json_options), status: :ok
         else
           render json: { errors: @ticket.errors.full_messages }, status: :unprocessable_content
         end
@@ -56,6 +56,13 @@ module Api
       def set_ticket
         @ticket = @current_user.tickets.includes(:event, :event_feedback).find_by(id: params[:id])
         render(json: { error: 'Ticket not found' }, status: :not_found) and return unless @ticket
+      end
+
+      def ticket_json_options
+        {
+          methods: [:qr_code_url],
+          include: ticket_serialization_includes
+        }
       end
 
       def ticket_serialization_includes

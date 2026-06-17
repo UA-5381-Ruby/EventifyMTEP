@@ -19,10 +19,6 @@ admin_user = User.find_or_create_by!(email: 'admin@test.com') do |u|
   u.is_confirmed = true
 end
 
-BrandMembership.find_or_create_by!(user: admin_user, brand: brand) do |m|
-  m.role = 'admin'
-end
-
 user = User.find_or_create_by!(email: 'admin@test.com') do |u|
   u.name = 'admin'
   u.password = 'password123'
@@ -43,6 +39,11 @@ end
 # CHANGED: Replaced the old 'Owner' model with the new join model 'BrandMembership'
 BrandMembership.find_or_create_by!(user: user, brand: brand) do |m|
   m.role = 'owner'
+end
+
+
+BrandMembership.find_or_create_by!(user: admin_user, brand: brand) do |m|
+  m.role = 'admin'
 end
 
 # Seed events

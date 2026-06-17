@@ -14,14 +14,21 @@ class S3BucketService
 
   def upload(file, folder:)
     extension = File.extname(file.original_filename)
+    upload_body(
+      File.binread(file.tempfile.path),
+      folder: folder,
+      extension: extension,
+      content_type: file.content_type.presence || 'application/octet-stream'
+    )
+  end
 
+  def upload_body(body, folder:, extension:, content_type:)
     unique_filename = "#{SecureRandom.uuid}#{extension}"
     s3_key = "#{folder}/#{unique_filename}"
-
     object = @bucket.object(s3_key)
 
     begin
-      object.upload_file(file.tempfile.path)
+      object.put(body: body, content_type: content_type)
       s3_key
     rescue Aws::S3::Errors::ServiceError => e
       Rails.logger.error("S3 Upload Error: #{e.message}")

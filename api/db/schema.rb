@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_12_124658) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_15_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -91,10 +91,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_12_124658) do
     t.bigint "event_id", null: false
     t.boolean "is_active", default: true, null: false
     t.string "qr_code", null: false
+    t.string "qr_image_key"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["event_id"], name: "index_tickets_on_event_id"
     t.index ["qr_code"], name: "index_tickets_on_qr_code", unique: true
+    t.index ["qr_image_key"], name: "index_tickets_on_qr_image_key", unique: true
     t.index ["user_id", "event_id"], name: "index_tickets_on_user_id_and_event_id", unique: true
     t.index ["user_id"], name: "index_tickets_on_user_id"
   end
