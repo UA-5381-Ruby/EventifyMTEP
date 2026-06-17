@@ -66,7 +66,7 @@ export function EventBookingSection({ event }: EventBookingSectionProps) {
                 </button>
                 <span className="text-sm w-4 text-center">{quantity}</span>
                 <button
-                  onClick={() => setQuantity((q) => Math.min(10, q + 1))}
+                  onClick={() => setQuantity((q) => Math.min(Math.min(10, Math.max(1, event.available_tickets_count)), q + 1))}
                   className="px-2 py-1 border rounded"
                 >
                   +
