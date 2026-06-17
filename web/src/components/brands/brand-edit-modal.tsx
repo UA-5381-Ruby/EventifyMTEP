@@ -20,7 +20,6 @@ interface BrandEditModalProps {
 }
 
 export function BrandEditModal({ isOpen, fields, onClose, onSave, onChange }: BrandEditModalProps) {
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     onChange('logo', file);
@@ -65,9 +64,7 @@ export function BrandEditModal({ isOpen, fields, onClose, onSave, onChange }: Br
         />
 
         <div>
-          <label className="block text-sm font-medium text-neutral-700 mb-1">
-            Brand Logo
-          </label>
+          <label className="block text-sm font-medium text-neutral-700 mb-1">Brand Logo</label>
 
           {!fields.logo && fields.logo_url && (
             <div className="mb-2">
@@ -91,9 +88,7 @@ export function BrandEditModal({ isOpen, fields, onClose, onSave, onChange }: Br
               hover:file:bg-primary-100 transition-colors"
           />
           {fields.logo && (
-            <p className="mt-1 text-xs text-neutral-500">
-              New file selected: {fields.logo.name}
-            </p>
+            <p className="mt-1 text-xs text-neutral-500">New file selected: {fields.logo.name}</p>
           )}
         </div>
 
