@@ -9,6 +9,8 @@ interface BrandGridProps {
   hasActiveFilters: boolean;
   onRetry: () => void;
   onClearFilters: () => void;
+  isSuperAdmin?: boolean;
+  onDelete?: (brandId: string | number, brandName: string) => void;
 }
 
 export function BrandGrid({
@@ -18,6 +20,8 @@ export function BrandGrid({
   hasActiveFilters,
   onRetry,
   onClearFilters,
+  isSuperAdmin,
+  onDelete
 }: BrandGridProps) {
   if (isLoading) {
     return (
@@ -63,7 +67,7 @@ export function BrandGrid({
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
       {brands.map((brand) => (
-        <BrandCard key={brand.id} brand={brand} />
+        <BrandCard key={brand.id} brand={brand} isSuperAdmin={isSuperAdmin} onDelete={onDelete} />
       ))}
     </div>
   );

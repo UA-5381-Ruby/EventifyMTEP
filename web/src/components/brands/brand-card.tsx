@@ -5,12 +5,22 @@ import type { Brand } from '@/types/brand';
 
 interface BrandCardProps {
   brand: Brand;
+  isSuperAdmin?: boolean;
+  onDelete?: (brandId: string | number, brandName: string) => void;
 }
 
-export function BrandCard({ brand }: BrandCardProps) {
+export function BrandCard({ brand, isSuperAdmin, onDelete }: BrandCardProps) {
   const navigate = useNavigate();
   const primaryColor = brand.primary_color || '#6366f1';
   const secondaryColor = brand.secondary_color || '#a855f7';
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onDelete) {
+      onDelete(brand.id, brand.name);
+    }
+  };
+
 
   return (
     <article
@@ -72,10 +82,22 @@ export function BrandCard({ brand }: BrandCardProps) {
           </p>
         )}
       </div>
-
-      <Button variant="outline" size="sm" fullWidth onClick={() => navigate(`/brands/${brand.id}`)}>
-        View Details
-      </Button>
+      <div className="flex gap-2 w-full mt-auto">
+        <div className="flex-1">
+          <Button variant="outline" size="sm" fullWidth onClick={() => navigate(`/brands/${brand.id}`)}>
+            View Details
+          </Button>
+        </div>
+        {isSuperAdmin && (
+          <button
+            onClick={handleDeleteClick}
+            className="px-3 flex items-center justify-center rounded-md border border-red-200 bg-white text-red-600 text-sm font-medium hover:bg-red-50 hover:text-red-700 transition-colors"
+            title="Delete Brand"
+          >
+            Delete
+          </button>
+        )}
+      </div>
     </article>
   );
 }

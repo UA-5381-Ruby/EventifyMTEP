@@ -42,14 +42,14 @@ export function DeleteUserModal({ isOpen, onClose, onConfirm, userName }: Delete
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-gray-200 hover:bg-gray-300 transition-colors"
+            className="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
           >
             Cancel
           </button>
 
           <button
             onClick={onConfirm}
-            className="px-6 py-2 border border-red-600 text-red-600 hover:bg-red-50 transition-colors"
+            className="px-6 py-2 border border-red-600 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
           >
             Delete
           </button>
@@ -64,9 +64,10 @@ interface DeleteBrandModalProps {
   onClose: () => void;
   onConfirm: () => void;
   brandName: string;
+  isDeleting?: boolean;
 }
 
-export function DeleteBrandModal({ isOpen, onClose, onConfirm, brandName }: DeleteBrandModalProps) {
+export function DeleteBrandModal({ isOpen, onClose, onConfirm, brandName, isDeleting }: DeleteBrandModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
       <div className="flex flex-col">
@@ -101,16 +102,17 @@ export function DeleteBrandModal({ isOpen, onClose, onConfirm, brandName }: Dele
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
-            className="px-6 py-2 bg-gray-200 hover:bg-gray-300 transition-colors"
+            className="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors"
           >
             Cancel
           </button>
 
           <button
             onClick={onConfirm}
-            className="px-6 py-2 border border-red-600 text-red-600 hover:bg-red-50 transition-colors"
+            className="px-6 py-2 border border-red-600 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+            disabled={isDeleting}
           >
-            Delete
+            {isDeleting ? 'Deleting...' : 'Delete'}
           </button>
         </div>
       </div>
@@ -149,7 +151,7 @@ export function SuccessModal({
 
         <button
           onClick={onClose}
-          className="mt-10 bg-[#2b2d3c] hover:bg-[#1f212c] text-white px-8 py-3 transition-colors"
+          className="mt-10 bg-[#2b2d3c] hover:bg-[#1f212c] text-white px-8 py-3 rounded-lg transition-colors"
         >
           Continue
         </button>

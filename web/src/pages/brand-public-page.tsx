@@ -110,7 +110,7 @@ export function BrandPublicPage() {
               isLoading={false}
               error={null}
               hasActiveFilters={filters.hasActiveFilters}
-              onRetry={() => {}}
+              onRetry={() => { }}
               onClearFilters={filters.clearFilters}
             />
 

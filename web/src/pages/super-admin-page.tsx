@@ -213,7 +213,7 @@ export function SuperAdminPage() {
           <h1 className="text-2xl font-bold">Admin Panel</h1>
           <button
             onClick={() => navigate('/activity-log')}
-            className="bg-black text-white text-xs px-4 py-2 hover:bg-gray-800 transition-colors"
+            className="bg-black text-white text-xs px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
           >
             View Activity Log
           </button>
@@ -221,7 +221,7 @@ export function SuperAdminPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {statsArray.map((card) => (
-            <div key={card.title} className="border border-gray-300 bg-white p-6">
+            <div key={card.title} className="border border-gray-300 bg-white p-6 rounded-xl shadow-sm">
               <p className="text-sm text-gray-600">{card.title}</p>
               <p className="text-4xl font-bold mt-2">{card.value}</p>
             </div>
@@ -234,16 +234,16 @@ export function SuperAdminPage() {
             <button className="text-sm hover:underline">View All</button>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full border-collapse border border-gray-300 bg-white">
+          <div className="overflow-x-auto rounded-xl border border-gray-300 shadow-sm">
+            <table className="w-full border-collapse bg-white">
               <thead>
                 <tr className="bg-gray-200">
-                  <th className="border px-4 py-3 text-left">Name</th>
-                  <th className="border px-4 py-3 text-left">Start Date</th>
-                  <th className="border px-4 py-3 text-left">Status</th>
-                  <th className="border px-4 py-3 text-left">Created By</th>
-                  <th className="border px-4 py-3 text-left">Location</th>
-                  <th className="border px-4 py-3 text-center">Actions</th>
+                  <th className="border-b border-gray-300 px-4 py-3 text-left">Name</th>
+                  <th className="border-b border-gray-300 px-4 py-3 text-left">Start Date</th>
+                  <th className="border-b border-gray-300 px-4 py-3 text-left">Status</th>
+                  <th className="border-b border-gray-300 px-4 py-3 text-left">Created By</th>
+                  <th className="border-b border-gray-300 px-4 py-3 text-left">Location</th>
+                  <th className="border-b border-gray-300 px-4 py-3 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -255,23 +255,23 @@ export function SuperAdminPage() {
                   </tr>
                 ) : (
                   pendingEvents.map((event) => (
-                    <tr key={event.id} className="hover:bg-gray-50">
-                      <td className="border px-4 py-3">{event.name}</td>
-                      <td className="border px-4 py-3">{event.startDate}</td>
-                      <td className="border px-4 py-3">{event.status}</td>
-                      <td className="border px-4 py-3">{event.createdBy}</td>
-                      <td className="border px-4 py-3">{event.location}</td>
-                      <td className="border px-4 py-3">
+                    <tr key={event.id} className="hover:bg-gray-50 last:border-none">
+                      <td className="border-b border-gray-200 px-4 py-3">{event.name}</td>
+                      <td className="border-b border-gray-200 px-4 py-3">{event.startDate}</td>
+                      <td className="border-b border-gray-200 px-4 py-3">{event.status}</td>
+                      <td className="border-b border-gray-200 px-4 py-3">{event.createdBy}</td>
+                      <td className="border-b border-gray-200 px-4 py-3">{event.location}</td>
+                      <td className="border-b border-gray-200 px-4 py-3">
                         <div className="flex justify-center gap-2">
                           <button
                             onClick={() => handleApprove(event.id)}
-                            className="bg-black text-white px-5 py-2 text-xs hover:bg-gray-800 transition-colors"
+                            className="bg-black text-white px-5 py-2 text-xs rounded-lg hover:bg-gray-800 transition-colors"
                           >
                             Approve
                           </button>
                           <button
                             onClick={() => handleReject(event.id)}
-                            className="bg-gray-300 px-5 py-2 text-xs hover:bg-gray-400 transition-colors"
+                            className="bg-gray-300 text-gray-800 px-5 py-2 text-xs rounded-lg hover:bg-gray-400 transition-colors"
                           >
                             Reject
                           </button>
@@ -291,9 +291,11 @@ export function SuperAdminPage() {
             <button className="text-sm hover:underline">Manage Members</button>
           </div>
 
-          <div className="border border-gray-300 bg-white p-6">
+          <div className="border border-gray-300 bg-white p-6 rounded-xl shadow-sm">
             <div className="flex justify-end mb-6">
-              <button className="border px-8 py-2 text-xs hover:bg-gray-100">Add Member</button>
+              <button className="border px-8 py-2 text-xs rounded-lg hover:bg-gray-100 transition-colors">
+                Add Member
+              </button>
             </div>
 
             <div className="space-y-5">
@@ -301,9 +303,9 @@ export function SuperAdminPage() {
                 <p className="text-center text-gray-500">No users found.</p>
               ) : (
                 users.map((user) => (
-                  <div key={user.id} className="flex justify-between items-center">
+                  <div key={user.id} className="flex justify-between items-center border-b border-gray-100 pb-4 last:border-none last:pb-0">
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-bold">
+                      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-bold text-gray-700">
                         {user.email.charAt(0).toUpperCase()}
                       </div>
                       <div>
@@ -313,7 +315,7 @@ export function SuperAdminPage() {
                     </div>
                     <button
                       onClick={() => openDeleteModal(user)}
-                      className="border border-gray-400 px-6 py-2 text-xs hover:border-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      className="border border-gray-400 px-6 py-2 text-xs rounded-lg hover:border-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
                     >
                       Delete
                     </button>

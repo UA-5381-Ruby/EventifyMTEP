@@ -18,6 +18,7 @@ class BrandMembership < ApplicationRecord
   end
 
   def ensure_at_least_one_owner_on_destroy
+    return if destroyed_by_association
     return unless role == 'owner'
     return unless brand.brand_memberships.where(role: 'owner').count <= 1
 
