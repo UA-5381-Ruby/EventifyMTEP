@@ -12,7 +12,7 @@ RSpec.describe Api::V1::BrandsController, type: :controller do
   before do
     allow(controller).to receive(:authorize_request).and_return(true)
     allow(controller).to receive(:current_user).and_return(user)
-
+    allow(user).to receive(:is_superadmin?).and_return(false)
     allow(user).to receive(:brands).and_return(brands_association)
     allow(brands_association).to receive(:find).with('1').and_return(brand)
     allow(brands_association).to receive(:find).with(1).and_return(brand)

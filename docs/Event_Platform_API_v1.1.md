@@ -239,7 +239,7 @@ Canonical create payload:
 
 Application rules:
 
-- a user can only create one ticket per event
+- a user can create few tickets per event
 - QR codes are generated automatically on ticket creation
 - ticket responses include nested event data and, when present, event feedback
 

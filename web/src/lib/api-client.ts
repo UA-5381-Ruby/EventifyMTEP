@@ -27,7 +27,6 @@ const apiClient: AxiosInstance = axios.create({
   },
 });
 
-// Attach the Bearer token to every request if one is stored.
 apiClient.interceptors.request.use((config) => {
   const token = tokenStorage.get();
   if (token) {

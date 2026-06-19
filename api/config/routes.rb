@@ -24,7 +24,9 @@ Rails.application.routes.draw do
       post '/auth/resend_confirmation', to: 'confirmations#resend'
 
       get 'users/me', to: 'users#me'
-      resources :users, except: [:create]
+      resources :users, except: [:create] do
+  resources :brand_memberships, only: [:index]
+end
 
       resources :events, only: [:index, :show, :create] do
         member do

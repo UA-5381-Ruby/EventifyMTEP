@@ -5,7 +5,8 @@ reviews:
   profile: "assertive"
   high_level_summary: true
   collapse_walkthrough: false
-
+  auto_review:
+  ignore_drafts: false
   path_instructions:
     - path: "api/**/*"
       instructions: |
