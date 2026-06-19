@@ -52,7 +52,6 @@ export function SuperAdminPage() {
   const [users, setUsers] = useState<UserPreview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
-
   useEffect(() => {
     let isMounted = true;
 
@@ -90,7 +89,9 @@ export function SuperAdminPage() {
           totalBrands: fetchedBrands.length,
           totalEvents: fetchedEvents.length,
           pendingApproval: pending.length,
-          rejectedEvents: fetchedEvents.filter((event) => event.status?.toLowerCase() === 'rejected').length,
+          rejectedEvents: fetchedEvents.filter(
+            (event) => event.status?.toLowerCase() === 'rejected'
+          ).length,
           reportedUsers: 0,
         });
       } catch (error) {
@@ -217,7 +218,6 @@ export function SuperAdminPage() {
             View Activity Log
           </button>
         </div>
-
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {statsArray.map((card) => (
