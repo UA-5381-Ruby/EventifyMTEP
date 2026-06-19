@@ -80,7 +80,7 @@ module Api
         authorize @brand
 
         if @brand.destroy!
-          render json: { message: 'Brand successfully deleted' }, status: :ok
+          head :no_content
         else
           render json: { error: @brand.errors.full_messages.join(', ') }, status: :unprocessable_entity
         end
