@@ -21,7 +21,7 @@ export function BrandGrid({
   onRetry,
   onClearFilters,
   isSuperAdmin,
-  onDelete
+  onDelete,
 }: BrandGridProps) {
   if (isLoading) {
     return (

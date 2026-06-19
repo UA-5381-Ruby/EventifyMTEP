@@ -67,7 +67,13 @@ interface DeleteBrandModalProps {
   isDeleting?: boolean;
 }
 
-export function DeleteBrandModal({ isOpen, onClose, onConfirm, brandName, isDeleting }: DeleteBrandModalProps) {
+export function DeleteBrandModal({
+  isOpen,
+  onClose,
+  onConfirm,
+  brandName,
+  isDeleting,
+}: DeleteBrandModalProps) {
   return (
     <Modal isOpen={isOpen} onClose={onClose} size="sm">
       <div className="flex flex-col">

@@ -221,7 +221,10 @@ export function SuperAdminPage() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {statsArray.map((card) => (
-            <div key={card.title} className="border border-gray-300 bg-white p-6 rounded-xl shadow-sm">
+            <div
+              key={card.title}
+              className="border border-gray-300 bg-white p-6 rounded-xl shadow-sm"
+            >
               <p className="text-sm text-gray-600">{card.title}</p>
               <p className="text-4xl font-bold mt-2">{card.value}</p>
             </div>
@@ -303,7 +306,10 @@ export function SuperAdminPage() {
                 <p className="text-center text-gray-500">No users found.</p>
               ) : (
                 users.map((user) => (
-                  <div key={user.id} className="flex justify-between items-center border-b border-gray-100 pb-4 last:border-none last:pb-0">
+                  <div
+                    key={user.id}
+                    className="flex justify-between items-center border-b border-gray-100 pb-4 last:border-none last:pb-0"
+                  >
                     <div className="flex items-center gap-4">
                       <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-bold text-gray-700">
                         {user.email.charAt(0).toUpperCase()}

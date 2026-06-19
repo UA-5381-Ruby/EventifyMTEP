@@ -68,7 +68,10 @@ export function BrandDiscoverPage() {
 
   const confirmDeleteBrand = async () => {
     if (!deleteModal.brandId) return;
-    console.log('Повний URL запиту:', apiClient.defaults.baseURL + `/api/v1/brands/${deleteModal.brandId}`);
+    console.log(
+      'Повний URL запиту:',
+      apiClient.defaults.baseURL + `/api/v1/brands/${deleteModal.brandId}`
+    );
     try {
       setIsDeleting(true);
       await apiClient.delete(`/api/v1/brands/${deleteModal.brandId}`);
@@ -99,7 +102,6 @@ export function BrandDiscoverPage() {
 
         <Container>
           <div className="py-8 space-y-6">
-
             {isSuperAdmin && (
               <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg shadow-sm">
                 <p className="text-sm font-bold text-amber-900 flex items-center gap-2">

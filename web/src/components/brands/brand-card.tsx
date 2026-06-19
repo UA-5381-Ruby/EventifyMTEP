@@ -21,7 +21,6 @@ export function BrandCard({ brand, isSuperAdmin, onDelete }: BrandCardProps) {
     }
   };
 
-
   return (
     <article
       className={cn(
@@ -84,7 +83,12 @@ export function BrandCard({ brand, isSuperAdmin, onDelete }: BrandCardProps) {
       </div>
       <div className="flex gap-2 w-full mt-auto">
         <div className="flex-1">
-          <Button variant="outline" size="sm" fullWidth onClick={() => navigate(`/brands/${brand.id}`)}>
+          <Button
+            variant="outline"
+            size="sm"
+            fullWidth
+            onClick={() => navigate(`/brands/${brand.id}`)}
+          >
             View Details
           </Button>
         </div>
