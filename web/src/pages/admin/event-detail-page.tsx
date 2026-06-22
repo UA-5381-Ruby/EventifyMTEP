@@ -3,7 +3,6 @@ import { useParams } from 'react-router-dom';
 import { Button, Spinner } from '@/components/ui';
 import { useEventDetail } from '@/hooks/use-event-detail';
 
-// Імпорт нових компонентів
 import { CategoryChip } from '@/components/admin/category-chip.tsx';
 import { EventInfoSection } from '@/components/admin/event/event-info-section.tsx';
 import { EventActionsCard } from '@/components/admin/event/event-actions-card.tsx';

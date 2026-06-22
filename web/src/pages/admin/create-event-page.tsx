@@ -7,7 +7,6 @@ import type { Category } from '@/types/category';
 import { Button, Alert, Spinner, Card } from '@/components/ui';
 import { Plus } from 'lucide-react';
 
-// Імпорт нових компонентів
 import { EventFormFields } from '../../components/admin/event/event-form-fields.tsx';
 import { CategoryChip } from '@/components/admin/category-chip.tsx';
 import { CreateCategoryModal } from '@/components/admin/modals/create-category-modal.tsx';
