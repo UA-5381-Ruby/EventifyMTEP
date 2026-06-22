@@ -97,7 +97,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_130000) do
     t.index ["event_id"], name: "index_tickets_on_event_id"
     t.index ["qr_code"], name: "index_tickets_on_qr_code", unique: true
     t.index ["qr_image_key"], name: "index_tickets_on_qr_image_key", unique: true
-    t.index ["user_id", "event_id"], name: "index_tickets_on_user_id_and_event_id", unique: true
     t.index ["user_id"], name: "index_tickets_on_user_id"
   end
 

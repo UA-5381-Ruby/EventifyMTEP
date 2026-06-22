@@ -17,6 +17,8 @@ import { SuperAdminPage } from '@/pages/super-admin-page.tsx';
 import { BrandDiscoverPage } from '@/pages/brand-discover-page.tsx';
 import { MyBrandsPage } from '@/pages/my-brands-page.tsx';
 import { MyTicketsPage } from '@/pages/my-tickets-page.tsx';
+import { SuperAdminRoute } from '@/components/super-admin-route';
+import { BrandManagerRoute } from '@/components/brand-admin-route';
 import { AcceptInvitationPage } from '@/pages/accept-invitation-page.tsx';
 
 function App() {
@@ -37,15 +39,19 @@ function App() {
         <Route path="/brands/:id" element={<BrandPublicPage />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/superadmin" element={<SuperAdminPage />} />
+          <Route element={<SuperAdminRoute />}>
+            <Route path="/superadmin" element={<SuperAdminPage />} />
+          </Route>
+
           <Route path="/brands" element={<BrandDiscoverPage />} />
           <Route path="/my-brands" element={<MyBrandsPage />} />
           <Route path="/my-tickets" element={<MyTicketsPage />} />
 
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/brands/:id" element={<BrandDashboardPage />} />
+          <Route element={<BrandManagerRoute />}>
+            <Route path="/dashboard/brands/:id" element={<BrandDashboardPage />} />
+          </Route>
           <Route path="/accept-invitation" element={<AcceptInvitationPage />} />
-
           <Route path="/profile/settings" element={<UserProfilePage />} />
         </Route>
 

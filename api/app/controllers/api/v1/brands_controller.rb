@@ -78,8 +78,12 @@ module Api
 
       def destroy
         authorize @brand
-        @brand.destroy
-        head :no_content
+
+        if @brand.destroy!
+          head :no_content
+        else
+          render json: { error: @brand.errors.full_messages.join(', ') }, status: :unprocessable_entity
+        end
       end
 
       private
@@ -134,7 +138,11 @@ module Api
       end
 
       def set_brand
-        @brand = current_user.brands.find(params[:id])
+        @brand = if current_user.is_superadmin?
+                   Brand.find(params[:id])
+                 else
+                   current_user.brands.find(params[:id])
+                 end
       rescue ActiveRecord::RecordNotFound
         render json: { error: 'Brand not found' }, status: :not_found
       end
@@ -146,15 +154,13 @@ module Api
       end
 
       def brand_params
-        params.expect(
-          brand: %i[
-            name
-            description
-            logo
-            subdomain
-            primary_color
-            secondary_color
-          ]
+        params.require(:brand).permit(
+          :name,
+          :description,
+          :logo,
+          :subdomain,
+          :primary_color,
+          :secondary_color
         )
       end
     end
