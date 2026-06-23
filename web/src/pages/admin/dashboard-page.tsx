@@ -32,18 +32,22 @@ export const DashboardPage = () => {
 
     const loadDashboardData = async () => {
       try {
-        const [eventsRes, membersRes] = await Promise.all([
+        const [recentEventsRes, allEventsStatsRes, membersRes] = await Promise.all([
           EventsService.getEvents({ brand_id: brand.id, per_page: 3 }),
+          EventsService.getEvents({ brand_id: brand.id }),
           BrandMembershipsService.getBrandMemberships(brand.id, { per_page: 1 }),
         ]);
 
         if (!isMounted) return;
 
-        setEvents(eventsRes?.data || []);
+        setEvents(recentEventsRes?.data || []);
+
         setEventStats({
-          total: eventsRes?.meta?.total || 0,
-          pending: (eventsRes?.data || []).filter((e) => e.status === 'draft_on_review').length,
+          total: allEventsStatsRes?.meta?.total || allEventsStatsRes?.data?.length || 0,
+          pending: (allEventsStatsRes?.data || []).filter((e) => e.status === 'draft_on_review')
+            .length,
         });
+
         setMembersCount(membersRes?.meta?.total_count ?? membersRes?.data?.length ?? 0);
       } catch (error) {
         console.error('Dashboard load error:', error);
