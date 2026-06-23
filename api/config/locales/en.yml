@@ -53,7 +53,7 @@ en:
 
         brands:
           not_found_or_access_denied: "Brand not found"
-          subdomain_taken: "Subdomain is already taken"
+          subdomain_taken: "Subdomain has already been taken"
           logo:
             invalid_format: "Invalid logo format. Allowed types: JPG, PNG, WEBP, GIF, SVG"
             too_large: "Logo file size must be under %{max_size}"

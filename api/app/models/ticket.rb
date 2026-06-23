@@ -55,6 +55,6 @@ class Ticket < ApplicationRecord
 
     return unless Ticket.where(user_id: user.id, event_id: event.id).where.not(id: id).exists?
 
-    errors.add(:base, 'User is already registered for this event')
+    errors.add(:base, I18n.t('activerecord.errors.models.ticket.attributes.base.already_registered'))
   end
 end
