@@ -39,7 +39,8 @@ export function useBrandAccess(
 
   const currentUserMembership = memberships.find((m) => m.user.id === userId);
   const canManage =
-    currentUserMembership?.role === 'owner' || currentUserMembership?.role === 'manager';
+    (currentUserMembership?.role as string) === 'owner' ||
+    (currentUserMembership?.role as string) === 'manager';
 
   return { canManage, memberships, isLoading };
 }
