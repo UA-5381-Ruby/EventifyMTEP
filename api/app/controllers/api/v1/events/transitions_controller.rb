@@ -53,21 +53,21 @@ module Api
         def set_event
           @event = Event.find(params[:id])
         rescue ActiveRecord::RecordNotFound
-          render(json: { error: 'Event not found' }, status: :not_found) and return
+          render(json: { error: t('api.v1.events.not_found') }, status: :not_found) and return
         end
 
         def handle_invalid_transition(action)
           if action == 'submit' && !@event.all_required_fields_filled?
             return render json: {
-              error: 'Cannot submit event',
-              message: 'All required fields must be filled before submission'
+              error: t('api.v1.events.transitions.cannot_action', action: action),
+              message: t('api.v1.events.transitions.required_fields')
             }, status: :unprocessable_content
           end
 
           render json: {
-            error: "Cannot #{action} event",
+            error: t('api.v1.events.transitions.cannot_action', action: action),
             current_status: @event.status,
-            message: "Transition '#{action}' is not valid from state '#{@event.status}'"
+            message: t('api.v1.events.transitions.invalid_transition', action: action, state: @event.status)
           }, status: :unprocessable_content
         end
       end

@@ -9,6 +9,9 @@ module Api
 
       class MediaUploadError < StandardError; end
 
+      MAX_LOGO_SIZE = 5.megabytes
+      ALLOWED_LOGO_TYPES = %w[image/jpeg image/png image/webp image/gif image/svg+xml].freeze
+
       rescue_from ActionController::ParameterMissing do |e|
         render json: { error: e.message }, status: :bad_request
       end
@@ -72,7 +75,7 @@ module Api
                  status: :unprocessable_content
         end
       rescue ActiveRecord::RecordNotUnique
-        render json: { errors: ['Subdomain is already taken'] },
+        render json: { errors: [t('api.v1.errors.brands.subdomain_taken')] },
                status: :unprocessable_content
       end
 
@@ -93,20 +96,22 @@ module Api
         file = attrs[:logo]
 
         if file.present? && file.is_a?(ActionDispatch::Http::UploadedFile)
-          allowed_types = %w[image/jpeg image/png image/webp image/gif image/svg+xml]
-
-          unless file.content_type.in?(allowed_types)
-            raise MediaUploadError, 'Invalid logo format. Allowed types: JPG, PNG, WEBP, GIF, SVG.'
-          end
-
-          raise MediaUploadError, 'Logo file size must be under 5MB.' if file.size > 5.megabytes
-
-          s3_key = S3BucketService.new.upload(file, folder: 'brands/logos')
-          raise MediaUploadError, 'Failed to upload logo to cloud storage. Please try again.' if s3_key.nil?
-
-          attrs[:logo] = s3_key
+          attrs[:logo] =
+            validated_media_key(file, folder: 'brands/logos',
+                                      error_scope: 'api.v1.errors.brands.logo')
         end
+
         attrs
+      end
+
+      def validated_media_key(file, folder:, error_scope:)
+        raise MediaUploadError, t("#{error_scope}.invalid_format") unless file.content_type.in?(ALLOWED_LOGO_TYPES)
+        raise MediaUploadError, t("#{error_scope}.too_large", max_size: '5MB') if file.size > MAX_LOGO_SIZE
+
+        s3_key = S3BucketService.new.upload(file, folder: folder)
+        raise MediaUploadError, t("#{error_scope}.upload_failed") if s3_key.nil?
+
+        s3_key
       end
 
       def fetch_brands_by_scope(scope)
@@ -144,13 +149,13 @@ module Api
                    current_user.brands.find(params[:id])
                  end
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Brand not found' }, status: :not_found
+        render json: { error: t('api.v1.errors.brands.not_found_or_access_denied') }, status: :not_found
       end
 
       def set_brand_public
         @brand = Brand.find(params[:id])
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Brand not found' }, status: :not_found
+        render json: { error: t('api.v1.errors.brands.not_found_or_access_denied') }, status: :not_found
       end
 
       def brand_params

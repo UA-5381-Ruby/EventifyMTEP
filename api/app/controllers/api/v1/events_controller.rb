@@ -7,6 +7,9 @@ module Api
 
       class MediaUploadError < StandardError; end
 
+      MAX_BANNER_SIZE = 5.megabytes
+      ALLOWED_BANNER_TYPES = %w[image/jpeg image/png image/webp image/gif image/svg+xml].freeze
+
       rescue_from MediaUploadError do |e|
         render json: { errors: [e.message] }, status: :unprocessable_content
       end
@@ -38,7 +41,7 @@ module Api
           render json: { errors: @event.errors }, status: :unprocessable_content
         end
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Brand not found or access denied' }, status: :forbidden
+        render json: { error: t('api.v1.errors.brands.not_found_or_access_denied') }, status: :forbidden
       end
 
       private
@@ -57,21 +60,22 @@ module Api
         file = attrs[:banner]
 
         if file.present? && file.is_a?(ActionDispatch::Http::UploadedFile)
-          allowed_types = %w[image/jpeg image/png image/webp image/gif image/svg+xml]
-
-          unless file.content_type.in?(allowed_types)
-            raise MediaUploadError, 'Invalid banner format. Allowed types: JPG, PNG, WEBP, GIF, SVG.'
-          end
-
-          raise MediaUploadError, 'Banner file size must be under 5MB.' if file.size > 5.megabytes
-
-          s3_key = S3BucketService.new.upload(file, folder: 'events/banners')
-          raise MediaUploadError, 'Failed to upload banner to cloud storage. Please try again.' if s3_key.nil?
-
-          attrs[:banner] = s3_key
+          attrs[:banner] =
+            validated_media_key(file, folder: 'events/banners',
+                                      error_scope: 'api.v1.errors.events.banner')
         end
 
         attrs
+      end
+
+      def validated_media_key(file, folder:, error_scope:)
+        raise MediaUploadError, t("#{error_scope}.invalid_format") unless file.content_type.in?(ALLOWED_BANNER_TYPES)
+        raise MediaUploadError, t("#{error_scope}.too_large", max_size: '5MB') if file.size > MAX_BANNER_SIZE
+
+        s3_key = S3BucketService.new.upload(file, folder: folder)
+        raise MediaUploadError, t("#{error_scope}.upload_failed") if s3_key.nil?
+
+        s3_key
       end
 
       def authorize_brand_access!
@@ -92,7 +96,7 @@ module Api
                       .merge(EventFilter.new(index_params, current_user).send(:accessible_events))
                       .find(params[:id])
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Event not found' }, status: :not_found
+        render json: { error: t('api.v1.errors.events.not_found') }, status: :not_found
       end
 
       def event_serialization_includes

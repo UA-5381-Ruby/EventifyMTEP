@@ -15,15 +15,11 @@ module Api
         email = params[:email].to_s.strip.downcase
         role  = params[:role].to_s
 
-        return render json: { error: 'Invalid role' }, status: :unprocessable_entity unless ALLOWED_ROLES.include?(role)
-
-        unless email.match?(/\A[^@\s]+@[^@\s]+\.[^@\s]+\z/)
-          return render json: { error: 'Invalid email' }, status: :unprocessable_entity
-        end
+        error = invitation_validation_error(email, role)
+        return render json: { error: error }, status: :unprocessable_entity if error
 
         MailerService.send_brand_invitation(email, @brand, role)
-
-        render json: { message: 'Invitation sent' }, status: :ok
+        render json: { message: t('api.v1.errors.invitations.sent') }, status: :ok
       end
 
       # POST /api/v1/brands/:brand_id/invitations/accept
@@ -31,7 +27,7 @@ module Api
         result = InvitationAcceptanceService.new(token: params[:token], brand: @brand).call
 
         if result.success?
-          render json: { message: 'You have joined the brand successfully' }, status: :ok
+          render json: { message: t('api.v1.errors.invitations.joined_success') }, status: :ok
         else
           render json: { error: result.error }, status: result.status
         end
@@ -42,7 +38,14 @@ module Api
       def load_brand
         @brand = Brand.find(params[:brand_id])
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Brand not found' }, status: :not_found
+        render json: { error: t('api.v1.errors.brands.not_found_or_access_denied') }, status: :not_found
+      end
+
+      def invitation_validation_error(email, role)
+        return t('api.v1.errors.brands.invitations.invalid_role') unless ALLOWED_ROLES.include?(role)
+        return t('api.v1.errors.brands.invitations.invalid_email') unless email.match?(/\A[^@\s]+@[^@\s]+\.[^@\s]+\z/)
+
+        nil
       end
     end
   end

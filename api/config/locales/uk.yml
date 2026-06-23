@@ -1,0 +1,80 @@
+uk:
+  api:
+    v1:
+      auth:
+        token_invalidated: "Несанкціонований доступ. Токен було анульовано."
+        invalid_token: "Несанкціонований доступ. Недійсний токен."
+        user_not_found: "Користувача з цим токеном більше не існує."
+        unauthorized: "Несанкціонований доступ. %{message}"
+        missing_token: "Несанкціонований доступ. Токен відсутній."
+        not_authorized: "У вас немає прав для виконання цієї дії."
+
+        registered: "Акаунт створено! Перевірте вашу пошту для підтвердження."
+        invalid_credentials: "Невірний email або пароль."
+        email_not_confirmed: "Будь ласка, підтвердіть вашу email-адресу для входу."
+
+        password:
+          reset_requested: "Якщо ваш email існує, ви отримаєте інструкції для скидання пароля."
+          invalid_or_expired_token: "Недійсний або прострочений токен."
+          new_password_blank: "Новий пароль не може бути порожнім."
+          current_password_blank: "Поточний пароль не може бути порожнім."
+          current_password_incorrect: "Невірний поточний пароль."
+          updated: "Пароль успішно оновлено."
+          changed: "Пароль успішно змінено."
+
+        confirmation:
+          invalid_or_expired: "Посилання для підтвердження недійсне або застаріле."
+          success: "Email підтверджено! Тепер ви можете увійти."
+          already_confirmed: "Email вже підтверджено."
+          resend_success: "Лист підтвердження надіслано."
+
+      errors:
+        too_many_requests: "Забагато запитів. Будь ласка, спробуйте пізніше."
+        forbidden: "Доступ заборонено."
+
+        users:
+          not_found: "Користувача не знайдено."
+        event_categories:
+          already_assigned: "вже додано до цієї події"
+          not_found: "Категорію не прикріплено до цієї події."
+        tickets:
+          not_found: "Квиток не знайдено."
+          already_registered: "Користувач вже зареєстрований на цю подію."
+        payments:
+          service_unavailable: "Сервіс оплати недоступний."
+          invalid_json: "Недійсний JSON."
+          invalid_signature: "Недійсний підпис."
+          event_not_available: "Подія недоступна для купівлі."
+          not_enough_tickets: "Недостатньо доступних квитків."
+          invalid_reference_format: "Невірний формат посилання."
+          invoice_creation_failed: "Не вдалося створити рахунок."
+
+        brands:
+          not_found_or_access_denied: "Бренд не знайдено або доступ заборонено."
+          subdomain_taken: "Цей субдомен уже зайнято."
+          invitations:
+            invalid_role: "Невірна роль."
+            invalid_email: "Невірний email."
+            sent: "Запрошення надіслано."
+            joined_success: "Ви успішно приєдналися до бренду."
+          logo:
+            invalid_format: "Невірний формат логотипу. Дозволені типи: JPG, PNG, WEBP, GIF, SVG."
+            too_large: "Розмір файлу логотипу не повинен перевищувати %{max_size}."
+            upload_failed: "Не вдалося завантажити логотип у хмарне сховище. Спробуйте ще раз."
+
+        brand_memberships:
+          not_found: "Учасника не знайдено в цьому бренді."
+          already_member: "Користувач вже є учасником цього бренду."
+          cannot_downgrade_last_owner: "Неможливо знизити роль останнього власника бренду."
+          cannot_remove_last_owner: "Неможливо видалити останнього власника бренду."
+
+        events:
+          not_found: "Подію не знайдено."
+          transitions:
+            cannot_action: "Неможливо виконати дію '%{action}' для події."
+            required_fields: "Усі обов'язкові поля мають бути заповнені перед відправкою."
+            invalid_transition: "Перехід '%{action}' неможливий зі стану '%{state}'."
+          banner:
+            invalid_format: "Невірний формат банера. Дозволені типи: JPG, PNG, WEBP, GIF, SVG."
+            too_large: "Розмір файлу банера не повинен перевищувати %{max_size}."
+            upload_failed: "Не вдалося завантажити банер у хмарне сховище. Спробуйте ще раз."
