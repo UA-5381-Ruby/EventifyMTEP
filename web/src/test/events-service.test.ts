@@ -85,11 +85,9 @@ describe('EventsService', () => {
 
       await EventsService.createEvent(payload);
 
-      expect(mockedPost).toHaveBeenCalledWith(
-        '/api/v1/events',
-        expect.any(FormData),
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
+      expect(mockedPost).toHaveBeenCalledWith('/api/v1/events', expect.any(FormData), {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
     });
   });
   describe('Discovery Methods', () => {
@@ -125,11 +123,9 @@ describe('EventsService', () => {
 
       await EventsService.createEvent(payload);
 
-      expect(mockedPost).toHaveBeenCalledWith(
-        '/api/v1/events',
-        expect.any(FormData),
-        { headers: { 'Content-Type': 'multipart/form-data' } }
-      );
+      expect(mockedPost).toHaveBeenCalledWith('/api/v1/events', expect.any(FormData), {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
     });
   });
 });

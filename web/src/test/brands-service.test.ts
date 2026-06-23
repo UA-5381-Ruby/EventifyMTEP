@@ -9,7 +9,9 @@ jest.mock('@/lib/api-client', () => ({
     patch: jest.fn(),
     delete: jest.fn(),
   },
-  parseApiError: jest.fn((err) => { throw err; })
+  parseApiError: jest.fn((err) => {
+    throw err;
+  }),
 }));
 
 import apiClient from '@/lib/api-client';
@@ -104,11 +106,9 @@ describe('BrandsService', () => {
 
     const result = await brandsService.createBrand(payload);
 
-    expect(apiClient.post).toHaveBeenCalledWith(
-      endpoint,
-      expect.any(FormData),
-      { headers: { 'Content-Type': 'multipart/form-data' } }
-    );
+    expect(apiClient.post).toHaveBeenCalledWith(endpoint, expect.any(FormData), {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     expect(result).toEqual(mockBrand);
   });
 
@@ -130,11 +130,9 @@ describe('BrandsService', () => {
 
     const result = await brandsService.updateBrand(1, payload);
 
-    expect(apiClient.patch).toHaveBeenCalledWith(
-      `${endpoint}/1`,
-      expect.any(FormData),
-      { headers: { 'Content-Type': 'multipart/form-data' } }
-    );
+    expect(apiClient.patch).toHaveBeenCalledWith(`${endpoint}/1`, expect.any(FormData), {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
     expect(result).toEqual(mockBrand);
   });
 
