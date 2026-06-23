@@ -5,7 +5,7 @@ import type { Brand } from '@/types/brand';
 import { Button, Spinner } from '@/components/ui';
 import { EventsTable } from '../../components/admin/event/events-table.tsx';
 
-export const EventsPage = () => {
+const EventsPage = () => {
   const { brand } = useOutletContext<{ brand: Brand }>();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
@@ -44,7 +44,6 @@ export const EventsPage = () => {
       <div className="space-y-0">
         <EventsTable events={events} canManage={true} />
 
-        {/* Pagination Footer */}
         <div className="p-4 px-8 border border-t-0 border-neutral-200 flex justify-between items-center bg-white text-[10px] font-black uppercase tracking-widest text-neutral-400">
           <span>
             Showing {events.length} of {meta?.total || 0} events
@@ -70,3 +69,4 @@ export const EventsPage = () => {
     </div>
   );
 };
+export default EventsPage;

@@ -1,5 +1,20 @@
 ﻿import { Button, Spinner } from '@/components/ui';
 
+interface EventInfo {
+  start_date: string;
+  location?: string;
+  description?: string;
+}
+
+interface EventInfoSectionProps {
+  isEditing: boolean;
+  event: EventInfo;
+  onCancel: () => void;
+  onSave: () => void;
+  isSaving: boolean;
+  setIsEditing: (value: boolean) => void;
+}
+
 export const EventInfoSection = ({
   isEditing,
   event,
@@ -7,11 +22,10 @@ export const EventInfoSection = ({
   onSave,
   isSaving,
   setIsEditing,
-}: any) => {
+}: EventInfoSectionProps) => {
   if (isEditing) {
     return (
       <div className="space-y-6 border border-neutral-200 p-8 bg-white">
-        {/* Поля вводу аналогічні EventFormFields, але адаптовані під Edit */}
         <div className="flex justify-end gap-3 pt-6 border-t border-neutral-100">
           <Button variant="secondary" onClick={onCancel} className="rounded-none px-8">
             Cancel

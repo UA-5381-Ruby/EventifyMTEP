@@ -1,49 +1,78 @@
 ﻿import React, { useState } from 'react';
 import { Modal, Input, Button, Spinner, Alert } from '@/components/ui';
-import type { UserRole, Membership } from '@/types/brand-memberships.ts';
+import { InvitationsService } from '@/services/invitations-service';
 import { X } from 'lucide-react';
 
 interface InviteMemberModalProps {
+  brandId: number;
   isOpen: boolean;
   onClose: () => void;
-  onInvite: (email: string, role: UserRole) => Promise<Membership>;
-  isLoading: boolean;
-  error: string | null;
 }
 
-export const InviteMemberModal = ({
-  isOpen,
-  onClose,
-  onInvite,
-  isLoading,
-  error,
-}: InviteMemberModalProps) => {
+export const InviteMemberModal = ({ brandId, isOpen, onClose }: InviteMemberModalProps) => {
   const [email, setEmail] = useState('');
-  const [role, setRole] = useState<UserRole>('member');
+  const [role, setRole] = useState('member');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!email.trim()) return;
+
+    setStatus('loading');
+    setError(null);
+
     try {
-      await onInvite(email, role);
+      // Викликаємо сервіс напряму
+      await InvitationsService.sendInvitation(brandId, email, role);
+
+      setStatus('success');
       setEmail('');
+
+      setTimeout(() => {
+        setStatus('idle');
+        onClose();
+      }, 1500);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to send invitation');
+      setStatus('error');
+    }
+  };
+
+  const handleClose = () => {
+    if (status !== 'loading') {
+      setEmail('');
+      setRole('member');
+      setStatus('idle');
+      setError(null);
       onClose();
-    } catch (error) {
-      console.error(error);
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={handleClose}>
       <div className="bg-white p-10 max-w-md w-full relative">
-        <button onClick={onClose} className="absolute top-6 right-6 cursor-pointer">
+        <button
+          onClick={handleClose}
+          className="absolute top-6 right-6 cursor-pointer hover:opacity-70 transition-opacity"
+          disabled={status === 'loading'}
+        >
           <X size={20} />
         </button>
+
         <h2 className="text-2xl font-bold mb-8">Invite New Member</h2>
-        {error && (
+
+        {status === 'error' && (
           <Alert variant="warning" className="mb-6">
             {error}
+          </Alert>
+        )}
+
+        {status === 'success' && (
+          <Alert variant="success" className="mb-6 bg-green-50 text-green-700 border-green-200">
+            Invitation sent successfully!
           </Alert>
         )}
 
@@ -52,9 +81,11 @@ export const InviteMemberModal = ({
             <label className="text-sm text-gray-500 font-medium">Email Address</label>
             <Input
               type="email"
+              placeholder="colleague@example.com"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              disabled={status === 'loading' || status === 'success'}
               className="rounded-none border-gray-400 h-11"
             />
           </div>
@@ -63,12 +94,12 @@ export const InviteMemberModal = ({
             <label className="text-sm text-gray-500 font-medium">Assign Role</label>
             <select
               value={role}
-              onChange={(e) => setRole(e.target.value as UserRole)}
-              className="w-full border border-neutral-400 rounded-none h-11 px-3 outline-none focus:border-black bg-white text-sm font-medium"
+              onChange={(e) => setRole(e.target.value)}
+              disabled={status === 'loading' || status === 'success'}
+              className="w-full border border-neutral-400 rounded-none h-11 px-3 outline-none focus:border-black bg-white text-sm font-medium disabled:opacity-50"
             >
-              <option value="user">Member</option>
+              <option value="member">Member</option>
               <option value="manager">Manager</option>
-              <option value="owner">Owner</option>
             </select>
           </div>
 
@@ -76,17 +107,18 @@ export const InviteMemberModal = ({
             <Button
               type="button"
               variant="secondary"
-              onClick={onClose}
+              onClick={handleClose}
+              disabled={status === 'loading'}
               className="rounded-none px-8 h-12"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
-              className="rounded-none bg-black text-white px-8 h-12 min-w-[140px]"
+              disabled={status === 'loading' || status === 'success' || !email.trim()}
+              className="rounded-none bg-black text-white px-8 h-12 min-w-[140px] hover:bg-neutral-800"
             >
-              {isLoading ? <Spinner /> : 'Send Invite'}
+              {status === 'loading' ? <Spinner /> : 'Send Invite'}
             </Button>
           </div>
         </form>

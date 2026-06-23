@@ -1,12 +1,20 @@
 ﻿import { Button, Spinner } from '@/components/ui';
 
+interface EventActionsCardProps {
+  status: 'draft' | 'published' | 'cancelled' | string; // Adjust strings based on your API
+  onReview: () => void;
+  onCancel: () => void;
+  isSubmitting: boolean;
+  isCancelling: boolean;
+}
+
 export const EventActionsCard = ({
   status,
   onReview,
   onCancel,
   isSubmitting,
   isCancelling,
-}: any) => (
+}: EventActionsCardProps) => (
   <div className="border border-neutral-200 p-8 bg-white divide-y divide-neutral-100">
     <h3 className="text-xl font-bold mb-8">Event Actions</h3>
     <div className="flex justify-between items-center py-8 first:pt-0">

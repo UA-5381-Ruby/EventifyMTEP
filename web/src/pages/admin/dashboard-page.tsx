@@ -3,10 +3,11 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 import type { Brand } from '@/types/brand';
 import type { Event } from '@/types/event';
 import { EventsService } from '@/services/events-service';
-import { useBrandMemberships } from '@/hooks/use-brand-memberships';
+import { BrandMembershipsService } from '@/services/brand-memberships-service';
+import { useBrandAccess } from '@/hooks/use-brand-access';
+import { useAuth } from '@/hooks/use-auth';
 import { InviteMemberModal } from '@/components/admin/modals/invite-member-modal.tsx';
 import { Button } from '@/components/ui';
-import AuthService from '@/services/auth-service';
 
 import { StatCard, SectionHeader } from '../../components/admin/shared';
 import { EventsTable } from '../../components/admin/event/events-table.tsx';
@@ -15,29 +16,26 @@ import { TeamList } from '../../components/admin/team-list.tsx';
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const { brand } = useOutletContext<{ brand: Brand }>();
+  const { user } = useAuth();
+
   const [events, setEvents] = useState<Event[]>([]);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [eventStats, setEventStats] = useState({ total: 0, pending: 0 });
+  const [membersCount, setMembersCount] = useState(0);
 
-  const currentUser = AuthService.getState().user;
-  const {
-    members,
-    isLoading: isMembersLoading,
-    error: membersError,
-    addMember,
-    fetchMembers,
-    totalCount: membersCount,
-  } = useBrandMemberships(brand.id);
+  const { canManage, memberships } = useBrandAccess(String(brand.id), user?.id);
 
-  const myMembership = members.find((m) => m.user?.email === currentUser?.email);
-  const canManage = myMembership?.role === 'owner' || myMembership?.role === 'manager';
+  const previewMembers = memberships.slice(0, 3);
 
   useEffect(() => {
     let isMounted = true;
 
     const loadDashboardData = async () => {
       try {
-        const eventsRes = await EventsService.getEvents({ brand_id: brand.id, per_page: 3 });
+        const [eventsRes, membersRes] = await Promise.all([
+          EventsService.getEvents({ brand_id: brand.id, per_page: 3 }),
+          BrandMembershipsService.getBrandMemberships(brand.id, { per_page: 1 }),
+        ]);
 
         if (!isMounted) return;
 
@@ -46,8 +44,7 @@ export const DashboardPage = () => {
           total: eventsRes?.meta?.total || 0,
           pending: (eventsRes?.data || []).filter((e) => e.status === 'draft_on_review').length,
         });
-
-        await fetchMembers({ page: 1, per_page: 3 });
+        setMembersCount(membersRes?.meta?.total_count ?? membersRes?.data?.length ?? 0);
       } catch (error) {
         console.error('Dashboard load error:', error);
       }
@@ -58,7 +55,7 @@ export const DashboardPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [brand.id, fetchMembers]);
+  }, [brand.id]);
 
   return (
     <div className="max-w-(--breakpoint-xl) mx-auto animate-in fade-in slide-in-from-bottom-2 duration-1000 space-y-12">
@@ -103,16 +100,14 @@ export const DashboardPage = () => {
               </button>
             </div>
           )}
-          <TeamList members={members} />
+          <TeamList members={previewMembers} />
         </div>
       </section>
 
       <InviteMemberModal
+        brandId={brand.id}
         isOpen={isInviteModalOpen}
         onClose={() => setIsInviteModalOpen(false)}
-        onInvite={addMember}
-        isLoading={isMembersLoading}
-        error={membersError}
       />
     </div>
   );

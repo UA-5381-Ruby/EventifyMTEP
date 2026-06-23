@@ -1,5 +1,5 @@
 ﻿import { Link, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useBrandContext } from '@/contexts/brand-context';
+import { useBrandContext } from '@/hooks/use-brand-context';
 import { ChevronLeft, User } from 'lucide-react';
 import { Spinner } from '@/components/ui';
 
@@ -16,7 +16,7 @@ export const AdminLayout = () => {
     );
 
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard' },
+    { name: 'Dashboard', path: '/dashboard/overview' },
     { name: 'Events', path: '/dashboard/events' },
     { name: 'Members', path: '/dashboard/members' },
     { name: 'Settings', path: '/dashboard/settings' },

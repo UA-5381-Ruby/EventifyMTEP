@@ -1,4 +1,12 @@
-﻿export const TeamList = ({ members }: { members: any[] }) => (
+﻿interface TeamMember {
+  id: string | number;
+  user?: {
+    email: string;
+  };
+  role: string;
+}
+
+export const TeamList = ({ members }: { members: TeamMember[] }) => (
   <div className="flex flex-col gap-6 max-w-2xl">
     {members.length > 0 ? (
       members.map((member) => (

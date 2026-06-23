@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
-import { EventsService } from '@/services/events-service';
 import { CategoriesService } from '@/services/categories-service';
 import type { Brand } from '@/types/brand';
 import type { Category } from '@/types/category';
@@ -10,26 +9,21 @@ import { Plus } from 'lucide-react';
 import { EventFormFields } from '../../components/admin/event/event-form-fields.tsx';
 import { CategoryChip } from '@/components/admin/category-chip.tsx';
 import { CreateCategoryModal } from '@/components/admin/modals/create-category-modal.tsx';
+import { useCreateEvent } from '@/hooks/use-create-event.ts';
 
 export const CreateEventPage = () => {
   const navigate = useNavigate();
   const { brand } = useOutletContext<{ brand: Brand }>();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [allCategories, setAllCategories] = useState<Category[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState('');
   const [isCreatingCategory, setIsCreatingCategory] = useState(false);
 
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    location: '',
-    start_date: '',
-    end_date: '',
-    category_ids: [] as number[],
-  });
+  const { fields, isSaving, saveError, handleFieldChange, handleSave } = useCreateEvent(
+    brand.id,
+    () => navigate('/dashboard/events')
+  );
 
   useEffect(() => {
     CategoriesService.getCategories().then(setAllCategories).catch(console.error);
@@ -37,16 +31,14 @@ export const CreateEventPage = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    handleFieldChange(name as keyof typeof fields, value as never);
   };
 
   const handleCategoryToggle = (categoryId: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      category_ids: prev.category_ids.includes(categoryId)
-        ? prev.category_ids.filter((id) => id !== categoryId)
-        : [...prev.category_ids, categoryId],
-    }));
+    const next = fields.category_ids.includes(categoryId)
+      ? fields.category_ids.filter((id) => id !== categoryId)
+      : [...fields.category_ids, categoryId];
+    handleFieldChange('category_ids', next);
   };
 
   const handleCreateCategory = async () => {
@@ -55,10 +47,10 @@ export const CreateEventPage = () => {
     try {
       const newCat = await CategoriesService.createCategory({ name: newCategoryName });
       setAllCategories((prev) => [...prev, newCat].sort((a, b) => a.name.localeCompare(b.name)));
-      setFormData((prev) => ({ ...prev, category_ids: [...prev.category_ids, newCat.id] }));
+      handleFieldChange('category_ids', [...fields.category_ids, newCat.id]);
       setNewCategoryName('');
       setIsModalOpen(false);
-    } catch (err) {
+    } catch {
       alert('Error creating category');
     } finally {
       setIsCreatingCategory(false);
@@ -67,15 +59,7 @@ export const CreateEventPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    try {
-      await EventsService.createEvent({ ...formData, brand_id: brand.id });
-      navigate('/dashboard/events');
-    } catch (err: any) {
-      setError('Failed to create event');
-    } finally {
-      setIsLoading(false);
-    }
+    await handleSave();
   };
 
   return (
@@ -84,14 +68,14 @@ export const CreateEventPage = () => {
         <Card className="p-10 bg-white shadow-none border border-neutral-200 rounded-none relative">
           <h1 className="text-2xl font-bold mb-10 uppercase">Create New Event</h1>
 
-          {error && (
+          {saveError && (
             <Alert variant="warning" className="mb-8">
-              {error}
+              {saveError}
             </Alert>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-8">
-            <EventFormFields formData={formData} onChange={handleInputChange} />
+            <EventFormFields formData={fields} onChange={handleInputChange} />
 
             <div className="space-y-4">
               <div className="flex justify-between items-center border-b border-neutral-100 pb-2">
@@ -111,7 +95,7 @@ export const CreateEventPage = () => {
                   <CategoryChip
                     key={cat.id}
                     name={cat.name}
-                    isSelected={formData.category_ids.includes(cat.id)}
+                    isSelected={fields.category_ids.includes(cat.id)}
                     onClick={() => handleCategoryToggle(cat.id)}
                   />
                 ))}
@@ -129,10 +113,10 @@ export const CreateEventPage = () => {
               </Button>
               <Button
                 type="submit"
-                disabled={isLoading}
+                disabled={isSaving}
                 className="rounded-none bg-black text-white px-10"
               >
-                {isLoading ? <Spinner className="w-4 h-4" /> : 'Create Event'}
+                {isSaving ? <Spinner className="w-4 h-4" /> : 'Create Event'}
               </Button>
             </div>
           </form>

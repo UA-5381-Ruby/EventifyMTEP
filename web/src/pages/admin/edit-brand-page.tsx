@@ -1,7 +1,7 @@
 ﻿import React, { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { brandsService } from '@/services/brands-service';
-import { useBrandContext } from '@/contexts/brand-context';
+import { useBrandContext } from '@/hooks/use-brand-context';
 import { Card } from '@/components/ui';
 import { BrandForm } from '../../components/admin/brand-form.tsx';
 import type { Brand } from '@/types/brand';
@@ -40,7 +40,7 @@ export const EditBrandPage = () => {
     try {
       await brandsService.updateBrand(brand.id, formData);
       await refreshBrand(brand.id);
-      navigate('/dashboard');
+      navigate('/dashboard/overview');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update brand');
     } finally {
@@ -62,7 +62,7 @@ export const EditBrandPage = () => {
             onChange={handleChange}
             onColorChange={handleColorChange}
             onSubmit={handleSubmit}
-            onCancel={() => navigate('/dashboard')}
+            onCancel={() => navigate('/dashboard/overview')}
             submitLabel="Save Changes"
           />
         </Card>

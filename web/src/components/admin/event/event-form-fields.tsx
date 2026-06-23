@@ -1,8 +1,22 @@
-﻿import { Input } from '@/components/ui/input.tsx';
+﻿import React from 'react';
+import { Input } from '@/components/ui/input.tsx';
 import { Textarea } from '@/components/ui/textarea.tsx';
 import { Type, AlignLeft, MapPin, Calendar } from 'lucide-react';
 
-export const EventFormFields = ({ formData, onChange }: any) => (
+interface EventFormData {
+  title: string;
+  description: string;
+  location: string;
+  start_date: string;
+  end_date: string;
+}
+
+interface EventFormFieldsProps {
+  formData: EventFormData;
+  onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+}
+
+export const EventFormFields = ({ formData, onChange }: EventFormFieldsProps) => (
   <div className="space-y-6">
     <div className="space-y-2">
       <label className="text-[11px] font-black uppercase tracking-[0.15em] text-neutral-400 flex items-center gap-2">
