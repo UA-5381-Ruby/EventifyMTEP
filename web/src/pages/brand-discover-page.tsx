@@ -4,7 +4,9 @@ import { Pagination } from '@/components/ui';
 import { BrandPageHeader } from '@/components/brands/brand-page-header';
 import { BrandFilters } from '@/components/brands/brand-filters';
 import { BrandGrid } from '@/components/brands/brand-grid';
+import { CreateBrandModal } from '@/components/brands/create-brand-modal';
 import { useBrands } from '@/hooks/use-brands';
+import { useCreateBrand } from '@/hooks/use-create-brand';
 import { PER_PAGE } from '@/constants/ui.constants';
 import { useAuth } from '@/hooks/use-auth';
 import apiClient from '@/lib/api-client';
@@ -36,6 +38,10 @@ export function BrandDiscoverPage() {
     sort,
     scope: 'discover',
     ...(search.trim() ? { q: search.trim() } : {}),
+  });
+
+  const createBrand = useCreateBrand(() => {
+    refetch();
   });
 
   const totalPages = total != null ? Math.ceil(total / PER_PAGE) : 1;
@@ -98,6 +104,7 @@ export function BrandDiscoverPage() {
             setSearch('');
             resetPage();
           }}
+          onCreateClick={createBrand.openModal}
         />
 
         <Container>
@@ -145,6 +152,15 @@ export function BrandDiscoverPage() {
         </Container>
       </div>
 
+      <CreateBrandModal
+        isOpen={createBrand.isOpen}
+        fields={createBrand.fields}
+        isSaving={createBrand.isSaving}
+        saveError={createBrand.saveError}
+        onClose={createBrand.closeModal}
+        onSave={createBrand.handleSave}
+        onChange={createBrand.handleFieldChange}
+      />
       <DeleteBrandModal
         isOpen={deleteModal.isOpen}
         brandName={deleteModal.brandName}

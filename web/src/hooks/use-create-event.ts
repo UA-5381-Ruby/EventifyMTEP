@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { EventsService } from '@/services/events-service';
+import { EventsService } from '@/services/events-service'; // або '@/lib/events-service'
 import type { CreateEventRequest } from '@/types/event';
 
 export interface CreateEventFields {
@@ -11,6 +11,7 @@ export interface CreateEventFields {
   price_cents: number;
   available_tickets_count: number;
   category_ids: number[];
+  banner: File | null;
 }
 
 const EMPTY_EVENT_FIELDS: CreateEventFields = {
@@ -22,6 +23,7 @@ const EMPTY_EVENT_FIELDS: CreateEventFields = {
   price_cents: 0,
   available_tickets_count: 0,
   category_ids: [],
+  banner: null,
 };
 
 interface UseCreateEventResult {
@@ -81,6 +83,7 @@ export function useCreateEvent(brandId: number, onSuccess: () => void): UseCreat
           ? { available_tickets_count: fields.available_tickets_count }
           : {}),
         ...(fields.category_ids.length > 0 ? { category_ids: fields.category_ids } : {}),
+        ...(fields.banner ? { banner: fields.banner } : {}), // Додаємо банер у payload
       };
 
       await EventsService.createEvent(payload);
