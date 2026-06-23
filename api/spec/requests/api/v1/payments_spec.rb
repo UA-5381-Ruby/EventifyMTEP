@@ -79,7 +79,7 @@ RSpec.describe 'Api::V1::Payments', type: :request do
              headers: headers
 
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.parsed_body['error']).to eq('Event not available for purchase')
+        expect(response.parsed_body['error']).to eq(I18n.t('api.v1.errors.payments.event_not_available'))
       end
     end
 
@@ -92,7 +92,7 @@ RSpec.describe 'Api::V1::Payments', type: :request do
              headers: headers
 
         expect(response).to have_http_status(:unprocessable_entity)
-        expect(response.parsed_body['error']).to eq('Not enough tickets available')
+        expect(response.parsed_body['error']).to eq(I18n.t('api.v1.errors.payments.not_enough_tickets'))
       end
     end
 

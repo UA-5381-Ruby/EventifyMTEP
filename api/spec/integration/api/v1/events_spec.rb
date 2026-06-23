@@ -4,9 +4,6 @@ require 'swagger_helper'
 
 RSpec.describe 'api/v1/events', type: :request do
   path '/api/v1/events' do
-    # =========================
-    # GET /events (filter by category - NO AUTH)
-    # =========================
     get 'Filter events by category' do
       tags 'Events'
       produces 'application/json'
@@ -39,9 +36,6 @@ RSpec.describe 'api/v1/events', type: :request do
       end
     end
 
-    # =========================
-    # GET /events (list - AUTH REQUIRED)
-    # =========================
     get 'List events' do
       tags 'Events'
       produces 'application/json'
@@ -67,28 +61,25 @@ RSpec.describe 'api/v1/events', type: :request do
                  title: 'Future Conf',
                  brand: brand,
                  start_date: 1.month.from_now,
-                 end_date: 1.month.from_now + 1.day) # Додано end_date
+                 end_date: 1.month.from_now + 1.day)
 
           create(:event,
                  title: 'Past Meetup',
                  brand: brand,
                  start_date: 1.month.ago,
-                 end_date: 1.month.ago + 1.day) # Додано end_date
+                 end_date: 1.month.ago + 1.day)
 
           create(:event,
                  title: 'Live Workshop',
                  brand: brand,
                  start_date: Time.zone.now,
-                 end_date: Time.zone.now + 1.day) # Додано end_date
+                 end_date: Time.zone.now + 1.day)
         end
 
         run_test!
       end
     end
 
-    # =========================
-    # POST /events (AUTH REQUIRED)
-    # =========================
     post 'Create event' do
       tags 'Events'
       consumes 'application/json'
@@ -140,22 +131,18 @@ RSpec.describe 'api/v1/events', type: :request do
         end
         run_test!
       end
+
       it 'is invalid if end_date is before start_date' do
-        # Створюємо подію в пам'яті (build, а не create), де кінець раніше за початок
         event = build(:event, start_date: 1.day.from_now, end_date: 1.day.ago)
 
-        # Перевіряємо, що подія невалідна
         expect(event).not_to be_valid
-
-        # Перевіряємо, що з'явилася правильна помилка, яка покриє ваш червоний рядок
-        expect(event.errors[:end_date]).to include('must be after start date')
+        expect(event.errors[:end_date]).to include(
+          I18n.t('activerecord.errors.models.event.attributes.end_date.after_start_date')
+        )
       end
     end
   end
 
-  # =========================
-  # /events/:id
-  # =========================
   path '/api/v1/events/{id}' do
     parameter name: :id, in: :path, type: :integer, required: true
 

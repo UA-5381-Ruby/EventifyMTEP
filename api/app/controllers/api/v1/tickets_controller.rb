@@ -29,7 +29,7 @@ module Api
           render json: { errors: @ticket.errors.messages }, status: :unprocessable_content
         end
       rescue ActiveRecord::RecordNotUnique
-        render json: { errors: { base: ['User is already registered for this event'] } },
+        render json: { errors: { base: [t('api.v1.errors.tickets.already_registered')] } },
                status: :unprocessable_content
       end
 
@@ -55,7 +55,7 @@ module Api
 
       def set_ticket
         @ticket = @current_user.tickets.includes(:event, :event_feedback).find_by(id: params[:id])
-        render(json: { error: 'Ticket not found' }, status: :not_found) and return unless @ticket
+        render(json: { error: t('api.v1.errors.tickets.not_found') }, status: :not_found) and return unless @ticket
       end
 
       def ticket_json_options

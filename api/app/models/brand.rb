@@ -17,22 +17,10 @@ class Brand < ApplicationRecord
   validates :subdomain,
             presence: true,
             uniqueness: true,
-            format: {
-              with: SUBDOMAIN_REGEX,
-              message: 'can only contain lowercase letters, numbers, and hyphens'
-            }
+            format: { with: SUBDOMAIN_REGEX, message: :invalid_format }
 
-  validates :primary_color,
-            format: {
-              with: HEX_COLOR_REGEX,
-              message: 'must be a valid hex color code'
-            }
-
-  validates :secondary_color,
-            format: {
-              with: HEX_COLOR_REGEX,
-              message: 'must be a valid hex color code'
-            }
+  validates :primary_color, format: { with: HEX_COLOR_REGEX, message: :invalid_hex }
+  validates :secondary_color, format: { with: HEX_COLOR_REGEX, message: :invalid_hex }
 
   def logo_url
     S3BucketService.new.file_url(logo) if logo.present?

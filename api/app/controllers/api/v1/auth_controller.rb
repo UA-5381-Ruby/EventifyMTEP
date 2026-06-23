@@ -14,7 +14,7 @@ module Api
 
           DeleteUnconfirmedUserJob.set(wait: 24.hours).perform_later(user.id)
 
-          render json: { message: 'Account created! Please check your email to verify your account.' }, status: :created
+          render json: { message: t('api.v1.auth.registered') }, status: :created
         else
           render json: { errors: user.errors.full_messages }, status: :unprocessable_content
         end
@@ -25,11 +25,11 @@ module Api
         user = find_user_by_email
 
         unless user&.authenticate(params[:password])
-          return render json: { error: 'Invalid email or password' }, status: :unauthorized
+          return render json: { error: t('api.v1.auth.invalid_credentials') }, status: :unauthorized
         end
 
         unless user.email_confirmed?
-          return render json: { error: 'Please verify your email address to log in.' }, status: :forbidden
+          return render json: { error: t('api.v1.auth.email_not_confirmed') }, status: :forbidden
         end
 
         render json: auth_success_payload(user), status: :ok

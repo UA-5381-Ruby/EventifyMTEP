@@ -20,8 +20,9 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
               as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
-        # Зверніть увагу: текст помилки має збігатися з моделлю (може бути "Cannot remove..." або "Cannot downgrade...")
-        expect(JSON.parse(response.body)['errors']['base']).to include('Cannot downgrade the last owner of a brand')
+        expect(JSON.parse(response.body)['errors']['base']).to include(
+          I18n.t('api.v1.errors.brand_memberships.cannot_downgrade_last_owner')
+        )
         expect(owner_brand_membership.reload.role).to eq('owner')
       end
     end
@@ -72,7 +73,9 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
                headers: headers
 
         expect(response).to have_http_status(:unprocessable_content)
-        expect(JSON.parse(response.body)['errors']['base']).to include('Cannot remove the last owner of a brand')
+        expect(JSON.parse(response.body)['errors']['base']).to include(
+          I18n.t('api.v1.errors.brand_memberships.cannot_remove_last_owner')
+        )
         expect(BrandMembership.exists?(owner_brand_membership.id)).to be_truthy
       end
     end
@@ -115,7 +118,9 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
              as: :json
 
         expect(response).to have_http_status(:unprocessable_content)
-        expect(JSON.parse(response.body)['errors']['base']).to include('User is already a member of this brand')
+        expect(JSON.parse(response.body)['errors']['base']).to include(
+          I18n.t('api.v1.errors.brand_memberships.already_member')
+        )
       end
     end
 

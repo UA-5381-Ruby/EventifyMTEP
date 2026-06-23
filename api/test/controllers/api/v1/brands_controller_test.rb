@@ -52,7 +52,7 @@ module Api
                  status: :unprocessable_content
         end
       rescue ActiveRecord::RecordNotUnique
-        render json: { errors: ['Subdomain is already taken'] },
+        render json: { errors: [I18n.t('api.v1.errors.brands.subdomain_taken')] },
                status: :unprocessable_content
       end
 
@@ -85,7 +85,7 @@ module Api
       def set_brand
         @brand = accessible_brands.find(params[:id])
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Brand not found' }, status: :not_found
+        render json: { error: I18n.t('api.v1.errors.brands.not_found_or_access_denied') }, status: :not_found
       end
 
       def accessible_brands
