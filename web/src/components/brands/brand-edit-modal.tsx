@@ -87,9 +87,7 @@ export function BrandEditModal({ isOpen, fields, onClose, onSave, onChange }: Br
         />
 
         <div>
-          <label className="block text-sm font-medium text-neutral-700 mb-1">
-            Brand Logo
-          </label>
+          <label className="block text-sm font-medium text-neutral-700 mb-1">Brand Logo</label>
 
           <div
             onDragOver={handleDragOver}

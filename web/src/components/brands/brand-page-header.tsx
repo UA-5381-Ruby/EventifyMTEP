@@ -32,11 +32,7 @@ export function BrandPageHeader({
           </div>
 
           <div className="flex flex-col sm:items-end gap-3">
-            <Button
-              onClick={onCreateClick}
-              variant="primary"
-              size="md"
-            >
+            <Button onClick={onCreateClick} variant="primary" size="md">
               + Add new brand
             </Button>
 
