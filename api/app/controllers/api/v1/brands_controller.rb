@@ -21,6 +21,12 @@ module Api
         render json: { errors: [e.message] }, status: :unprocessable_content
       end
 
+      rescue_from ActiveRecord::RecordNotUnique do
+        render json: {
+          errors: [I18n.t('api.v1.errors.brands.subdomain_taken')]
+        }, status: :unprocessable_content
+      end
+
       before_action :set_brand, only: %i[update destroy]
       before_action :set_brand_public, only: %i[show]
 
@@ -74,9 +80,6 @@ module Api
           render json: { errors: @brand.errors.full_messages },
                  status: :unprocessable_content
         end
-      rescue ActiveRecord::RecordNotUnique
-        render json: { errors: [t('api.v1.errors.brands.subdomain_taken')] },
-               status: :unprocessable_content
       end
 
       def destroy
