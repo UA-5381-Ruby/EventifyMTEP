@@ -33,6 +33,8 @@ export interface EventDetail extends Event {
     id: number;
     name: string;
   }[];
+  banner_url?: string;
+  price_cents: number;
   available_tickets_count: number;
 }
 
@@ -57,6 +59,8 @@ export interface CreateEventRequest {
   brand_id: number;
   description?: string;
   end_date?: string;
+  price_cents?: number;
+  available_tickets_count?: number;
   category_ids?: number[];
 }
 

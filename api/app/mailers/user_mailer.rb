@@ -19,6 +19,24 @@ class UserMailer < ApplicationMailer
     mail(to: @user.email, subject: 'Reset your password')
   end
 
+  def ticket_confirmation(user, ticket)
+    @user   = user
+    @ticket = ticket
+    @event  = ticket.event
+
+    pdf = TicketPdfService.generate(ticket)
+
+    attachments["ticket-#{ticket.qr_code}.pdf"] = {
+      mime_type: 'application/pdf',
+      content: pdf
+    }
+
+    mail(
+      to: @user.email,
+      subject: "Your ticket for #{@event.title}"
+    )
+  end
+
   def brand_invitation(email, brand, token)
     @brand = brand
     @accept_link = "#{ENV.fetch('FRONTEND_URL')}/accept-invitation?token=#{token}&brand_id=#{brand.id}"

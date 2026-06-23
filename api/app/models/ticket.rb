@@ -7,7 +7,6 @@ class Ticket < ApplicationRecord
 
   validates :user_id, :event_id, presence: true
   validates :qr_code, presence: true, uniqueness: true
-  validate :user_can_have_only_one_ticket_per_event
 
   before_validation :generate_qr_code, on: :create
   before_create :upload_qr_code_to_s3
