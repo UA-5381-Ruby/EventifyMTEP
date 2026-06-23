@@ -14,7 +14,7 @@ class BrandMembership < ApplicationRecord
     return unless will_save_change_to_role?(from: 'owner')
     return unless brand.brand_memberships.where(role: 'owner').count <= 1
 
-    errors.add(:base, 'Cannot remove the last owner of a brand')
+    errors.add(:base, :cannot_remove_last_owner)
   end
 
   def ensure_at_least_one_owner_on_destroy
@@ -22,7 +22,7 @@ class BrandMembership < ApplicationRecord
     return unless role == 'owner'
     return unless brand.brand_memberships.where(role: 'owner').count <= 1
 
-    errors.add(:base, 'Cannot remove the last owner of a brand')
+    errors.add(:base, :cannot_remove_last_owner)
     throw(:abort)
   end
 end

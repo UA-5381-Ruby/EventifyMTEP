@@ -52,7 +52,7 @@ module Api
                  status: :unprocessable_content
         end
       rescue ActiveRecord::RecordNotUnique
-        render json: { errors: ['Subdomain is already taken'] },
+        render json: { errors: [I18n.t('api.v1.errors.brands.subdomain_taken')] },
                status: :unprocessable_content
       end
 

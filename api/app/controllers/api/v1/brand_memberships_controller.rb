@@ -43,8 +43,9 @@ module Api
         new_role = update_membership_params[:role]
 
         if last_owner_downgrade?(new_role)
-          return render json: { errors: { base: ['Cannot downgrade the last owner of a brand'] } },
-                        status: :unprocessable_content
+          return render json: {
+            errors: { base: [t('api.v1.errors.brand_memberships.cannot_downgrade_last_owner')] }
+          }, status: :unprocessable_content
         end
 
         if @membership.update(update_membership_params)
@@ -56,8 +57,9 @@ module Api
 
       def destroy
         if last_owner_removal?
-          return render json: { errors: { base: ['Cannot remove the last owner of a brand'] } },
-                        status: :unprocessable_content
+          return render json: {
+            errors: { base: [t('api.v1.errors.brand_memberships.cannot_remove_last_owner')] }
+          }, status: :unprocessable_content
         end
 
         @membership.destroy
@@ -71,15 +73,15 @@ module Api
 
         authorize @brand, :manage_memberships?
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Brand not found' }, status: :not_found
+        render json: { error: t('api.v1.errors.brands.not_found_or_access_denied') }, status: :not_found
       rescue Pundit::NotAuthorizedError
-        render json: { error: 'Forbidden' }, status: :forbidden
+        render json: { error: t('api.v1.errors.forbidden') }, status: :forbidden
       end
 
       def set_membership
         @membership = @brand.brand_memberships.find(params[:id])
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Membership not found in this brand' }, status: :not_found
+        render json: { error: t('api.v1.errors.brand_memberships.not_found') }, status: :not_found
       end
 
       def authorize_membership
@@ -100,7 +102,7 @@ module Api
 
       def render_duplicate_error
         render json: {
-          errors: { base: ['User is already a member of this brand'] }
+          errors: { base: [t('api.v1.errors.brand_memberships.already_member')] }
         }, status: :unprocessable_content
       end
 

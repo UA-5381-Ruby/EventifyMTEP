@@ -9,14 +9,20 @@ class InvitationAcceptanceService
   end
 
   def call
-    return failure('Invalid or expired invitation link', :unprocessable_entity) unless valid_payload?
-    return failure('Invitation is for a different brand', :unprocessable_entity) unless matching_brand?
-    return failure('No account found. Please register first.', :not_found) unless user
-    return failure('User is already a member of this brand', :conflict) if existing_member?
+    unless valid_payload?
+      return failure(I18n.t('services.invitation_acceptance.invalid_or_expired'),
+                     :unprocessable_content)
+    end
+    unless matching_brand?
+      return failure(I18n.t('services.invitation_acceptance.brand_mismatch'),
+                     :unprocessable_content)
+    end
+    return failure(I18n.t('services.invitation_acceptance.no_account'), :not_found) unless user
+    return failure(I18n.t('services.invitation_acceptance.already_member'), :conflict) if existing_member?
 
     save_membership
   rescue ActiveRecord::RecordNotUnique
-    failure('User is already a member of this brand', :conflict)
+    failure(I18n.t('services.invitation_acceptance.already_member'), :conflict)
   end
 
   private
