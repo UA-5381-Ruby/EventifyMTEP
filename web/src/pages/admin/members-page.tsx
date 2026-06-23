@@ -7,7 +7,8 @@ import { InviteMemberModal } from '@/components/admin/modals/invite-member-modal
 import { RemoveMemberModal } from '@/components/admin/modals/remove-member-modal.tsx';
 import type { Brand } from '@/types/brand';
 import type { Membership } from '@/types/brand-memberships';
-import { Button, Spinner } from '@/components/ui';
+import { Button } from '@/components/ui';
+import { MembersTable } from '../../components/admin/member/members-table.tsx';
 
 export const MembersPage = () => {
   const { brand } = useOutletContext<{ brand: Brand }>();
@@ -22,9 +23,7 @@ export const MembersPage = () => {
   const [isRemoving, setIsRemoving] = useState(false);
 
   const { isCurrentBrandManager } = useBrandMembership(String(brand.id));
-
   const isOwner = brandMembers.some((m) => m.user?.id === user?.id && m.role === 'owner');
-
   const canManage = isCurrentBrandManager || isOwner;
 
   const loadMembers = useCallback(async () => {
@@ -44,12 +43,11 @@ export const MembersPage = () => {
   }, [brand.id]);
 
   useEffect(() => {
-    const fetchMembers = async () => {
-      await loadMembers();
-    };
-
-    void fetchMembers();
+    Promise.resolve().then(() => {
+      void loadMembers();
+    });
   }, [loadMembers]);
+
   const openRemoveModal = (id: number, email: string) => {
     setMembersError(null);
     setMemberToRemove({ id, email });
@@ -69,20 +67,10 @@ export const MembersPage = () => {
     }
   };
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return '—';
-    return new Date(dateString).toLocaleDateString('en-En', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
   return (
     <div className="max-w-(--breakpoint-xl) mx-auto animate-in fade-in duration-700 space-y-8">
       <div className="flex justify-between items-end">
         <h1 className="text-3xl font-bold tracking-tight text-black ml-1">Team Members</h1>
-
         {canManage && (
           <Button
             onClick={() => setIsInviteModalOpen(true)}
@@ -99,76 +87,13 @@ export const MembersPage = () => {
         </div>
       )}
 
-      <div className="border border-neutral-200 bg-white overflow-hidden">
-        <table className="w-full text-left border-collapse">
-          <thead>
-            <tr className="bg-neutral-100 border-b border-neutral-200 text-[11px] uppercase tracking-widest text-neutral-500 font-black">
-              <th className="px-8 py-4 font-bold">User</th>
-              <th className="px-4 py-4 font-bold text-center">Role</th>
-              <th className="px-4 py-4 font-bold">Joined date</th>
-              <th className="px-8 py-4 font-bold text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-neutral-100">
-            {isMembersLoading ? (
-              <tr>
-                <td colSpan={4} className="py-20 text-center">
-                  <Spinner />
-                </td>
-              </tr>
-            ) : brandMembers.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="py-20 text-center text-neutral-400">
-                  No team members found.
-                </td>
-              </tr>
-            ) : (
-              brandMembers.map((member) => (
-                <tr key={member.id} className="group hover:bg-neutral-50 transition-colors">
-                  <td className="px-8 py-5">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-neutral-100 border border-neutral-200 flex items-center justify-center font-bold text-neutral-400 group-hover:bg-black group-hover:text-white transition-all">
-                        {(member.user?.email || 'U').charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <p className="text-sm font-bold text-black">
-                          {member.user?.name || 'No Name'}
-                          {member.user?.id === user?.id && (
-                            <span className="ml-1 text-neutral-400 font-medium">(You)</span>
-                          )}
-                        </p>
-                        <p className="text-xs text-neutral-400">{member.user?.email}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-5 text-center">
-                    <span className="inline-block border border-neutral-300 px-6 py-1 text-[10px] font-black uppercase tracking-widest text-neutral-600 bg-white min-w-[100px]">
-                      {member.role}
-                    </span>
-                  </td>
-                  <td className="px-4 py-5 text-sm text-neutral-500 font-medium">
-                    {formatDate(member.created_at)}
-                  </td>
-                  <td className="px-8 py-5 text-right">
-                    {member.role !== 'owner' && canManage ? (
-                      <button
-                        onClick={() => openRemoveModal(member.id, member.user?.email || '')}
-                        className="text-[11px] font-black uppercase tracking-tighter text-neutral-400 hover:text-red-600 transition-colors cursor-pointer"
-                      >
-                        Remove
-                      </button>
-                    ) : (
-                      <span className="text-[10px] font-black uppercase text-neutral-200">
-                        Protected
-                      </span>
-                    )}
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
-      </div>
+      <MembersTable
+        members={brandMembers}
+        isLoading={isMembersLoading}
+        currentUserId={user?.id}
+        canManage={canManage}
+        onRemoveClick={openRemoveModal}
+      />
 
       <InviteMemberModal
         brandId={brand.id}
