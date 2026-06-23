@@ -1,147 +1,131 @@
 uk:
-  api:
-    v1:
-      auth:
-        token_invalidated: "Несанкціонований доступ. Токен було анульовано"
-        invalid_token: "Несанкціонований доступ. Недійсний токен"
-        user_not_found: "Користувача з цим токеном більше не існує"
-        unauthorized: "Несанкціонований доступ. %{message}"
-        missing_token: "Несанкціонований доступ. Токен відсутній"
-        not_authorized: "У вас немає прав для виконання цієї дії"
-
-        registered: "Акаунт створено! Перевірте вашу пошту для підтвердження"
-        invalid_credentials: "Невірний email або пароль"
-        email_not_confirmed: "Будь ласка, підтвердіть вашу email-адресу для входу"
-
-        password:
-          reset_requested: "Якщо ваш email існує, ви отримаєте інструкції для скидання пароля"
-          invalid_or_expired_token: "Недійсний або прострочений токен"
-          new_password_blank: "Новий пароль не може бути порожнім"
-          current_password_blank: "Поточний пароль не може бути порожнім"
-          current_password_incorrect: "Невірний поточний пароль"
-          updated: "Пароль успішно оновлено"
-          changed: "Пароль успішно змінено"
-
-        confirmation:
-          invalid_or_expired: "Посилання для підтвердження недійсне або застаріле"
-          success: "Email підтверджено! Тепер ви можете увійти"
-          already_confirmed: "Email вже підтверджено"
-          resend_success: "Лист підтвердження надіслано"
-
-      errors:
-        too_many_requests: "Забагато запитів. Будь ласка, спробуйте пізніше"
-        forbidden: "Доступ заборонено"
-
-        users:
-          not_found: "Користувача не знайдено"
-
-        event_categories:
-          already_assigned: "вже додано до цієї події"
-          not_found: "Категорію не прикріплено до цієї події"
-
-        tickets:
-          not_found: "Квиток не знайдено"
-          already_registered: "Користувач вже зареєстрований на цю подію"
-
-        payments:
-          service_unavailable: "Сервіс оплати недоступний"
-          invalid_json: "Недійсний JSON"
-          invalid_signature: "Недійсний підпис"
-          event_not_available: "Подія недоступна для купівлі"
-          not_enough_tickets: "Недостатньо доступних квитків"
-          invalid_reference_format: "Невірний формат посилання"
-          invoice_creation_failed: "Не вдалося створити рахунок"
-
-        brands:
-          not_found_or_access_denied: "Бренд не знайдено або доступ заборонено"
-          subdomain_taken: "Цей субдомен уже зайнято"
-          logo:
-            invalid_format: "Невірний формат логотипу. Дозволені типи: JPG, PNG, WEBP, GIF, SVG"
-            too_large: "Розмір файлу логотипу не повинен перевищувати %{max_size}"
-            upload_failed: "Не вдалося завантажити логотип у хмарне сховище. Спробуйте ще раз"
-
-        invitations:
-          invalid_role: "Невірна роль"
-          invalid_email: "Невірний email"
-          sent: "Запрошення надіслано"
-          joined_success: "Ви успішно приєдналися до бренду"
-
-        brand_memberships:
-          not_found: "Учасника не знайдено в цьому бренді"
-          already_member: "Користувач вже є учасником цього бренду"
-          cannot_downgrade_last_owner: "Неможливо знизити роль останнього власника бренду"
-          cannot_remove_last_owner: "Неможливо видалити останнього власника бренду"
-
-        events:
-          not_found: "Подію не знайдено"
-          transitions:
-            cannot_action: "Неможливо виконати дію '%{action}' для події"
-            required_fields: "Усі обов'язкові поля мають бути заповнені перед відправкою"
-            invalid_transition: "Перехід '%{action}' неможливий зі стану '%{state}'"
-          banner:
-            invalid_format: "Невірний формат банера. Дозволені типи: JPG, PNG, WEBP, GIF, SVG"
-            too_large: "Розмір файлу банера не повинен перевищувати %{max_size}"
-            upload_failed: "Не вдалося завантажити банер у хмарне сховище. Спробуйте ще раз"
-
-  services:
-    invitation_acceptance:
-      invalid_or_expired: "Посилання для запрошення недійсне або застаріле"
-      brand_mismatch: "Запрошення призначене для іншого бренду"
-      no_account: "Облікового запису не знайдено. Будь ласка, зареєструйтеся"
-      already_member: "Користувач вже є учасником цього бренду"
-
-    ticket_qr_code:
-      upload_failed: "Не вдалося завантажити QR-код на S3"
-
-    ticket_pdf:
-      title: "КВИТОК"
-      date_time: "Дата та час"
-      location: "Місце"
-      attendee: "Відвідувач"
-      ticket_id: "ID квитка"
-      scan_to_verify: "Скануйте для перевірки квитка"
-      non_transferable: "Цей квиток не підлягає передачі. Покажіть цей QR-код на вході"
-
-    monobank:
-      ticket_for: "Квиток на %{title}"
-
   activerecord:
     errors:
       models:
         brand:
           attributes:
-            subdomain:
-              invalid_format: "може містити лише малі латинські букви, цифри та дефіси"
             primary_color:
-              invalid_hex: "має бути дійсним hex-кодом кольору"
+              invalid_hex: має бути дійсним hex-кодом кольору
             secondary_color:
-              invalid_hex: "має бути дійсним hex-кодом кольору"
-
+              invalid_hex: має бути дійсним hex-кодом кольору
+            subdomain:
+              invalid_format: може містити лише малі латинські букви, цифри та дефіси
         brand_membership:
           attributes:
             base:
-              cannot_remove_last_owner: "Неможливо видалити останнього власника бренду"
+              cannot_remove_last_owner: Неможливо видалити останнього власника бренду
             user_id:
-              uniqueness: "вже є учасником цього бренду"
-
+              uniqueness: вже є учасником цього бренду
         event:
           attributes:
             end_date:
-              after_start_date: "має бути пізніше дати початку"
-
+              after_start_date: має бути пізніше дати початку
         event_category:
           attributes:
             event_id:
-              already_assigned: "вже додано до цієї події"
-
-        user:
-          attributes:
-            email:
-              invalid_email: "має бути дійсною email-адресою"
-
+              already_assigned: вже додано до цієї події
         ticket:
           attributes:
             base:
-              already_registered: "вже зареєстровано на цю подію"
+              already_registered: вже зареєстровано на цю подію
             user_id:
-              taken: "вже зареєстровано на цю подію"
+              taken: вже зареєстровано на цю подію
+        user:
+          attributes:
+            email:
+              invalid_email: має бути дійсною email-адресою
+  api:
+    v1:
+      auth:
+        confirmation:
+          already_confirmed: Email вже підтверджено
+          invalid_or_expired: Посилання для підтвердження недійсне або застаріле
+          resend_success: Лист підтвердження надіслано
+          success: Email підтверджено! Тепер ви можете увійти
+        email_not_confirmed: Будь ласка, підтвердіть вашу email-адресу для входу
+        invalid_credentials: Невірний email або пароль
+        invalid_token: Несанкціонований доступ. Недійсний токен
+        missing_token: Несанкціонований доступ. Токен відсутній
+        not_authorized: У вас немає прав для виконання цієї дії
+        password:
+          changed: Пароль успішно змінено
+          current_password_blank: Поточний пароль не може бути порожнім
+          current_password_incorrect: Невірний поточний пароль
+          invalid_or_expired_token: Недійсний або прострочений токен
+          new_password_blank: Новий пароль не може бути порожнім
+          reset_requested: Якщо ваш email існує, ви отримаєте інструкції для скидання
+            пароля
+          updated: Пароль успішно оновлено
+        registered: Акаунт створено! Перевірте вашу пошту для підтвердження
+        token_invalidated: Несанкціонований доступ. Токен було анульовано
+        unauthorized: Несанкціонований доступ. %{message}
+        user_not_found: Користувача з цим токеном більше не існує
+      errors:
+        brand_memberships:
+          already_member: Користувач вже є учасником цього бренду
+          cannot_downgrade_last_owner: Неможливо знизити роль останнього власника
+            бренду
+          cannot_remove_last_owner: Неможливо видалити останнього власника бренду
+          not_found: Учасника не знайдено в цьому бренді
+        brands:
+          logo:
+            invalid_format: 'Невірний формат логотипу. Дозволені типи: JPG, PNG, WEBP,
+              GIF, SVG'
+            too_large: Розмір файлу логотипу не повинен перевищувати %{max_size}
+            upload_failed: Не вдалося завантажити логотип у хмарне сховище. Спробуйте
+              ще раз
+          not_found_or_access_denied: Бренд не знайдено або доступ заборонено
+          subdomain_taken: Цей субдомен уже зайнято
+        event_categories:
+          already_assigned: вже додано до цієї події
+          not_found: Категорію не прикріплено до цієї події
+        events:
+          banner:
+            invalid_format: 'Невірний формат банера. Дозволені типи: JPG, PNG, WEBP,
+              GIF, SVG'
+            too_large: Розмір файлу банера не повинен перевищувати %{max_size}
+            upload_failed: Не вдалося завантажити банер у хмарне сховище. Спробуйте
+              ще раз
+          not_found: Подію не знайдено
+          transitions:
+            cannot_action: Неможливо виконати дію '%{action}' для події
+            invalid_transition: Перехід '%{action}' неможливий зі стану '%{state}'
+            required_fields: Усі обов'язкові поля мають бути заповнені перед відправкою
+        forbidden: Доступ заборонено
+        invitations:
+          invalid_email: Невірний email
+          invalid_role: Невірна роль
+          joined_success: Ви успішно приєдналися до бренду
+          sent: Запрошення надіслано
+        payments:
+          event_not_available: Подія недоступна для купівлі
+          invalid_json: Недійсний JSON
+          invalid_reference_format: Невірний формат посилання
+          invalid_signature: Недійсний підпис
+          invoice_creation_failed: Не вдалося створити рахунок
+          not_enough_tickets: Недостатньо доступних квитків
+          service_unavailable: Сервіс оплати недоступний
+        tickets:
+          already_registered: Користувач вже зареєстрований на цю подію
+          not_found: Квиток не знайдено
+        too_many_requests: Забагато запитів. Будь ласка, спробуйте пізніше
+        users:
+          not_found: Користувача не знайдено
+  services:
+    invitation_acceptance:
+      already_member: Користувач вже є учасником цього бренду
+      brand_mismatch: Запрошення призначене для іншого бренду
+      invalid_or_expired: Посилання для запрошення недійсне або застаріле
+      no_account: Облікового запису не знайдено. Будь ласка, зареєструйтеся
+    monobank:
+      ticket_for: Квиток на %{title}
+    ticket_pdf:
+      attendee: Відвідувач
+      date_time: Дата та час
+      location: Місце
+      non_transferable: Цей квиток не підлягає передачі. Покажіть цей QR-код на вході
+      scan_to_verify: Скануйте для перевірки квитка
+      ticket_id: ID квитка
+      title: КВИТОК
+    ticket_qr_code:
+      upload_failed: Не вдалося завантажити QR-код на S3

@@ -1,145 +1,128 @@
 en:
-  api:
-    v1:
-      auth:
-        token_invalidated: "Unauthorized access. Token has been invalidated"
-        invalid_token: "Unauthorized access. Invalid token."
-        user_not_found: "User with this token no longer exists."
-        unauthorized: "Unauthorized access. %{message}"
-        missing_token: "Unauthorized access. Missing token."
-        not_authorized: "You are not authorized to perform this action"
-
-        registered: "Account created! Please check your email to verify your account"
-        invalid_credentials: "Invalid email or password"
-        email_not_confirmed: "Please verify your email address to log in"
-
-        password:
-          reset_requested: "If your email exists, you will receive reset instructions"
-          invalid_or_expired_token: "Invalid or expired token"
-          new_password_blank: "New password cannot be blank"
-          current_password_blank: "Current password cannot be blank"
-          current_password_incorrect: "Current password is incorrect"
-          updated: "Password successfully updated"
-          changed: "Password successfully changed"
-
-        confirmation:
-          invalid_or_expired: "Invalid or expired verification link"
-          success: "Email verified successfully! You can now log in"
-          already_confirmed: "Email already verified"
-          resend_success: "Verification email sent"
-
-      errors:
-        too_many_requests: "Too many requests. Please try again later"
-        forbidden: "Forbidden"
-        users:
-          not_found: "User not found"
-
-        event_categories:
-          already_assigned: "already assigned to this event"
-          not_found: "Category is not assigned to this event"
-
-        tickets:
-          not_found: "Ticket not found"
-          already_registered: "User is already registered for this event"
-
-        payments:
-          service_unavailable: "Payment service unavailable"
-          invalid_json: "Invalid JSON"
-          invalid_signature: "Invalid signature"
-          event_not_available: "Event not available for purchase"
-          not_enough_tickets: "Not enough tickets available"
-          invalid_reference_format: "Invalid reference format"
-          invoice_creation_failed: "Invoice creation failed"
-
-        brands:
-          not_found_or_access_denied: "Brand not found"
-          subdomain_taken: "Subdomain has already been taken"
-          logo:
-            invalid_format: "Invalid logo format. Allowed types: JPG, PNG, WEBP, GIF, SVG"
-            too_large: "Logo file size must be under %{max_size}"
-            upload_failed: "Failed to upload logo to cloud storage. Please try again"
-
-        invitations:
-          invalid_role: "Invalid role"
-          invalid_email: "Invalid email"
-          sent: "Invitation sent"
-          joined_success: "You have joined the brand successfully"
-
-        brand_memberships:
-          not_found: "Membership not found in this brand"
-          already_member: "User is already a member of this brand"
-          cannot_downgrade_last_owner: "Cannot downgrade the last owner of a brand"
-          cannot_remove_last_owner: "Cannot remove the last owner of a brand"
-
-        events:
-          not_found: "Event not found"
-          transitions:
-            cannot_action: "Cannot %{action} event"
-            required_fields: "All required fields must be filled before submission"
-            invalid_transition: "Transition '%{action}' is not valid from state '%{state}'"
-          banner:
-            invalid_format: "Invalid banner format. Allowed types: JPG, PNG, WEBP, GIF, SVG"
-            too_large: "Banner file size must be under %{max_size}"
-            upload_failed: "Failed to upload banner to cloud storage. Please try again"
-
-  services:
-    invitation_acceptance:
-      invalid_or_expired: "Invalid or expired invitation link"
-      brand_mismatch: "Invitation is for a different brand"
-      no_account: "No account found. Please register first"
-      already_member: "User is already a member of this brand"
-
-    ticket_qr_code:
-      upload_failed: "Failed to upload QR code to S3"
-
-    ticket_pdf:
-      title: "TICKET"
-      date_time: "Date & Time"
-      location: "Location"
-      attendee: "Attendee"
-      ticket_id: "Ticket ID"
-      scan_to_verify: "Scan to verify your ticket"
-      non_transferable: "This ticket is non-transferable. Present this QR code at the entrance"
-    monobank:
-      ticket_for: "Ticket for %{title}"
-
   activerecord:
     errors:
       models:
         brand:
           attributes:
-            subdomain:
-              invalid_format: "can only contain lowercase letters, numbers, and hyphens"
             primary_color:
-              invalid_hex: "must be a valid hex color code"
+              invalid_hex: must be a valid hex color code
             secondary_color:
-              invalid_hex: "must be a valid hex color code"
-
+              invalid_hex: must be a valid hex color code
+            subdomain:
+              invalid_format: can only contain lowercase letters, numbers, and hyphens
         brand_membership:
           attributes:
             base:
-              cannot_remove_last_owner: "Cannot remove the last owner of a brand"
+              cannot_remove_last_owner: Cannot remove the last owner of a brand
             user_id:
-              uniqueness: "is already a member of this brand"
-
+              uniqueness: is already a member of this brand
         event:
           attributes:
             end_date:
-              after_start_date: "must be after start date"
-
+              after_start_date: must be after start date
         event_category:
           attributes:
             event_id:
-              already_assigned: "already has this category assigned"
-
-        user:
-          attributes:
-            email:
-              invalid_email: "must be a valid email address"
-
+              already_assigned: already has this category assigned
         ticket:
           attributes:
             base:
-              already_registered: "already registered for this event"
+              already_registered: already registered for this event
             user_id:
-              taken: "already registered for this event"
+              taken: already registered for this event
+        user:
+          attributes:
+            email:
+              invalid_email: must be a valid email address
+  api:
+    v1:
+      auth:
+        confirmation:
+          already_confirmed: Email already verified
+          invalid_or_expired: Invalid or expired verification link
+          resend_success: Verification email sent
+          success: Email verified successfully! You can now log in
+        email_not_confirmed: Please verify your email address to log in
+        invalid_credentials: Invalid email or password
+        invalid_token: Unauthorized access. Invalid token.
+        missing_token: Unauthorized access. Missing token.
+        not_authorized: You are not authorized to perform this action
+        password:
+          changed: Password successfully changed
+          current_password_blank: Current password cannot be blank
+          current_password_incorrect: Current password is incorrect
+          invalid_or_expired_token: Invalid or expired token
+          new_password_blank: New password cannot be blank
+          reset_requested: If your email exists, you will receive reset instructions
+          updated: Password successfully updated
+        registered: Account created! Please check your email to verify your account
+        token_invalidated: Unauthorized access. Token has been invalidated
+        unauthorized: Unauthorized access. %{message}
+        user_not_found: User with this token no longer exists.
+      errors:
+        brand_memberships:
+          already_member: User is already a member of this brand
+          cannot_downgrade_last_owner: Cannot downgrade the last owner of a brand
+          cannot_remove_last_owner: Cannot remove the last owner of a brand
+          not_found: Membership not found in this brand
+        brands:
+          logo:
+            invalid_format: 'Invalid logo format. Allowed types: JPG, PNG, WEBP, GIF,
+              SVG'
+            too_large: Logo file size must be under %{max_size}
+            upload_failed: Failed to upload logo to cloud storage. Please try again
+          not_found_or_access_denied: Brand not found
+          subdomain_taken: Subdomain has already been taken
+        event_categories:
+          already_assigned: already assigned to this event
+          not_found: Category is not assigned to this event
+        events:
+          banner:
+            invalid_format: 'Invalid banner format. Allowed types: JPG, PNG, WEBP,
+              GIF, SVG'
+            too_large: Banner file size must be under %{max_size}
+            upload_failed: Failed to upload banner to cloud storage. Please try again
+          not_found: Event not found
+          transitions:
+            cannot_action: Cannot %{action} event
+            invalid_transition: Transition '%{action}' is not valid from state '%{state}'
+            required_fields: All required fields must be filled before submission
+        forbidden: Forbidden
+        invitations:
+          invalid_email: Invalid email
+          invalid_role: Invalid role
+          joined_success: You have joined the brand successfully
+          sent: Invitation sent
+        payments:
+          event_not_available: Event not available for purchase
+          invalid_json: Invalid JSON
+          invalid_reference_format: Invalid reference format
+          invalid_signature: Invalid signature
+          invoice_creation_failed: Invoice creation failed
+          not_enough_tickets: Not enough tickets available
+          service_unavailable: Payment service unavailable
+        tickets:
+          already_registered: User is already registered for this event
+          not_found: Ticket not found
+        too_many_requests: Too many requests. Please try again later
+        users:
+          not_found: User not found
+  services:
+    invitation_acceptance:
+      already_member: User is already a member of this brand
+      brand_mismatch: Invitation is for a different brand
+      invalid_or_expired: Invalid or expired invitation link
+      no_account: No account found. Please register first
+    monobank:
+      ticket_for: Ticket for %{title}
+    ticket_pdf:
+      attendee: Attendee
+      date_time: Date & Time
+      location: Location
+      non_transferable: This ticket is non-transferable. Present this QR code at the
+        entrance
+      scan_to_verify: Scan to verify your ticket
+      ticket_id: Ticket ID
+      title: TICKET
+    ticket_qr_code:
+      upload_failed: Failed to upload QR code to S3
