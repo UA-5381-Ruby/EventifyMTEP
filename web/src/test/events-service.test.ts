@@ -34,6 +34,8 @@ const mockEventDetail: EventDetail = {
   end_date: '2026-09-03T18:00:00.000Z',
   brand: { id: 42, name: 'Acme Corp' },
   categories: [{ id: 5, name: 'Technology' }],
+  price_cents: 150000,
+  available_tickets_count: 100,
 };
 
 const mockPaginatedResponse: PaginatedResponse<Event> = {
@@ -83,7 +85,11 @@ describe('EventsService', () => {
 
       await EventsService.createEvent(payload);
 
-      expect(mockedPost).toHaveBeenCalledWith('/api/v1/events', { event: payload });
+      expect(mockedPost).toHaveBeenCalledWith(
+        '/api/v1/events',
+        expect.any(FormData),
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
     });
   });
   describe('Discovery Methods', () => {
@@ -119,7 +125,11 @@ describe('EventsService', () => {
 
       await EventsService.createEvent(payload);
 
-      expect(mockedPost).toHaveBeenCalledWith('/api/v1/events', { event: payload });
+      expect(mockedPost).toHaveBeenCalledWith(
+        '/api/v1/events',
+        expect.any(FormData),
+        { headers: { 'Content-Type': 'multipart/form-data' } }
+      );
     });
   });
 });

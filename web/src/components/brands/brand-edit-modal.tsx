@@ -65,7 +65,7 @@ export function BrandEditModal({ isOpen, fields, onClose, onSave, onChange }: Br
         </>
       }
     >
-      <div className="space-y-4 py-2">
+      <div className="space-y-4 py-2 max-h-[65vh] overflow-y-auto pr-2">
         <Input
           label="Brand name"
           value={fields.name}
