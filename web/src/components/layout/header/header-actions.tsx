@@ -1,5 +1,6 @@
-import { Search, User } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState, useRef, useEffect } from 'react';
+import { Search, User, LayoutDashboard, Settings, LogOut } from 'lucide-react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui';
 
 interface HeaderActionsProps {
@@ -15,31 +16,88 @@ export function HeaderActions({
   onProfile,
   onLogout,
 }: HeaderActionsProps) {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const isInsideBrandDashboard = location.pathname.startsWith('/dashboard');
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleDashboardChange = (path: string) => {
+    setIsMenuOpen(false);
+    navigate(path);
+  };
+
   return (
     <div className="flex items-center gap-4">
+      {/* Пошук */}
       <div className="flex items-center border border-neutral-300 px-3 py-1 rounded-md">
         <input type="text" placeholder="Search" className="outline-none text-sm" />
         <Search size={16} className="text-neutral-500" />
       </div>
 
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-6 relative" ref={menuRef}>
         {isAuthenticated ? (
           <>
             <span
-              onClick={onProfile}
-              className="flex items-center gap-3 text-sm font-medium text-neutral-700 cursor-pointer"
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="flex items-center gap-3 text-sm font-medium text-neutral-700 cursor-pointer select-none"
             >
               {userName}
-              <button
-                onClick={onProfile}
-                className="w-8 h-8 rounded-full bg-neutral-300 flex items-center justify-center cursor-pointer"
-              >
+              <button className="w-8 h-8 rounded-full bg-neutral-300 flex items-center justify-center cursor-pointer hover:bg-neutral-400 transition-colors">
                 <User size={16} />
               </button>
             </span>
-            <Button variant="primary" onClick={onLogout}>
-              Log out
-            </Button>
+
+            {isMenuOpen && (
+              <div className="absolute right-0 top-10 w-56 bg-white border border-neutral-200 shadow-lg py-1 z-50 animate-in fade-in zoom-in-95 duration-100 rounded-md">
+                <button
+                  onClick={() => handleDashboardChange('/dashboard/overview')}
+                  className={`w-full flex items-center gap-2 px-4 py-2 text-sm text-left cursor-pointer transition-colors ${
+                    isInsideBrandDashboard
+                      ? 'bg-neutral-100 text-black font-semibold'
+                      : 'text-neutral-700 hover:bg-neutral-50'
+                  }`}
+                >
+                  <LayoutDashboard size={14} className="text-neutral-500" />
+                  Brand Dashboard
+                </button>
+
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    onProfile();
+                  }}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-neutral-700 hover:bg-neutral-50 text-left cursor-pointer"
+                >
+                  <Settings size={14} className="text-neutral-500" />
+                  Profile Settings
+                </button>
+
+                <div className="border-t border-neutral-100 my-1" />
+
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    onLogout();
+                  }}
+                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 text-left cursor-pointer font-medium"
+                >
+                  <LogOut size={14} />
+                  Log out
+                </button>
+              </div>
+            )}
           </>
         ) : (
           <>
