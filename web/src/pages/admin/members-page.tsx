@@ -13,23 +13,18 @@ export const MembersPage = () => {
   const { brand } = useOutletContext<{ brand: Brand }>();
   const { user } = useAuth();
 
-  // Стани для списку користувачів
   const [brandMembers, setBrandMembers] = useState<Membership[]>([]);
   const [isMembersLoading, setIsMembersLoading] = useState(true);
   const [membersError, setMembersError] = useState<string | null>(null);
 
-  // Стани для модалок
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<{ id: number; email: string } | null>(null);
   const [isRemoving, setIsRemoving] = useState(false);
 
-  // Перевірка прав доступу
   const { isCurrentBrandManager } = useBrandMembership(String(brand.id));
 
-  // Визначаємо, чи є поточний користувач власником (owner)
   const isOwner = brandMembers.some((m) => m.user?.id === user?.id && m.role === 'owner');
 
-  // Може керувати (додавати/видаляти), якщо менеджер або власник
   const canManage = isCurrentBrandManager || isOwner;
 
   const loadMembers = useCallback(async () => {
@@ -88,7 +83,6 @@ export const MembersPage = () => {
       <div className="flex justify-between items-end">
         <h1 className="text-3xl font-bold tracking-tight text-black ml-1">Team Members</h1>
 
-        {/* Кнопка додавання (показуємо власнику або менеджеру) */}
         {canManage && (
           <Button
             onClick={() => setIsInviteModalOpen(true)}
