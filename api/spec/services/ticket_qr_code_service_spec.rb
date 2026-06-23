@@ -26,7 +26,7 @@ RSpec.describe TicketQrCodeService do
 
       expect do
         service.generate_image_key!('550e8400-e29b-41d4-a716-446655440000')
-      end.to raise_error(TicketQrCodeService::UploadError, 'Failed to upload QR code to S3')
+      end.to raise_error(TicketQrCodeService::UploadError, I18n.t('services.ticket_qr_code.upload_failed'))
     end
   end
 end

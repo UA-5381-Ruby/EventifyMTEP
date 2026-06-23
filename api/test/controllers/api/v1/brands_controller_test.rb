@@ -85,7 +85,7 @@ module Api
       def set_brand
         @brand = accessible_brands.find(params[:id])
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Brand not found' }, status: :not_found
+        render json: { error: I18n.t('api.v1.errors.brands.not_found_or_access_denied') }, status: :not_found
       end
 
       def accessible_brands
