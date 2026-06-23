@@ -42,8 +42,13 @@ module Api
       end
 
       def invitation_validation_error(email, role)
-        return t('api.v1.errors.brands.invitations.invalid_role') unless ALLOWED_ROLES.include?(role)
-        return t('api.v1.errors.brands.invitations.invalid_email') unless email.match?(/\A[^@\s]+@[^@\s]+\.[^@\s]+\z/)
+        unless ALLOWED_ROLES.include?(role)
+          return render json: { error: t('api.v1.errors.invitations.invalid_role') }, status: :unprocessable_content
+        end
+
+        unless email.match?(/\A[^@\s]+@[^@\s]+\.[^@\s]+\z/)
+          return render json: { error: t('api.v1.errors.invitations.invalid_email') }, status: :unprocessable_content
+        end
 
         nil
       end
