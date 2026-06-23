@@ -18,9 +18,6 @@ RSpec.describe 'Api::V1::Brands', type: :request do
 
   let(:headers) { auth_headers(user) }
 
-  # ==========================================
-  # GET /api/v1/brands
-  # ==========================================
   describe 'GET /api/v1/brands' do
     it 'returns brands list' do
       get '/api/v1/brands', headers: headers
@@ -32,9 +29,6 @@ RSpec.describe 'Api::V1::Brands', type: :request do
     end
   end
 
-  # ==========================================
-  # GET /api/v1/brands/:id
-  # ==========================================
   describe 'GET /api/v1/brands/:id' do
     it 'returns brand' do
       get "/api/v1/brands/#{brand.id}", headers: headers
@@ -52,9 +46,6 @@ RSpec.describe 'Api::V1::Brands', type: :request do
     end
   end
 
-  # ==========================================
-  # POST /api/v1/brands
-  # ==========================================
   describe 'POST /api/v1/brands' do
     let(:valid_params) do
       {
@@ -78,7 +69,6 @@ RSpec.describe 'Api::V1::Brands', type: :request do
     end
 
     it 'returns 400 Bad Request when required parameters are missing (rescues ParameterMissing)' do
-      # Відправляємо пусті параметри, щоб спровокувати ActionController::ParameterMissing
       post '/api/v1/brands',
            params: {},
            headers: headers,
@@ -92,9 +82,6 @@ RSpec.describe 'Api::V1::Brands', type: :request do
     end
   end
 
-  # ==========================================
-  # PATCH /api/v1/brands/:id
-  # ==========================================
   describe 'PATCH /api/v1/brands/:id' do
     it 'updates brand' do
       patch "/api/v1/brands/#{brand.id}", params: {
@@ -106,7 +93,6 @@ RSpec.describe 'Api::V1::Brands', type: :request do
     end
 
     it 'returns 422 unprocessable_content when validation fails' do
-      # Навмисно відправляємо невалідні дані (наприклад, пусте ім'я)
       patch "/api/v1/brands/#{brand.id}", params: {
         brand: { name: '' }
       }, headers: headers, as: :json
@@ -124,14 +110,10 @@ RSpec.describe 'Api::V1::Brands', type: :request do
       }, headers: headers, as: :json
 
       expect(response).to have_http_status(:unprocessable_content)
-      json = JSON.parse(response.body)
-      expect(json['errors']).to include('Subdomain has already been taken')
+      expect(JSON.parse(response.body)).to eq({ 'errors' => [I18n.t('api.v1.errors.brands.subdomain_taken')] })
     end
   end
 
-  # ==========================================
-  # DELETE /api/v1/brands/:id
-  # ==========================================
   describe 'DELETE /api/v1/brands/:id' do
     it 'deletes brand' do
       delete "/api/v1/brands/#{brand.id}", headers: headers
@@ -140,9 +122,6 @@ RSpec.describe 'Api::V1::Brands', type: :request do
     end
   end
 
-  # ==========================================
-  # AUTHENTICATION CORNER CASES (current_user token parsing)
-  # ==========================================
   context 'when Authorization header is missing' do
     it 'returns 401 for a protected endpoint' do
       delete "/api/v1/brands/#{brand.id}"
