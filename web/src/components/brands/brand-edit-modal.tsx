@@ -94,8 +94,10 @@ export function BrandEditModal({ isOpen, fields, onClose, onSave, onChange }: Br
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={cn(
-              "mt-1 flex flex-col items-center justify-center rounded-md border-2 border-dashed px-6 py-6 transition-colors duration-200",
-              isDragging ? "border-primary-500 bg-primary-50" : "border-neutral-300 hover:border-neutral-400 bg-white"
+              'mt-1 flex flex-col items-center justify-center rounded-md border-2 border-dashed px-6 py-6 transition-colors duration-200',
+              isDragging
+                ? 'border-primary-500 bg-primary-50'
+                : 'border-neutral-300 hover:border-neutral-400 bg-white'
             )}
           >
             <input

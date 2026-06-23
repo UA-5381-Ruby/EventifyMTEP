@@ -65,8 +65,6 @@ export interface CreateEventRequest {
   banner?: File | null;
 }
 
-export interface UpdateEventRequest extends Partial<CreateEventRequest> { }
-
 export interface PaginationMeta {
   page: number;
   per_page: number;

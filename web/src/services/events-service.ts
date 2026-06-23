@@ -17,11 +17,9 @@ function buildEventFormData(payload: Partial<CreateEventRequest>): FormData {
       value.forEach((id) => {
         formData.append('event[category_ids][]', id.toString());
       });
-    }
-    else if (key === 'banner' && value instanceof File) {
+    } else if (key === 'banner' && value instanceof File) {
       formData.append('event[banner]', value);
-    }
-    else {
+    } else {
       formData.append(`event[${key}]`, value.toString());
     }
   });

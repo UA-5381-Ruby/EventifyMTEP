@@ -74,7 +74,13 @@ export function CreateEventModal({
           <Button variant="outline" size="sm" onClick={onClose} className="font-normal">
             Cancel
           </Button>
-          <Button size="sm" onClick={onSave} disabled={isSaving} className="font-medium" isLoading={isSaving}>
+          <Button
+            size="sm"
+            onClick={onSave}
+            disabled={isSaving}
+            className="font-medium"
+            isLoading={isSaving}
+          >
             {isSaving ? 'Creating…' : 'Create event'}
           </Button>
         </>
@@ -152,16 +158,16 @@ export function CreateEventModal({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-neutral-700 mb-1">
-            Event Banner
-          </label>
+          <label className="block text-sm font-medium text-neutral-700 mb-1">Event Banner</label>
           <div
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             className={cn(
-              "mt-1 flex flex-col items-center justify-center rounded-md border-2 border-dashed px-6 py-6 transition-colors duration-200",
-              isDragging ? "border-primary-500 bg-primary-50" : "border-neutral-300 hover:border-neutral-400 bg-white"
+              'mt-1 flex flex-col items-center justify-center rounded-md border-2 border-dashed px-6 py-6 transition-colors duration-200',
+              isDragging
+                ? 'border-primary-500 bg-primary-50'
+                : 'border-neutral-300 hover:border-neutral-400 bg-white'
             )}
           >
             <input
