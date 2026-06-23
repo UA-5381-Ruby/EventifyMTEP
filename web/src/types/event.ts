@@ -62,7 +62,10 @@ export interface CreateEventRequest {
   price_cents?: number;
   available_tickets_count?: number;
   category_ids?: number[];
+  banner?: File | null;
 }
+
+export interface UpdateEventRequest extends Partial<CreateEventRequest> { }
 
 export interface PaginationMeta {
   page: number;
