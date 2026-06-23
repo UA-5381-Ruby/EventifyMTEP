@@ -7,6 +7,7 @@ import { VerifyEmailPage } from '@/pages/verify-email-page.tsx';
 import { ForgotPasswordPage } from '@/pages/forgot-password-page.tsx';
 import { ResetPasswordPage } from '@/pages/reset-password-page.tsx';
 import { EventListPage } from '@/pages/event-list-page.tsx';
+import ActivityLogPage from '@/pages/activity-log-page.tsx';
 import { EventDetailPage } from '@/pages/event-detail-page';
 import { NotFoundPage } from '@/pages/not-found-page.tsx';
 import UserProfilePage from '@/pages/user-profile-page';
@@ -41,6 +42,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<SuperAdminRoute />}>
             <Route path="/superadmin" element={<SuperAdminPage />} />
+            <Route path="/logs" element={<ActivityLogPage />} />
           </Route>
 
           <Route path="/brands" element={<BrandDiscoverPage />} />

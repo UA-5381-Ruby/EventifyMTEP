@@ -1,0 +1,498 @@
+[33mcommit c3f7e3ac6c8863620d6873d91e67da2662d64113[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mactive-log-page[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m, [m[1;32mfeat-superadmin[m[33m, [m[1;32mcopilot/worktree-2026-06-14T20-00-22[m[33m)[m
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Thu Jun 11 13:10:23 2026 +0000
+
+    update seeds User admin
+
+[33mcommit ad70f1adf37d2c84231dc1daa87e74f518467971[m
+Merge: 4b05f1e 24e0b15
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Thu Jun 11 15:51:18 2026 +0300
+
+    Merge pull request #118 from UA-5381-Ruby/108-integrating-amazon-s3
+    
+    fix: resolve params access and add file validation for uploads
+
+[33mcommit 24e0b15e4f42d2633f5fedd4cc19e65637d1e407[m[33m ([m[1;31morigin/108-integrating-amazon-s3[m[33m)[m
+Author: Qeade <ralforov@gmail.com>
+Date:   Thu Jun 11 12:21:45 2026 +0000
+
+    Fix
+
+[33mcommit f08cef15c9a63815a4761ce1dc043da24ec83b2c[m
+Author: Qeade <ralforov@gmail.com>
+Date:   Thu Jun 11 12:10:01 2026 +0000
+
+    fix: resolve params access and add file validation for uploads
+
+[33mcommit 4b05f1e3fd595095a3a64000ff5b1e7a051661b1[m
+Merge: 00e5389 d38b543
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue Jun 9 17:02:18 2026 +0300
+
+    Merge pull request #116 from UA-5381-Ruby/108-integrating-amazon-s3
+    
+    Integrating amazon S3
+
+[33mcommit 00e53891ae47bbe3f5d59f8d42c3e71932b4d26c[m
+Merge: abaab08 784bbcc
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue Jun 9 16:22:27 2026 +0300
+
+    Merge pull request #112 from UA-5381-Ruby/feature/email-verification-and-password-reset-ui
+    
+    Implement Email Verification and Password Reset UI
+
+[33mcommit d38b543ec66b425ad309baabcce481d027e19edc[m
+Author: Qeade <ralforov@gmail.com>
+Date:   Tue Jun 9 13:21:18 2026 +0000
+
+    Fix Gemfile.lock
+
+[33mcommit abaab0888f3b249696dbc15550ee1ad1d190ce46[m
+Merge: 5a46df5 e2d64b4
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue Jun 9 16:17:42 2026 +0300
+
+    Merge pull request #114 from UA-5381-Ruby/superadmin-dashboard
+    
+    new protected routes
+
+[33mcommit fb3ae9041f507163c65b82492588d4d596630d4a[m
+Author: Qeade <ralforov@gmail.com>
+Date:   Tue Jun 9 13:17:19 2026 +0000
+
+    Fix for tests
+
+[33mcommit 3769e918315d9990221ed016187c6d66d6737485[m
+Author: Qeade <ralforov@gmail.com>
+Date:   Tue Jun 9 12:59:54 2026 +0000
+
+    Implement S3 service for brands and events images
+
+[33mcommit 283bddcbe9b1b773dfaa3f2581b2cdba83a012ea[m
+Author: Qeade <ralforov@gmail.com>
+Date:   Tue Jun 9 12:59:17 2026 +0000
+
+    Change columns for brand and event tables
+
+[33mcommit 966fd6784bd974873240c3e9d65da43d037f65c6[m
+Author: Qeade <ralforov@gmail.com>
+Date:   Tue Jun 9 12:56:37 2026 +0000
+
+    Add gems for S3 implementation
+
+[33mcommit e2d64b49cecee9f88c8c5543d8874084d298165b[m[33m ([m[1;31morigin/superadmin-dashboard[m[33m)[m
+Author: Marharyta Zadoia <zadoia.marharyta@chnu.edu.ua>
+Date:   Tue Jun 9 14:55:58 2026 +0300
+
+    Delete web/src/pages/activity-log-page.tsx
+
+[33mcommit de61cbd5269c32a2f76741ef65a317613883782b[m
+Author: Marharyta Zadoia <zadoia.marharyta@chnu.edu.ua>
+Date:   Tue Jun 9 14:53:40 2026 +0300
+
+    Delete web/src/pages/action-logs-page.tsx
+
+[33mcommit e49639095fb2511d5192df0eed9e1fae4c1d5fc2[m
+Author: Marharyta Zadoia <zadoia.marharyta@chnu.edu.ua>
+Date:   Tue Jun 9 14:49:41 2026 +0300
+
+    Change brandId type from string to int
+
+[33mcommit ea21b665cafec18a17968d025d8ad715ea735abe[m[33m ([m[1;32mcopilot/worktree-2026-06-11T11-40-25[m[33m)[m
+Author: zadoiamarharyta-bit <zadoia.marharyta@chnu.edu.ua>
+Date:   Mon Jun 8 12:55:37 2026 +0300
+
+    new protected routes
+
+[33mcommit 784bbcc0712354754da6d2160f7320a09674bca5[m[33m ([m[1;31morigin/feature/email-verification-and-password-reset-ui[m[33m)[m
+Merge: 79e28ec 375c005
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Mon Jun 8 09:05:28 2026 +0000
+
+    Merge remote-tracking branch 'origin/feature/email-verification-and-password-reset-ui' into feature/email-verification-and-password-reset-ui
+
+[33mcommit 79e28ec90b19c169924dc437f225ad612b223129[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Mon Jun 8 09:04:47 2026 +0000
+
+    refactor: /registration to /register
+
+[33mcommit 375c005f5d65abcb80293320d8578b4f2f7e0263[m
+Author: Tania Macheieva <120329506+tania-macheieva@users.noreply.github.com>
+Date:   Mon Jun 8 11:58:40 2026 +0300
+
+    Potential fix for pull request finding
+    
+    Co-authored-by: Copilot Autofix powered by AI <175728472+Copilot@users.noreply.github.com>
+
+[33mcommit 3a2e02227f5042e85443ad57528358f81b70b165[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Mon Jun 8 08:54:36 2026 +0000
+
+    refactor: UTF-8 BOM - re-save
+
+[33mcommit d2c965881d54fca6a51b22e3f4b7f18bc5b8dd83[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Mon Jun 8 08:48:12 2026 +0000
+
+    feat: add password confirmation for registration
+
+[33mcommit 0ed3b4407175a2cba395035849eb2f1d2b75265f[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Mon Jun 8 08:22:45 2026 +0000
+
+    refactor: coverage tests
+
+[33mcommit a0683ef7efd15712f3c33672915a925537d390ee[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Sat Jun 6 08:28:32 2026 +0000
+
+    fix: fix tests
+
+[33mcommit f06b952f4a195cebcd882c81de187070049687c3[m
+Merge: 403c867 5a46df5
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Fri Jun 5 13:05:57 2026 +0000
+
+    Merge branch 'main' of github.com:UA-5381-Ruby/EventifyMTEP into feature/email-verification-and-password-reset-ui
+
+[33mcommit 5a46df51ce1a22767e9b69e441dada6b4950ec67[m
+Merge: cbf4359 7ac5c6e
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Fri Jun 5 15:42:54 2026 +0300
+
+    Merge pull request #111 from UA-5381-Ruby/feature/email-verification-and-password-reset
+    
+    Implement Email Verification and Password Reset
+
+[33mcommit 7ac5c6e1d9998fd475efe6b44eea78c3d6bd9229[m
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Fri Jun 5 15:40:02 2026 +0300
+
+    Apply suggestions from code review
+    
+    Co-authored-by: Copilot Autofix powered by AI <175728472+Copilot@users.noreply.github.com>
+
+[33mcommit cbf4359390368b192d100f1494b99780398f4025[m
+Merge: f17fb92 fe4b1bd
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Fri Jun 5 15:27:48 2026 +0300
+
+    Merge pull request #109 from UA-5381-Ruby/chore/event-detail-page
+    
+    Move location coordinates fetching to MapService and add tests
+
+[33mcommit 1c242dc18571c09eebc856ed0a0df552da1014ab[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Fri Jun 5 12:18:34 2026 +0000
+
+    feat: implement email verification and password reset
+
+[33mcommit 403c8674d3a62b37e9430bea3946a985d492ce00[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Fri Jun 5 12:17:23 2026 +0000
+
+    feat: implement email verification and password reset UI
+
+[33mcommit fe4b1bd1bb5c50af7d25870e2206f0e31f93de59[m
+Author: nox <cheporte.dev@gmail.com>
+Date:   Thu Jun 4 15:43:20 2026 +0300
+
+    fix URL import in map service tests
+
+[33mcommit 11e41bf215778ee7769415d14c0e5b88794edf3b[m
+Author: nox <cheporte.dev@gmail.com>
+Date:   Thu Jun 4 15:19:42 2026 +0300
+
+    Move map API base URL to env; move Coordinates to types/
+
+[33mcommit 3911ca2409366b23379e2000e90485ce121d6e0e[m
+Author: nox <cheporte.dev@gmail.com>
+Date:   Wed Jun 3 14:40:12 2026 +0300
+
+    Add more tests and remove duplicate line
+
+[33mcommit 0138f10edd821c6ad66066a815aef17be88156a6[m
+Author: nox <cheporte.dev@gmail.com>
+Date:   Wed Jun 3 14:33:08 2026 +0300
+
+    Apply suggestions from code review
+    
+    Co-authored-by: coderabbitai[bot] <136622811+coderabbitai[bot]@users.noreply.github.com>
+
+[33mcommit 1212bc102301c569277c691030d1ee59e514ea56[m
+Author: nox <cheporte.dev@gmail.com>
+Date:   Wed Jun 3 13:17:55 2026 +0300
+
+    Move location coordinates fetch to a separate MapService and add Jest tests for it
+
+[33mcommit f17fb921347a4cdf1ddada3e71ca299f61d95fd8[m
+Merge: 5d3713c 172ee22
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue Jun 2 16:54:18 2026 +0300
+
+    Merge pull request #104 from UA-5381-Ruby/chore/event-detail-page
+    
+    Refine styles for EventDetailPage
+
+[33mcommit 5d3713c893ab44a3d660c5c1c4a583a09ecd2d08[m
+Merge: 4dd0944 2d856c2
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue Jun 2 16:53:14 2026 +0300
+
+    Merge pull request #103 from UA-5381-Ruby/superadmin-dashboard
+    
+    feat: SuperAdmin DashBoard
+
+[33mcommit 2d856c2e67340bb0137c183a13a7885441431734[m
+Merge: 6ef3c75 4dd0944
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue Jun 2 16:51:22 2026 +0300
+
+    Merge branch 'main' into superadmin-dashboard
+
+[33mcommit 4dd09445d27044fb88a2f56f29ff5e2a1f9133de[m
+Merge: 98625bc a5cb7ab
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue Jun 2 16:48:54 2026 +0300
+
+    Merge pull request #105 from UA-5381-Ruby/feature/api-brands-events-pagination
+    
+    Core refactor, pagination concern, and brand discovery filtering
+
+[33mcommit 6ef3c75666605532d0a9b053b26dc5e358eadb0d[m
+Author: zadoiamarharyta-bit <zadoia.marharyta@chnu.edu.ua>
+Date:   Tue Jun 2 16:46:35 2026 +0300
+
+    superadmin
+
+[33mcommit a5cb7abf9e7daa1ac748e08fc34b22c794928c97[m
+Merge: 3527616 db0affb
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue Jun 2 16:41:07 2026 +0300
+
+    Merge pull request #106 from UA-5381-Ruby/feature/web-brand-discovery-views
+    
+    Web Brand Discovery
+
+[33mcommit 172ee22fba81e9967f15d56d82b99c625008796b[m
+Author: nox <cheporte.dev@gmail.com>
+Date:   Tue Jun 2 13:38:52 2026 +0000
+
+    update aliases
+
+[33mcommit 9c0aae7fd79a161d19dfe216b4fb75942fb1edc9[m
+Author: Marharyta Zadoia <zadoia.marharyta@chnu.edu.ua>
+Date:   Tue Jun 2 16:30:32 2026 +0300
+
+    Refactor sidebar action component styles
+
+[33mcommit 3527616ad158daffe015f7434b0a1c6196a2a096[m
+Merge: 02950be 8140007
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue Jun 2 16:28:40 2026 +0300
+
+    Merge pull request #107 from UA-5381-Ruby/feature/web-ui-kit-events-pagination
+    
+    Web UI Kit & Events
+
+[33mcommit db0affb3b8eaf5f33472d0b1dde1d863135d7b5b[m
+Merge: 0080e5c 06e01e2
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Tue Jun 2 10:09:47 2026 +0000
+
+    Merge remote-tracking branch 'origin/feature/web-brand-discovery-views' into feature/web-brand-discovery-views
+
+[33mcommit 0080e5c7b7a6b68412f4db7dd56ee6d09bed7a4a[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Tue Jun 2 10:09:01 2026 +0000
+
+    fixes
+
+[33mcommit 02950be4ef53208a1b70e9999d56d42761026500[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Tue Jun 2 09:26:36 2026 +0000
+
+    refactor: jwt version
+
+[33mcommit 6cf6357428a054667a3f6ea0016acd1d8a48146c[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Tue Jun 2 09:23:36 2026 +0000
+
+    fixes
+
+[33mcommit 6c21c63e85e961f3b8c1e6125b99d71935035146[m
+Author: zadoiamarharyta-bit <zadoia.marharyta@chnu.edu.ua>
+Date:   Tue Jun 2 12:14:28 2026 +0300
+
+    pretty
+
+[33mcommit 85a716aa1b758e71020d00279b2049efd201e2cd[m
+Author: zadoiamarharyta-bit <zadoia.marharyta@chnu.edu.ua>
+Date:   Tue Jun 2 11:11:39 2026 +0300
+
+    Adding sidebar to pagewrapper
+
+[33mcommit 06e01e2bcc530c787edba9081b601bf9e83437aa[m
+Merge: 627104d 8140007
+Author: Tania Macheieva <120329506+tania-macheieva@users.noreply.github.com>
+Date:   Mon Jun 1 17:20:05 2026 +0300
+
+    Merge branch 'feature/web-ui-kit-events-pagination' into feature/web-brand-discovery-views
+
+[33mcommit 81400071db976d78f214a8584a0c32546b17acea[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Mon Jun 1 14:12:19 2026 +0000
+
+    feat: add tab & back UI components and update event list pagination
+
+[33mcommit 627104d6f9c5b022b5cfb738eab19f454b10cf97[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Mon Jun 1 14:07:19 2026 +0000
+
+    feat: separate brand discovery and my brands views
+
+[33mcommit 87096f66fc1361ca75cdc39523011d0d567a48d8[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Mon Jun 1 13:47:10 2026 +0000
+
+    fix: update jwt version
+
+[33mcommit e057293f792ba817d9e793a7537082a8b515c08f[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Mon Jun 1 13:40:11 2026 +0000
+
+    feat(api): implement pagination concern and brand discovery filtering, clear logs
+
+[33mcommit c80890672ab36e1577d252c5fc292328a069bc7a[m
+Author: zadoiamarharyta-bit <zadoia.marharyta@chnu.edu.ua>
+Date:   Sun May 31 21:22:40 2026 +0300
+
+    view
+
+[33mcommit c95e28670a56208cfa03bfb5e87b77a16ee3883d[m
+Author: nox <cheporte.dev@gmail.com>
+Date:   Sun May 31 15:49:29 2026 +0300
+
+    feat: add OpenStreetMap API via Leaflet
+
+[33mcommit 0c96079f5efc35499a28e6603b8ef3947aa5d5c5[m
+Author: nox <cheporte.dev@gmail.com>
+Date:   Sun May 31 15:37:37 2026 +0300
+
+    chore: tweak EventDetailPage styles
+
+[33mcommit 08944223a352f605d57cde2b81b6529270d70b73[m
+Author: zadoiamarharyta-bit <zadoia.marharyta@chnu.edu.ua>
+Date:   Thu May 28 14:57:27 2026 +0300
+
+    pretty
+
+[33mcommit 41bf7c5cf8e195146b2d7524af7c5fec3e1590f8[m
+Author: zadoiamarharyta-bit <zadoia.marharyta@chnu.edu.ua>
+Date:   Thu May 28 14:38:11 2026 +0300
+
+    less files
+
+[33mcommit 98625bcd2b0a177185fb49c954c20f8bb024c191[m
+Merge: 9b7debf 3aeb5cf
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue May 26 16:57:00 2026 +0300
+
+    Merge pull request #101 from UA-5381-Ruby/72-user-profile-page
+    
+    Implement user profile page
+
+[33mcommit 3aeb5cfc9af933bf4954765cca4722bb06052273[m
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue May 26 13:55:15 2026 +0000
+
+    fix
+
+[33mcommit 5e8d88b7b60f0304081a8d8132ace48f803999be[m
+Merge: 229f8f7 9b7debf
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue May 26 13:36:49 2026 +0000
+
+    Merge branch 'main' into 72-user-profile-page
+
+[33mcommit 229f8f7b31db49ad51c3413ccd60eafef64b7f46[m
+Author: Qeade <ralforov@gmail.com>
+Date:   Tue May 26 13:34:53 2026 +0000
+
+    Fix
+
+[33mcommit 9b7debf67f30c8a8a67f7f2834b480ed7f9f9e85[m
+Merge: e22080c 2ec8f3a
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue May 26 16:25:57 2026 +0300
+
+    Merge pull request #102 from UA-5381-Ruby/refactor/fix-cleanup-testing
+    
+    Refactor Pages, Modals, Hooks, and Constants
+
+[33mcommit 2ec8f3a60552a7d041a4efa3975e6e8badd92ccd[m
+Author: Liubomyr Halamaha <galamagal86@gmail.com>
+Date:   Tue May 26 16:24:50 2026 +0300
+
+    Apply suggestions from code review
+    
+    Co-authored-by: Copilot Autofix powered by AI <175728472+Copilot@users.noreply.github.com>
+
+[33mcommit 9220d0bc6620cc21abc6f58c59ad4ef37ebea36a[m
+Author: Qeade <ralforov@gmail.com>
+Date:   Tue May 26 12:32:21 2026 +0000
+
+    Fix codeRabbit suggestions
+
+[33mcommit 0fac54b6f87d9d2c5c2ee2f3c6076cef98461704[m
+Author: Tania Macheieva <120329506+tania-macheieva@users.noreply.github.com>
+Date:   Tue May 26 14:37:10 2026 +0300
+
+    Enhance category creation error handling
+
+[33mcommit ab2c582d1f9561bbd6d803dfd1ee61973dacbb60[m
+Author: Tania Macheieva <120329506+tania-macheieva@users.noreply.github.com>
+Date:   Tue May 26 14:24:28 2026 +0300
+
+    Add id to label for hex input in ColorField
+
+[33mcommit 58679ac580696c7eeb928619fbe7e9484a6adcbd[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Tue May 26 11:10:13 2026 +0000
+
+    refactor: clean-up and split brand pages
+
+[33mcommit 0151c50d79edd35033fb67ad3587104faec72f6a[m
+Author: Qeade <ralforov@gmail.com>
+Date:   Tue May 26 10:48:11 2026 +0000
+
+    fix lint error
+
+[33mcommit f8e3efa6b350cf4fb0bac8e12699123ad1331a16[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Tue May 26 10:39:59 2026 +0000
+
+    refactor: clean-up and split modals
+
+[33mcommit e0506497ba08e436373389742d5df43c07d1a375[m
+Author: tania-macheieva <macheieva.tetiana@gmail.com>
+Date:   Tue May 26 10:18:33 2026 +0000
+
+    refactore: clean-up hooks and constants
+
+[33mcommit f7ef4b41b3c1bdeda4221c8152c7d6c13853af54[m
+Author: Qeade <ralforov@gmail.com>
+Date:   Mon May 25 13:12:34 2026 +0000
+
+    Add tests for user-profile-page
+
+[33mcommit c7fa7219c94379ecc423966ed09fbc5ffb6543e9[m
+Author: Qeade <ralforov@gmail.com>
+Date:   Mon May 25 12:50:46 2026 +0000
+
+    Add PageWrapper
+
+[33mcommit c71ba1245654531
