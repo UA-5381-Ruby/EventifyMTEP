@@ -178,6 +178,8 @@ npm run build
 ## Coverege 
 ```
 npx jest --coverage
+npx prettier --write .
+
 ```
 ## Swagger and local verification
 

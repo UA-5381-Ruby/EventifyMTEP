@@ -61,7 +61,9 @@ export function SuperAdminPage() {
 
         const [usersRes, brandsRes, eventsRes] = await Promise.all([
           apiClient.get('/api/v1/users').catch(() => ({ data: { data: [], meta: {} } })),
-          apiClient.get('/api/v1/brands', { params: { scope: 'discover', per_page: 100 } }).catch(() => ({ data: { data: [], meta: {} } })),
+          apiClient
+            .get('/api/v1/brands', { params: { scope: 'discover', per_page: 100 } })
+            .catch(() => ({ data: { data: [], meta: {} } })),
           apiClient.get('/api/v1/events').catch(() => ({ data: { data: [], meta: {} } })),
         ]);
 
@@ -73,8 +75,8 @@ export function SuperAdminPage() {
         } else if (Array.isArray(usersRes.data)) {
           fetchedUsers = usersRes.data;
         }
-        const totalUsersCount = usersRes.data?.meta?.total || usersRes.data?.meta?.total_count || fetchedUsers.length;
-
+        const totalUsersCount =
+          usersRes.data?.meta?.total || usersRes.data?.meta?.total_count || fetchedUsers.length;
 
         let fetchedBrands: any[] = [];
         if (brandsRes.data && 'data' in brandsRes.data && Array.isArray(brandsRes.data.data)) {
@@ -82,7 +84,8 @@ export function SuperAdminPage() {
         } else if (Array.isArray(brandsRes.data)) {
           fetchedBrands = brandsRes.data;
         }
-        const totalBrandsCount = brandsRes.data?.meta?.total || brandsRes.data?.meta?.total_count || fetchedBrands.length;
+        const totalBrandsCount =
+          brandsRes.data?.meta?.total || brandsRes.data?.meta?.total_count || fetchedBrands.length;
 
         let fetchedEvents: PendingEvent[] = [];
         if (eventsRes.data && 'data' in eventsRes.data && Array.isArray(eventsRes.data.data)) {
@@ -92,12 +95,13 @@ export function SuperAdminPage() {
             startDate: event.start_date || event.date || new Date().toISOString(),
             status: event.status || 'draft',
             createdBy: event.created_by || event.actor?.name || 'Unknown',
-            location: event.location || 'N/A'
+            location: event.location || 'N/A',
           }));
         } else if (Array.isArray(eventsRes.data)) {
           fetchedEvents = eventsRes.data;
         }
-        const totalEventsCount = eventsRes.data?.meta?.total || eventsRes.data?.meta?.total_count || fetchedEvents.length;
+        const totalEventsCount =
+          eventsRes.data?.meta?.total || eventsRes.data?.meta?.total_count || fetchedEvents.length;
 
         const pending = fetchedEvents.filter((event) => event.status?.toLowerCase() === 'pending');
         setPendingEvents(pending);
@@ -108,15 +112,17 @@ export function SuperAdminPage() {
           totalBrands: totalBrandsCount,
           totalEvents: totalEventsCount,
 
-
-          pendingApproval: eventsRes.data?.meta?.total_pending || eventsRes.data?.meta?.pending_count || pending.length,
-          rejectedEvents: eventsRes.data?.meta?.total_rejected || eventsRes.data?.meta?.rejected_count || fetchedEvents.filter(
-            (event) => event.status?.toLowerCase() === 'rejected'
-          ).length,
+          pendingApproval:
+            eventsRes.data?.meta?.total_pending ||
+            eventsRes.data?.meta?.pending_count ||
+            pending.length,
+          rejectedEvents:
+            eventsRes.data?.meta?.total_rejected ||
+            eventsRes.data?.meta?.rejected_count ||
+            fetchedEvents.filter((event) => event.status?.toLowerCase() === 'rejected').length,
 
           reportedUsers: 0,
         });
-
       } catch (error) {
         console.error('Dashboard loading failed:', error);
       } finally {
