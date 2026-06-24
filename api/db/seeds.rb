@@ -1,98 +1,199 @@
 # frozen_string_literal: true
 
-# Populate categories
-categories = %w[Concert Workshop Conference Networking Education]
-categories.each do |category_name|
-  Category.find_or_create_by!(name: category_name)
+# rubocop:disable Metrics/AbcSize, Metrics/MethodLength
+require 'faker'
+
+RNG = Random.new(42)
+Faker::Config.random = RNG
+
+EVENT_DURATION_RANGE  = (2..8)
+TICKET_CAPACITY_RANGE = (20..500)
+MAX_PRICE_CENTS       = 50_000
+DAYS_OFFSET_RANGE     = (-60..14)
+MEMBERSHIPS_PER_BRAND = 3
+USERS_COUNT           = 15
+BRANDS_COUNT          = 8
+EVENTS_COUNT          = 40
+
+LOGO_FILES = %w[
+  brands/logo1.jpg
+  brands/logo2.jpg
+  brands/logo3.jpg
+  brands/logo4.jpg
+].freeze
+
+BANNER_FILES = %w[
+  events/banner1.jpg
+  events/banner2.jpg
+  events/banner3.jpg
+  events/banner4.jpg
+].freeze
+
+# ---------------- OPTIONAL STORAGE ----------------
+S3 = begin
+  S3BucketService.new
+rescue StandardError
+  nil
 end
 
-# Create admin user
-# CHANGED: 'username' -> 'name', 'is_admin' -> 'is_superadmin', relying on email for uniqueness
-user = User.find_or_create_by!(email: 'admin@test.com') do |u|
-  u.name = 'admin'
-  u.password = 'password123'
-  u.is_superadmin = true
-  u.is_confirmed = true
-end
+def upload_seed(path, folder:, filename: 'image.jpg')
+  return nil if path.nil?
+  return nil unless S3
 
-# Create brand
-# CHANGED: Added required 'subdomain' column to the lookup block
-brand = Brand.find_or_create_by!(subdomain: 'tech-corp') do |b|
-  b.name = 'Tech Corp'
-  b.description = 'Main tech brand'
-  b.primary_color = '#000000'
-  b.secondary_color = '#FFFFFF'
-end
+  file_path = Rails.root.join("db/seed_files/#{path}")
 
-# Create owner relationship
-# CHANGED: Replaced the old 'Owner' model with the new join model 'BrandMembership'
-BrandMembership.find_or_create_by!(user: user, brand: brand) do |m|
-  m.role = 'owner'
-end
+  File.open(file_path) do |file|
+    uploaded = ActionDispatch::Http::UploadedFile.new(
+      tempfile: file,
+      filename: filename,
+      type: 'image/jpeg'
+    )
 
-# Seed events
-Rails.logger.debug 'Seeding events...'
-
-education_category = Category.find_by!(name: 'Education')
-conference_category = Category.find_by!(name: 'Conference')
-workshop_category = Category.find_by!(name: 'Workshop')
-networking_category = Category.find_by!(name: 'Networking')
-
-events_data = [
-  {
-    title: 'Future Conf',
-    start_date: 1.month.from_now,
-    end_date: 1.month.from_now + 2.hours,
-    location: 'Kyiv',
-    brand: brand,
-    # CHANGED: 'category' -> 'categories' (accepts an array of objects)
-    categories: [conference_category, networking_category],
-    status: :published,
-    price_cents: 10_000,
-    available_tickets_count: 100
-  },
-  {
-    title: 'Past Meetup',
-    start_date: 1.month.ago,
-    end_date: 1.month.ago + 3.hours,
-    location: 'Lviv',
-    brand: brand,
-    categories: [education_category],
-    status: :archived,
-    price_cents: 15_000,
-    available_tickets_count: 250
-  },
-  {
-    title: 'Current Workshop',
-    start_date: Time.current,
-    end_date: 1.hour.from_now,
-    location: 'Online',
-    brand: brand,
-    categories: [workshop_category],
-    status: :published,
-    price_cents: 25_000,
-    available_tickets_count: 50
-  }
-]
-
-events_data.each do |attrs|
-  # 1. Витягуємо категорії з хешу атрибутів, щоб вони не потрапили в update!
-  event_categories = attrs.delete(:categories)
-
-  # 2. Знаходимо або створюємо сам івент з іншими полями
-  event = Event.find_or_initialize_by(title: attrs[:title])
-  event.update!(attrs)
-
-  # 3. Безпечно додаємо категорії по одній, уникаючи дублікатів
-  event_categories.each do |category|
-    EventCategory.find_or_create_by!(event: event, category: category)
+    S3.upload(uploaded, folder: folder)
   end
 end
 
-first_event = Event.first
-
-Ticket.find_or_create_by!(user: user, event: first_event) do |t|
-  t.qr_code = "QR-#{SecureRandom.hex(6)}"
+# ---------------- PIPELINE ----------------
+def run_seeds
+  ActiveRecord::Base.transaction do
+    users      = seed_users
+    categories = seed_categories
+    brands     = seed_brands(users)
+    seed_memberships(brands, users)
+    events     = seed_events(brands, categories)
+    tickets    = seed_tickets(events, users)
+    seed_feedback(tickets)
+  end
 end
 
-Rails.logger.debug { "Done! #{Event.count} events seeded." }
+# ---------------- USERS ----------------
+def seed_admin
+  User.find_or_create_by!(email: 'admin@test.com') do |u|
+    u.name = 'Admin'
+    u.password = '123123'
+    u.is_superadmin = true
+    u.is_confirmed = true
+  end
+end
+
+def seed_normal_users
+  USERS_COUNT.times.map do |i|
+    User.find_or_create_by!(email: "user#{i}@test.com") do |u|
+      u.name = Faker::Name.name
+      u.password = '123123'
+      u.is_confirmed = RNG.rand < 0.5
+    end
+  end
+end
+
+def seed_users
+  [seed_admin, *seed_normal_users]
+end
+
+# ---------------- CATEGORIES ----------------
+def seed_categories
+  %w[Concert Workshop Conference Networking Education Gaming Startup Business Tech]
+    .map { |name| Category.find_or_create_by!(name: name) }
+end
+
+# ---------------- BRANDS ----------------
+def seed_brands(users)
+  BRANDS_COUNT.times.map do |i|
+    brand = Brand.find_or_initialize_by(subdomain: "brand#{i}")
+
+    if brand.new_record?
+      brand.assign_attributes(
+        name: Faker::Company.name,
+        description: Faker::Company.catch_phrase,
+        primary_color: Faker::Color.hex_color.downcase,
+        secondary_color: Faker::Color.hex_color.downcase,
+        logo: upload_seed(LOGO_FILES.sample(random: RNG), folder: 'brands/logos')
+      )
+
+      brand.save!
+
+      owner = users.sample(random: RNG)
+      BrandMembership.create!(user: owner, brand: brand, role: 'owner')
+    end
+
+    brand
+  end
+end
+
+def seed_memberships(brands, users)
+  roles = %w[manager member].freeze
+
+  brands.each do |brand|
+    users.sample(MEMBERSHIPS_PER_BRAND, random: RNG).each do |user|
+      BrandMembership.find_or_create_by!(user: user, brand: brand) do |m|
+        m.role = roles.sample(random: RNG)
+      end
+    end
+  end
+end
+
+# ---------------- EVENTS ----------------
+def seed_events(brands, categories)
+  statuses = Event.statuses.keys
+
+  EVENTS_COUNT.times.map do |i|
+    event = Event.find_or_initialize_by(title: "event-#{i}")
+
+    is_new = event.new_record?
+
+    if is_new
+      days_offset = RNG.rand(DAYS_OFFSET_RANGE)
+      start_date  = Time.current + days_offset.days
+      end_date    = start_date + RNG.rand(EVENT_DURATION_RANGE).hours
+
+      event.assign_attributes(
+        brand: brands.sample(random: RNG),
+        description: Faker::Lorem.paragraph(sentence_count: 5),
+        location: %w[Lviv Kyiv Online].sample(random: RNG),
+        start_date: start_date,
+        end_date: end_date,
+        status: statuses.sample(random: RNG),
+        price_cents: RNG.rand(0..MAX_PRICE_CENTS),
+        available_tickets_count: RNG.rand(TICKET_CAPACITY_RANGE),
+        banner: upload_seed(BANNER_FILES.sample(random: RNG), folder: 'events/banners')
+      )
+    end
+
+    event.save!
+
+    event.category_ids = categories.sample(RNG.rand(1..3), random: RNG).map(&:id) if is_new
+
+    event
+  end
+end
+
+# ---------------- TICKETS ----------------
+def seed_tickets(events, users)
+  events.flat_map do |event|
+    users.sample(RNG.rand(3..8), random: RNG).map do |user|
+      ticket = Ticket.find_or_initialize_by(user: user, event: event)
+
+      ticket.qr_code ||= SecureRandom.uuid
+      ticket.save!
+
+      ticket
+    end
+  end
+end
+
+# ---------------- FEEDBACK ----------------
+def seed_feedback(tickets)
+  return if tickets.empty?
+
+  sample_size = [tickets.size / 2, 1].max
+
+  tickets.sample(sample_size, random: RNG).each do |ticket|
+    EventFeedback.find_or_create_by!(ticket: ticket) do |f|
+      f.rating  = RNG.rand(1..5)
+      f.comment = Faker::Lorem.sentence
+    end
+  end
+end
+
+run_seeds
+# rubocop:enable Metrics/AbcSize, Metrics/MethodLength
