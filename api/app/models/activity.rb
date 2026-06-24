@@ -18,23 +18,29 @@ class Activity < ApplicationRecord
   scope :recent, -> { order(created_at: :desc) }
 
   class << self
-    def log_activity(user, activity_type, resource_type, resource_id = nil, resource_name = nil, details = nil,
-                     ip_address = nil, user_agent = nil, status = 'success')
+    def log_activity(activity_type, resource_type, attributes = {})
+      user = attributes[:user] || RequestContext.current_user
       return if user.nil?
 
-      create!(
+      create!(build_payload(user, activity_type, resource_type, attributes))
+    rescue StandardError => e
+      Rails.logger.error("Failed to log activity: #{e.message}")
+    end
+
+    private
+
+    def build_payload(user, activity_type, resource_type, attrs)
+      {
         user_id: user.id,
         activity_type: activity_type,
         resource_type: resource_type,
-        resource_id: resource_id,
-        resource_name: resource_name,
-        status: status,
-        details: details,
-        ip_address: ip_address,
-        user_agent: user_agent
-      )
-    rescue StandardError => e
-      Rails.logger.error("Failed to log activity: #{e.message}")
+        resource_id: attrs[:resource_id],
+        resource_name: attrs[:resource_name],
+        status: attrs[:status] || 'success',
+        details: attrs[:details],
+        ip_address: attrs[:ip_address] || RequestContext.current_ip,
+        user_agent: attrs[:user_agent] || RequestContext.current_user_agent
+      }
     end
   end
 end

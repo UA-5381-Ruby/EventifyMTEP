@@ -56,100 +56,97 @@ end
 Rails.logger.debug 'Seeding events...'
 
 events_data = [
-
   {
     title: 'Future Conf 2026', start_date: 1.month.from_now, end_date: 1.month.from_now + 8.hours,
-    location: 'Kyiv, Parkovy', brand: brands['tech-corp'], status: :published, price_cents: 15_000, available_tickets_count: 500,
-    categories: %w[Conference Networking]
+    location: 'Kyiv, Parkovy', brand: brands['tech-corp'], status: :published, price_cents: 15_000,
+    available_tickets_count: 500, categories: %w[Conference Networking]
   },
   {
     title: 'Ruby on Rails Meetup', start_date: 2.weeks.from_now, end_date: 2.weeks.from_now + 3.hours,
-    location: 'Lviv, IZONE', brand: brands['tech-corp'], status: :published, price_cents: 5_000, available_tickets_count: 100,
-    categories: %w[Education Networking]
+    location: 'Lviv, IZONE', brand: brands['tech-corp'], status: :published, price_cents: 5_000,
+    available_tickets_count: 100, categories: %w[Education Networking]
   },
   {
     title: 'Python Workshop Advanced', start_date: 10.days.from_now, end_date: 10.days.from_now + 4.hours,
-    location: 'Kharkiv', brand: brands['tech-corp'], status: :published, price_cents: 8_000, available_tickets_count: 80,
-    categories: %w[Workshop Tech]
+    location: 'Kharkiv', brand: brands['tech-corp'], status: :published, price_cents: 8_000,
+    available_tickets_count: 80, categories: %w[Workshop Tech]
   },
   {
     title: 'AI & Machine Learning Summit', start_date: 3.weeks.from_now, end_date: 3.weeks.from_now + 6.hours,
-    location: 'Online', brand: brands['tech-corp'], status: :draft, price_cents: 20_000, available_tickets_count: 300,
-    categories: %w[Conference Tech]
+    location: 'Online', brand: brands['tech-corp'], status: :draft, price_cents: 20_000,
+    available_tickets_count: 300, categories: %w[Conference Tech]
   },
   {
     title: 'Past AI Summit', start_date: 2.months.ago, end_date: 2.months.ago + 5.hours,
-    location: 'Online', brand: brands['tech-corp'], status: :archived, price_cents: 10_000, available_tickets_count: 300,
-    categories: %w[Conference]
+    location: 'Online', brand: brands['tech-corp'], status: :archived, price_cents: 10_000,
+    available_tickets_count: 300, categories: %w[Conference]
   },
-
   {
     title: 'Summer Rock Fest', start_date: 3.months.from_now, end_date: 3.months.from_now + 12.hours,
-    location: 'Kyiv, VDNG', brand: brands['music-live'], status: :published, price_cents: 85_000, available_tickets_count: 5000,
-    categories: %w[Concert]
+    location: 'Kyiv, VDNG', brand: brands['music-live'], status: :published, price_cents: 85_000,
+    available_tickets_count: 5000, categories: %w[Concert]
   },
   {
-    title: 'Jazz & Wine Evening', start_date: Time.current.end_of_week + 19.hours, end_date: Time.current.end_of_week + 23.hours,
-    location: 'Odesa, Green Theatre', brand: brands['music-live'], status: :published, price_cents: 45_000, available_tickets_count: 200,
-    categories: %w[Concert Networking]
+    title: 'Jazz & Wine Evening', start_date: Time.current.end_of_week + 19.hours,
+    end_date: Time.current.end_of_week + 23.hours, location: 'Odesa, Green Theatre',
+    brand: brands['music-live'], status: :published, price_cents: 45_000,
+    available_tickets_count: 200, categories: %w[Concert Networking]
   },
   {
     title: 'Indie Music Night', start_date: 5.days.from_now, end_date: 5.days.from_now + 3.hours,
-    location: 'Kyiv, Pod Vyshyvankoyu', brand: brands['music-live'], status: :published, price_cents: 12_000, available_tickets_count: 150,
-    categories: %w[Concert]
+    location: 'Kyiv, Pod Vyshyvankoyu', brand: brands['music-live'], status: :published, price_cents: 12_000,
+    available_tickets_count: 150, categories: %w[Concert]
   },
   {
     title: 'Electronic Music Festival', start_date: 2.months.from_now, end_date: 2.months.from_now + 10.hours,
-    location: 'Kyiv, NSC Olimpiyski', brand: brands['music-live'], status: :published, price_cents: 50_000, available_tickets_count: 2000,
-    categories: %w[Concert]
+    location: 'Kyiv, NSC Olimpiyski', brand: brands['music-live'], status: :published, price_cents: 50_000,
+    available_tickets_count: 2000, categories: %w[Concert]
   },
-
   {
-    title: 'PostgreSQL Advanced Workshop', start_date: Time.current + 2.days, end_date: Time.current + 2.days + 4.hours,
-    location: 'Online', brand: brands['skill-up'], status: :published, price_cents: 25_000, available_tickets_count: 50,
+    title: 'PostgreSQL Advanced Workshop', start_date: Time.current + 2.days,
+    end_date: Time.current + 2.days + 4.hours, location: 'Online', brand: brands['skill-up'],
+    status: :published, price_cents: 25_000, available_tickets_count: 50,
     categories: %w[Workshop Education]
   },
   {
     title: 'Design Patterns for Beginners', start_date: 1.week.ago, end_date: 1.week.ago + 2.hours,
-    location: 'Kharkiv', brand: brands['skill-up'], status: :archived, price_cents: 0, available_tickets_count: 150,
-    categories: %w[Education]
+    location: 'Kharkiv', brand: brands['skill-up'], status: :archived, price_cents: 0,
+    available_tickets_count: 150, categories: %w[Education]
   },
   {
     title: 'Leadership Masterclass', start_date: 3.days.from_now, end_date: 3.days.from_now + 3.hours,
-    location: 'Kyiv', brand: brands['skill-up'], status: :published, price_cents: 35_000, available_tickets_count: 40,
-    categories: %w[Workshop Education]
+    location: 'Kyiv', brand: brands['skill-up'], status: :published, price_cents: 35_000,
+    available_tickets_count: 40, categories: %w[Workshop Education]
   },
-
   {
     title: 'Digital Art Expo 2026', start_date: 2.weeks.from_now, end_date: 2.weeks.from_now + 6.hours,
-    location: 'Kyiv, PinchukArtCentre', brand: brands['creative-events'], status: :published, price_cents: 18_000, available_tickets_count: 300,
-    categories: %w[Art Conference]
+    location: 'Kyiv, PinchukArtCentre', brand: brands['creative-events'], status: :published, price_cents: 18_000,
+    available_tickets_count: 300, categories: %w[Art Conference]
   },
   {
     title: 'Photography Workshop', start_date: 1.week.from_now, end_date: 1.week.from_now + 2.hours,
-    location: 'Lviv', brand: brands['creative-events'], status: :published, price_cents: 8_000, available_tickets_count: 25,
-    categories: %w[Workshop Art]
+    location: 'Lviv', brand: brands['creative-events'], status: :published, price_cents: 8_000,
+    available_tickets_count: 25, categories: %w[Workshop Art]
   },
   {
     title: 'Illustration & Design Masterclass', start_date: 4.weeks.from_now, end_date: 4.weeks.from_now + 3.hours,
-    location: 'Online', brand: brands['creative-events'], status: :draft, price_cents: 12_000, available_tickets_count: 60,
-    categories: %w[Workshop Art]
+    location: 'Online', brand: brands['creative-events'], status: :draft, price_cents: 12_000,
+    available_tickets_count: 60, categories: %w[Workshop Art]
   },
-
   {
     title: 'Marathon 2026', start_date: 2.months.from_now, end_date: 2.months.from_now + 4.hours,
-    location: 'Kyiv, NSC Olimpiyski', brand: brands['sports-hub'], status: :published, price_cents: 5_000, available_tickets_count: 1000,
-    categories: %w[Sport]
+    location: 'Kyiv, NSC Olimpiyski', brand: brands['sports-hub'], status: :published, price_cents: 5_000,
+    available_tickets_count: 1000, categories: %w[Sport]
   },
   {
     title: 'Yoga & Wellness Retreat', start_date: 3.weeks.from_now, end_date: 3.weeks.from_now + 2.hours,
-    location: 'Karpaty', brand: brands['sports-hub'], status: :published, price_cents: 50_000, available_tickets_count: 30,
-    categories: %w[Sport Networking]
+    location: 'Karpaty', brand: brands['sports-hub'], status: :published, price_cents: 50_000,
+    available_tickets_count: 30, categories: %w[Sport Networking]
   },
   {
     title: 'Fitness Challenge', start_date: 1.week.from_now, end_date: 1.week.from_now + 1.hour,
-    location: 'Kyiv', brand: brands['sports-hub'], status: :published, price_cents: 2_000, available_tickets_count: 200,
-    categories: %w[Sport]
+    location: 'Kyiv', brand: brands['sports-hub'], status: :published, price_cents: 2_000,
+    available_tickets_count: 200, categories: %w[Sport]
   }
 ]
 
@@ -166,11 +163,13 @@ events_data.each do |attrs|
     )
   end
 end
+
 first_event = Event.first
 
-Ticket.find_or_create_by!(user: user, event: first_event) do |t|
+Ticket.find_or_create_by!(user: attendees.first, event: first_event) do |t|
   t.qr_code = "QR-#{SecureRandom.hex(6)}"
 end
+
 Rails.logger.debug 'Done! Seeds summary:'
 Rails.logger.debug "- #{User.count} users"
 Rails.logger.debug "- #{Brand.count} brands"

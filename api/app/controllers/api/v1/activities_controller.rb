@@ -10,26 +10,32 @@ module Api
 
       # GET /api/v1/activities
       def index
-        scope = Activity.recent
-        scope = scope.by_activity_types(params[:activity_types]) if params[:activity_types].present?
-        scope = scope.by_resource_type(params[:resource]) if params[:resource].present?
-        scope = scope.by_status(params[:status]) if params[:status].present?
-        scope = scope.by_user_email(params[:email]) if params[:email].present?
-
-        paginated = paginate(scope)
+        paginated = paginate(filtered_activities)
 
         render json: {
           data: format_activities(paginated[:records]),
-          meta: paginated[:meta].merge(
-            page: paginated[:meta][:current_page],
-            per_page: paginated[:meta][:per_page],
-            total: paginated[:meta][:total_count],
-            pages: paginated[:meta][:total_pages]
-          ).except(:current_page, :total_count, :total_pages)
+          meta: format_meta(paginated[:meta])
         }, status: :ok
       end
 
       private
+
+      def filtered_activities
+        Activity.recent
+                .by_activity_types(params[:activity_types])
+                .by_resource_type(params[:resource])
+                .by_status(params[:status])
+                .by_user_email(params[:email])
+      end
+
+      def format_meta(meta)
+        meta.merge(
+          page: meta[:current_page],
+          per_page: meta[:per_page],
+          total: meta[:total_count],
+          pages: meta[:total_pages]
+        ).except(:current_page, :total_count, :total_pages)
+      end
 
       def require_superadmin!
         render json: { error: 'Unauthorized' }, status: :forbidden unless current_user.is_superadmin?

@@ -16,50 +16,40 @@ module ActivityLogger
   end
 
   def log_create_activity
-    Activity.log_activity(
-      RequestContext.current_user,
-      'create',
-      self.class.name,
-      id,
-      model_display_name,
-      changes_summary,
-      RequestContext.current_ip,
-      RequestContext.current_user_agent
-    )
-  rescue StandardError => e
-    Rails.logger.error("Failed to log create activity: #{e.message}")
+    record_activity('create', changes_summary)
   end
 
   def log_update_activity
-    return if changes.blank? || changes.keys.all? { |k| %w[updated_at].include?(k) }
+    return unless significant_changes?
 
-    Activity.log_activity(
-      RequestContext.current_user,
-      'update',
-      self.class.name,
-      id,
-      model_display_name,
-      changes_summary,
-      RequestContext.current_ip,
-      RequestContext.current_user_agent
-    )
-  rescue StandardError => e
-    Rails.logger.error("Failed to log update activity: #{e.message}")
+    record_activity('update', changes_summary)
   end
 
   def log_destroy_activity
+    record_activity('delete', "Deleted #{self.class.name}")
+  end
+
+  # --- Extracted Helpers ---
+
+  def significant_changes?
+    return false if changes.blank?
+
+    changes.keys.any? { |k| k != 'updated_at' }
+  end
+
+  def record_activity(action, details)
     Activity.log_activity(
-      RequestContext.current_user,
-      'delete',
+      action,
       self.class.name,
-      id,
-      model_display_name,
-      "Deleted #{self.class.name}",
-      RequestContext.current_ip,
-      RequestContext.current_user_agent
+      user: RequestContext.current_user,
+      resource_id: id,
+      resource_name: model_display_name,
+      details: details,
+      ip_address: RequestContext.current_ip,
+      user_agent: RequestContext.current_user_agent
     )
   rescue StandardError => e
-    Rails.logger.error("Failed to log destroy activity: #{e.message}")
+    Rails.logger.error("Failed to log #{action} activity: #{e.message}")
   end
 
   def model_display_name
