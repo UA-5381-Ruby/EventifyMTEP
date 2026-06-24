@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Search, User, LayoutDashboard, Settings, LogOut } from 'lucide-react';
+import { User, LayoutDashboard, Settings, LogOut } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui';
 
@@ -40,13 +40,7 @@ export function HeaderActions({
 
   return (
     <div className="flex items-center gap-4">
-      {/* Пошук */}
-      <div className="flex items-center border border-neutral-300 px-3 py-1 rounded-md">
-        <input type="text" placeholder="Search" className="outline-none text-sm" />
-        <Search size={16} className="text-neutral-500" />
-      </div>
-
-      <div className="flex items-center gap-6 relative" ref={menuRef}>
+      <div className="flex items-center gap-6">
         {isAuthenticated ? (
           <>
             <span

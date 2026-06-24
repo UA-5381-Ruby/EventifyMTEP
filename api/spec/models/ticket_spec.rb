@@ -31,9 +31,8 @@ RSpec.describe Ticket, type: :model do
 
     it 'returns qr_code_url when qr_image_key is present' do
       ticket = build(:ticket, qr_image_key: 'tickets/qr/test.png')
-      allow_any_instance_of(S3BucketService).to receive(:file_url).with('tickets/qr/test.png').and_return('https://s3.example/test.png')
 
-      expect(ticket.qr_code_url).to eq('https://s3.example/test.png')
+      expect(ticket.qr_code_url).to eq('https://example.com/tickets/qr/test.png')
     end
   end
 

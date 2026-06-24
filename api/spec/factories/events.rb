@@ -12,6 +12,14 @@ FactoryBot.define do
     available_tickets_count { 100 }
     association :brand
 
+    trait :published do
+      status { :published }
+    end
+
+    transient do
+      categories { [] }
+    end
+
     after(:create) do |event, evaluator|
       if evaluator.categories.any?
         evaluator.categories.each do |category|

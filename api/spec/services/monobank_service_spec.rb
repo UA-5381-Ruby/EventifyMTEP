@@ -157,4 +157,64 @@ RSpec.describe MonobankService do
       expect(result.to_der).to eq(key_pair.to_der)
     end
   end
+
+  describe 'error handling' do
+    around do |example|
+      Rails.cache = ActiveSupport::Cache::MemoryStore.new
+      example.run
+      Rails.cache = ActiveSupport::Cache::NullStore.new
+    end
+
+    it 'returns nil when API response is unsuccessful' do
+      allow(faraday_connection).to receive(:get).and_return(
+        instance_double(Faraday::Response, success?: false, body: {}, status: 500)
+      )
+
+      expect(described_class.fetch_public_key).to be_nil
+    end
+
+    it 'returns nil when pubkey is missing from response' do
+      allow(faraday_connection).to receive(:get).and_return(
+        instance_double(Faraday::Response, success?: true, body: {}, status: 200)
+      )
+
+      expect(described_class.fetch_public_key).to be_nil
+    end
+
+    it 'returns nil when network error occurs' do
+      allow(faraday_connection).to receive(:get).and_raise(Faraday::ConnectionFailed, 'timeout')
+
+      expect(described_class.fetch_public_key).to be_nil
+    end
+
+    it 'returns false when signature verification raises unexpected error' do
+      allow(described_class).to receive(:decode_signature).and_raise(StandardError, 'boom')
+
+      expect(described_class.verify_webhook_signature('{}', 'abc')).to be(false)
+    end
+
+    it 'retries verification after OpenSSL key error' do
+      key_pair = OpenSSL::PKey::EC.generate('prime256v1')
+      signature = key_pair.sign('SHA256', '{}')
+      encoded = Base64.encode64(signature)
+      call_count = 0
+
+      allow(described_class).to receive(:fetch_public_key).and_wrap_original do |_method|
+        call_count += 1
+        call_count == 1 ? raise(OpenSSL::PKey::PKeyError, 'bad key') : key_pair
+      end
+      allow(described_class).to receive(:clear_public_key_cache)
+
+      expect(described_class.verify_webhook_signature('{}', encoded)).to be(true)
+      expect(call_count).to eq(2)
+    end
+
+    it 'logs and returns nil for invalid public key format' do
+      allow(faraday_connection).to receive(:get).and_return(
+        instance_double(Faraday::Response, success?: true, body: { 'key' => 'not-a-key' }, status: 200)
+      )
+
+      expect(described_class.fetch_public_key).to be_nil
+    end
+  end
 end

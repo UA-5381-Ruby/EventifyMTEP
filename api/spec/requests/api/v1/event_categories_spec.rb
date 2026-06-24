@@ -58,5 +58,32 @@ RSpec.describe 'Api::V1::EventCategories', type: :request do
       expect(response).to have_http_status(:no_content)
       expect(EventCategory.exists?(event_category.id)).to be false
     end
+
+    it 'returns 404 when category is not assigned' do
+      other_category = create(:category)
+
+      delete "/api/v1/events/#{event.id}/categories/#{other_category.id}", headers: auth_headers(owner)
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'returns 404 when event is missing' do
+      delete "/api/v1/events/999999/categories/#{category.id}", headers: auth_headers(owner)
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe 'POST /api/v1/events/:event_id/categories authorization' do
+    it 'returns forbidden for non-manager user' do
+      outsider = create(:user)
+
+      post "/api/v1/events/#{event.id}/categories",
+           params: { category_id: category.id },
+           headers: auth_headers(outsider),
+           as: :json
+
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 end

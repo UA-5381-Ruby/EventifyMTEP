@@ -8,6 +8,16 @@ RSpec.describe TicketQrCodeService do
   let(:s3_service) { instance_double(S3BucketService) }
 
   describe '#generate_image_key!' do
+    it 'uses default S3 service when none is provided' do
+      s3 = instance_double(S3BucketService)
+      allow(S3BucketService).to receive(:new).and_return(s3)
+      allow(s3).to receive(:upload_body).and_return('tickets/qr/default.png')
+
+      key = described_class.new.generate_image_key!('payload')
+
+      expect(key).to eq('tickets/qr/default.png')
+    end
+
     it 'generates a PNG and uploads it to S3' do
       allow(s3_service).to receive(:upload_body) do |body, **|
         expect(body.bytesize).to be > 0
@@ -26,7 +36,7 @@ RSpec.describe TicketQrCodeService do
 
       expect do
         service.generate_image_key!('550e8400-e29b-41d4-a716-446655440000')
-      end.to raise_error(TicketQrCodeService::UploadError, I18n.t('services.ticket_qr_code.upload_failed'))
+      end.to raise_error(TicketQrCodeService::UploadError, 'Failed to upload QR code to S3')
     end
   end
 end

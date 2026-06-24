@@ -39,7 +39,7 @@ Enum event_status {
 // ==========================================
 
 Table users {
-  id integer [primary key]
+  id bigint [primary key]
   name varchar
   email varchar [unique, not null]
   password_digest varchar [not null]
@@ -50,7 +50,7 @@ Table users {
 }
 
 Table brands {
-  id integer [primary key]
+  id bigint [primary key]
   name varchar [not null]
   subdomain varchar [unique, not null]
   description text
@@ -62,82 +62,99 @@ Table brands {
 }
 
 Table categories {
-  id integer [primary key]
+  id bigint [primary key]
   name varchar [unique, not null]
   created_at timestamp [not null]
   updated_at timestamp [not null]
 }
 
 // ==========================================
-// ASSOCIATION TABLES
+// ASSOCIATIONS
 // ==========================================
 
 Table brand_memberships {
-  id integer [primary key]
-  user_id integer [ref: > users.id, not null]
-  brand_id integer [ref: > brands.id, not null]
-  role varchar [not null, note: "Allowed values: owner, manager, user"]
+  id bigint [primary key]
+  user_id bigint [not null, ref: > users.id]
+  brand_id bigint [not null, ref: > brands.id]
+  role varchar [not null]
+
   created_at timestamp [not null]
   updated_at timestamp [not null]
 
   indexes {
-    (user_id, brand_id) [unique, name: 'index_brand_memberships_on_user_id_and_brand_id']
+    (user_id, brand_id) [unique]
   }
 }
 
 Table events {
-  id integer [primary key]
+  id bigint [primary key]
   title varchar [not null]
   description text
-  brand_id integer [ref: > brands.id, not null]
+  brand_id bigint [not null, ref: > brands.id]
+
   location varchar
   start_date timestamp
   end_date timestamp
+
   status event_status [default: 'draft']
+
   banner varchar
-  price_cents integer
-  available_tickets_count integer
+
+  price_cents integer [not null, default: 0]
+  available_tickets_count integer [not null, default: 0]
+
   created_at timestamp [not null]
   updated_at timestamp [not null]
 }
 
 Table event_categories {
-  id integer [primary key]
-  event_id integer [ref: > events.id, not null]
-  category_id integer [ref: > categories.id, not null]
+  id bigint [primary key]
+  event_id bigint [not null, ref: > events.id]
+  category_id bigint [not null, ref: > categories.id]
+
   created_at timestamp [not null]
-  updated_at timestamp [not null]
 
   indexes {
-    (event_id, category_id) [unique, name: 'index_event_categories_on_event_id_and_category_id']
+    (event_id, category_id) [unique]
   }
 }
 
 // ==========================================
-// TICKETS AND FEEDBACK
+// TICKETS + FEEDBACK
 // ==========================================
 
 Table tickets {
-  id integer [primary key]
-  user_id integer [ref: > users.id, not null]
-  event_id integer [ref: > events.id, not null]
+  id bigint [primary key]
+  user_id bigint [not null, ref: > users.id]
+  event_id bigint [not null, ref: > events.id]
+
   qr_code varchar [unique, not null]
+  qr_image_key varchar [unique]
+
   is_active boolean [not null, default: true]
+
   created_at timestamp [not null]
   updated_at timestamp [not null]
 
   indexes {
-    (user_id, event_id) [unique, name: 'index_tickets_on_user_id_and_event_id']
+    (qr_code) [unique]
+    (qr_image_key) [unique]
   }
 }
 
 Table event_feedbacks {
-  id integer [primary key]
-  ticket_id integer [ref: > tickets.id, not null]
-  rating integer [note: 'Allowed range: 1..5']
+  id bigint [primary key]
+  ticket_id bigint [not null, ref: > tickets.id]
+
+  rating integer
   comment text
+
   created_at timestamp [not null]
   updated_at timestamp [not null]
+
+  indexes {
+    (ticket_id)
+  }
 }
 ```
 

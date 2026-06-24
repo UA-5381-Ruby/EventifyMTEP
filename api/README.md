@@ -47,6 +47,7 @@ Optional maintenance commands:
 
 ```bash
 bin/rails db:seed
+bin/rails db:seed:replant
 bin/rails db:reset
 bin/rails db:test:prepare
 ```
