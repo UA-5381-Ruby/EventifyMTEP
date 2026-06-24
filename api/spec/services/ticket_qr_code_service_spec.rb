@@ -20,7 +20,7 @@ RSpec.describe TicketQrCodeService do
 
     it 'generates a PNG and uploads it to S3' do
       allow(s3_service).to receive(:upload_body) do |body, **|
-        expect(body.bytesize).to be.positive?
+        expect(body.bytesize).to be > 0
         expect(body).to start_with("\x89PNG".b)
 
         'tickets/qr/test-key.png'

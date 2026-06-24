@@ -3,9 +3,9 @@
 require Rails.root.join('test/support/fake_s3_bucket_service')
 
 RSpec.configure do |config|
-  %i[request controller mailer].each do |type|
-    config.before(type: type) do
-      allow(S3BucketService).to receive(:new).and_return(FakeS3BucketService.new)
-    end
+  config.before do |example|
+    next if example.file_path.include?('s3_bucket_service_spec.rb')
+
+    allow(S3BucketService).to receive(:new).and_return(FakeS3BucketService.new)
   end
 end
