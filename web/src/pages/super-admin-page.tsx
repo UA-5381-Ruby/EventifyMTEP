@@ -60,40 +60,63 @@ export function SuperAdminPage() {
         if (isMounted) setIsLoading(true);
 
         const [usersRes, brandsRes, eventsRes] = await Promise.all([
-          apiClient.get('/api/v1/users').catch(() => ({ data: [] })),
-          apiClient.get('/api/v1/brands').catch(() => ({ data: [] })),
-          apiClient.get('/api/v1/events').catch(() => ({ data: [] })),
+          apiClient.get('/api/v1/users').catch(() => ({ data: { data: [], meta: {} } })),
+          apiClient.get('/api/v1/brands', { params: { scope: 'discover', per_page: 100 } }).catch(() => ({ data: { data: [], meta: {} } })),
+          apiClient.get('/api/v1/events').catch(() => ({ data: { data: [], meta: {} } })),
         ]);
 
         if (!isMounted) return;
 
-        const fetchedUsers: UserPreview[] = Array.isArray(usersRes.data)
-          ? usersRes.data
-          : usersRes.data?.users || [];
+        let fetchedUsers: UserPreview[] = [];
+        if (usersRes.data && 'data' in usersRes.data && Array.isArray(usersRes.data.data)) {
+          fetchedUsers = usersRes.data.data;
+        } else if (Array.isArray(usersRes.data)) {
+          fetchedUsers = usersRes.data;
+        }
+        const totalUsersCount = usersRes.data?.meta?.total || usersRes.data?.meta?.total_count || fetchedUsers.length;
 
-        const fetchedBrands = Array.isArray(brandsRes.data)
-          ? brandsRes.data
-          : brandsRes.data?.brands || [];
 
-        const fetchedEvents: PendingEvent[] = Array.isArray(eventsRes.data)
-          ? eventsRes.data
-          : eventsRes.data?.events || [];
+        let fetchedBrands: any[] = [];
+        if (brandsRes.data && 'data' in brandsRes.data && Array.isArray(brandsRes.data.data)) {
+          fetchedBrands = brandsRes.data.data;
+        } else if (Array.isArray(brandsRes.data)) {
+          fetchedBrands = brandsRes.data;
+        }
+        const totalBrandsCount = brandsRes.data?.meta?.total || brandsRes.data?.meta?.total_count || fetchedBrands.length;
 
-        setUsers(fetchedUsers);
+        let fetchedEvents: PendingEvent[] = [];
+        if (eventsRes.data && 'data' in eventsRes.data && Array.isArray(eventsRes.data.data)) {
+          fetchedEvents = eventsRes.data.data.map((event: any) => ({
+            id: event.id,
+            name: event.title || event.name || 'N/A',
+            startDate: event.start_date || event.date || new Date().toISOString(),
+            status: event.status || 'draft',
+            createdBy: event.created_by || event.actor?.name || 'Unknown',
+            location: event.location || 'N/A'
+          }));
+        } else if (Array.isArray(eventsRes.data)) {
+          fetchedEvents = eventsRes.data;
+        }
+        const totalEventsCount = eventsRes.data?.meta?.total || eventsRes.data?.meta?.total_count || fetchedEvents.length;
 
         const pending = fetchedEvents.filter((event) => event.status?.toLowerCase() === 'pending');
         setPendingEvents(pending);
+        setUsers(fetchedUsers);
 
         setStats({
-          totalUsers: fetchedUsers.length,
-          totalBrands: fetchedBrands.length,
-          totalEvents: fetchedEvents.length,
-          pendingApproval: pending.length,
-          rejectedEvents: fetchedEvents.filter(
+          totalUsers: totalUsersCount,
+          totalBrands: totalBrandsCount,
+          totalEvents: totalEventsCount,
+
+
+          pendingApproval: eventsRes.data?.meta?.total_pending || eventsRes.data?.meta?.pending_count || pending.length,
+          rejectedEvents: eventsRes.data?.meta?.total_rejected || eventsRes.data?.meta?.rejected_count || fetchedEvents.filter(
             (event) => event.status?.toLowerCase() === 'rejected'
           ).length,
+
           reportedUsers: 0,
         });
+
       } catch (error) {
         console.error('Dashboard loading failed:', error);
       } finally {
@@ -211,12 +234,14 @@ export function SuperAdminPage() {
       <div className="p-6 max-w-6xl mx-auto text-gray-800">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold">Admin Panel</h1>
-          <button
-            onClick={() => navigate('/activity-log')}
-            className="bg-black text-white text-xs px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
-          >
-            View Activity Log
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => navigate('/activity-log')}
+              className="bg-black text-white text-xs px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+            >
+              User Activity Log
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">

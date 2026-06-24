@@ -8,6 +8,20 @@ module Api
       class MediaUploadError < StandardError; end
 
       rescue_from MediaUploadError do |e|
+        if current_user.present?
+          Activity.log_activity(
+            current_user,
+            'create',
+            'Event',
+            nil,
+            params.dig(:event, :title),
+            "Media upload failed: #{e.message}",
+            request.remote_ip,
+            request.user_agent,
+            'failed'
+          )
+        end
+
         render json: { errors: [e.message] }, status: :unprocessable_content
       end
 
@@ -18,7 +32,10 @@ module Api
         paginated = paginate(EventFilter.new(index_params, current_user).call)
 
         render json: {
-          data: paginated[:records].as_json(methods: [:banner_url]),
+          data: paginated[:records].as_json(
+            methods: [:banner_url],
+            include: event_serialization_includes
+          ),
           meta: paginated[:meta]
         }
       end
@@ -33,11 +50,49 @@ module Api
       def create
         @event = build_event
         if @event.save
+
+          Activity.log_activity(
+            current_user,
+            'create',
+            'Event',
+            @event.id,
+            @event.title,
+            nil,
+            request.remote_ip,
+            request.user_agent,
+            'success'
+          )
+
           render json: @event.as_json(methods: [:banner_url]), status: :created
         else
+
+          Activity.log_activity(
+            current_user,
+            'create',
+            'Event',
+            nil,
+            event_params[:title],
+            "Validation failed: #{@event.errors.full_messages.to_sentence}",
+            request.remote_ip,
+            request.user_agent,
+            'failed'
+          )
+
           render json: { errors: @event.errors }, status: :unprocessable_content
         end
       rescue ActiveRecord::RecordNotFound
+        Activity.log_activity(
+          current_user,
+          'create',
+          'Event',
+          nil,
+          params.dig(:event, :title),
+          'Brand not found or access denied',
+          request.remote_ip,
+          request.user_agent,
+          'failed'
+        )
+
         render json: { error: 'Brand not found or access denied' }, status: :forbidden
       end
 

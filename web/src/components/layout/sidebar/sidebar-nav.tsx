@@ -14,8 +14,8 @@ interface SidebarNavProps {
 const SUPERADMIN_ITEMS = [
   { label: 'Dashboard', href: '/superadmin' },
   { label: 'Brands', href: '/brands' },
-  { label: 'Users', href: '/users' },
-  { label: 'Logs Page', href: '/logs' },
+  { label: 'User\'s activity log', href: '/activity-log' },
+  { label: 'Events History', href: '/logs' },
 ];
 
 const ADMIN_ITEMS = [
@@ -28,9 +28,8 @@ const ADMIN_ITEMS = [
 
 export function SidebarNav({
   currentPath = '/dashboard',
-  //onNavigate = () => { },
   isCollapsed = false,
-  onSelect = () => {},
+  onSelect = () => { },
   isSuperAdmin,
   role,
 }: SidebarNavProps) {

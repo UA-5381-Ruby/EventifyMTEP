@@ -6,6 +6,7 @@ class User < ApplicationRecord
   has_many :brand_memberships, dependent: :destroy
   has_many :brands, through: :brand_memberships
   has_many :tickets, dependent: :destroy
+  has_many :activities, dependent: :destroy
 
   validates :name, presence: true
   validates :password, presence: true, length: { minimum: 6 }, if: -> { new_record? || !password.nil? }

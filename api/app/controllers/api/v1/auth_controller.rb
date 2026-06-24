@@ -5,13 +5,24 @@ module Api
     class AuthController < ApplicationController
       skip_before_action :authorize_request, only: %i[register login]
 
-      # POST /auth/register
       def register
         user = User.new(user_params)
 
         if user.save
-          MailerService.send_email_verification(user)
 
+          Activity.log_activity(
+            user,
+            'create',
+            'User',
+            user.id,
+            user.email,
+            'Account registered successfully',
+            request.remote_ip,
+            request.user_agent,
+            'success'
+          )
+
+          MailerService.send_email_verification(user)
           DeleteUnconfirmedUserJob.set(wait: 24.hours).perform_later(user.id)
 
           render json: { message: 'Account created! Please check your email to verify your account.' }, status: :created
@@ -20,17 +31,56 @@ module Api
         end
       end
 
-      # POST /auth/login
       def login
         user = find_user_by_email
 
         unless user&.authenticate(params[:password])
+
+          if user
+            Activity.log_activity(
+              user,
+              'login',
+              'System',
+              nil,
+              nil,
+              'Invalid password attempt',
+              request.remote_ip,
+              request.user_agent,
+              'failed'
+            )
+          end
+
           return render json: { error: 'Invalid email or password' }, status: :unauthorized
         end
 
         unless user.email_confirmed?
+
+          Activity.log_activity(
+            user,
+            'login',
+            'System',
+            nil,
+            nil,
+            'Login failed: Email not verified',
+            request.remote_ip,
+            request.user_agent,
+            'failed'
+          )
+
           return render json: { error: 'Please verify your email address to log in.' }, status: :forbidden
         end
+
+        Activity.log_activity(
+          user,
+          'login',
+          'System',
+          nil,
+          nil,
+          'Successful login',
+          request.remote_ip,
+          request.user_agent,
+          'success'
+        )
 
         render json: auth_success_payload(user), status: :ok
       end

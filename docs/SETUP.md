@@ -175,7 +175,10 @@ npm run lint
 npm run lint:css
 npm run build
 ```
-
+## Coverege 
+```
+npx jest --coverage
+```
 ## Swagger and local verification
 
 Start the API locally:

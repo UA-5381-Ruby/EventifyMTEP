@@ -7,7 +7,7 @@ import { VerifyEmailPage } from '@/pages/verify-email-page.tsx';
 import { ForgotPasswordPage } from '@/pages/forgot-password-page.tsx';
 import { ResetPasswordPage } from '@/pages/reset-password-page.tsx';
 import { EventListPage } from '@/pages/event-list-page.tsx';
-import ActivityLogPage from '@/pages/activity-log-page.tsx';
+import ActivityLogPage from '@/pages/super-admin-events-page.tsx';
 import { EventDetailPage } from '@/pages/event-detail-page';
 import { NotFoundPage } from '@/pages/not-found-page.tsx';
 import UserProfilePage from '@/pages/user-profile-page';
@@ -15,6 +15,7 @@ import { Dashboard } from '@/pages/dashboard.tsx';
 import { BrandPublicPage } from '@/pages/brand-public-page.tsx';
 import { BrandDashboardPage } from '@/pages/brand-dashboard-page.tsx';
 import { SuperAdminPage } from '@/pages/super-admin-page.tsx';
+import SuperAdminActivityPage from '@/pages/super-admin-activity-page.tsx';
 import { BrandDiscoverPage } from '@/pages/brand-discover-page.tsx';
 import { MyBrandsPage } from '@/pages/my-brands-page.tsx';
 import { MyTicketsPage } from '@/pages/my-tickets-page.tsx';
@@ -42,6 +43,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<SuperAdminRoute />}>
             <Route path="/superadmin" element={<SuperAdminPage />} />
+            <Route path="/activity-log" element={<SuperAdminActivityPage />} />
             <Route path="/logs" element={<ActivityLogPage />} />
           </Route>
 
