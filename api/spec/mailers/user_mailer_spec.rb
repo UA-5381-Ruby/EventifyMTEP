@@ -50,4 +50,32 @@ RSpec.describe UserMailer, type: :mailer do
       expect(mail.body.encoded).to include(user.name)
     end
   end
+
+  describe '#ticket_confirmation' do
+    let(:ticket) { create(:ticket, user: user) }
+    let(:mail) { UserMailer.ticket_confirmation(user, ticket) }
+
+    it 'renders subject with event title' do
+      expect(mail.subject).to eq("Your ticket for #{ticket.event.title}")
+    end
+
+    it 'attaches a PDF ticket' do
+      expect(mail.attachments.map(&:filename)).to include("ticket-#{ticket.qr_code}.pdf")
+    end
+  end
+
+  describe '#brand_invitation' do
+    let(:brand) { create(:brand) }
+    let(:token) { 'invite-token' }
+    let(:mail) { UserMailer.brand_invitation('guest@example.com', brand, token) }
+
+    it 'renders invitation subject' do
+      expect(mail.subject).to eq("You're invited to join #{brand.name}")
+    end
+
+    it 'includes accept link with token and brand id' do
+      expect(mail.body.encoded).to include('accept-invitation?token=invite-token')
+      expect(mail.body.encoded).to include("brand_id=#{brand.id}")
+    end
+  end
 end
