@@ -56,11 +56,7 @@ export const EventDetailPage = () => {
           <h3 className="text-xl font-bold">Event Categories</h3>
           <div className="flex flex-wrap gap-3">
             {event.categories.map((cat) => (
-              <CategoryChip
-                key={cat.id}
-                name={cat.name}
-                isRemovable={false}
-              />
+              <CategoryChip key={cat.id} name={cat.name} isRemovable={false} />
             ))}
           </div>
         </div>

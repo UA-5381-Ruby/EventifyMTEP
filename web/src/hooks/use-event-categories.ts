@@ -49,6 +49,7 @@ export const useEventCategories = (
   const closeModal = useCallback(() => {
     setIsModalOpen(false);
     setCategoryError(null);
+    setNewCategoryName('');
   }, []);
 
   return {

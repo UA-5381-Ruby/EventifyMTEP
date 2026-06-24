@@ -46,7 +46,6 @@ export function useEventDetail(id: number): UseEventDetailResult {
     setIsSubmitting(true);
     setError(null);
     try {
-      // Використовуємо коректний сервіс, який є в наявності
       const updated = await EventLifecycleService.submitEvent(event.id);
       setEvent(updated as unknown as EventDetail);
     } catch (err) {
