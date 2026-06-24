@@ -124,7 +124,7 @@ RSpec.describe 'Api coverage extensions', type: :request do
     end
 
     it 'returns service unavailable when invoice params are invalid' do
-      event.update_column(:price_cents, -1)
+      allow_any_instance_of(Event).to receive(:price_cents).and_return(-1)
 
       post '/api/v1/payments',
            params: { event_id: event.id }.to_json,
