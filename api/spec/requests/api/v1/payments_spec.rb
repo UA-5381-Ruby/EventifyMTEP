@@ -225,5 +225,55 @@ RSpec.describe 'Api::V1::Payments', type: :request do
         expect(response).to have_http_status(:bad_request)
       end
     end
+
+    context 'when reference format is invalid' do
+      let(:missing_user_payload) do
+        {
+          status: 'success',
+          invoiceId: invoice_id,
+          reference: "event-#{event.id}-user-999999-qty-1"
+        }.to_json
+      end
+
+      it 'returns 404' do
+        post '/api/v1/payments/webhook',
+             params: missing_user_payload,
+             headers: webhook_headers
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context 'when event from reference is missing' do
+      let(:missing_event_payload) do
+        {
+          status: 'success',
+          invoiceId: invoice_id,
+          reference: "event-999999-user-#{user.id}-qty-1"
+        }.to_json
+      end
+
+      it 'returns 404' do
+        post '/api/v1/payments/webhook',
+             params: missing_event_payload,
+             headers: webhook_headers
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
+  describe 'POST /api/v1/payments service errors' do
+    before do
+      allow(MonobankService).to receive(:create_invoice).and_raise(StandardError, 'network down')
+    end
+
+    it 'returns service unavailable' do
+      post '/api/v1/payments',
+           params: { event_id: event.id }.to_json,
+           headers: headers
+
+      expect(response).to have_http_status(:service_unavailable)
+    end
   end
 end
