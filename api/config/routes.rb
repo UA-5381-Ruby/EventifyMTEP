@@ -1,6 +1,4 @@
-# frozen_string_literal: true
-
-﻿ # frozen_string_literal: true
+﻿# frozen_string_literal: true
 
 Rails.application.routes.draw do
   if Rails.env.development? || Rails.env.test?
@@ -18,7 +16,7 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :payments, only: [:create]
-      post 'payments/webhook', to: 'payments#webhook'
+      post "payments/webhook", to: "payments#webhook"
 
       post '/auth/register', to: 'auth#register'
       post '/auth/login', to: 'auth#login'
@@ -27,10 +25,10 @@ Rails.application.routes.draw do
 
       get 'users/me', to: 'users#me'
       resources :users, except: [:create] do
-        resources :brand_memberships, only: [:index]
-      end
+  resources :brand_memberships, only: [:index]
+end
 
-      resources :events, only: %i[index show create] do
+      resources :events, only: [:index, :show, :create] do
         member do
           post :submit,  to: 'events/transitions#submit'
           post :cancel,  to: 'events/transitions#cancel'
@@ -39,13 +37,13 @@ Rails.application.routes.draw do
         end
 
         resources :categories,
-                  only: %i[index create destroy],
-                  param: :category_id,
+                  only:       [:index, :create, :destroy],
+                  param:       :category_id,
                   controller: 'event_categories'
       end
 
-      resources :brands, only: %i[index create show update destroy] do
-        resources :memberships, controller: 'brand_memberships', only: %i[index create update destroy]
+      resources :brands, only: [:index, :create, :show, :update, :destroy] do
+        resources :memberships, controller: 'brand_memberships', only: [:index, :create, :update, :destroy]
 
         resources :invitations, only: [:create] do
           collection do
@@ -60,13 +58,13 @@ Rails.application.routes.draw do
 
       get 'my_tickets', to: 'tickets#index'
 
-      resources :tickets, only: %i[index create update show] do
+      resources :tickets, only: [:index, :create, :update, :show] do
         member do
           post :review
         end
       end
 
-      resources :categories, only: %i[index create]
+      resources :categories, only: [:index, :create]
     end
   end
 
