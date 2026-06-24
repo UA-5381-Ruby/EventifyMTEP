@@ -199,7 +199,7 @@ RSpec.describe MonobankService do
       encoded = Base64.encode64(signature)
       call_count = 0
 
-      allow(described_class).to receive(:fetch_public_key).and_wrap_original do |method|
+      allow(described_class).to receive(:fetch_public_key).and_wrap_original do |_method|
         call_count += 1
         call_count == 1 ? raise(OpenSSL::PKey::PKeyError, 'bad key') : key_pair
       end

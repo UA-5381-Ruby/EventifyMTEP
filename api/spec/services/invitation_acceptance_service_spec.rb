@@ -60,7 +60,8 @@ RSpec.describe InvitationAcceptanceService do
     end
 
     it 'returns validation error when membership save fails' do
-      membership = instance_double(BrandMembership, save: false, errors: instance_double(ActiveModel::Errors, full_messages: ['invalid']))
+      errors = instance_double(ActiveModel::Errors, full_messages: ['invalid'])
+      membership = instance_double(BrandMembership, save: false, errors: errors)
       allow(BrandMembership).to receive(:new).and_return(membership)
 
       result = service_for(email: user.email).call
