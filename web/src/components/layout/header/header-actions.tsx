@@ -21,7 +21,7 @@ export function HeaderActions({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const isInsideBrandDashboard = location.pathname.startsWith('/dashboard');
+  const isInsideBrandDashboard = location.pathname.startsWith('/dashboard/overview');
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -42,19 +42,22 @@ export function HeaderActions({
     <div className="flex items-center gap-4">
       <div className="flex items-center gap-6">
         {isAuthenticated ? (
-          <>
-            <span
+          <div className="relative" ref={menuRef}>
+            <button
+              type="button"
+              aria-haspopup="menu"
+              aria-expanded={isMenuOpen}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="flex items-center gap-3 text-sm font-medium text-neutral-700 cursor-pointer select-none"
             >
               {userName}
-              <button className="w-8 h-8 rounded-full bg-neutral-300 flex items-center justify-center cursor-pointer hover:bg-neutral-400 transition-colors">
+              <span className="w-8 h-8 rounded-full bg-neutral-300 flex items-center justify-center hover:bg-neutral-400 transition-colors">
                 <User size={16} />
-              </button>
-            </span>
+              </span>
+            </button>
 
             {isMenuOpen && (
-              <div className="absolute right-0 top-10 w-56 bg-white border border-neutral-200 shadow-lg py-1 z-50 animate-in fade-in zoom-in-95 duration-100 rounded-md">
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-neutral-200 shadow-lg py-1 z-50 animate-in fade-in zoom-in-95 duration-100 rounded-md">
                 <button
                   onClick={() => handleDashboardChange('/dashboard/overview')}
                   className={`w-full flex items-center gap-2 px-4 py-2 text-sm text-left cursor-pointer transition-colors ${
@@ -92,7 +95,7 @@ export function HeaderActions({
                 </button>
               </div>
             )}
-          </>
+          </div>
         ) : (
           <>
             <Button variant="primary">
