@@ -55,8 +55,13 @@ export function EventDetailPage() {
   }
 
   return (
-    <PageWrapper>
-      <div className="min-h-screen min-w-screen bg-white max-w-lg mx-auto">
+    <PageWrapper
+      gradientColors={{
+        primary: eventDetail.brand?.primary_color,
+        secondary: eventDetail.brand?.secondary_color,
+      }}
+    >
+      <div className="min-h-screen min-w-2xl bg-white max-w-3xl mx-auto">
         <EventHero event={eventDetail} onBack={() => navigate('/events')} />
 
         <div className="px-5 pb-10">
