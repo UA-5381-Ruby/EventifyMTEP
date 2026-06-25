@@ -14,7 +14,7 @@ class UserMailer < ApplicationMailer
 
   def reset_password(user, signed_id)
     @user = user
-    frontend_url = ENV.fetch('FRONTEND_URL')
+    frontend_url = ENV.fetch('FRONTEND_URL', 'http://localhost:5173')
     @reset_link = "#{frontend_url}/reset-password?token=#{signed_id}"
     mail(to: @user.email, subject: 'Reset your password')
   end
@@ -39,7 +39,7 @@ class UserMailer < ApplicationMailer
 
   def brand_invitation(email, brand, token)
     @brand = brand
-    @accept_link = "#{ENV.fetch('FRONTEND_URL')}/accept-invitation?token=#{token}&brand_id=#{brand.id}".html_safe
+    @accept_link = "#{ENV.fetch('FRONTEND_URL', 'http://localhost:5173')}/accept-invitation?token=#{token}&brand_id=#{brand.id}".html_safe
 
     mail(
       to: email,
