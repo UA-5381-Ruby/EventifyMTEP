@@ -100,7 +100,11 @@ RSpec.describe Ticket, type: :model do
         other_event    = create(:event)
         another_ticket = build(:ticket, user: user, event: other_event)
 
-        another_ticket.send(:user_can_have_only_one_ticket_per_event) rescue nil
+        begin
+          another_ticket.send(:user_can_have_only_one_ticket_per_event)
+        rescue StandardError
+          nil
+        end
         expect(another_ticket.errors[:base]).to be_empty
       end
 

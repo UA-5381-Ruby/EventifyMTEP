@@ -24,8 +24,8 @@ RSpec.describe BrandMembership, type: :model do
 
         expect(membership.save).to be false
         expect(membership.errors.details[:base]).to include(
-                                                      a_hash_including(error: :cannot_remove_last_owner)
-                                                    )
+          a_hash_including(error: :cannot_remove_last_owner)
+        )
         expect(membership.reload.role).to eq('owner')
       end
     end
@@ -62,8 +62,8 @@ RSpec.describe BrandMembership, type: :model do
 
         expect(result).to be false
         expect(membership.errors.details[:base]).to include(
-                                                      a_hash_including(error: :cannot_remove_last_owner)
-                                                    )
+          a_hash_including(error: :cannot_remove_last_owner)
+        )
         expect(BrandMembership.exists?(membership.id)).to be true
       end
     end

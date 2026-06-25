@@ -21,8 +21,8 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['errors']['base']).to include(
-                                                                 I18n.t('api.v1.errors.brand_memberships.cannot_downgrade_last_owner')
-                                                               )
+          I18n.t('api.v1.errors.brand_memberships.cannot_downgrade_last_owner')
+        )
         expect(owner_brand_membership.reload.role).to eq('owner')
       end
     end
@@ -74,8 +74,8 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['errors']['base']).to include(
-                                                                 I18n.t('api.v1.errors.brand_memberships.cannot_remove_last_owner')
-                                                               )
+          I18n.t('api.v1.errors.brand_memberships.cannot_remove_last_owner')
+        )
         expect(BrandMembership.exists?(owner_brand_membership.id)).to be_truthy
       end
     end
@@ -119,8 +119,8 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
 
         expect(response).to have_http_status(:unprocessable_content)
         expect(JSON.parse(response.body)['errors']['base']).to include(
-                                                                 I18n.t('api.v1.errors.brand_memberships.already_member')
-                                                               )
+          I18n.t('api.v1.errors.brand_memberships.already_member')
+        )
       end
     end
 
@@ -184,8 +184,8 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
 
         expect(response).to have_http_status(:not_found)
         expect(JSON.parse(response.body)['error']).to eq(
-                                                        I18n.t('api.v1.errors.brands.not_found_or_access_denied')
-                                                      )
+          I18n.t('api.v1.errors.brands.not_found_or_access_denied')
+        )
       end
     end
 
@@ -211,8 +211,8 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
 
       expect(response).to have_http_status(:not_found)
       expect(JSON.parse(response.body)['error']).to eq(
-                                                      I18n.t('api.v1.errors.brand_memberships.not_found')
-                                                    )
+        I18n.t('api.v1.errors.brand_memberships.not_found')
+      )
     end
   end
 
@@ -221,7 +221,7 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
 
     it 'rescues the DB-level error and returns 422 instead of 500' do
       allow_any_instance_of(BrandMembership).to receive(:save)
-                                                  .and_raise(ActiveRecord::RecordNotUnique, 'duplicate key value violates unique constraint')
+        .and_raise(ActiveRecord::RecordNotUnique, 'duplicate key value violates unique constraint')
 
       post "/api/v1/brands/#{brand.id}/memberships",
            params: { membership: { user_id: new_user.id, role: 'manager' } },
@@ -230,8 +230,8 @@ RSpec.describe 'Api::V1::BrandMemberships', type: :request do
 
       expect(response).to have_http_status(:unprocessable_content)
       expect(JSON.parse(response.body)['errors']['base']).to include(
-                                                               I18n.t('api.v1.errors.brand_memberships.already_member')
-                                                             )
+        I18n.t('api.v1.errors.brand_memberships.already_member')
+      )
     end
   end
 

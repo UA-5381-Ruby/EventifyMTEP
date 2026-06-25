@@ -139,11 +139,11 @@ RSpec.describe Api::V1::TicketsController, type: :request do
       it 'creates a ticket and returns 201' do
         new_event = create(:event)
 
-        expect {
+        expect do
           post '/api/v1/tickets',
                params: { ticket: { event_id: new_event.id } }.to_json,
                headers: json_headers
-        }.to change(Ticket, :count).by(1)
+        end.to change(Ticket, :count).by(1)
 
         expect(response).to have_http_status(:created)
         json = response.parsed_body
@@ -163,10 +163,8 @@ RSpec.describe Api::V1::TicketsController, type: :request do
       end
 
       it 'returns 422 when a duplicate ticket already exists (RecordNotUnique)' do
-        tickets_relation = instance_double(ActiveRecord::Associations::CollectionProxy)
-        built_ticket     = build(:ticket, user: user, event: event)
-
-        allow(@current_user || user).to receive(:tickets).and_return(tickets_relation) if false
+        instance_double(ActiveRecord::Associations::CollectionProxy)
+        build(:ticket, user: user, event: event)
 
         allow_any_instance_of(Ticket).to receive(:save).and_raise(ActiveRecord::RecordNotUnique)
 
@@ -235,9 +233,9 @@ RSpec.describe Api::V1::TicketsController, type: :request do
 
     context 'when the ticket has no existing feedback' do
       it 'creates event_feedback and returns 200' do
-        expect {
+        expect do
           post "/api/v1/tickets/#{ticket.id}/review", params: review_body, headers: json_headers
-        }.to change(EventFeedback, :count).by(1)
+        end.to change(EventFeedback, :count).by(1)
 
         expect(response).to have_http_status(:ok)
         json = response.parsed_body
@@ -252,9 +250,9 @@ RSpec.describe Api::V1::TicketsController, type: :request do
       end
 
       it 'updates existing feedback without creating a new record' do
-        expect {
+        expect do
           post "/api/v1/tickets/#{ticket.id}/review", params: review_body, headers: json_headers
-        }.not_to change(EventFeedback, :count)
+        end.not_to change(EventFeedback, :count)
 
         expect(response).to have_http_status(:ok)
         expect(existing_feedback.reload.rating).to eq(5)

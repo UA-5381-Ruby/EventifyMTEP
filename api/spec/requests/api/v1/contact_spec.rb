@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe 'Api::V1::Contact', type: :request do
@@ -22,7 +24,8 @@ RSpec.describe 'Api::V1::Contact', type: :request do
         expect(response).to have_http_status(:ok)
         expect(JSON.parse(response.body)['message']).to eq('Message sent successfully')
         expect(MailerService).to have_received(:send_contact_message)
-                                   .with(ActionController::Parameters.new(valid_params[:contact]).permit(:name, :email, :subject, :message))
+          .with(ActionController::Parameters.new(valid_params[:contact]).permit(:name, :email,
+                                                                                :subject, :message))
       end
     end
 
