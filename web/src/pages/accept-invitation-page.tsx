@@ -37,7 +37,7 @@ export function AcceptInvitationPage() {
     hasAccepted.current = true;
 
     if (!tokenStorage.get()) {
-      const returnUrl = `/accept-invitation?token=${encodeURIComponent(token)}&brand_id=${brandId}`;
+      const returnUrl = `/accept-invitation?token=${encodeURIComponent(token)}&brand_id=${encodeURIComponent(brandId)}`;
       navigate(`/login?redirect=${encodeURIComponent(returnUrl)}`, { replace: true });
       return;
     }

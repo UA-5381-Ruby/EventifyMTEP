@@ -73,7 +73,9 @@ export const BrandMembershipsService = {
     await apiClient.delete(`/api/v1/brands/${brandId}/memberships/${membershipId}`);
   },
   async getUserMemberships(userId: string | number): Promise<Membership[]> {
-    const response = await apiClient.get<Membership[]>(`/api/v1/users/${userId}/brand_memberships`);
-    return response.data;
+    const response = await apiClient.get<PaginatedResponse<Membership>>(
+      `/api/v1/users/${userId}/brand_memberships`
+    );
+    return response.data.data; // розпаковуємо envelope
   },
 };

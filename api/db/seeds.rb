@@ -81,7 +81,7 @@ def seed_normal_users
     User.find_or_create_by!(email: "user#{i}@test.com") do |u|
       u.name = Faker::Name.name
       u.password = '123123'
-      u.is_confirmed = RNG.rand < 0.5
+      u.is_confirmed = true
     end
   end
 end
