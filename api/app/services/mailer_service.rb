@@ -28,4 +28,8 @@ class MailerService
     UserMailer.brand_invitation(email, brand, token).deliver_later
     token
   end
+
+  def self.send_contact_message(params)
+    UserMailer.contact_message(params).deliver_later
+  end
 end

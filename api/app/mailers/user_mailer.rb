@@ -47,4 +47,17 @@ class UserMailer < ApplicationMailer
       content_type: 'text/html'
     )
   end
+
+  def contact_message(params)
+    @name    = params[:name]
+    @email   = params[:email]
+    @subject = params[:subject]
+    @message = params[:message]
+
+    mail(
+      to: 'support@eventify.com',
+      reply_to: @email,
+      subject: "[Contact] #{@subject}"
+    )
+  end
 end
