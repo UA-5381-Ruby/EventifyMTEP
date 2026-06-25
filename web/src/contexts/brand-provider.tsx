@@ -1,4 +1,5 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+﻿// brand-provider.tsx
+import React, { useState, useEffect, useCallback } from 'react';
 import { brandsService } from '@/services/brands-service';
 import { BrandMembershipsService } from '@/services/brand-memberships-service';
 import type { Brand } from '@/types/brand';
