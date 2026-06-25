@@ -1,7 +1,7 @@
 import { Button, Input, Textarea, Alert, Card } from '@/components/ui';
 import { Container, PageWrapper } from '@/components/layout';
 import { CONTACT_DETAILS } from '@/constants/ui.constants';
-import { useContactForm } from '@/hooks/useContactForm';
+import { useContactForm } from '@/hooks/use-contact-form.ts';
 
 export function ContactPage() {
   const { fields, errors, status, handleChange, handleSubmit } = useContactForm();

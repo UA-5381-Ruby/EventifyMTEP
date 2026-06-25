@@ -2,6 +2,25 @@
 
 require 'active_support/core_ext/integer/time'
 
+def configure_mailer(config)
+  # Action Mailer
+  config.action_mailer.raise_delivery_errors = true
+  config.action_mailer.perform_caching = false
+  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
+
+  config.action_mailer.delivery_method = :letter_opener
+
+  # config.action_mailer.delivery_method = :smtp
+  # config.action_mailer.smtp_settings = {
+  #   address: 'smtp.resend.com',
+  #   port: 587,
+  #   user_name: 'resend',
+  #   password: ENV['RESEND_API_KEY'],
+  #   authentication: :plain,
+  #   enable_starttls_auto: true
+  # }
+end
+
 Rails.application.configure do
   config.enable_reloading = true
   config.eager_load = false
@@ -29,21 +48,5 @@ Rails.application.configure do
     config.cache_store = :null_store
   end
 
-
-  # Action Mailer
-  config.action_mailer.raise_delivery_errors = true
-  config.action_mailer.perform_caching = false
-  config.action_mailer.default_url_options = { host: 'localhost', port: 3000 }
-
-  config.action_mailer.delivery_method = :letter_opener
-
-  # config.action_mailer.delivery_method = :smtp
-  # config.action_mailer.smtp_settings = {
-  #   address: 'smtp.resend.com',
-  #   port: 587,
-  #   user_name: 'resend',
-  #   password: ENV['RESEND_API_KEY'],
-  #   authentication: :plain,
-  #   enable_starttls_auto: true
-  # }
+  configure_mailer(config)
 end
