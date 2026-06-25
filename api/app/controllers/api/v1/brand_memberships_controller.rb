@@ -5,19 +5,29 @@ module Api
     class BrandMembershipsController < ApplicationController
       include Paginatable
 
-      before_action :set_brand
+      before_action :set_brand, if: -> { params[:brand_id].present? }
       before_action :set_membership, only: %i[update destroy]
       before_action :authorize_membership, only: %i[update destroy]
 
       def index
-        authorize @brand, :show_brand_memberships?
-        memberships = @brand.brand_memberships.includes(:user)
+        if params[:brand_id].present?
+          authorize @brand, :show_brand_memberships?
+          memberships = @brand.brand_memberships.includes(:user)
+          serializer_opts = { include: { user: { only: %i[id name email] } } }
+        else
+          unless params[:user_id].to_i == current_user.id || current_user.is_superadmin?
+            return render json: { error: t('api.v1.errors.forbidden') }, status: :forbidden
+          end
+
+          user = User.find(params[:user_id])
+          memberships = user.brand_memberships.includes(:brand)
+          serializer_opts = { include: { brand: { only: %i[id name subdomain], methods: [:logo_url] } } }
+        end
+
         paginated = paginate(memberships)
 
         render json: {
-          data: paginated[:records].as_json(
-            include: { user: { only: %i[id name email] } }
-          ),
+          data: paginated[:records].as_json(serializer_opts),
           meta: paginated[:meta]
         }, status: :ok
       end
@@ -70,10 +80,7 @@ module Api
 
       def set_brand
         @brand = Brand.find(params[:brand_id])
-
         authorize @brand, :manage_memberships?
-      rescue ActiveRecord::RecordNotFound
-        render json: { error: t('api.v1.errors.brands.not_found_or_access_denied') }, status: :not_found
       rescue Pundit::NotAuthorizedError
         render json: { error: t('api.v1.errors.forbidden') }, status: :forbidden
       end

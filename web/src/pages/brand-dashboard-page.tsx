@@ -6,17 +6,47 @@ import { BrandView } from '@/components/brands/brand-view';
 import { BrandEditModal } from '@/components/brands/brand-edit-modal';
 import { InviteMemberModal } from '@/components/brands/invite-member-modal';
 import { CreateEventModal } from '@/components/events/create-event-modal';
-import { useAuth } from '@/hooks/use-auth';
 import { useBrandDashboard } from '@/hooks/use-brand-dashboard';
 import { useCreateEvent } from '@/hooks/use-create-event';
 import { useBrandAccess } from '@/hooks/use-brand-access';
+import { BrandMembershipsService } from '@/services/brand-memberships-service';
+import type { Membership } from '@/types/brand-memberships';
 
 export function BrandDashboardPage() {
-  const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const brandId = Number(id);
 
-  const { canManage, memberships, isLoading: membershipsLoading } = useBrandAccess(id, user?.id);
+  const { canManage, isLoading: accessLoading } = useBrandAccess(id);
+
+  const [memberships, setMemberships] = useState<Membership[]>([]);
+  const [membershipsLoading, setMembershipsLoading] = useState(true);
+
+  useEffect(() => {
+    if (!canManage || Number.isNaN(brandId)) {
+      setMembershipsLoading(false);
+      return;
+    }
+
+    let isMounted = true;
+    setMembershipsLoading(true);
+
+    BrandMembershipsService.getBrandMemberships(brandId, {})
+      .then((data) => {
+        if (isMounted) setMemberships(data.data);
+      })
+      .catch(() => {
+        if (isMounted) setMemberships([]);
+      })
+      .finally(() => {
+        if (isMounted) setMembershipsLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [canManage, brandId]);
+
   const [isInviteOpen, setIsInviteOpen] = useState(false);
 
   const {
@@ -30,16 +60,16 @@ export function BrandDashboardPage() {
     handleFieldChange,
     handleSave,
   } = useBrandDashboard(id);
-  const brandId = Number(id);
+
   const createEvent = useCreateEvent(brandId, () => window.location.reload());
 
   useEffect(() => {
-    if (!membershipsLoading && !isLoading && !canManage) {
+    if (!accessLoading && !canManage) {
       navigate(`/brands/${id}`, { replace: true });
     }
-  }, [membershipsLoading, canManage, isLoading, id, navigate]);
+  }, [accessLoading, canManage, id, navigate]);
 
-  if (isLoading || membershipsLoading) {
+  if (accessLoading || isLoading) {
     return (
       <PageWrapper>
         <div className="flex h-96 items-center justify-center">
