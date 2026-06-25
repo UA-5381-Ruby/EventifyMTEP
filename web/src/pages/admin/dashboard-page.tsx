@@ -11,7 +11,7 @@ import { Button } from '@/components/ui';
 import { StatCard, SectionHeader } from '../../components/admin/shared';
 import { EventsTable } from '../../components/admin/event/events-table';
 import { TeamList } from '../../components/admin/team-list';
-import type {Membership} from "@/types/brand-memberships";
+import type { Membership } from '@/types/brand-memberships';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
