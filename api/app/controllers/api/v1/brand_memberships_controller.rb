@@ -7,55 +7,25 @@ module Api
 
       before_action :set_brand, if: -> { params[:brand_id].present? }
       before_action :set_membership, only: %i[update destroy]
-      before_action :authorize_membership, only: %i[update destroy]
 
       def index
-        if params[:brand_id].present?
-          authorize @brand, :show_brand_memberships?
-          memberships = @brand.brand_memberships.includes(:user)
-          serializer_opts = { include: { user: { only: %i[id name email] } } }
-        else
-          unless params[:user_id].to_i == current_user.id || current_user.is_superadmin?
-            return render json: { error: t('api.v1.errors.forbidden') }, status: :forbidden
-          end
-
-          user = User.find(params[:user_id])
-          memberships = user.brand_memberships.includes(:brand)
-          serializer_opts = { include: { brand: { only: %i[id name subdomain], methods: [:logo_url] } } }
-        end
-
-        paginated = paginate(memberships)
-
-        render json: {
-          data: paginated[:records].as_json(serializer_opts),
-          meta: paginated[:meta]
-        }, status: :ok
+        params[:brand_id].present? ? index_for_brand : index_for_user
       end
 
       def create
         @membership = @brand.brand_memberships.build(create_membership_params)
         authorize @membership
 
-        begin
-          if @membership.save
-            render json: @membership, status: :created
-          elsif duplicate_membership_error?
-            render_duplicate_error
-          else
-            render json: { errors: @membership.errors }, status: :unprocessable_content
-          end
-        rescue ActiveRecord::RecordNotUnique
-          render_duplicate_error
-        end
+        save_membership
+      rescue ActiveRecord::RecordNotUnique
+        render_base_error(t('api.v1.errors.brand_memberships.already_member'))
       end
 
       def update
-        new_role = update_membership_params[:role]
+        authorize @membership
 
-        if last_owner_downgrade?(new_role)
-          return render json: {
-            errors: { base: [t('api.v1.errors.brand_memberships.cannot_downgrade_last_owner')] }
-          }, status: :unprocessable_content
+        if ownership_guard.downgrade_blocked?(update_membership_params[:role])
+          return render_base_error(t('api.v1.errors.brand_memberships.cannot_downgrade_last_owner'))
         end
 
         if @membership.update(update_membership_params)
@@ -66,10 +36,9 @@ module Api
       end
 
       def destroy
-        if last_owner_removal?
-          return render json: {
-            errors: { base: [t('api.v1.errors.brand_memberships.cannot_remove_last_owner')] }
-          }, status: :unprocessable_content
+        authorize @membership
+        if ownership_guard.removal_blocked?
+          return render_base_error(t('api.v1.errors.brand_memberships.cannot_remove_last_owner'))
         end
 
         @membership.destroy
@@ -78,21 +47,57 @@ module Api
 
       private
 
+      def save_membership
+        if @membership.save
+          render json: @membership, status: :created
+        elsif @membership.errors[:user_id]&.any? { |e| e.include?('taken') }
+          render_base_error(t('api.v1.errors.brand_memberships.already_member'))
+        else
+          render json: { errors: @membership.errors }, status: :unprocessable_content
+        end
+      end
+
+      def index_for_brand
+        authorize @brand, :show_brand_memberships?
+        render_memberships(@brand.brand_memberships.includes(:user), include: { user: { only: %i[id name email] } })
+      end
+
+      def index_for_user
+        return render_error(t('api.v1.errors.forbidden'), :forbidden) unless authorized_user_index?
+
+        memberships = User.find(params[:user_id]).brand_memberships.includes(:brand)
+        render_memberships(memberships, include: { brand: { only: %i[id name subdomain], methods: [:logo_url] } })
+      end
+
+      def authorized_user_index?
+        params[:user_id].to_i == current_user.id || current_user.is_superadmin?
+      end
+
+      def render_memberships(memberships, serializer_opts)
+        paginated = paginate(memberships)
+        render json: {
+          data: paginated[:records].as_json(serializer_opts),
+          meta: paginated[:meta]
+        }, status: :ok
+      end
+
       def set_brand
         @brand = Brand.find(params[:brand_id])
         authorize @brand, :manage_memberships?
+      rescue ActiveRecord::RecordNotFound
+        render_error(t('api.v1.errors.brands.not_found_or_access_denied'), :not_found)
       rescue Pundit::NotAuthorizedError
-        render json: { error: t('api.v1.errors.forbidden') }, status: :forbidden
+        render_error(t('api.v1.errors.forbidden'), :forbidden)
       end
 
       def set_membership
         @membership = @brand.brand_memberships.find(params[:id])
       rescue ActiveRecord::RecordNotFound
-        render json: { error: t('api.v1.errors.brand_memberships.not_found') }, status: :not_found
+        render_error(t('api.v1.errors.brand_memberships.not_found'), :not_found)
       end
 
-      def authorize_membership
-        authorize @membership
+      def ownership_guard
+        @ownership_guard ||= BrandMembershipOwnershipGuard.new(@membership)
       end
 
       def create_membership_params
@@ -103,28 +108,12 @@ module Api
         params.expect(membership: %i[role])
       end
 
-      def duplicate_membership_error?
-        @membership.errors[:user_id]&.any? { |e| e.include?('taken') }
+      def render_error(message, status)
+        render json: { error: message }, status: status
       end
 
-      def render_duplicate_error
-        render json: {
-          errors: { base: [t('api.v1.errors.brand_memberships.already_member')] }
-        }, status: :unprocessable_content
-      end
-
-      def last_owner_downgrade?(new_role)
-        @membership.role == 'owner' &&
-          new_role != 'owner' &&
-          owners_count <= 1
-      end
-
-      def last_owner_removal?
-        @membership.role == 'owner' && owners_count <= 1
-      end
-
-      def owners_count
-        @brand.brand_memberships.where(role: 'owner').count
+      def render_base_error(message)
+        render json: { errors: { base: [message] } }, status: :unprocessable_content
       end
     end
   end

@@ -1,4 +1,3 @@
-// use-brand-membership.ts
 import { useBrand } from '@/contexts/brand-context';
 
 export const useBrandMembership = (targetBrandId?: string) => {
