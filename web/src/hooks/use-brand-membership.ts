@@ -1,46 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/hooks/use-auth';
-import type { Membership } from '@/types/brand-memberships';
-import { BrandMembershipsService } from '@/services/brand-memberships-service';
+import { useBrand } from '@/contexts/brand-context';
 
 export const useBrandMembership = (targetBrandId?: string) => {
-  const { user } = useAuth();
-  const [memberships, setMemberships] = useState<Membership[]>([]);
-  const [isLoading, setIsLoading] = useState(!!user?.id);
-  const [error, setError] = useState<Error | null>(null);
+  const { memberships, isLoading } = useBrand();
 
-  useEffect(() => {
-    if (!user?.id) {
-      return;
-    }
-
-    const loadMembershipsData = async () => {
-      try {
-        setIsLoading(true);
-        const data = await BrandMembershipsService.getUserMemberships(user.id);
-        setMemberships(data);
-      } catch (err) {
-        setError(err instanceof Error ? err : new Error('Unknown error'));
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadMembershipsData();
-  }, [user?.id]);
-  const isAnyBrandManager = memberships.some((m) => m.role === 'admin' || m.role === 'owner');
-
+  const isAnyBrandManager = memberships.some((m) => m.role === 'owner' || m.role === 'manager');
   const isCurrentBrandManager = targetBrandId
     ? memberships.some(
-        (m) => m.brand_id === Number(targetBrandId) && (m.role === 'admin' || m.role === 'owner')
+        (m) => m.brand_id === Number(targetBrandId) && (m.role === 'owner' || m.role === 'manager')
       )
     : false;
 
-  return {
-    memberships,
-    isLoading,
-    error,
-    isAnyBrandManager,
-    isCurrentBrandManager,
-  };
+  return { memberships, isLoading, isAnyBrandManager, isCurrentBrandManager };
 };

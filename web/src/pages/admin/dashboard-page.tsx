@@ -5,27 +5,27 @@ import type { Event } from '@/types/event';
 import { EventsService } from '@/services/events-service';
 import { BrandMembershipsService } from '@/services/brand-memberships-service';
 import { useBrandAccess } from '@/hooks/use-brand-access';
-import { useAuth } from '@/hooks/use-auth';
-import { InviteMemberModal } from '@/components/admin/modals/invite-member-modal.tsx';
+import { InviteMemberModal } from '@/components/admin/modals/invite-member-modal';
 import { Button } from '@/components/ui';
 
 import { StatCard, SectionHeader } from '../../components/admin/shared';
-import { EventsTable } from '../../components/admin/event/events-table.tsx';
-import { TeamList } from '../../components/admin/team-list.tsx';
+import { EventsTable } from '../../components/admin/event/events-table';
+import { TeamList } from '../../components/admin/team-list';
+import type { Membership } from '@/types/brand-memberships';
 
 export const DashboardPage = () => {
   const navigate = useNavigate();
   const { brand } = useOutletContext<{ brand: Brand }>();
-  const { user } = useAuth();
 
   const [events, setEvents] = useState<Event[]>([]);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [eventStats, setEventStats] = useState({ total: 0, pending: 0 });
+  const [teamMembers, setTeamMembers] = useState<Membership[]>([]);
   const [membersCount, setMembersCount] = useState(0);
 
-  const { canManage, memberships } = useBrandAccess(String(brand.id), user?.id);
+  const { canManage } = useBrandAccess(String(brand.id));
 
-  const previewMembers = memberships.slice(0, 3);
+  const previewMembers = teamMembers.slice(0, 3);
 
   useEffect(() => {
     let isMounted = true;
@@ -35,7 +35,7 @@ export const DashboardPage = () => {
         const [recentEventsRes, allEventsStatsRes, membersRes] = await Promise.all([
           EventsService.getEvents({ brand_id: brand.id, per_page: 3 }),
           EventsService.getEvents({ brand_id: brand.id }),
-          BrandMembershipsService.getBrandMemberships(brand.id, { per_page: 1 }),
+          BrandMembershipsService.getBrandMemberships(brand.id, { per_page: 3 }),
         ]);
 
         if (!isMounted) return;
@@ -48,6 +48,7 @@ export const DashboardPage = () => {
             .length,
         });
 
+        setTeamMembers(membersRes?.data || []);
         setMembersCount(membersRes?.meta?.total_count ?? membersRes?.data?.length ?? 0);
       } catch (error) {
         console.error('Dashboard load error:', error);

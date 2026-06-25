@@ -1,6 +1,9 @@
 ﻿import React, { useState, useEffect, useCallback } from 'react';
 import { brandsService } from '@/services/brands-service';
+import { BrandMembershipsService } from '@/services/brand-memberships-service';
 import type { Brand } from '@/types/brand';
+import type { Membership } from '@/types/brand-memberships';
+import { useAuth } from '@/hooks/use-auth';
 import { BrandContext } from './brand-context';
 
 const fetchManagedBrands = async (): Promise<Brand[]> => {
@@ -8,46 +11,74 @@ const fetchManagedBrands = async (): Promise<Brand[]> => {
   return response.data;
 };
 
-export function BrandProvider({ children }: { children: React.ReactNode }) {
-  const [brand, setBrand] = useState<Brand | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+type BrandState = {
+  brand: Brand | null;
+  memberships: Membership[];
+  isLoading: boolean;
+};
 
-  const refreshBrand = useCallback(async (brandId?: number) => {
-    setIsLoading(true);
-    try {
-      const brands = await fetchManagedBrands();
-      if (brands && brands.length > 0) {
-        const targetBrand = brandId
-          ? brands.find((b: Brand) => b.id === brandId) || brands[0]
-          : brands[0];
-        setBrand(targetBrand);
+const LOADING_STATE: BrandState = { brand: null, memberships: [], isLoading: true };
+const EMPTY_STATE: BrandState = { brand: null, memberships: [], isLoading: false };
+
+export function BrandProvider({ children }: { children: React.ReactNode }) {
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const [state, setState] = useState<BrandState>(LOADING_STATE);
+
+  const loadData = useCallback(async (userId: number, brandId?: number) => {
+    const run = async () => {
+      setState(LOADING_STATE);
+      try {
+        const [brands, userMemberships] = await Promise.all([
+          fetchManagedBrands(),
+          BrandMembershipsService.getUserMemberships(userId),
+        ]);
+
+        const targetBrand =
+          brands.length > 0
+            ? brandId
+              ? (brands.find((b: Brand) => b.id === brandId) ?? brands[0])
+              : brands[0]
+            : null;
+
+        setState({ brand: targetBrand, memberships: userMemberships, isLoading: false });
+      } catch (error) {
+        console.error('Error fetching brand data:', error);
+        setState(EMPTY_STATE);
       }
-    } catch (error) {
-      console.error('Error fetching user brands:', error);
-    } finally {
-      setIsLoading(false);
-    }
+    };
+    await run();
   }, []);
 
   useEffect(() => {
-    async function initializeBrand() {
-      try {
-        const brands = await fetchManagedBrands();
-        if (brands && brands.length > 0) {
-          setBrand(brands[0]);
-        }
-      } catch (error) {
-        console.error('Error fetching user brands:', error);
-      } finally {
-        setIsLoading(false);
-      }
+    if (isAuthLoading) return;
+
+    const userId = user?.id;
+    if (!userId) {
+      void (async () => setState(EMPTY_STATE))();
+      return;
     }
 
-    void initializeBrand();
-  }, []);
+    void loadData(userId);
+  }, [isAuthLoading, user, loadData]);
+
+  const refreshBrand = useCallback(
+    async (brandId?: number) => {
+      const userId = user?.id;
+      if (userId) await loadData(userId, brandId);
+    },
+    [user, loadData]
+  );
 
   return (
-    <BrandContext.Provider value={{ brand, hasBrand: !!brand, isLoading, refreshBrand }}>
+    <BrandContext.Provider
+      value={{
+        brand: state.brand,
+        hasBrand: !!state.brand,
+        memberships: state.memberships,
+        isLoading: state.isLoading,
+        refreshBrand,
+      }}
+    >
       {children}
     </BrandContext.Provider>
   );

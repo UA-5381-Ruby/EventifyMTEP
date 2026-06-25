@@ -1,9 +1,11 @@
 import { createContext, useContext } from 'react';
 import type { Brand } from '@/types/brand';
+import type { Membership } from '@/types/brand-memberships';
 
 export interface BrandContextType {
   brand: Brand | null;
   hasBrand: boolean;
+  memberships: Membership[];
   isLoading: boolean;
   refreshBrand: (brandId?: number) => Promise<void>;
 }

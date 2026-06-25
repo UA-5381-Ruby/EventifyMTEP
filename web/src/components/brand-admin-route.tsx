@@ -4,7 +4,7 @@ import { useBrandMembership } from '@/hooks/use-brand-membership';
 
 export const BrandManagerRoute = () => {
   const { user, isAuthenticated } = useAuth();
-  const { brandId } = useParams<{ brandId: string }>();
+  const { id: brandId } = useParams<{ id: string }>();
   const { isLoading, isCurrentBrandManager } = useBrandMembership(brandId);
 
   if (!isAuthenticated) return <Navigate to="/login" replace />;
