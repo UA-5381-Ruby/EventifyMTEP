@@ -20,27 +20,26 @@ export function BrandDashboardPage() {
   const { canManage, isLoading: accessLoading } = useBrandAccess(id);
 
   const [memberships, setMemberships] = useState<Membership[]>([]);
-  const [membershipsLoading, setMembershipsLoading] = useState(true);
+  const [membershipsLoading, setMembershipsLoading] = useState(false);
 
   useEffect(() => {
-    if (!canManage || Number.isNaN(brandId)) {
-      setMembershipsLoading(false);
-      return;
-    }
+    if (!canManage || Number.isNaN(brandId)) return;
 
     let isMounted = true;
-    setMembershipsLoading(true);
 
-    BrandMembershipsService.getBrandMemberships(brandId, {})
-      .then((data) => {
+    const run = async () => {
+      setMembershipsLoading(true);
+      try {
+        const data = await BrandMembershipsService.getBrandMemberships(brandId, {});
         if (isMounted) setMemberships(data.data);
-      })
-      .catch(() => {
+      } catch {
         if (isMounted) setMemberships([]);
-      })
-      .finally(() => {
+      } finally {
         if (isMounted) setMembershipsLoading(false);
-      });
+      }
+    };
+
+    void run();
 
     return () => {
       isMounted = false;
