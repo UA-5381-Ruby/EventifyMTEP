@@ -1,81 +1,10 @@
-import { useState } from 'react';
 import { Button, Input, Textarea, Alert, Card } from '@/components/ui';
 import { Container, PageWrapper } from '@/components/layout';
-import { Mail, Clock } from 'lucide-react';
-
-type FormFields = {
-  name: string;
-  email: string;
-  subject: string;
-  message: string;
-};
-
-type FormErrors = Partial<Record<keyof FormFields, string>>;
-
-const EMPTY_FORM: FormFields = { name: '', email: '', subject: '', message: '' };
-
-function validate(fields: FormFields): FormErrors {
-  const errors: FormErrors = {};
-  if (!fields.name.trim()) errors.name = 'Name is required';
-  if (!fields.email.trim()) {
-    errors.email = 'Email is required';
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email)) {
-    errors.email = 'Enter a valid email address';
-  }
-  if (!fields.subject.trim()) errors.subject = 'Subject is required';
-  if (!fields.message.trim()) errors.message = 'Message is required';
-  else if (fields.message.trim().length < 10) errors.message = 'Message is too short';
-  return errors;
-}
-
-const CONTACT_DETAILS = [
-  {
-    icon: Mail,
-    label: 'Email',
-    value: 'support@eventify.com',
-  },
-  {
-    icon: Clock,
-    label: 'Response time',
-    value: 'Within 24 hours',
-  },
-];
+import { CONTACT_DETAILS } from '@/constants/ui.constants';
+import { useContactForm } from '@/hooks/useContactForm';
 
 export function ContactPage() {
-  const [fields, setFields] = useState<FormFields>(EMPTY_FORM);
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-
-  const handleChange =
-    (key: keyof FormFields) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setFields((prev) => ({ ...prev, [key]: e.target.value }));
-      if (errors[key]) setErrors((prev) => ({ ...prev, [key]: undefined }));
-    };
-
-  const handleSubmit = async () => {
-    const validationErrors = validate(fields);
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    setStatus('loading');
-    try {
-      const res = await fetch('/api/v1/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contact: fields }),
-      });
-
-      if (!res.ok) throw new Error('Failed to send');
-
-      setStatus('success');
-      setFields(EMPTY_FORM);
-      setErrors({});
-    } catch {
-      setStatus('error');
-    }
-  };
+  const { fields, errors, status, handleChange, handleSubmit } = useContactForm();
 
   return (
     <PageWrapper>
