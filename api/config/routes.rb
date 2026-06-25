@@ -26,8 +26,8 @@ Rails.application.routes.draw do
 
       get 'users/me', to: 'users#me'
       resources :users, except: [:create] do
-  resources :brand_memberships, only: [:index]
-end
+        resources :brand_memberships, only: [:index]
+      end
 
       resources :events, only: [:index, :show, :create] do
         member do

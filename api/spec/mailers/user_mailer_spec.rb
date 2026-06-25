@@ -78,4 +78,32 @@ RSpec.describe UserMailer, type: :mailer do
       expect(mail.body.encoded).to include("brand_id=#{brand.id}")
     end
   end
+  describe '#contact_message' do
+    let(:contact_params) do
+      {
+        name: 'Jane Doe',
+        email: 'jane@example.com',
+        subject: 'Hello',
+        message: 'This is a test message.'
+      }
+    end
+    let(:mail) { UserMailer.contact_message(contact_params) }
+
+    it 'sends to the support address' do
+      expect(mail.to).to eq(['support@eventify.com'])
+    end
+
+    it 'sets reply_to to the submitter\'s email' do
+      expect(mail.reply_to).to eq(['jane@example.com'])
+    end
+
+    it 'renders subject with the contact subject interpolated' do
+      expect(mail.subject).to eq('[Contact] Hello')
+    end
+
+    it 'includes the submitter name and message in the body' do
+      expect(mail.body.encoded).to include('Jane Doe')
+      expect(mail.body.encoded).to include('This is a test message.')
+    end
+  end
 end

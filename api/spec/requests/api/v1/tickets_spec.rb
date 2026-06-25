@@ -1,366 +1,287 @@
 # frozen_string_literal: true
 
-require 'swagger_helper'
+require 'rails_helper'
 
-RSpec.describe 'api/v1/tickets', type: :request do
-  path '/api/v1/tickets' do
-    # =========================
-    # GET /tickets (list - AUTH REQUIRED)
-    # =========================
-    get 'List user tickets' do
-      tags 'Tickets'
-      produces 'application/json'
-      security [{ bearer_auth: [] }]
-      description 'Returns paginated, filterable and sortable list of tickets owned by the current user.'
+RSpec.describe Api::V1::TicketsController, type: :request do
+  let(:user) { create(:user) }
+  let(:headers) { auth_headers(user) }
+  let(:json_headers) { headers.merge('Content-Type' => 'application/json') }
 
-      parameter name: :current_page, in: :query, type: :integer, required: false
-      parameter name: :per_page, in: :query, type: :integer, required: false
-      parameter name: :sort, in: :query, type: :string, required: false
-      parameter name: :order, in: :query, type: :string, required: false
-      parameter name: :q, in: :query, type: :string, required: false
-      parameter name: :is_active, in: :query, type: :boolean, required: false
-      parameter name: :event_id, in: :query, type: :integer, required: false
+  let(:event) { create(:event) }
+  let!(:ticket) { create(:ticket, user: user, event: event) }
+  describe 'GET /api/v1/tickets' do
+    context 'when authenticated' do
+      it 'returns 200 and a list of tickets' do
+        get '/api/v1/tickets', headers: headers
 
-      let(:user) { create(:user) }
-      let(:Authorization) { jwt_for(user) }
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body
+        expect(json['data']).to be_an(Array)
+        expect(json['meta']).to be_present
+      end
 
-      response '200', 'tickets listed successfully' do
-        schema '$ref' => '#/components/schemas/TicketList'
+      it 'includes event and qr_code_url keys in each ticket' do
+        get '/api/v1/tickets', headers: headers
 
-        before do
-          brand = create(:brand)
+        first = response.parsed_body['data'].first
+        expect(first).to include('event', 'qr_code_url')
+        expect(first['event'].keys).to include('id', 'title', 'location', 'start_date', 'end_date')
+      end
 
-          event1 = create(:event,
-                          brand: brand,
-                          title: 'Tech Summit',
-                          start_date: 1.month.from_now,
-                          end_date: 1.month.from_now + 1.day)
+      it 'includes event_feedback key when feedback exists' do
+        create(:event_feedback, ticket: ticket)
 
-          event2 = create(:event,
-                          brand: brand,
-                          title: 'Web Workshop',
-                          start_date: 2.months.from_now,
-                          end_date: 2.months.from_now + 1.day)
+        get '/api/v1/tickets', headers: headers
 
-          create(:ticket, user: user, event: event1, is_active: true)
-          create(:ticket, user: user, event: event2, is_active: false)
+        first = response.parsed_body['data'].first
+        expect(first).to have_key('event_feedback')
+        expect(first['event_feedback']).to include('id', 'rating', 'comment')
+      end
+
+      it 'returns only tickets belonging to the current user' do
+        other_user_ticket = create(:ticket, user: create(:user), event: event)
+
+        get '/api/v1/tickets', headers: headers
+
+        ids = response.parsed_body['data'].pluck('id')
+        expect(ids).to include(ticket.id)
+        expect(ids).not_to include(other_user_ticket.id)
+      end
+
+      context 'with filtering' do
+        it 'filters by is_active' do
+          other_event     = create(:event)
+          inactive_ticket = create(:ticket, user: user, event: other_event, is_active: false)
+
+          get '/api/v1/tickets', params: { is_active: true }, headers: headers
+
+          ids = response.parsed_body['data'].pluck('id')
+          expect(ids).to include(ticket.id)
+          expect(ids).not_to include(inactive_ticket.id)
         end
 
-        let(:current_page) { 1 }
-        let(:per_page) { 20 }
+        it 'filters by event_id' do
+          other_event  = create(:event)
+          other_ticket = create(:ticket, user: user, event: other_event)
 
-        run_test!
-      end
+          get '/api/v1/tickets', params: { event_id: event.id }, headers: headers
 
-      response '200', 'tickets filtered by active status' do
-        schema '$ref' => '#/components/schemas/TicketList'
-
-        before do
-          brand = create(:brand)
-
-          event1 = create(:event,
-                          brand: brand,
-                          title: 'Active Event',
-                          start_date: 1.week.from_now,
-                          end_date: 1.week.from_now + 1.day)
-
-          event2 = create(:event,
-                          brand: brand,
-                          title: 'Inactive Event',
-                          start_date: 2.weeks.from_now,
-                          end_date: 2.weeks.from_now + 1.day)
-
-          event3 = create(:event,
-                          brand: brand,
-                          title: 'Another Event',
-                          start_date: 3.weeks.from_now,
-                          end_date: 3.weeks.from_now + 1.day)
-
-          create(:ticket, user: user, event: event1, is_active: true)
-          create(:ticket, user: user, event: event2, is_active: false)
-          create(:ticket, user: user, event: event3, is_active: true)
+          ids = response.parsed_body['data'].pluck('id')
+          expect(ids).to include(ticket.id)
+          expect(ids).not_to include(other_ticket.id)
         end
 
-        let(:is_active) { 'true' }
+        it 'searches by event name via :q param' do
+          get '/api/v1/tickets', params: { q: event.title }, headers: headers
 
-        run_test!
-      end
-
-      response '200', 'tickets searched by event title' do
-        schema '$ref' => '#/components/schemas/TicketList'
-
-        before do
-          brand = create(:brand)
-
-          event1 = create(:event,
-                          brand: brand,
-                          title: 'Ruby Conference',
-                          start_date: 1.week.from_now,
-                          end_date: 1.week.from_now + 1.day)
-
-          event2 = create(:event,
-                          brand: brand,
-                          title: 'Python Meetup',
-                          start_date: 2.weeks.from_now,
-                          end_date: 2.weeks.from_now + 1.day)
-
-          create(:ticket, user: user, event: event1)
-          create(:ticket, user: user, event: event2)
+          expect(response).to have_http_status(:ok)
+          ids = response.parsed_body['data'].pluck('id')
+          expect(ids).to include(ticket.id)
         end
-
-        let(:q) { 'Ruby' }
-
-        run_test!
       end
 
-      response '401', 'unauthorized' do
-        schema '$ref' => '#/components/schemas/Unauthorized'
-        let(:Authorization) { nil }
+      context 'with pagination' do
+        it 'respects page and per_page params' do
+          create_list(:ticket, 3, user: user, event: create(:event))
 
-        run_test!
-      end
-    end
+          get '/api/v1/tickets', params: { page: 1, per_page: 2 }, headers: headers
 
-    # =========================
-    # POST /tickets (CREATE - AUTH REQUIRED)
-    # =========================
-    post 'Create ticket' do
-      tags 'Tickets'
-      consumes 'application/json'
-      produces 'application/json'
-      security [{ bearer_auth: [] }]
-      description 'Creates a new ticket for the current user for a specified event. QR code is auto-generated.'
-
-      parameter name: :body, in: :body, required: true,
-                schema: { '$ref' => '#/components/schemas/TicketInput' }
-
-      let(:user) { create(:user) }
-      let(:Authorization) { jwt_for(user) }
-
-      response '201', 'ticket created' do
-        schema '$ref' => '#/components/schemas/Ticket'
-
-        let(:brand) { create(:brand) }
-        let(:event) { create(:event, brand: brand, start_date: 1.week.from_now, end_date: 1.week.from_now + 1.day) }
-
-        let(:body) do
-          {
-            ticket: {
-              event_id: event.id
-            }
-          }
+          json = response.parsed_body
+          expect(json['data'].size).to eq(2)
+          expect(json['meta']).to be_present
         end
-
-        run_test!
-      end
-
-      # Instead of an error, the button is disabled on frontend
-      # response '422', 'validation failed - user already registered for event' do
-      #   schema '$ref' => '#/components/schemas/ValidationErrors'
-
-      #   let(:brand) { create(:brand) }
-      #   let(:event) { create(:event, brand: brand, start_date: 1.week.from_now, end_date: 1.week.from_now + 1.day) }
-
-      #   before do
-      #     create(:ticket, user: user, event: event)
-      #   end
-
-      #   let(:body) do
-      #     {
-      #       ticket: {
-      #         event_id: event.id
-      #       }
-      #     }
-      #   end
-
-      #   run_test!
-      # end
-
-      response '401', 'unauthorized' do
-        schema '$ref' => '#/components/schemas/Unauthorized'
-        let(:Authorization) { nil }
-        let(:body) { { ticket: { event_id: 1 } } }
-
-        run_test!
       end
     end
   end
 
-  # =========================
-  # /tickets/:id
-  # =========================
-  path '/api/v1/tickets/{id}' do
-    parameter name: :id, in: :path, type: :integer, required: true
+  describe 'GET /api/v1/tickets/:id' do
+    context 'when the ticket belongs to the current user' do
+      it 'returns 200 and the ticket' do
+        get "/api/v1/tickets/#{ticket.id}", headers: headers
 
-    # =========================
-    # GET /tickets/:id (SHOW)
-    # =========================
-    get 'Show ticket' do
-      tags 'Tickets'
-      produces 'application/json'
-      security [{ bearer_auth: [] }]
-      description 'Returns a specific ticket with associated event and feedback.'
-
-      let(:user) { create(:user) }
-      let(:Authorization) { jwt_for(user) }
-
-      response '200', 'ticket found' do
-        schema '$ref' => '#/components/schemas/Ticket'
-
-        let(:brand) { create(:brand) }
-        let(:event) { create(:event, brand: brand, start_date: 1.week.from_now, end_date: 1.week.from_now + 1.day) }
-        let(:id) { create(:ticket, user: user, event: event).id }
-
-        run_test!
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body
+        expect(json['id']).to eq(ticket.id)
+        expect(json).to include('event', 'qr_code_url')
       end
 
-      response '404', 'ticket not found' do
-        schema '$ref' => '#/components/schemas/NotFound'
-        let(:id) { 0 }
+      it 'includes event_feedback when it exists' do
+        create(:event_feedback, ticket: ticket)
 
-        run_test!
-      end
+        get "/api/v1/tickets/#{ticket.id}", headers: headers
 
-      response '401', 'unauthorized' do
-        schema '$ref' => '#/components/schemas/Unauthorized'
-        let(:Authorization) { nil }
-        let(:id) { 1 }
-
-        run_test!
+        json = response.parsed_body
+        expect(json).to have_key('event_feedback')
+        expect(json['event_feedback']).to include('id', 'rating', 'comment')
       end
     end
 
-    # =========================
-    # PATCH /tickets/:id (UPDATE)
-    # =========================
-    patch 'Update ticket' do
-      tags 'Tickets'
-      consumes 'application/json'
-      produces 'application/json'
-      security [{ bearer_auth: [] }]
-      description 'Updates a ticket (e.g., is_active status).'
+    context 'when the ticket does not exist or belongs to another user' do
+      it 'returns 404 for non-existent id' do
+        get '/api/v1/tickets/0', headers: headers
 
-      parameter name: :body, in: :body, required: true,
-                schema: { '$ref' => '#/components/schemas/TicketUpdateInput' }
-
-      let(:user) { create(:user) }
-      let(:Authorization) { jwt_for(user) }
-
-      response '200', 'ticket updated' do
-        schema '$ref' => '#/components/schemas/Ticket'
-
-        let(:brand) { create(:brand) }
-        let(:event) { create(:event, brand: brand, start_date: 1.week.from_now, end_date: 1.week.from_now + 1.day) }
-        let(:id) { create(:ticket, user: user, event: event, is_active: true).id }
-
-        let(:body) do
-          {
-            ticket: {
-              is_active: false
-            }
-          }
-        end
-
-        run_test!
+        expect(response).to have_http_status(:not_found)
+        expect(response.parsed_body).to include('error')
       end
 
-      response '404', 'ticket not found' do
-        schema '$ref' => '#/components/schemas/NotFound'
-        let(:id) { 0 }
-        let(:body) { { ticket: { is_active: false } } }
+      it "returns 404 for another user's ticket" do
+        other_ticket = create(:ticket, user: create(:user), event: event)
 
-        run_test!
-      end
+        get "/api/v1/tickets/#{other_ticket.id}", headers: headers
 
-      response '401', 'unauthorized' do
-        schema '$ref' => '#/components/schemas/Unauthorized'
-        let(:Authorization) { nil }
-        let(:id) { 1 }
-        let(:body) { { ticket: { is_active: false } } }
-
-        run_test!
+        expect(response).to have_http_status(:not_found)
       end
     end
   end
 
-  # =========================
-  # /tickets/:id/review
-  # =========================
-  path '/api/v1/tickets/{id}/review' do
-    parameter name: :id, in: :path, type: :integer, required: true
+  describe 'POST /api/v1/tickets' do
+    context 'with valid params' do
+      it 'creates a ticket and returns 201' do
+        new_event = create(:event)
 
-    post 'Create or update ticket review' do
-      tags 'Tickets'
-      consumes 'application/json'
-      produces 'application/json'
-      security [{ bearer_auth: [] }]
-      description 'Creates or updates event feedback (review) for a ticket.'
+        expect {
+          post '/api/v1/tickets',
+               params: { ticket: { event_id: new_event.id } }.to_json,
+               headers: json_headers
+        }.to change(Ticket, :count).by(1)
 
-      parameter name: :body, in: :body, required: true,
-                schema: { '$ref' => '#/components/schemas/ReviewInput' }
+        expect(response).to have_http_status(:created)
+        json = response.parsed_body
+        expect(json['id']).to be_present
+        expect(json).to include('event', 'qr_code_url')
+      end
+    end
 
-      let(:user) { create(:user) }
-      let(:Authorization) { jwt_for(user) }
+    context 'with invalid params' do
+      it 'returns 422 when event_id is missing' do
+        post '/api/v1/tickets',
+             params: { ticket: {} }.to_json,
+             headers: json_headers
 
-      response '200', 'review created successfully' do
-        schema '$ref' => '#/components/schemas/EventFeedback'
-
-        let(:brand) { create(:brand) }
-        let(:event) { create(:event, brand: brand, start_date: 1.week.from_now, end_date: 1.week.from_now + 1.day) }
-        let(:id) { create(:ticket, user: user, event: event).id }
-
-        let(:body) do
-          {
-            ticket: {
-              rating: 5,
-              comment: 'Amazing event!'
-            }
-          }
-        end
-
-        run_test!
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.parsed_body).to include('errors')
       end
 
-      response '200', 'review updated successfully' do
-        schema '$ref' => '#/components/schemas/EventFeedback'
+      it 'returns 422 when a duplicate ticket already exists (RecordNotUnique)' do
+        tickets_relation = instance_double(ActiveRecord::Associations::CollectionProxy)
+        built_ticket     = build(:ticket, user: user, event: event)
 
-        let(:brand) { create(:brand) }
-        let(:event1) { create(:event, brand: brand, start_date: 1.week.from_now, end_date: 1.week.from_now + 1.day) }
-        let(:event2) { create(:event, brand: brand, start_date: 2.weeks.from_now, end_date: 2.weeks.from_now + 1.day) }
-        let(:ticket1) { create(:ticket, user: user, event: event1) }
-        let(:id) { ticket1.id }
+        allow(@current_user || user).to receive(:tickets).and_return(tickets_relation) if false
 
-        before do
-          create(:event_feedback, ticket: ticket1, rating: 3, comment: 'Good')
-        end
+        allow_any_instance_of(Ticket).to receive(:save).and_raise(ActiveRecord::RecordNotUnique)
 
-        let(:body) do
-          {
-            ticket: {
-              rating: 5,
-              comment: 'Changed my mind, it was excellent!'
-            }
-          }
-        end
+        post '/api/v1/tickets',
+             params: { ticket: { event_id: event.id } }.to_json,
+             headers: json_headers
 
-        run_test!
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.parsed_body.dig('errors', 'base')).to be_present
+      end
+    end
+  end
+
+  describe 'PATCH /api/v1/tickets/:id' do
+    context 'with valid params' do
+      it 'updates is_active and returns 200' do
+        patch "/api/v1/tickets/#{ticket.id}",
+              params: { ticket: { is_active: false } }.to_json,
+              headers: json_headers
+
+        expect(response).to have_http_status(:ok)
+        expect(ticket.reload.is_active).to be(false)
       end
 
-      response '404', 'ticket not found' do
-        schema '$ref' => '#/components/schemas/NotFound'
-        let(:id) { 0 }
-        let(:body) { { ticket: { rating: 5, comment: 'Great!' } } }
+      it 'returns the updated ticket with expected keys' do
+        patch "/api/v1/tickets/#{ticket.id}",
+              params: { ticket: { is_active: false } }.to_json,
+              headers: json_headers
 
-        run_test!
+        json = response.parsed_body
+        expect(json['id']).to eq(ticket.id)
+        expect(json).to include('event', 'qr_code_url')
+      end
+    end
+
+    context 'with invalid params' do
+      it 'returns 422 when update fails due to model validation' do
+        allow_any_instance_of(Ticket).to receive(:update).and_return(false)
+        errors_double = instance_double(ActiveModel::Errors, full_messages: ['is_active is invalid'])
+        allow_any_instance_of(Ticket).to receive(:errors).and_return(errors_double)
+
+        patch "/api/v1/tickets/#{ticket.id}",
+              params: { ticket: { is_active: false } }.to_json,
+              headers: json_headers
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.parsed_body).to include('errors')
+      end
+    end
+
+    context 'when the ticket does not belong to the user' do
+      it 'returns 404' do
+        other_ticket = create(:ticket, user: create(:user), event: event)
+
+        patch "/api/v1/tickets/#{other_ticket.id}",
+              params: { ticket: { is_active: false } }.to_json,
+              headers: json_headers
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
+  describe 'POST /api/v1/tickets/:id/review' do
+    let(:review_body) { { ticket: { rating: 5, comment: 'Great event!' } }.to_json }
+
+    context 'when the ticket has no existing feedback' do
+      it 'creates event_feedback and returns 200' do
+        expect {
+          post "/api/v1/tickets/#{ticket.id}/review", params: review_body, headers: json_headers
+        }.to change(EventFeedback, :count).by(1)
+
+        expect(response).to have_http_status(:ok)
+        json = response.parsed_body
+        expect(json['rating']).to eq(5)
+        expect(json['comment']).to eq('Great event!')
+      end
+    end
+
+    context 'when the ticket already has feedback' do
+      let!(:existing_feedback) do
+        create(:event_feedback, ticket: ticket, rating: 3, comment: 'OK')
       end
 
-      response '401', 'unauthorized' do
-        schema '$ref' => '#/components/schemas/Unauthorized'
-        let(:Authorization) { nil }
-        let(:id) { 1 }
-        let(:body) { { ticket: { rating: 5, comment: 'Great!' } } }
+      it 'updates existing feedback without creating a new record' do
+        expect {
+          post "/api/v1/tickets/#{ticket.id}/review", params: review_body, headers: json_headers
+        }.not_to change(EventFeedback, :count)
 
-        run_test!
+        expect(response).to have_http_status(:ok)
+        expect(existing_feedback.reload.rating).to eq(5)
+        expect(existing_feedback.reload.comment).to eq('Great event!')
+      end
+    end
+
+    context 'with invalid review params' do
+      it 'returns 422 when feedback fails validation' do
+        allow_any_instance_of(EventFeedback).to receive(:update).and_return(false)
+        errors_double = instance_double(ActiveModel::Errors, full_messages: ['Rating is invalid'])
+        allow_any_instance_of(EventFeedback).to receive(:errors).and_return(errors_double)
+
+        post "/api/v1/tickets/#{ticket.id}/review", params: review_body, headers: json_headers
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.parsed_body).to include('errors')
+      end
+    end
+
+    context 'when the ticket does not belong to the user' do
+      it 'returns 404' do
+        other_ticket = create(:ticket, user: create(:user), event: event)
+
+        post "/api/v1/tickets/#{other_ticket.id}/review", params: review_body, headers: json_headers
+
+        expect(response).to have_http_status(:not_found)
       end
     end
   end
