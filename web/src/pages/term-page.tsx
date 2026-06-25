@@ -213,12 +213,12 @@ export function TermsPage() {
               <h2 className="text-xl font-bold text-neutral-900 mb-3">12. Contact</h2>
               <p className="text-neutral-600">
                 If you have questions about these Terms, please{' '}
-                <a
-                  href="/contact"
+                <Link
+                  to="/contact"
                   className="font-semibold text-primary-600 hover:text-primary-700 hover:underline underline-offset-4 transition-colors"
                 >
                   contact the Eventify support team
-                </a>
+                </Link>
                 .
               </p>
             </div>
