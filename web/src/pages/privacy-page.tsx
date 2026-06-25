@@ -154,12 +154,12 @@ export function PrivacyPage() {
               <p className="mb-6 text-neutral-600">
                 If you have any questions about this Privacy Policy or how your data is handled, you
                 may{' '}
-                <a
-                  href="/contact"
+                <Link
+                  to="/contact"
                   className="font-semibold text-primary-600 hover:text-primary-700 hover:underline underline-offset-4 transition-colors"
                 >
                   contact the Eventify support team
-                </a>
+                </Link>
                 .
               </p>
               <p className="text-sm font-medium text-neutral-500">
