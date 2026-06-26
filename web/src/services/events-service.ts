@@ -33,6 +33,11 @@ export const EventsService = {
     return response.data;
   },
 
+  async getAllCategories(): Promise<{ id: number; name: string }[]> {
+    const response = await apiClient.get('/api/v1/categories');
+    return response.data;
+  },
+
   async getEventById(id: number): Promise<EventDetail> {
     const response = await apiClient.get(`/api/v1/events/${id}`);
     return response.data;
@@ -42,9 +47,16 @@ export const EventsService = {
     const formData = buildEventFormData(payload);
 
     const response = await apiClient.post('/api/v1/events', formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
+
+  async updateEvent(id: number, payload: Partial<CreateEventRequest>): Promise<EventDetail> {
+    const formData = buildEventFormData(payload);
+
+    const response = await apiClient.patch(`/api/v1/events/${id}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
     });
     return response.data;
   },

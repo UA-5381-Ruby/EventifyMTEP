@@ -73,9 +73,7 @@ module Api
       def update_event_attrs
         attrs = process_banner_upload(event_base_params.to_h)
 
-        if event_params[:category_ids].present?
-          attrs.merge!(category_ids: event_params[:category_ids])
-        end
+        attrs.merge!(category_ids: event_params[:category_ids]) if event_params[:category_ids].present?
 
         attrs
       end
@@ -87,7 +85,7 @@ module Api
         if file.present? && file.is_a?(ActionDispatch::Http::UploadedFile)
           attrs[:banner] =
             validated_media_key(file, folder: 'events/banners',
-                                error_scope: 'api.v1.errors.events.banner')
+                                      error_scope: 'api.v1.errors.events.banner')
         end
 
         attrs
@@ -133,10 +131,10 @@ module Api
 
       def event_params
         params.expect(event: [
-          :title, :description, :location, :start_date,
-          :end_date, :status, :brand_id, :banner, :price_cents, :available_tickets_count,
-          { category_ids: [] }
-        ])
+                        :title, :description, :location, :start_date,
+                        :end_date, :status, :brand_id, :banner, :price_cents, :available_tickets_count,
+                        { category_ids: [] }
+                      ])
       end
 
       def index_params

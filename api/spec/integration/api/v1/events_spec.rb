@@ -139,8 +139,8 @@ RSpec.describe 'api/v1/events', type: :request do
 
         expect(event).not_to be_valid
         expect(event.errors[:end_date]).to include(
-                                             I18n.t('activerecord.errors.models.event.attributes.end_date.after_start_date')
-                                           )
+          I18n.t('activerecord.errors.models.event.attributes.end_date.after_start_date')
+        )
       end
     end
   end
