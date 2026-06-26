@@ -13,7 +13,7 @@ class User < ApplicationRecord
   validates :email,
             presence: true,
             uniqueness: { case_sensitive: false },
-            format: { with: /\A[^@\s]+@[^@\s]+\.[^@\s]+\z/, message: 'must be a valid email address' }
+            format: { with: /\A[^@\s]+@[^@\s]+\.[^@\s]+\z/, message: :invalid_email }
 
   generates_token_for :email_verification, expires_in: 24.hours do
     email

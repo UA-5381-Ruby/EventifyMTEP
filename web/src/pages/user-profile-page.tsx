@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { PageWrapper } from '@/components/layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Alert } from '@/components/ui/alert';
+import { ChangePasswordModal } from '@/components/auth/change-password/change-password-modal';
 import { ProfileHeader } from '@/components/profile/profile-header';
 import { BrandMemberships } from '@/components/profile/brand-memberships';
 import { DeleteAccountSection } from '@/components/profile/delete-account-section';
@@ -20,6 +22,8 @@ export default function UserProfilePage() {
     handleSave,
     handleCancel,
   } = useUserProfile();
+
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
   if (isLoading)
     return <div className="p-8 text-neutral-500 flex justify-center">Loading profile...</div>;
@@ -70,6 +74,7 @@ export default function UserProfilePage() {
                 <Button
                   variant="outline"
                   className="bg-transparent text-neutral-700 hover:bg-neutral-50"
+                  onClick={() => setIsPasswordModalOpen(true)}
                 >
                   Change password
                 </Button>
@@ -96,6 +101,14 @@ export default function UserProfilePage() {
           </div>
         </div>
       </div>
+
+      <ChangePasswordModal
+        isOpen={isPasswordModalOpen}
+        onClose={() => setIsPasswordModalOpen(false)}
+        onSuccess={() =>
+          setAlert({ variant: 'success', message: 'Your password has been changed.' })
+        }
+      />
     </PageWrapper>
   );
 }

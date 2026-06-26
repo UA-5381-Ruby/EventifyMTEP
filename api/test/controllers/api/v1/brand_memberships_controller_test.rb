@@ -84,7 +84,7 @@ module Api
         assert_response :unprocessable_content
 
         json_response = JSON.parse(response.body)
-        assert_includes json_response['errors']['base'], 'User is already a member of this brand'
+        assert_includes json_response['errors']['base'], I18n.t('api.v1.errors.brand_memberships.already_member')
       end
     end
 
@@ -108,7 +108,8 @@ module Api
         assert_response :unprocessable_content
 
         json_response = JSON.parse(response.body)
-        assert_includes json_response['errors']['base'], 'Cannot downgrade the last owner of a brand'
+        assert_includes json_response['errors']['base'],
+                        I18n.t('api.v1.errors.brand_memberships.cannot_downgrade_last_owner')
 
         assert_equal 'owner', @owner_membership.reload.role
       end
@@ -147,7 +148,8 @@ module Api
         assert_response :unprocessable_content
 
         json_response = JSON.parse(response.body)
-        assert_includes json_response['errors']['base'], 'Cannot remove the last owner of a brand'
+        assert_includes json_response['errors']['base'],
+                        I18n.t('api.v1.errors.brand_memberships.cannot_remove_last_owner')
       end
     end
 
@@ -160,7 +162,7 @@ module Api
         assert_response :not_found
 
         json_response = JSON.parse(response.body)
-        assert_equal 'Brand not found', json_response['error']
+        assert_equal I18n.t('api.v1.errors.brands.not_found_or_access_denied'), json_response['error']
       end
 
       test 'should return 404 if membership is not found in the brand' do
@@ -172,7 +174,7 @@ module Api
         assert_response :not_found
 
         json_response = JSON.parse(response.body)
-        assert_equal 'Membership not found in this brand', json_response['error']
+        assert_equal I18n.t('api.v1.errors.brand_memberships.not_found'), json_response['error']
       end
     end
 

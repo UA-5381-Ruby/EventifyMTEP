@@ -26,7 +26,7 @@ module Api
         assert_response :created
         json_response = JSON.parse(response.body)
         assert_nil json_response['token'], 'JWT token should NOT be present on registration'
-        assert_includes json_response['message'], 'check your email'
+        assert_includes json_response['message'], I18n.t('api.v1.auth.registered')
       end
 
       test 'should not register with duplicate email (Edge case)' do
@@ -75,7 +75,7 @@ module Api
 
         assert_response :unauthorized
         json_response = JSON.parse(response.body)
-        assert_equal 'Invalid email or password', json_response['error']
+        assert_equal I18n.t('api.v1.auth.invalid_credentials'), json_response['error']
       end
 
       test 'should not login with non-existent email (Edge case)' do
@@ -86,7 +86,7 @@ module Api
 
         assert_response :unauthorized
         json_response = JSON.parse(response.body)
-        assert_equal 'Invalid email or password', json_response['error']
+        assert_equal I18n.t('api.v1.auth.invalid_credentials'), json_response['error']
       end
 
       test 'should block unconfirmed user from logging in' do
@@ -104,7 +104,7 @@ module Api
 
         assert_response :forbidden
         json_response = JSON.parse(response.body)
-        assert_includes json_response['error'], 'verify your email'
+        assert_equal I18n.t('api.v1.auth.email_not_confirmed'), json_response['error']
       end
     end
   end

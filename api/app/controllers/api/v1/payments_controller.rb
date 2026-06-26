@@ -2,8 +2,10 @@
 
 module Api
   module V1
+    # rubocop:disable Metrics/ClassLength
     class PaymentsController < ApplicationController
       skip_before_action :authorize_request, only: [:webhook]
+      before_action :require_authentication!, only: [:create]
 
       def create
         event = Event.find(params[:event_id])
@@ -14,10 +16,10 @@ module Api
 
         create_and_render_invoice(event, quantity)
       rescue ActiveRecord::RecordNotFound
-        render json: { error: 'Event not found' }, status: :not_found
+        render json: { error: t('api.v1.errors.events.not_found') }, status: :not_found
       rescue StandardError => e
         Rails.logger.error("Payment creation failed: #{e.message}")
-        render json: { error: 'Payment service unavailable' }, status: :service_unavailable
+        render json: { error: t('api.v1.errors.payments.service_unavailable') }, status: :service_unavailable
       end
 
       def webhook
@@ -25,11 +27,10 @@ module Api
 
         payload = parse_webhook_payload
         return if payload.is_a?(ActionDispatch::Response)
-
         return head :ok unless payload['status'] == 'success'
 
-        process_successful_payment(payload)
-        head :ok
+        result = process_successful_payment(payload)
+        head :ok unless result == false
       end
 
       private
@@ -44,7 +45,7 @@ module Api
       def parse_dev_webhook_payload
         JSON.parse(request.raw_post)
       rescue JSON::ParserError
-        render json: { error: 'Invalid JSON' }, status: :bad_request
+        render json: { error: t('api.v1.errors.payments.invalid_json') }, status: :bad_request
       end
 
       def verify_production_webhook_signature?
@@ -52,7 +53,7 @@ module Api
         if MonobankService.verify_webhook_signature(request.raw_post, x_sign_header)
           true
         else
-          render json: { error: 'Invalid signature' }, status: :unauthorized
+          render json: { error: t('api.v1.errors.payments.invalid_signature') }, status: :unauthorized
           false
         end
       end
@@ -60,16 +61,18 @@ module Api
       def parse_webhook_payload
         JSON.parse(request.raw_post)
       rescue JSON::ParserError
-        render json: { error: 'Invalid JSON' }, status: :bad_request
+        render json: { error: t('api.v1.errors.payments.invalid_json') }, status: :bad_request
       end
 
       def validate_event_for_purchase(event, quantity)
         unless event.published?
-          return render json: { error: 'Event not available for purchase' }, status: :unprocessable_entity
+          return render json: { error: t('api.v1.errors.payments.event_not_available') },
+                        status: :unprocessable_entity
         end
 
         if event.available_tickets_count < quantity
-          return render json: { error: 'Not enough tickets available' }, status: :unprocessable_entity
+          return render json: { error: t('api.v1.errors.payments.not_enough_tickets') },
+                        status: :unprocessable_entity
         end
 
         nil
@@ -77,9 +80,11 @@ module Api
 
       def process_successful_payment(payload)
         reference = payload['reference']
-        # "event-1-user-2-qty-3"
         match = reference.match(/event-(\d+)-user-(\d+)-qty-(\d+)/)
-        return render json: { error: 'Invalid reference format' }, status: :bad_request unless match
+        unless match
+          render json: { error: t('api.v1.errors.payments.invalid_reference_format') }, status: :bad_request
+          return false
+        end
 
         event_id, user_id, quantity = match.captures
         quantity = quantity.to_i
@@ -87,8 +92,15 @@ module Api
         user  = User.find_by(id: user_id)
         event = Event.find_by(id: event_id)
 
-        return render json: { error: 'User not found' }, status: :not_found  unless user
-        return render json: { error: 'Event not found' }, status: :not_found unless event
+        unless user
+          render json: { error: t('api.v1.errors.users.not_found') }, status: :not_found
+          return false
+        end
+
+        unless event
+          render json: { error: t('api.v1.errors.events.not_found') }, status: :not_found
+          return false
+        end
 
         create_tickets_for_user_and_event(user, event, quantity, payload['invoiceId'])
       end
@@ -115,7 +127,8 @@ module Api
         if result['pageUrl']
           render json: { pageUrl: result['pageUrl'], invoiceId: result['invoiceId'] }
         else
-          render json: { error: result['errCode'] || 'Invoice creation failed' }, status: :unprocessable_entity
+          render json: { error: result['errCode'] || t('api.v1.errors.payments.invoice_creation_failed') },
+                 status: :unprocessable_entity
         end
       end
 
@@ -132,5 +145,6 @@ module Api
         }
       end
     end
+    # rubocop:enable Metrics/ClassLength
   end
 end

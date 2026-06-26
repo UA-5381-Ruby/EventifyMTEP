@@ -39,7 +39,7 @@ class UserMailer < ApplicationMailer
 
   def brand_invitation(email, brand, token)
     @brand = brand
-    @accept_link = "#{ENV.fetch('FRONTEND_URL')}/accept-invitation?token=#{token}&brand_id=#{brand.id}"
+    @accept_link = "#{ENV.fetch('FRONTEND_URL')}/accept-invitation?token=#{token}&brand_id=#{brand.id}".html_safe
 
     mail(
       to: email,

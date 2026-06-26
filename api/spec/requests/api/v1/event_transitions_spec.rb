@@ -52,10 +52,49 @@ RSpec.describe 'Api::V1::Events Transitions', type: :request do
     it 'moves draft_on_review to rejected (Superadmin)' do
       event = create(:event, brand: brand, status: 'draft_on_review')
 
-      post "/api/v1/events/#{event.id}/reject", headers: auth_headers(superadmin)
+      post "/api/v1/events/#{event.id}/reject", params: { reason: 'Incomplete' }, headers: auth_headers(superadmin)
 
       expect(response).to have_http_status(:ok)
       expect(event.reload.status).to eq('rejected')
+    end
+  end
+
+  describe 'POST /api/v1/events/:id/submit' do
+    it 'returns 404 when event is missing' do
+      post '/api/v1/events/999999/submit', headers: auth_headers(owner)
+
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'returns required fields message when draft is incomplete' do
+      event = create(:event, brand: brand, status: 'draft', title: 'Test', location: 'Online',
+                             start_date: 1.day.from_now)
+      event.update_columns(title: '', location: '', start_date: nil)
+
+      post "/api/v1/events/#{event.id}/submit", headers: auth_headers(owner)
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(response.parsed_body['message']).to be_present
+    end
+  end
+
+  describe 'authorization failures' do
+    it 'returns forbidden when non-owner submits' do
+      event = create(:event, brand: brand, status: 'draft', title: 'Test', location: 'Online',
+                             start_date: 1.day.from_now)
+      outsider = create(:user)
+
+      post "/api/v1/events/#{event.id}/submit", headers: auth_headers(outsider)
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'returns forbidden when owner tries to approve' do
+      event = create(:event, brand: brand, status: 'draft_on_review')
+
+      post "/api/v1/events/#{event.id}/approve", headers: auth_headers(owner)
+
+      expect(response).to have_http_status(:forbidden)
     end
   end
 

@@ -28,7 +28,8 @@ module Api
         end
       rescue ActiveRecord::RecordNotUnique
         # Validation: Catches composite unique index violation (Race Condition)
-        render json: { errors: { category_id: ['already assigned to this event'] } }, status: :unprocessable_content
+        render json: { errors: { category_id: [t('api.v1.errors.event_categories.already_assigned')] } },
+               status: :unprocessable_content
       end
 
       # DELETE /api/v1/events/:event_id/categories/:category_id
@@ -47,14 +48,14 @@ module Api
         # Optimization: includes(:categories) prevents N+1 queries in the index action
         @event = Event.includes(:categories).find(params[:event_id])
       rescue ActiveRecord::RecordNotFound
-        render(json: { error: 'Event not found' }, status: :not_found) and return
+        render(json: { error: t('api.v1.errors.events.not_found') }, status: :not_found) and return
       end
 
       def set_event_category
         # Finds the join record by the category_id from the URL
         @event_category = @event.event_categories.find_by!(category_id: params[:category_id])
       rescue ActiveRecord::RecordNotFound
-        render(json: { error: 'Category is not assigned to this event' }, status: :not_found) and return
+        render(json: { error: t('api.v1.errors.event_categories.not_found') }, status: :not_found) and return
       end
 
       def event_category_params

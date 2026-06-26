@@ -21,7 +21,7 @@ RSpec.describe ApplicationController, type: :controller do
         get :index
 
         expect(response).to have_http_status(:unauthorized)
-        expect(JSON.parse(response.body)['error']).to eq('Unauthorized access. Missing token.')
+        expect(JSON.parse(response.body)['error']).to eq(I18n.t('api.v1.auth.missing_token'))
       end
     end
 
@@ -39,7 +39,7 @@ RSpec.describe ApplicationController, type: :controller do
           get :index
 
           expect(response).to have_http_status(:unauthorized)
-          expect(JSON.parse(response.body)['error']).to eq('Unauthorized access. Invalid token.')
+          expect(JSON.parse(response.body)['error']).to eq(I18n.t('api.v1.auth.invalid_token'))
         end
       end
 
@@ -73,7 +73,7 @@ RSpec.describe ApplicationController, type: :controller do
             get :index
 
             expect(response).to have_http_status(:unauthorized)
-            expect(JSON.parse(response.body)['error']).to eq('User with this token no longer exists.')
+            expect(JSON.parse(response.body)['error']).to eq(I18n.t('api.v1.auth.user_not_found'))
           end
         end
       end
@@ -89,7 +89,7 @@ RSpec.describe ApplicationController, type: :controller do
           get :index
 
           expect(response).to have_http_status(:unauthorized)
-          expect(JSON.parse(response.body)['error']).to eq("Unauthorized access. #{error_message}")
+          expect(JSON.parse(response.body)['error']).to eq(I18n.t('api.v1.auth.unauthorized', message: error_message))
         end
       end
     end

@@ -32,7 +32,7 @@ class TicketPdfService
 
   def render_header(pdf)
     pdf.fill_color PRIMARY_COLOR
-    pdf.text 'TICKET', size: 28, style: :bold, align: :center
+    pdf.text I18n.t('services.ticket_pdf.title'), size: 28, style: :bold, align: :center
     pdf.fill_color TEXT_COLOR
     pdf.move_down 6
     pdf.text @event.title, size: 18, style: :bold, align: :center
@@ -46,10 +46,10 @@ class TicketPdfService
   end
 
   def render_event_info(pdf)
-    render_info_block(pdf, 'Date & Time', formatted_date)
-    render_info_block(pdf, 'Location', @event.location.to_s)
-    render_info_block(pdf, 'Attendee', @user.name.to_s)
-    render_info_block(pdf, 'Ticket ID', @ticket.qr_code, size: 9)
+    render_info_block(pdf, I18n.t('services.ticket_pdf.date_time'), formatted_date)
+    render_info_block(pdf, I18n.t('services.ticket_pdf.location'), @event.location.to_s)
+    render_info_block(pdf, I18n.t('services.ticket_pdf.attendee'), @user.name.to_s)
+    render_info_block(pdf, I18n.t('services.ticket_pdf.ticket_id'), @ticket.qr_code, size: 9)
   end
 
   def render_info_block(pdf, label, value, size: 11)
@@ -65,14 +65,13 @@ class TicketPdfService
     pdf.print_qr_code(@ticket.qr_code, extent: 120, pos: [(pdf.bounds.width / 2) - 60, pdf.cursor])
     pdf.move_down 130
     pdf.fill_color MUTED_COLOR
-    pdf.text 'Scan to verify your ticket', size: 8, align: :center
+    pdf.text I18n.t('services.ticket_pdf.scan_to_verify'), size: 8, align: :center
   end
 
   def render_footer(pdf)
     pdf.move_down 16
     pdf.fill_color MUTED_COLOR
-    pdf.text 'This ticket is non-transferable. Present this QR code at the entrance.',
-             size: 8, align: :center
+    pdf.text I18n.t('services.ticket_pdf.non_transferable'), size: 8, align: :center
   end
 
   def formatted_date
