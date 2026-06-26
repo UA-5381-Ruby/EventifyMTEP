@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui';
 import { Container, PageWrapper } from '@/components/layout';
 
