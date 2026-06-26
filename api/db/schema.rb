@@ -10,13 +10,33 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_15_130000) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_23_231940) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   # Custom types defined in this database.
   # Note that some types may not work with other database engines. Be careful if changing database.
   create_enum "event_status", ["draft", "draft_on_review", "published", "rejected", "published_unverified", "published_on_review", "published_rejected", "archived", "cancelled"]
+
+  create_table "activities", force: :cascade do |t|
+    t.string "activity_type", null: false
+    t.datetime "created_at", null: false
+    t.text "details"
+    t.string "ip_address"
+    t.bigint "resource_id"
+    t.string "resource_name"
+    t.string "resource_type", null: false
+    t.string "status", default: "success", null: false
+    t.datetime "updated_at", null: false
+    t.string "user_agent"
+    t.bigint "user_id", null: false
+    t.index ["activity_type", "created_at"], name: "index_activities_on_activity_type_and_created_at", order: { created_at: :desc }
+    t.index ["activity_type"], name: "index_activities_on_activity_type"
+    t.index ["resource_type", "resource_id"], name: "index_activities_on_resource_type_and_resource_id"
+    t.index ["status"], name: "index_activities_on_status"
+    t.index ["user_id", "created_at"], name: "index_activities_on_user_id_and_created_at", order: { created_at: :desc }
+    t.index ["user_id"], name: "index_activities_on_user_id"
+  end
 
   create_table "brand_memberships", force: :cascade do |t|
     t.bigint "brand_id", null: false
@@ -112,6 +132,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_15_130000) do
     t.index ["is_confirmed"], name: "index_users_on_is_confirmed"
   end
 
+  add_foreign_key "activities", "users"
   add_foreign_key "brand_memberships", "brands"
   add_foreign_key "brand_memberships", "users"
   add_foreign_key "event_categories", "categories"

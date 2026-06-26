@@ -8,7 +8,6 @@ import type {
   TicketFeedback,
 } from '@/types/ticket';
 
-//error parser
 const handleTicketError = (err: unknown): never => {
   if (axios.isAxiosError(err) && err.response?.data?.errors) {
     const errors = err.response.data.errors;

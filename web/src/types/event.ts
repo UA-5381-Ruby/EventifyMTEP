@@ -28,6 +28,8 @@ export interface EventDetail extends Event {
     id: number;
     name: string;
     logoUrl?: string;
+    primary_color?: string;
+    secondary_color?: string;
   };
   categories: {
     id: number;

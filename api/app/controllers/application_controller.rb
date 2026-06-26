@@ -6,6 +6,8 @@ class ApplicationController < ActionController::API
 
   before_action :set_locale
   before_action :authorize_request
+  before_action :set_request_context
+  after_action :clear_request_context
 
   attr_reader :current_user
 
@@ -35,6 +37,16 @@ class ApplicationController < ActionController::API
     end
 
     authenticate_with_token(header.split.last)
+  end
+
+  def set_request_context
+    RequestContext.current_user = current_user
+    RequestContext.current_ip = request.remote_ip
+    RequestContext.current_user_agent = request.user_agent
+  end
+
+  def clear_request_context
+    RequestContext.reset
   end
 
   def authenticate_with_token(token)
