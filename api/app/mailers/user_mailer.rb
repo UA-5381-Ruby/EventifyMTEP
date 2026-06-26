@@ -3,7 +3,7 @@
 class UserMailer < ApplicationMailer
   def email_verification(user, signed_id)
     @user = user
-    @verify_link = "#{ENV.fetch('FRONTEND_URL')}/verify-email?token=#{signed_id}"
+    @verify_link = "#{ENV.fetch('FRONTEND_URL', 'http://localhost:5173')}/verify-email?token=#{signed_id}"
 
     mail(
       to: @user.email,
