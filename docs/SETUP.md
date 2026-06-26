@@ -176,7 +176,12 @@ npm run lint
 npm run lint:css
 npm run build
 ```
+## Coverage
 
+~~~bash
+npm run test:coverage
+npm run format
+~~~
 ## Swagger and local verification
 
 Start the API locally:

@@ -57,13 +57,11 @@ export function parseApiError(err: unknown): never {
       }
     }
 
-    // Network-level failures (no response at all)
     if (!axiosErr.response) {
       throw new Error('Network error — please check your connection.');
     }
   }
 
-  // Unknown shape — rethrow as-is so nothing is silently swallowed
   throw err instanceof Error ? err : new Error('An unexpected error occurred.');
 }
 

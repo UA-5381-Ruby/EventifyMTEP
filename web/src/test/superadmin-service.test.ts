@@ -1,144 +1,110 @@
-import MockAdapter from 'axios-mock-adapter';
-import apiClient from '@/lib/api-client';
 import { SuperadminService } from '@/services/superadmin-service';
+import { UserService } from '@/services/user-service';
+import { EventsService } from '@/services/events-service';
+import { brandsService } from '@/services/brands-service';
+
+jest.mock('@/services/user-service');
+jest.mock('@/services/events-service');
+jest.mock('@/services/brands-service');
 
 describe('SuperadminService', () => {
-  let mock: MockAdapter;
-
-  beforeEach(() => {
-    mock = new MockAdapter(apiClient);
-  });
-
   afterEach(() => {
-    mock.restore();
+    jest.clearAllMocks();
   });
 
-  describe('Events', () => {
-    it('createEvent sends POST request to /api/v1/events', async () => {
-      const payload = { title: 'New Event' };
-      const responseData = { id: 1, ...payload };
+  describe('getDashboardData', () => {
+    it('should successfully aggregate data and correctly calculate stats', async () => {
+      const mockUsers = [
+        { id: 1, email: 'admin@test.com', role: 'Admin' },
+        { id: 2, email: 'user@test.com' },
+      ];
 
-      mock.onPost('/api/v1/events').reply(201, responseData);
+      const mockBrands = {
+        data: [
+          { id: 1, name: 'Brand A' },
+          { id: 2, name: 'Brand B' },
+        ],
+      };
 
-      const result = await SuperadminService.createEvent(payload);
+      const mockEvents = {
+        data: [
+          { id: 1, status: 'pending', name: 'Event 1' },
+          { id: 2, status: 'rejected', title: 'Event 2' },
+          { id: 3, status: 'approved', name: 'Event 3' },
+        ],
+      };
 
-      expect(mock.history.post[0].url).toBe('/api/v1/events');
-      expect(JSON.parse(mock.history.post[0].data)).toEqual(payload);
-      expect(result).toEqual(responseData);
-    });
-  });
+      (UserService.getAllUsers as jest.Mock).mockResolvedValue(mockUsers);
+      (brandsService.getBrands as jest.Mock).mockResolvedValue(mockBrands);
+      (EventsService.getEvents as jest.Mock).mockResolvedValue(mockEvents);
 
-  describe('Users', () => {
-    it('updateUser sends PATCH request to /api/v1/users/:id', async () => {
-      const userId = 456;
-      const payload = { name: 'Updated Name' };
-      const responseData = { id: userId, ...payload };
+      const result = await SuperadminService.getDashboardData();
 
-      mock.onPatch(`/api/v1/users/${userId}`).reply(200, responseData);
+      expect(UserService.getAllUsers).toHaveBeenCalledTimes(1);
+      expect(brandsService.getBrands).toHaveBeenCalledTimes(1);
+      expect(EventsService.getEvents).toHaveBeenCalledTimes(1);
 
-      const result = await SuperadminService.updateUser(userId, payload);
+      expect(result.stats).toEqual({
+        totalUsers: 2,
+        totalBrands: 2,
+        totalEvents: 3,
+        pendingApproval: 1,
+        rejectedEvents: 1,
+        reportedUsers: 0,
+      });
 
-      expect(mock.history.patch[0].url).toBe(`/api/v1/users/${userId}`);
-      expect(JSON.parse(mock.history.patch[0].data)).toEqual(payload);
-      expect(result).toEqual(responseData);
-    });
+      expect(result.users).toEqual([
+        { id: '1', email: 'admin@test.com', role: 'Admin' },
+        { id: '2', email: 'user@test.com', role: 'Member' },
+      ]);
 
-    it('deleteUser sends DELETE request to /api/v1/users/:id', async () => {
-      const userId = 456;
-
-      mock.onDelete(`/api/v1/users/${userId}`).reply(204);
-
-      await SuperadminService.deleteUser(userId);
-
-      expect(mock.history.delete[0].url).toBe(`/api/v1/users/${userId}`);
-    });
-  });
-
-  describe('Brands', () => {
-    it('updateBrand sends PATCH request to /api/v1/brands/:id', async () => {
-      const brandId = 789;
-      const payload = { name: 'Updated Brand' };
-      const responseData = { id: brandId, ...payload };
-
-      mock.onPatch(`/api/v1/brands/${brandId}`).reply(200, responseData);
-
-      const result = await SuperadminService.updateBrand(brandId, payload);
-
-      expect(mock.history.patch[0].url).toBe(`/api/v1/brands/${brandId}`);
-      expect(JSON.parse(mock.history.patch[0].data)).toEqual(payload);
-      expect(result).toEqual(responseData);
+      expect(result.pendingEvents).toHaveLength(1);
+      expect(result.pendingEvents[0]).toMatchObject({
+        id: '1',
+        status: 'pending',
+        name: 'Event 1',
+      });
     });
 
-    it('deleteBrand sends DELETE request to /api/v1/brands/:id', async () => {
-      const brandId = 789;
+    it('should safely handle empty or invalid data', async () => {
+      (UserService.getAllUsers as jest.Mock).mockResolvedValue(null);
+      (brandsService.getBrands as jest.Mock).mockResolvedValue({});
+      (EventsService.getEvents as jest.Mock).mockResolvedValue({ data: null });
 
-      mock.onDelete(`/api/v1/brands/${brandId}`).reply(204);
+      const result = await SuperadminService.getDashboardData();
 
-      await SuperadminService.deleteBrand(brandId);
+      expect(result.stats).toEqual({
+        totalUsers: 0,
+        totalBrands: 0,
+        totalEvents: 0,
+        pendingApproval: 0,
+        rejectedEvents: 0,
+        reportedUsers: 0,
+      });
 
-      expect(mock.history.delete[0].url).toBe(`/api/v1/brands/${brandId}`);
-    });
-  });
-
-  describe('Brand Memberships', () => {
-    it('getBrandMemberships sends GET request to /api/v1/brands/:brand_id/memberships', async () => {
-      const brandId = 789;
-      const params = { page: 1, per_page: 10 };
-      const responseData = { items: [], total: 0 };
-
-      mock.onGet(`/api/v1/brands/${brandId}/memberships`).reply(200, responseData);
-
-      const result = await SuperadminService.getBrandMemberships(brandId, params);
-
-      expect(mock.history.get[0].url).toBe(`/api/v1/brands/${brandId}/memberships`);
-      expect(mock.history.get[0].params).toEqual(params);
-      expect(result).toEqual(responseData);
+      expect(result.users).toEqual([]);
+      expect(result.pendingEvents).toEqual([]);
     });
 
-    it('addBrandMember sends POST request to /api/v1/brands/:brand_id/memberships', async () => {
-      const brandId = 789;
-      const payload = { user_id: 1, role: 'manager' };
-      const responseData = { id: 100, ...payload };
+    it('should provide default values for events with missing fields', async () => {
+      const mockEvents = {
+        data: [{ id: 1, status: 'pending' }],
+      };
 
-      mock.onPost(`/api/v1/brands/${brandId}/memberships`).reply(201, responseData);
+      (UserService.getAllUsers as jest.Mock).mockResolvedValue([]);
+      (brandsService.getBrands as jest.Mock).mockResolvedValue({ data: [] });
+      (EventsService.getEvents as jest.Mock).mockResolvedValue(mockEvents);
 
-      const result = await SuperadminService.addBrandMember(brandId, payload);
+      const result = await SuperadminService.getDashboardData();
 
-      expect(mock.history.post[0].url).toBe(`/api/v1/brands/${brandId}/memberships`);
-      expect(JSON.parse(mock.history.post[0].data)).toEqual(payload);
-      expect(result).toEqual(responseData);
-    });
-
-    it('updateBrandMember sends PATCH request to /api/v1/brands/:brand_id/memberships/:membership_id', async () => {
-      const brandId = 789;
-      const membershipId = 100;
-      const role = 'owner';
-      const responseData = { id: membershipId, role };
-
-      mock
-        .onPatch(`/api/v1/brands/${brandId}/memberships/${membershipId}`)
-        .reply(200, responseData);
-
-      const result = await SuperadminService.updateBrandMember(brandId, membershipId, role);
-
-      expect(mock.history.patch[0].url).toBe(
-        `/api/v1/brands/${brandId}/memberships/${membershipId}`
-      );
-      expect(JSON.parse(mock.history.patch[0].data)).toEqual({ role });
-      expect(result).toEqual(responseData);
-    });
-
-    it('removeBrandMember sends DELETE request to /api/v1/brands/:brand_id/memberships/:membership_id', async () => {
-      const brandId = 789;
-      const membershipId = 100;
-
-      mock.onDelete(`/api/v1/brands/${brandId}/memberships/${membershipId}`).reply(204);
-
-      await SuperadminService.removeBrandMember(brandId, membershipId);
-
-      expect(mock.history.delete[0].url).toBe(
-        `/api/v1/brands/${brandId}/memberships/${membershipId}`
-      );
+      expect(result.pendingEvents[0]).toEqual({
+        id: '1',
+        status: 'pending',
+        name: 'Untitled Event',
+        startDate: 'N/A',
+        createdBy: 'Unknown',
+        location: 'Remote',
+      });
     });
   });
 });
