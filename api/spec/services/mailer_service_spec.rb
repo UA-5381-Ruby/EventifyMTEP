@@ -56,4 +56,15 @@ RSpec.describe MailerService do
       expect(UserMailer).to have_received(:brand_invitation).with('guest@example.com', brand, token)
     end
   end
+
+  describe '.send_contact_message' do
+    it 'enqueues contact message mail' do
+      allow(UserMailer).to receive_message_chain(:contact_message, :deliver_later)
+      contact_params = { name: 'Alice', email: 'alice@example.com', message: 'Hello' }
+
+      described_class.send_contact_message(contact_params)
+
+      expect(UserMailer).to have_received(:contact_message).with(contact_params)
+    end
+  end
 end
