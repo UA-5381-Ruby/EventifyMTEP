@@ -52,4 +52,20 @@ describe('SuperAdminRoute', () => {
 
     expect(screen.getByText('Events Page')).toBeInTheDocument();
   });
+
+  it('shows spinner while loading', () => {
+    mockedUseAuthSuperadmin.mockReturnValue({
+      isSuperAdmin: false,
+      isLoading: true,
+      user: null,
+    });
+
+    render(
+      <MemoryRouter>
+        <SuperAdminRoute />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByRole('status')).toBeInTheDocument();
+  });
 });

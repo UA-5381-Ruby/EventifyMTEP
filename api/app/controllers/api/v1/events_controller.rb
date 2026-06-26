@@ -104,7 +104,10 @@ module Api
       end
 
       def event_serialization_includes
-        { brand: { only: %i[id name] }, categories: { only: %i[id name] } }
+        {
+          brand: { only: %i[id name primary_color secondary_color] },
+          categories: { only: %i[id name] }
+        }
       end
 
       def event_params

@@ -24,6 +24,7 @@ jest.mock('@/services/auth-service', () => ({
     login: jest.fn(),
     register: jest.fn(),
     logout: jest.fn(),
+    resendEmailVerification: jest.fn(),
   },
 }));
 

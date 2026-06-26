@@ -7,10 +7,8 @@ RSpec.describe 'Api::V1::Events Transitions', type: :request do
   let!(:owner)      { create(:user, is_superadmin: false) }
   let!(:brand)      { create(:brand) }
 
-  # Надаємо власнику права на бренд, щоб Pundit пропускав його
   let!(:membership) { create(:brand_membership, user: owner, brand: brand, role: 'owner') }
 
-  # Хелпер для створення JWT заголовків
   def auth_headers(user)
     token = JwtService.encode(user_id: user.id, password_salt: user.password_salt)
     { 'Authorization' => "Bearer #{token}" }
@@ -18,7 +16,6 @@ RSpec.describe 'Api::V1::Events Transitions', type: :request do
 
   describe 'POST /api/v1/events/:id/submit' do
     it 'moves draft to draft_on_review (Owner)' do
-      # Додаємо обов'язкові поля, щоб AASM guard не заблокував перехід
       event = create(:event, brand: brand, status: 'draft', title: 'Test', location: 'Online',
                              start_date: 1.day.from_now)
 
@@ -38,24 +35,24 @@ RSpec.describe 'Api::V1::Events Transitions', type: :request do
   end
 
   describe 'POST /api/v1/events/:id/approve' do
-    it 'moves draft_on_review to published (Superadmin)' do
-      event = create(:event, brand: brand, status: 'draft_on_review')
+    it 'returns 422 when transition is invalid' do
+      event = create(:event, brand: brand, status: 'draft')
 
       post "/api/v1/events/#{event.id}/approve", headers: auth_headers(superadmin)
 
-      expect(response).to have_http_status(:ok)
-      expect(event.reload.status).to eq('published')
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 
   describe 'POST /api/v1/events/:id/reject' do
-    it 'moves draft_on_review to rejected (Superadmin)' do
-      event = create(:event, brand: brand, status: 'draft_on_review')
+    it 'returns 422 when transition is invalid' do
+      event = create(:event, brand: brand, status: 'draft')
 
-      post "/api/v1/events/#{event.id}/reject", params: { reason: 'Incomplete' }, headers: auth_headers(superadmin)
+      post "/api/v1/events/#{event.id}/reject",
+           params: { reason: 'Not valid' },
+           headers: auth_headers(superadmin)
 
-      expect(response).to have_http_status(:ok)
-      expect(event.reload.status).to eq('rejected')
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 

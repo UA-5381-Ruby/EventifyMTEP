@@ -17,6 +17,10 @@ import { EventListPage } from '@/pages/event-list-page.tsx';
 import { EventDetailPage } from '@/pages/event-detail-page';
 import { NotFoundPage } from '@/pages/not-found-page.tsx';
 import { BrandPublicPage } from '@/pages/brand-public-page.tsx';
+import { AboutPage } from '@/pages/about-page.tsx';
+import { ContactPage } from '@/pages/contact-page.tsx';
+import { PrivacyPage } from '@/pages/privacy-page.tsx';
+import { TermsPage } from '@/pages/term-page.tsx';
 
 import { Dashboard } from '@/pages/dashboard.tsx';
 import { BrandDashboardPage } from '@/pages/brand-dashboard-page.tsx';
@@ -50,6 +54,10 @@ function App() {
           <Route path="/events" element={<EventListPage />} />
           <Route path="/events/:id" element={<EventDetailPage />} />
           <Route path="/brands/:id" element={<BrandPublicPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/contact" element={<ContactPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPage />} />
+          <Route path="/terms-of-use" element={<TermsPage />} />
 
           <Route element={<ProtectedRoute />}>
             <Route element={<SuperAdminRoute />}>

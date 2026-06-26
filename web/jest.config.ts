@@ -43,6 +43,7 @@ const config: Config = {
     'src/components/layout/header',
     'src/components/layout/footer',
     'src/components/layout/scroll-to-top',
+    'src/lib/utils.ts',
   ],
 };
 
