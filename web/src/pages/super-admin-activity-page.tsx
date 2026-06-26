@@ -19,6 +19,7 @@ export default function SuperAdminActivityPage() {
   const filterContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
   }, [selectedActivityTypes, selectedResource, selectedStatus, searchEmail]);
 
@@ -218,11 +219,10 @@ export default function SuperAdminActivityPage() {
             <div className="relative">
               <button
                 onClick={() => setActiveDropdown(activeDropdown === 'status' ? null : 'status')}
-                className={`border px-4 py-2 text-sm rounded-lg transition-colors flex items-center gap-2 ${
-                  selectedStatus
-                    ? 'border-gray-400 bg-gray-50 font-medium'
-                    : 'border-gray-300 bg-white hover:bg-gray-50'
-                }`}
+                className={`border px-4 py-2 text-sm rounded-lg transition-colors flex items-center gap-2 ${selectedStatus
+                  ? 'border-gray-400 bg-gray-50 font-medium'
+                  : 'border-gray-300 bg-white hover:bg-gray-50'
+                  }`}
               >
                 {selectedStatus ? `Status: ${selectedStatus}` : 'All Status'}{' '}
                 <span className="text-gray-400 text-xs">⏷</span>
@@ -366,11 +366,10 @@ export default function SuperAdminActivityPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span
-                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full ${
-                            item.status === 'success'
-                              ? 'text-green-700 bg-green-100'
-                              : 'text-red-700 bg-red-100'
-                          }`}
+                          className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full ${item.status === 'success'
+                            ? 'text-green-700 bg-green-100'
+                            : 'text-red-700 bg-red-100'
+                            }`}
                         >
                           <span
                             className={`w-2 h-2 rounded-full ${item.status === 'success' ? 'bg-green-500' : 'bg-red-500'}`}
@@ -405,11 +404,10 @@ export default function SuperAdminActivityPage() {
                 <button
                   key={page}
                   onClick={() => setCurrentPage(page)}
-                  className={`px-3 py-1 rounded-md text-sm transition-colors ${
-                    currentPage === page
-                      ? 'bg-gray-900 font-bold text-white shadow-sm'
-                      : 'text-gray-500 hover:bg-gray-100'
-                  }`}
+                  className={`px-3 py-1 rounded-md text-sm transition-colors ${currentPage === page
+                    ? 'bg-gray-900 font-bold text-white shadow-sm'
+                    : 'text-gray-500 hover:bg-gray-100'
+                    }`}
                 >
                   {page}
                 </button>

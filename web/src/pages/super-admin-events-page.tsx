@@ -39,6 +39,37 @@ interface Category {
   name: string;
 }
 
+interface AxiosResponseData<T> {
+  data?: {
+    data?: T;
+    meta?: {
+      total?: number;
+      total_count?: number;
+    };
+  };
+  meta?: {
+    total?: number;
+    total_count?: number;
+  };
+}
+
+interface RawBackendEvent {
+  id: string | number;
+  brand_id?: string | number;
+  title?: string;
+  name?: string;
+  start_date?: string;
+  date?: string;
+  status?: string;
+  brand?: {
+    name?: string;
+    logo?: string;
+    logo_url?: string;
+    image_url?: string;
+  };
+  categories?: Array<{ id: string | number; name: string }>;
+}
+
 const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL || 'https://your-bucket-name.s3.amazonaws.com';
 
 export default function ActivityLogPage() {
@@ -68,33 +99,34 @@ export default function ActivityLogPage() {
           CategoriesService.getCategories().catch(() => null),
         ]);
 
-        const brandsRes = brandsRaw as any;
-        const categoriesRes = categoriesRaw as any;
+        const brandsRes = brandsRaw as AxiosResponseData<Brand[]>;
+        const categoriesRes = categoriesRaw as AxiosResponseData<Category[]>;
 
-        const brandsData = brandsRes?.data?.data || brandsRes?.data || brandsRes || [];
+        const brandsData = brandsRes?.data?.data || (Array.isArray(brandsRes?.data) ? brandsRes.data : []) || [];
         if (Array.isArray(brandsData)) {
-          setBrands(brandsData.map((b: any) => ({ id: String(b.id), name: b.name })));
+          setBrands(brandsData.map((b) => ({ id: String(b.id), name: b.name })));
         }
 
-        const categoriesData =
-          categoriesRes?.data?.data || categoriesRes?.data || categoriesRes || [];
+        const categoriesData = categoriesRes?.data?.data || (Array.isArray(categoriesRes?.data) ? categoriesRes.data : []) || [];
         if (Array.isArray(categoriesData)) {
-          setCategories(categoriesData.map((c: any) => ({ id: String(c.id), name: c.name })));
+          setCategories(categoriesData.map((c) => ({ id: String(c.id), name: c.name })));
         }
       } catch (err) {
-        console.error('Помилка завантаження брендів/категорій:', err);
+        console.error('Error fetching brands/categories:', err);
       }
     };
 
     fetchBrandsAndCategories();
   }, []);
 
+
   useEffect(() => {
+     
     const fetchDataFromDB = async () => {
       setLoading(true);
       setError(null);
       try {
-        const params: Record<string, any> = {
+        const params: Record<string, string | number> = {
           page: currentPage,
           per_page: itemsPerPage,
         };
@@ -104,14 +136,13 @@ export default function ActivityLogPage() {
         if (selectedStatuses.length > 0) params.status = selectedStatuses.join(',');
 
         const rawResponse = await EventsService.getEvents(params);
+        const response = rawResponse as AxiosResponseData<RawBackendEvent[]>;
 
-        const response = rawResponse as any;
-
-        const responseData = response?.data?.data || response?.data || response || [];
+        const responseData = response?.data?.data || (Array.isArray(response?.data) ? response.data : []) || [];
         const responseMeta = response?.data?.meta || response?.meta || {};
 
         if (Array.isArray(responseData)) {
-          const events = responseData.map((event: any) => {
+          const events = responseData.map((event) => {
             const matchedBrand = brands.find((b) => b.id === String(event.brand_id));
 
             const rawLogo =
@@ -126,7 +157,6 @@ export default function ActivityLogPage() {
 
             return {
               id: String(event.id),
-
               brandName: event.brand?.name || matchedBrand?.name || 'N/A',
               brandLogo: finalBrandLogo,
               eventName: event.title || event.name || 'N/A',
@@ -138,9 +168,9 @@ export default function ActivityLogPage() {
           setActivities(events);
           setTotalEvents(responseMeta.total || responseMeta.total_count || events.length);
         }
-      } catch (err) {
+      } catch {
         setError('Try again later. Error fetching events from the database.');
-      } finally {
+      } {
         setLoading(false);
       }
     };
@@ -290,11 +320,10 @@ export default function ActivityLogPage() {
           <div className="relative">
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'status' ? null : 'status')}
-              className={`border px-4 py-2 text-sm rounded-lg transition-colors flex items-center gap-2 ${
-                selectedStatuses.length > 0 || activeDropdown === 'status'
-                  ? 'border-gray-400 bg-gray-50 font-medium'
-                  : 'border-gray-300 bg-white hover:bg-gray-50'
-              }`}
+              className={`border px-4 py-2 text-sm rounded-lg transition-colors flex items-center gap-2 ${selectedStatuses.length > 0 || activeDropdown === 'status'
+                ? 'border-gray-400 bg-gray-50 font-medium'
+                : 'border-gray-300 bg-white hover:bg-gray-50'
+                }`}
             >
               Status {selectedStatuses.length > 0 && `(${selectedStatuses.length})`}{' '}
               <span className="text-gray-400 text-xs">⏷</span>
@@ -473,11 +502,10 @@ export default function ActivityLogPage() {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1 rounded-md text-sm transition-colors ${
-                  currentPage === page
-                    ? 'bg-gray-900 font-bold text-white shadow-sm'
-                    : 'text-gray-500 hover:bg-gray-100'
-                }`}
+                className={`px-3 py-1 rounded-md text-sm transition-colors ${currentPage === page
+                  ? 'bg-gray-900 font-bold text-white shadow-sm'
+                  : 'text-gray-500 hover:bg-gray-100'
+                  }`}
               >
                 {page}
               </button>
