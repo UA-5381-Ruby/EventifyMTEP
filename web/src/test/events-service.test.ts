@@ -128,4 +128,56 @@ describe('EventsService', () => {
       });
     });
   });
+
+  describe('buildEventFormData (via createEvent)', () => {
+    it('excludes null and undefined values from FormData', async () => {
+      const payload = {
+        title: 'Event',
+        location: null,
+        start_date: undefined,
+        brand_id: 42,
+      } as unknown as CreateEventRequest;
+
+      mockedPost.mockResolvedValueOnce({ data: mockEvent });
+      await EventsService.createEvent(payload);
+
+      const formData = mockedPost.mock.calls[0][1] as FormData;
+      expect(formData.get('event[title]')).toBe('Event');
+      expect(formData.get('event[location]')).toBeNull();
+      expect(formData.get('event[start_date]')).toBeNull();
+    });
+
+    it('appends category_ids as array entries', async () => {
+      const payload: CreateEventRequest = {
+        title: 'Event',
+        location: 'Lviv',
+        start_date: '2026-01-01',
+        brand_id: 42,
+        category_ids: [1, 2, 3],
+      };
+
+      mockedPost.mockResolvedValueOnce({ data: mockEvent });
+      await EventsService.createEvent(payload);
+
+      const formData = mockedPost.mock.calls[0][1] as FormData;
+      expect(formData.getAll('event[category_ids][]')).toEqual(['1', '2', '3']);
+    });
+
+    it('appends banner as File when provided', async () => {
+      const file = new File(['content'], 'banner.png', { type: 'image/png' });
+      const payload: CreateEventRequest = {
+        title: 'Event',
+        location: 'Lviv',
+        start_date: '2026-01-01',
+        brand_id: 42,
+        banner: file,
+      };
+
+      mockedPost.mockResolvedValueOnce({ data: mockEvent });
+      await EventsService.createEvent(payload);
+
+      const formData = mockedPost.mock.calls[0][1] as FormData;
+      expect(formData.get('event[banner]')).toBe(file);
+    });
+  });
 });
