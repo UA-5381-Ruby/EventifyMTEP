@@ -53,7 +53,8 @@ module Api
 
       def build_event
         brand = authorize_brand_access!(event_params[:brand_id])
-        Event.new(process_banner_upload(event_base_params.to_h).merge(brand: brand, status: 'draft')).tap do |event|
+        attrs = process_banner_upload(event_base_params.to_h)
+        Event.new(attrs.merge(brand: brand, status: 'draft')).tap do |event|
           event.category_ids = event_params[:category_ids] if event_params[:category_ids].present?
         end
       end
@@ -78,7 +79,8 @@ module Api
         raise MediaUploadError, t("#{error_scope}.invalid_format") unless file.content_type.in?(ALLOWED_BANNER_TYPES)
         raise MediaUploadError, t("#{error_scope}.too_large", max_size: '5MB') if file.size > MAX_BANNER_SIZE
 
-        S3BucketService.new.upload(file, folder: 'events/banners') || raise(MediaUploadError, t("#{error_scope}.upload_failed"))
+        S3BucketService.new.upload(file, folder: 'events/banners') ||
+          raise(MediaUploadError, t("#{error_scope}.upload_failed"))
       end
 
       def authorize_brand_access!(brand_id = event_params[:brand_id])
@@ -106,12 +108,15 @@ module Api
       end
 
       def event_params
-        params.expect(event: [:title, :description, :location, :start_date, :end_date, :status,
-                              :brand_id, :banner, :price_cents, :available_tickets_count, { category_ids: [] }])
+        params.expect(event: [
+                        :title, :description, :location, :start_date, :end_date, :status,
+                        :brand_id, :banner, :price_cents, :available_tickets_count, { category_ids: [] }
+                      ])
       end
 
       def index_params
-        @index_params ||= params.permit(:from, :to, :q, :sort, :order, :page, :per_page, :status, :brand_id, :category_id)
+        @index_params ||= params.permit(:from, :to, :q, :sort, :order, :page, :per_page, :status, :brand_id,
+                                        :category_id)
       end
     end
   end
