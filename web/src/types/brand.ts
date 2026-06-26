@@ -17,11 +17,13 @@ export interface BrandWithEvents extends Brand {
 export interface CreateBrandRequest {
   name: string;
   description?: string;
-  logo_url?: string;
+  logo?: File | null;
   subdomain: string;
   primary_color?: string;
   secondary_color?: string;
 }
+
+export type UpdateBrandRequest = Partial<CreateBrandRequest>;
 
 export type BrandScope = 'managed' | 'subscribed' | 'discover';
 export type Tab = 'managed' | 'subscribed';

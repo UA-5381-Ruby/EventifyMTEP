@@ -23,7 +23,7 @@ RSpec.describe 'Auth Endpoints', type: :request do
 
       expect(response).to have_http_status(:created)
       expect(json_response[:token]).to be_nil
-      expect(json_response[:message]).to include('check your email')
+      expect(json_response[:message]).to include(I18n.t('api.v1.auth.registered'))
     end
 
     it 'queues the email verification mailer' do
@@ -57,7 +57,7 @@ RSpec.describe 'Auth Endpoints', type: :request do
       post '/api/v1/auth/login', params: { email: unconfirmed_user.email, password: unconfirmed_user.password }
 
       expect(response).to have_http_status(:forbidden)
-      expect(json_response[:error]).to include('verify your email')
+      expect(json_response[:error]).to eq(I18n.t('api.v1.auth.email_not_confirmed'))
     end
 
     it 'returns error for invalid credentials' do
@@ -82,15 +82,13 @@ RSpec.describe 'Auth Endpoints', type: :request do
       post '/api/v1/auth/confirm_email', params: { token: 'invalid' }
 
       expect(response).to have_http_status(:bad_request)
-      expect(json_response[:error]).to include('Invalid or expired')
+      expect(json_response[:error]).to eq(I18n.t('api.v1.auth.confirmation.invalid_or_expired'))
     end
 
     it 'returns error for expired token' do
-      # Create user and token
       user = create(:user, is_confirmed: false)
       token = user.generate_token_for(:email_verification)
 
-      # Travel 25 hours into the future
       travel_to(25.hours.from_now) do
         post '/api/v1/auth/confirm_email', params: { token: token }
       end
@@ -120,7 +118,7 @@ RSpec.describe 'Password Reset Endpoints', type: :request do
       post '/api/v1/auth/password/reset', params: { email: 'nonexistent@example.com' }
 
       expect(response).to have_http_status(:ok)
-      expect(json_response[:message]).to include('If your email exists')
+      expect(json_response[:message]).to eq(I18n.t('api.v1.auth.password.reset_requested'))
     end
 
     it 'always returns 200 OK (prevents user enumeration)' do
@@ -152,7 +150,7 @@ RSpec.describe 'Password Reset Endpoints', type: :request do
       post "/api/v1/auth/password/reset?token=#{token}", params: { new_password: '' }
 
       expect(response).to have_http_status(:unprocessable_content)
-      expect(json_response[:error]).to include('blank')
+      expect(json_response[:error]).to eq(I18n.t('api.v1.auth.password.new_password_blank'))
     end
   end
 end

@@ -4,8 +4,5 @@ class EventCategory < ApplicationRecord
   belongs_to :event
   belongs_to :category
 
-  validates :event_id, uniqueness: {
-    scope: :category_id,
-    message: 'already has this category assigned'
-  }
+  validates :event_id, uniqueness: { scope: :category_id, message: :already_assigned }
 end

@@ -184,6 +184,20 @@ async function confirmPasswordReset(token: string, newPassword: string): Promise
   }
 }
 
+/**
+ * PATCH /api/v1/auth/password/change
+ */
+async function changePassword(currentPassword: string, newPassword: string): Promise<void> {
+  try {
+    await apiClient.patch('/api/v1/auth/password/change', {
+      current_password: currentPassword,
+      new_password: newPassword,
+    });
+  } catch (err) {
+    parseApiError(err);
+  }
+}
+
 const AuthService = {
   getState: (): AuthState => authState,
   subscribe,
@@ -196,6 +210,7 @@ const AuthService = {
   resendEmailVerification,
   requestPasswordReset,
   confirmPasswordReset,
+  changePassword,
 
   init,
   isSuperAdmin: (): boolean => {

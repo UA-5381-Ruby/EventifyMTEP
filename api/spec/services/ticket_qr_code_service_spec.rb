@@ -8,6 +8,16 @@ RSpec.describe TicketQrCodeService do
   let(:s3_service) { instance_double(S3BucketService) }
 
   describe '#generate_image_key!' do
+    it 'uses default S3 service when none is provided' do
+      s3 = instance_double(S3BucketService)
+      allow(S3BucketService).to receive(:new).and_return(s3)
+      allow(s3).to receive(:upload_body).and_return('tickets/qr/default.png')
+
+      key = described_class.new.generate_image_key!('payload')
+
+      expect(key).to eq('tickets/qr/default.png')
+    end
+
     it 'generates a PNG and uploads it to S3' do
       allow(s3_service).to receive(:upload_body) do |body, **|
         expect(body.bytesize).to be > 0

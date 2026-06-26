@@ -64,7 +64,7 @@ RSpec.describe Api::V1::BrandsController, type: :controller do
         put :update, params: { id: 1 }
 
         expect(response).to have_http_status(:unprocessable_content)
-        expect(JSON.parse(response.body)).to eq({ 'errors' => ['Subdomain is already taken'] })
+        expect(JSON.parse(response.body)).to eq({ 'errors' => [I18n.t('api.v1.errors.brands.subdomain_taken')] })
       end
     end
   end

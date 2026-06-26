@@ -144,6 +144,7 @@ Use these commands from `api/`:
 ```bash
 bin/rails db:prepare
 bin/rails db:seed
+bin/rails db:seed:replant
 bin/rails db:test:prepare
 bin/rails db:reset
 ```

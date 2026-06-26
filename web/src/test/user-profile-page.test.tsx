@@ -5,6 +5,10 @@ import UserProfilePage from '@/pages/user-profile-page';
 import * as useUserProfileModule from '@/hooks/use-user-profile';
 import type { UserProfile } from '@/types/user';
 
+jest.mock('@/components/layout', () => ({
+  PageWrapper: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
 jest.mock('@/hooks/use-user-profile');
 const mockUseUserProfile = jest.spyOn(useUserProfileModule, 'useUserProfile');
 
