@@ -13,11 +13,13 @@ jest.mock('@/lib/api-client', () => ({
   default: {
     get: jest.fn(),
     post: jest.fn(),
+    patch: jest.fn(),
   },
 }));
 
 const mockedGet = apiClient.get as jest.Mock;
 const mockedPost = apiClient.post as jest.Mock;
+const mockedPatch = apiClient.patch as jest.Mock;
 
 const mockEvent: Event = {
   id: 1,
@@ -43,6 +45,11 @@ const mockPaginatedResponse: PaginatedResponse<Event> = {
   meta: { page: 1, per_page: 20, total: 1, total_pages: 3 },
 };
 
+const mockCategories = [
+  { id: 1, name: 'Concert' },
+  { id: 2, name: 'Education' },
+];
+
 describe('EventsService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -61,6 +68,17 @@ describe('EventsService', () => {
     it('works without params', async () => {
       mockedGet.mockResolvedValueOnce({ data: mockPaginatedResponse });
       await expect(EventsService.getEvents()).resolves.toBeDefined();
+    });
+  });
+
+  describe('getAllCategories', () => {
+    it('should fetch all categories', async () => {
+      mockedGet.mockResolvedValueOnce({ data: mockCategories });
+
+      const result = await EventsService.getAllCategories();
+
+      expect(mockedGet).toHaveBeenCalledWith('/api/v1/categories');
+      expect(result).toEqual(mockCategories);
     });
   });
 
@@ -90,6 +108,28 @@ describe('EventsService', () => {
       });
     });
   });
+
+  describe('updateEvent', () => {
+    it('should call PATCH /api/v1/events/:id with FormData payload', async () => {
+      const payload: Partial<CreateEventRequest> = {
+        location: 'Lviv, Ukraine',
+        category_ids: [3],
+      };
+      mockedPatch.mockResolvedValueOnce({ data: mockEventDetail });
+
+      const result = await EventsService.updateEvent(1, payload);
+
+      expect(mockedPatch).toHaveBeenCalledWith('/api/v1/events/1', expect.any(FormData), {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+
+      const sentFormData = mockedPatch.mock.calls[0][1] as FormData;
+      expect(sentFormData.get('event[location]')).toBe('Lviv, Ukraine');
+      expect(sentFormData.getAll('event[category_ids][]')).toEqual(['3']);
+      expect(result).toEqual(mockEventDetail);
+    });
+  });
+
   describe('Discovery Methods', () => {
     it('should fetch events with correct query params', async () => {
       mockedGet.mockResolvedValueOnce({ data: mockPaginatedResponse });

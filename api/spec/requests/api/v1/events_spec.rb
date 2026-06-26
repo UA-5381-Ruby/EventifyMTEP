@@ -8,8 +8,6 @@ RSpec.describe 'api/v1/events', type: :request do
   let!(:category) { create(:category) }
   let!(:membership) { create(:brand_membership, user: user, brand: brand, role: 'owner') }
 
-  # CRITICAL: Build the raw token payload string that your ApplicationController handles
-  # Replace this calculation with your true token encryption helper method if necessary
   let(:Authorization) { jwt_for(user) }
 
   let(:id) { create(:event, brand: brand, categories: [category]).id }
@@ -45,7 +43,8 @@ RSpec.describe 'api/v1/events', type: :request do
                      start_date: Time.current.iso8601,
                      location: 'Lviv',
                      price_cents: 100,
-                     available_tickets_count: 100 } }
+                     available_tickets_count: 100,
+                     category_ids: [category.id] } }
         end
         run_test!
       end
@@ -64,6 +63,40 @@ RSpec.describe 'api/v1/events', type: :request do
       parameter name: :id, in: :path, type: :integer
 
       response '200', 'returns a 200 response' do
+        run_test!
+      end
+    end
+
+    patch 'patch event updated' do
+      tags 'Events'
+      consumes 'application/json'
+      parameter name: :Authorization, in: :header, type: :string, required: true
+      parameter name: :id, in: :path, type: :integer
+
+      parameter name: :event, in: :body, schema: {
+        type: :object,
+        properties: {
+          event: {
+            type: :object,
+            properties: {
+              title: { type: :string, example: 'Updated Event Title' },
+              description: { type: :string, example: 'New description here' },
+              location: { type: :string, example: 'Odesa' },
+              start_date: { type: :string, example: '2026-07-20T18:00:00Z' },
+              category_ids: {
+                type: :array,
+                items: { type: :integer },
+                example: [1, 2, 3]
+              }
+            },
+            required: %w[title]
+          }
+        }
+      }
+
+      response '404', 'forbidden update returns not found' do
+        let(:Authorization) { jwt_for(create(:user)) }
+        let(:event) { { event: { title: 'Hack Title' } } }
         run_test!
       end
     end
