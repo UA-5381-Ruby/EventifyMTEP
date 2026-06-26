@@ -56,7 +56,6 @@ function App() {
 
           {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
-
             {/* Super Admin Routes */}
             <Route element={<SuperAdminRoute />}>
               <Route path="/superadmin" element={<SuperAdminPage />} />
@@ -89,7 +88,6 @@ function App() {
                 <Route path="/dashboard/settings" element={<EditBrandPage />} />
               </Route>
             </Route>
-
           </Route>
 
           {/* 404 Route */}

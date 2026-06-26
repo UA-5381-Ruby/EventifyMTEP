@@ -102,12 +102,16 @@ export default function ActivityLogPage() {
         const brandsRes = brandsRaw as AxiosResponseData<Brand[]>;
         const categoriesRes = categoriesRaw as AxiosResponseData<Category[]>;
 
-        const brandsData = brandsRes?.data?.data || (Array.isArray(brandsRes?.data) ? brandsRes.data : []) || [];
+        const brandsData =
+          brandsRes?.data?.data || (Array.isArray(brandsRes?.data) ? brandsRes.data : []) || [];
         if (Array.isArray(brandsData)) {
           setBrands(brandsData.map((b) => ({ id: String(b.id), name: b.name })));
         }
 
-        const categoriesData = categoriesRes?.data?.data || (Array.isArray(categoriesRes?.data) ? categoriesRes.data : []) || [];
+        const categoriesData =
+          categoriesRes?.data?.data ||
+          (Array.isArray(categoriesRes?.data) ? categoriesRes.data : []) ||
+          [];
         if (Array.isArray(categoriesData)) {
           setCategories(categoriesData.map((c) => ({ id: String(c.id), name: c.name })));
         }
@@ -119,9 +123,7 @@ export default function ActivityLogPage() {
     fetchBrandsAndCategories();
   }, []);
 
-
   useEffect(() => {
-     
     const fetchDataFromDB = async () => {
       setLoading(true);
       setError(null);
@@ -138,7 +140,8 @@ export default function ActivityLogPage() {
         const rawResponse = await EventsService.getEvents(params);
         const response = rawResponse as AxiosResponseData<RawBackendEvent[]>;
 
-        const responseData = response?.data?.data || (Array.isArray(response?.data) ? response.data : []) || [];
+        const responseData =
+          response?.data?.data || (Array.isArray(response?.data) ? response.data : []) || [];
         const responseMeta = response?.data?.meta || response?.meta || {};
 
         if (Array.isArray(responseData)) {
@@ -170,7 +173,8 @@ export default function ActivityLogPage() {
         }
       } catch {
         setError('Try again later. Error fetching events from the database.');
-      } {
+      }
+      {
         setLoading(false);
       }
     };
@@ -320,10 +324,11 @@ export default function ActivityLogPage() {
           <div className="relative">
             <button
               onClick={() => setActiveDropdown(activeDropdown === 'status' ? null : 'status')}
-              className={`border px-4 py-2 text-sm rounded-lg transition-colors flex items-center gap-2 ${selectedStatuses.length > 0 || activeDropdown === 'status'
-                ? 'border-gray-400 bg-gray-50 font-medium'
-                : 'border-gray-300 bg-white hover:bg-gray-50'
-                }`}
+              className={`border px-4 py-2 text-sm rounded-lg transition-colors flex items-center gap-2 ${
+                selectedStatuses.length > 0 || activeDropdown === 'status'
+                  ? 'border-gray-400 bg-gray-50 font-medium'
+                  : 'border-gray-300 bg-white hover:bg-gray-50'
+              }`}
             >
               Status {selectedStatuses.length > 0 && `(${selectedStatuses.length})`}{' '}
               <span className="text-gray-400 text-xs">⏷</span>
@@ -502,10 +507,11 @@ export default function ActivityLogPage() {
               <button
                 key={page}
                 onClick={() => setCurrentPage(page)}
-                className={`px-3 py-1 rounded-md text-sm transition-colors ${currentPage === page
-                  ? 'bg-gray-900 font-bold text-white shadow-sm'
-                  : 'text-gray-500 hover:bg-gray-100'
-                  }`}
+                className={`px-3 py-1 rounded-md text-sm transition-colors ${
+                  currentPage === page
+                    ? 'bg-gray-900 font-bold text-white shadow-sm'
+                    : 'text-gray-500 hover:bg-gray-100'
+                }`}
               >
                 {page}
               </button>

@@ -20,7 +20,10 @@ describe('SuperadminService', () => {
       ];
 
       const mockBrands = {
-        data: [{ id: 1, name: 'Brand A' }, { id: 2, name: 'Brand B' }],
+        data: [
+          { id: 1, name: 'Brand A' },
+          { id: 2, name: 'Brand B' },
+        ],
       };
 
       const mockEvents = {

@@ -39,10 +39,10 @@ export const SuperadminService = {
 
     const fetchedUsers: UserPreview[] = Array.isArray(users)
       ? (users as RawUser[]).map((user) => ({
-        id: String(user.id),
-        email: user.email,
-        role: user.role || 'Member',
-      }))
+          id: String(user.id),
+          email: user.email,
+          role: user.role || 'Member',
+        }))
       : [];
 
     const fetchedBrands = brands?.data || [];
@@ -69,7 +69,8 @@ export const SuperadminService = {
       totalBrands: fetchedBrands.length,
       totalEvents: fetchedEvents.length,
       pendingApproval: pendingEvents.length,
-      rejectedEvents: fetchedEvents.filter((event) => event.status?.toLowerCase() === 'rejected').length,
+      rejectedEvents: fetchedEvents.filter((event) => event.status?.toLowerCase() === 'rejected')
+        .length,
       reportedUsers: 0,
     };
 
