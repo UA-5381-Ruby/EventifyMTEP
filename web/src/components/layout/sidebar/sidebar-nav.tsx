@@ -14,7 +14,7 @@ interface SidebarNavProps {
 const SUPERADMIN_ITEMS = [
   { label: 'Dashboard', href: '/superadmin' },
   { label: 'Brands', href: '/brands' },
-  { label: 'User\'s activity log', href: '/activity-log' }
+  { label: "User's activity log", href: '/activity-log' },
   { label: 'Events History', href: '/logs' },
 ];
 
