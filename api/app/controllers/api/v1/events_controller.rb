@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ClassLength
 module Api
   module V1
     class EventsController < ApplicationController
@@ -29,33 +30,17 @@ module Api
 
       def show
         render json: @event.as_json(
-          methods: %i[banner_url average_rating reviews_count], 
+          methods: %i[banner_url average_rating reviews_count],
           include: event_serialization_includes
         ), status: :ok
       end
 
       def reviews
-        feedbacks = @event.event_feedbacks
-                          .includes(ticket: :user)
-                          .order(created_at: :desc)
+        feedbacks = @event.event_feedbacks.includes(ticket: :user).order(created_at: :desc)
         paginated = paginate(feedbacks)
 
-        formatted_data = paginated[:records].map do |feedback|
-          user = feedback.ticket.user
-          {
-            id: feedback.id,
-            rating: feedback.rating,
-            comment: feedback.comment,
-            created_at: feedback.created_at,
-            user: {
-              id: user.id,
-              name: user.name,
-            }
-          }
-        end
-
         render json: {
-          data: formatted_data,
+          data: paginated[:records].map { |feedback| format_feedback(feedback) },
           meta: paginated[:meta]
         }, status: :ok
       end
@@ -80,6 +65,20 @@ module Api
         Event.new(attrs.merge(brand: brand, status: 'draft')).tap do |event|
           event.category_ids = event_params[:category_ids] if event_params[:category_ids].present?
         end
+      end
+
+      def format_feedback(feedback)
+        user = feedback.ticket.user
+        {
+          id: feedback.id,
+          rating: feedback.rating,
+          comment: feedback.comment,
+          created_at: feedback.created_at,
+          user: {
+            id: user.id,
+            name: user.name
+          }
+        }
       end
 
       def process_banner_upload(attrs)
@@ -148,3 +147,4 @@ module Api
     end
   end
 end
+# rubocop:enable Metrics/ClassLength

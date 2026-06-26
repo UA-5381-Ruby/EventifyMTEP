@@ -18,7 +18,7 @@ RSpec.describe Event, type: :model do
   it { is_expected.to belong_to(:brand) }
   it { is_expected.to have_many(:event_categories).dependent(:destroy) }
   it { is_expected.to have_many(:categories).through(:event_categories) }
-  
+
   it { is_expected.to have_many(:tickets).dependent(:destroy) }
   it { is_expected.to have_many(:event_feedbacks).through(:tickets) }
 
@@ -39,7 +39,7 @@ RSpec.describe Event, type: :model do
   describe 'reviews statistics (average_rating and reviews_count)' do
     let(:user1) { create(:user) }
     let(:user2) { create(:user) }
-    
+
     let(:event) { create(:event, brand: brand, categories: [category]) }
 
     context 'when there are no reviews' do
