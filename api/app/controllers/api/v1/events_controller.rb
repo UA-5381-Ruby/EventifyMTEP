@@ -14,8 +14,8 @@ module Api
         render json: { errors: [e.message] }, status: :unprocessable_content
       end
 
-      before_action :require_authentication!, only: %i[create]
-      before_action :set_event, only: [:show]
+      before_action :require_authentication!, only: %i[create update]
+      before_action :set_event, only: %i[show update]
 
       def index
         paginated = paginate(EventFilter.new(index_params, current_user).call)
@@ -44,15 +44,40 @@ module Api
         render json: { error: t('api.v1.errors.brands.not_found_or_access_denied') }, status: :forbidden
       end
 
+      def update
+        authorize_brand_access!(@event.brand_id)
+
+        if @event.update(update_event_attrs)
+          render json: @event.as_json(
+            methods: [:banner_url],
+            include: event_serialization_includes
+          ), status: :ok
+        else
+          render json: { errors: @event.errors }, status: :unprocessable_content
+        end
+      rescue ActiveRecord::RecordNotFound
+        render json: { error: t('api.v1.errors.brands.not_found_or_access_denied') }, status: :forbidden
+      end
+
       private
 
       def build_event
-        brand = authorize_brand_access!
+        brand = authorize_brand_access!(event_params[:brand_id])
         attrs = process_banner_upload(event_base_params.to_h)
 
         Event.new(attrs.merge(brand: brand, status: 'draft')).tap do |event|
           event.category_ids = event_params[:category_ids] if event_params[:category_ids].present?
         end
+      end
+
+      def update_event_attrs
+        attrs = process_banner_upload(event_base_params.to_h)
+
+        if event_params[:category_ids].present?
+          attrs.merge!(category_ids: event_params[:category_ids])
+        end
+
+        attrs
       end
 
       def process_banner_upload(attrs)
@@ -62,7 +87,7 @@ module Api
         if file.present? && file.is_a?(ActionDispatch::Http::UploadedFile)
           attrs[:banner] =
             validated_media_key(file, folder: 'events/banners',
-                                      error_scope: 'api.v1.errors.events.banner')
+                                error_scope: 'api.v1.errors.events.banner')
         end
 
         attrs
@@ -78,8 +103,8 @@ module Api
         s3_key
       end
 
-      def authorize_brand_access!
-        brand = current_user.brands.find(event_params[:brand_id])
+      def authorize_brand_access!(brand_id = event_params[:brand_id])
+        brand = current_user.brands.find(brand_id)
         membership = brand.brand_memberships.find_by(user_id: current_user.id)
 
         raise Pundit::NotAuthorizedError unless membership&.role.in?(%w[owner manager])
@@ -108,10 +133,10 @@ module Api
 
       def event_params
         params.expect(event: [
-                        :title, :description, :location, :start_date,
-                        :end_date, :status, :brand_id, :banner, :price_cents, :available_tickets_count,
-                        { category_ids: [] }
-                      ])
+          :title, :description, :location, :start_date,
+          :end_date, :status, :brand_id, :banner, :price_cents, :available_tickets_count,
+          { category_ids: [] }
+        ])
       end
 
       def index_params

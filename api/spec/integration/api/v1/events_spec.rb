@@ -98,6 +98,7 @@ RSpec.describe 'api/v1/events', type: :request do
 
         let(:brand) { create(:brand) }
         let!(:membership) { create(:brand_membership, user: user, brand: brand, role: 'owner') }
+        let!(:category) { create(:category) }
 
         let(:body) do
           {
@@ -108,7 +109,8 @@ RSpec.describe 'api/v1/events', type: :request do
               end_date: (1.week.from_now + 1.day).iso8601,
               brand_id: brand.id,
               price_cents: 1000,
-              available_tickets_count: 100
+              available_tickets_count: 100,
+              category_ids: [category.id]
             }
           }
         end
@@ -137,8 +139,8 @@ RSpec.describe 'api/v1/events', type: :request do
 
         expect(event).not_to be_valid
         expect(event.errors[:end_date]).to include(
-          I18n.t('activerecord.errors.models.event.attributes.end_date.after_start_date')
-        )
+                                             I18n.t('activerecord.errors.models.event.attributes.end_date.after_start_date')
+                                           )
       end
     end
   end
@@ -166,6 +168,61 @@ RSpec.describe 'api/v1/events', type: :request do
         schema '$ref' => '#/components/schemas/NotFound'
         let(:id) { 0 }
 
+        run_test!
+      end
+    end
+
+    patch 'Update event and categories' do
+      tags 'Events'
+      consumes 'application/json'
+      produces 'application/json'
+      security [{ bearer_auth: [] }]
+      description 'Updates an existing event details and replaces its categories.'
+
+      parameter name: :body, in: :body, required: true,
+                schema: { '$ref' => '#/components/schemas/EventInput' }
+
+      let(:user) { create(:user) }
+      let(:Authorization) { jwt_for(user) }
+      let(:brand) { create(:brand) }
+      let!(:membership) { create(:brand_membership, user: user, brand: brand, role: 'owner') }
+      let!(:event_item) { create(:event, brand: brand) }
+      let(:id) { event_item.id }
+
+      response '200', 'event updated successfully' do
+        schema '$ref' => '#/components/schemas/Event'
+        let!(:new_category) { create(:category) }
+
+        let(:body) do
+          {
+            event: {
+              title: 'Updated Event Title',
+              location: 'Odesa',
+              category_ids: [new_category.id]
+            }
+          }
+        end
+        run_test!
+      end
+
+      response '422', 'update validation failed' do
+        schema '$ref' => '#/components/schemas/ValidationErrors'
+        let(:body) do
+          {
+            event: {
+              title: ''
+            }
+          }
+        end
+        run_test!
+      end
+
+      response '404', 'forbidden access returns not found' do
+        schema '$ref' => '#/components/schemas/NotFound'
+
+        let(:outsider) { create(:user) }
+        let(:Authorization) { jwt_for(outsider) }
+        let(:body) { { event: { title: 'No Access' } } }
         run_test!
       end
     end
