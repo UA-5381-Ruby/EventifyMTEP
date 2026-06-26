@@ -5,10 +5,10 @@ module Api
     class ActivitiesController < ApplicationController
       include Paginatable
 
+      skip_before_action :set_brand, only: [:index], raise: false, if: -> { current_user&.superadmin? }
       before_action :require_authentication!
       before_action :require_superadmin!
 
-      # GET /api/v1/activities
       def index
         paginated = paginate(filtered_activities)
 

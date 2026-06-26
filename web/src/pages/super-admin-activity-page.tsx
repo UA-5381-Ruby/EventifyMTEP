@@ -1,49 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import apiClient from '@/lib/api-client';
 import { PageWrapper } from '@/components/layout';
-
-type ActivityType =
-  | 'login'
-  | 'logout'
-  | 'create'
-  | 'update'
-  | 'delete'
-  | 'approve'
-  | 'reject'
-  | 'publish'
-  | 'download'
-  | 'upload'
-  | 'other';
-
-interface ActivityActor {
-  id: string;
-  email: string;
-  name?: string;
-}
-
-interface Activity {
-  id: string;
-  actor: ActivityActor;
-  type: ActivityType;
-  resource: string;
-  resourceId?: string;
-  resourceName?: string;
-  timestamp: string;
-  details?: string;
-  ipAddress?: string;
-  status: 'success' | 'failed';
-}
-
-interface ApiResponse {
-  data: unknown[];
-  meta?: {
-    page: number;
-    per_page: number;
-    total: number;
-    pages: number;
-  };
-}
-
+import type { Activity, ActivityType } from '@/services/activity-service';
+import { activityService } from '@/services/activity-service';
 export default function SuperAdminActivityPage() {
   const [activities, setActivities] = useState<Activity[]>([]);
   const [totalActivities, setTotalActivities] = useState<number>(0);
@@ -69,84 +27,23 @@ export default function SuperAdminActivityPage() {
       setLoading(true);
       setError(null);
       try {
-        const params: Record<string, unknown> = {
+        const { activities, total } = await activityService.getActivities({
           page: currentPage,
-          per_page: itemsPerPage,
-        };
+          perPage: itemsPerPage,
+          activityTypes: selectedActivityTypes,
+          resource: selectedResource,
+          status: selectedStatus,
+          email: searchEmail,
+        });
 
-        if (selectedActivityTypes.length > 0) {
-          params.activity_types = selectedActivityTypes.join(',');
-        }
-        if (selectedResource) {
-          params.resource = selectedResource;
-        }
-        if (selectedStatus) {
-          params.status = selectedStatus;
-        }
-        if (searchEmail) {
-          params.email = searchEmail;
-        }
-
-        const response = await apiClient.get<unknown>('/api/v1/activities', { params });
-
-        const res = response as unknown as Record<string, unknown>;
-
-        const responseBody: ApiResponse =
-          res.data && typeof res.data === 'object' && 'data' in res.data
-            ? (res.data as ApiResponse)
-            : (res as unknown as ApiResponse);
-
-        if (responseBody && Array.isArray(responseBody.data)) {
-          const rawRecords = responseBody.data;
-
-          const fetchedActivities: Activity[] = rawRecords.map((item: unknown) => {
-            const activity = item as Record<string, unknown>;
-            const actor = (activity.actor as Record<string, unknown>) || {};
-
-            return {
-              id: String(activity.id || ''),
-              actor: {
-                id: String(actor.id || ''),
-                email: String(actor.email || 'Unknown'),
-                name: actor.name ? String(actor.name) : undefined,
-              },
-              type: (activity.type || 'other') as ActivityType,
-              resource: String(activity.resource || 'System'),
-              resourceId: activity.resource_id
-                ? String(activity.resource_id)
-                : activity.resourceId
-                  ? String(activity.resourceId)
-                  : undefined,
-              resourceName: activity.resource_name
-                ? String(activity.resource_name)
-                : activity.resourceName
-                  ? String(activity.resourceName)
-                  : undefined,
-              timestamp: String(
-                activity.created_at || activity.timestamp || new Date().toISOString()
-              ),
-              details: activity.details ? String(activity.details) : undefined,
-              ipAddress: activity.ip_address
-                ? String(activity.ip_address)
-                : activity.ipAddress
-                  ? String(activity.ipAddress)
-                  : undefined,
-              status: (activity.status || 'success') as 'success' | 'failed',
-            };
-          });
-
-          setActivities(fetchedActivities);
-
-          setTotalActivities(responseBody.meta?.total ?? fetchedActivities.length);
-        } else {
-          throw new Error('Incorrect data format received from the server.');
-        }
+        setActivities(activities);
+        setTotalActivities(total);
       } catch (err: unknown) {
         console.error('Error loading activities:', err);
 
         let errorMessage = 'Failed to load activity data. Check your connection to the server.';
-
         const axiosError = err as { response?: { data?: { error?: string } } };
+
         if (axiosError?.response?.data?.error) {
           errorMessage = axiosError.response.data.error;
         } else if (err instanceof Error) {

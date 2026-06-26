@@ -1,32 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import apiClient from '@/lib/api-client';
+
 import { PageWrapper } from '@/components/layout';
 import { DeleteUserModal, SuccessModal } from '@/components/ui/super-admin-modals';
 
-interface AdminStats {
-  totalEvents: number;
-  totalUsers: number;
-  totalBrands: number;
-  pendingApproval: number;
-  rejectedEvents: number;
-  reportedUsers: number;
-}
+import { UserService } from '@/services/user-service';
+import { EventLifecycleService } from '@/services/event-lifecycle-service';
+import { SuperadminService } from '@/services/superadmin-service';
 
-interface PendingEvent {
-  id: string;
-  name: string;
-  startDate: string;
-  status: string;
-  createdBy: string;
-  location: string;
-}
-
-interface UserPreview {
-  id: string;
-  email: string;
-  role: string;
-}
+import type { AdminStats, PendingEvent, UserPreview } from '@/types/super-admin';
 
 export function SuperAdminPage() {
   const navigate = useNavigate();
@@ -52,89 +34,24 @@ export function SuperAdminPage() {
   const [users, setUsers] = useState<UserPreview[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const loadDashboard = async () => {
+    try {
+      setIsLoading(true);
+
+      const dashboard = await SuperadminService.getDashboardData();
+
+      setUsers(dashboard.users);
+      setPendingEvents(dashboard.pendingEvents);
+      setStats(dashboard.stats);
+    } catch (error) {
+      console.error('Failed to load dashboard:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    let isMounted = true;
-
-    const fetchDashboardData = async () => {
-      try {
-        if (isMounted) setIsLoading(true);
-
-        const [usersRes, brandsRes, eventsRes] = await Promise.all([
-          apiClient.get('/api/v1/users').catch(() => ({ data: { data: [], meta: {} } })),
-          apiClient
-            .get('/api/v1/brands', { params: { scope: 'discover', per_page: 100 } })
-            .catch(() => ({ data: { data: [], meta: {} } })),
-          apiClient.get('/api/v1/events').catch(() => ({ data: { data: [], meta: {} } })),
-        ]);
-
-        if (!isMounted) return;
-
-        let fetchedUsers: UserPreview[] = [];
-        if (usersRes.data && 'data' in usersRes.data && Array.isArray(usersRes.data.data)) {
-          fetchedUsers = usersRes.data.data;
-        } else if (Array.isArray(usersRes.data)) {
-          fetchedUsers = usersRes.data;
-        }
-        const totalUsersCount =
-          usersRes.data?.meta?.total || usersRes.data?.meta?.total_count || fetchedUsers.length;
-
-        let fetchedBrands: any[] = [];
-        if (brandsRes.data && 'data' in brandsRes.data && Array.isArray(brandsRes.data.data)) {
-          fetchedBrands = brandsRes.data.data;
-        } else if (Array.isArray(brandsRes.data)) {
-          fetchedBrands = brandsRes.data;
-        }
-        const totalBrandsCount =
-          brandsRes.data?.meta?.total || brandsRes.data?.meta?.total_count || fetchedBrands.length;
-
-        let fetchedEvents: PendingEvent[] = [];
-        if (eventsRes.data && 'data' in eventsRes.data && Array.isArray(eventsRes.data.data)) {
-          fetchedEvents = eventsRes.data.data.map((event: any) => ({
-            id: event.id,
-            name: event.title || event.name || 'N/A',
-            startDate: event.start_date || event.date || new Date().toISOString(),
-            status: event.status || 'draft',
-            createdBy: event.created_by || event.actor?.name || 'Unknown',
-            location: event.location || 'N/A',
-          }));
-        } else if (Array.isArray(eventsRes.data)) {
-          fetchedEvents = eventsRes.data;
-        }
-        const totalEventsCount =
-          eventsRes.data?.meta?.total || eventsRes.data?.meta?.total_count || fetchedEvents.length;
-
-        const pending = fetchedEvents.filter((event) => event.status?.toLowerCase() === 'pending');
-        setPendingEvents(pending);
-        setUsers(fetchedUsers);
-
-        setStats({
-          totalUsers: totalUsersCount,
-          totalBrands: totalBrandsCount,
-          totalEvents: totalEventsCount,
-
-          pendingApproval:
-            eventsRes.data?.meta?.total_pending ||
-            eventsRes.data?.meta?.pending_count ||
-            pending.length,
-          rejectedEvents:
-            eventsRes.data?.meta?.total_rejected ||
-            eventsRes.data?.meta?.rejected_count ||
-            fetchedEvents.filter((event) => event.status?.toLowerCase() === 'rejected').length,
-
-          reportedUsers: 0,
-        });
-      } catch (error) {
-        console.error('Dashboard loading failed:', error);
-      } finally {
-        if (isMounted) setIsLoading(false);
-      }
-    };
-
-    fetchDashboardData();
-
-    return () => {
-      isMounted = false;
-    };
+    void loadDashboard();
   }, []);
 
   const openDeleteModal = (user: UserPreview) => {
@@ -152,79 +69,79 @@ export function SuperAdminPage() {
       userEmail: '',
     });
   };
-
   const handleDeleteUser = async () => {
     if (!deleteModal.userId) return;
 
     try {
-      await apiClient.delete(`/api/v1/users/${deleteModal.userId}`);
-
-      setUsers((prev) => prev.filter((user) => user.id !== deleteModal.userId));
-
-      setStats((prev) => ({
-        ...prev,
-        totalUsers: prev.totalUsers - 1,
-      }));
+      await UserService.deleteUser(deleteModal.userId);
 
       closeDeleteModal();
       setShowSuccess(true);
+
+      await loadDashboard();
     } catch (error) {
       console.error('Delete user failed:', error);
-      alert('Could not delete user. Make sure you have Super Admin rights.');
+
+      alert('Could not delete user.');
+
       closeDeleteModal();
     }
   };
 
   const handleApprove = async (eventId: string) => {
     try {
-      await apiClient.patch(`/api/v1/events/${eventId}`, {
-        status: 'approved',
-      });
-
-      setPendingEvents((prev) => prev.filter((event) => event.id !== eventId));
-
-      setStats((prev) => ({
-        ...prev,
-        pendingApproval: Math.max(prev.pendingApproval - 1, 0),
-      }));
+      await EventLifecycleService.approveEvent(eventId);
 
       setShowSuccess(true);
+
+      await loadDashboard();
     } catch (error) {
       console.error('Approve failed:', error);
+
       alert('Could not approve event.');
     }
   };
 
   const handleReject = async (eventId: string) => {
     try {
-      await apiClient.patch(`/api/v1/events/${eventId}`, {
-        status: 'rejected',
-      });
-
-      setPendingEvents((prev) => prev.filter((event) => event.id !== eventId));
-
-      setStats((prev) => ({
-        ...prev,
-        pendingApproval: Math.max(prev.pendingApproval - 1, 0),
-        rejectedEvents: prev.rejectedEvents + 1,
-      }));
+      await EventLifecycleService.rejectEvent(eventId);
 
       setShowSuccess(true);
+
+      await loadDashboard();
     } catch (error) {
       console.error('Reject failed:', error);
+
       alert('Could not reject event.');
     }
   };
 
   const statsArray = [
-    { title: 'Total Events', value: stats.totalEvents },
-    { title: 'Total Users', value: stats.totalUsers },
-    { title: 'Total Brands', value: stats.totalBrands },
-    { title: 'Pending Approval', value: stats.pendingApproval },
-    { title: 'Rejected Events', value: stats.rejectedEvents },
-    { title: 'Reported Users', value: stats.reportedUsers },
+    {
+      title: 'Total Events',
+      value: stats.totalEvents,
+    },
+    {
+      title: 'Total Users',
+      value: stats.totalUsers,
+    },
+    {
+      title: 'Total Brands',
+      value: stats.totalBrands,
+    },
+    {
+      title: 'Pending Approval',
+      value: stats.pendingApproval,
+    },
+    {
+      title: 'Rejected Events',
+      value: stats.rejectedEvents,
+    },
+    {
+      title: 'Reported Users',
+      value: stats.reportedUsers,
+    },
   ];
-
   if (isLoading) {
     return (
       <PageWrapper>
@@ -240,15 +157,16 @@ export function SuperAdminPage() {
       <div className="p-6 max-w-6xl mx-auto text-gray-800">
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-2xl font-bold">Admin Panel</h1>
-          <div className="flex gap-2">
-            <button
-              onClick={() => navigate('/activity-log')}
-              className="bg-black text-white text-xs px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
-            >
-              User Activity Log
-            </button>
-          </div>
+
+          <button
+            onClick={() => navigate('/activity-log')}
+            className="bg-black text-white text-xs px-4 py-2 rounded-lg hover:bg-gray-800 transition-colors"
+          >
+            View Activity Log
+          </button>
         </div>
+
+        {/* Statistics */}
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {statsArray.map((card) => (
@@ -257,14 +175,18 @@ export function SuperAdminPage() {
               className="border border-gray-300 bg-white p-6 rounded-xl shadow-sm"
             >
               <p className="text-sm text-gray-600">{card.title}</p>
+
               <p className="text-4xl font-bold mt-2">{card.value}</p>
             </div>
           ))}
         </div>
 
+        {/* Pending Events */}
+
         <div className="mb-12">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-bold">Events Pending Approval</h2>
+
             <button className="text-sm hover:underline">View All</button>
           </div>
 
@@ -273,13 +195,19 @@ export function SuperAdminPage() {
               <thead>
                 <tr className="bg-gray-200">
                   <th className="border-b border-gray-300 px-4 py-3 text-left">Name</th>
+
                   <th className="border-b border-gray-300 px-4 py-3 text-left">Start Date</th>
+
                   <th className="border-b border-gray-300 px-4 py-3 text-left">Status</th>
+
                   <th className="border-b border-gray-300 px-4 py-3 text-left">Created By</th>
+
                   <th className="border-b border-gray-300 px-4 py-3 text-left">Location</th>
+
                   <th className="border-b border-gray-300 px-4 py-3 text-center">Actions</th>
                 </tr>
               </thead>
+
               <tbody>
                 {pendingEvents.length === 0 ? (
                   <tr>
@@ -289,23 +217,29 @@ export function SuperAdminPage() {
                   </tr>
                 ) : (
                   pendingEvents.map((event) => (
-                    <tr key={event.id} className="hover:bg-gray-50 last:border-none">
-                      <td className="border-b border-gray-200 px-4 py-3">{event.name}</td>
-                      <td className="border-b border-gray-200 px-4 py-3">{event.startDate}</td>
-                      <td className="border-b border-gray-200 px-4 py-3">{event.status}</td>
-                      <td className="border-b border-gray-200 px-4 py-3">{event.createdBy}</td>
-                      <td className="border-b border-gray-200 px-4 py-3">{event.location}</td>
-                      <td className="border-b border-gray-200 px-4 py-3">
+                    <tr key={event.id} className="hover:bg-gray-50">
+                      <td className="border-b px-4 py-3">{event.name}</td>
+
+                      <td className="border-b px-4 py-3">{event.startDate}</td>
+
+                      <td className="border-b px-4 py-3">{event.status}</td>
+
+                      <td className="border-b px-4 py-3">{event.createdBy}</td>
+
+                      <td className="border-b px-4 py-3">{event.location}</td>
+
+                      <td className="border-b px-4 py-3">
                         <div className="flex justify-center gap-2">
                           <button
                             onClick={() => handleApprove(event.id)}
-                            className="bg-black text-white px-5 py-2 text-xs rounded-lg hover:bg-gray-800 transition-colors"
+                            className="bg-black text-white px-5 py-2 text-xs rounded-lg hover:bg-gray-800"
                           >
                             Approve
                           </button>
+
                           <button
                             onClick={() => handleReject(event.id)}
-                            className="bg-gray-300 text-gray-800 px-5 py-2 text-xs rounded-lg hover:bg-gray-400 transition-colors"
+                            className="bg-gray-300 text-gray-800 px-5 py-2 text-xs rounded-lg hover:bg-gray-400"
                           >
                             Reject
                           </button>
@@ -319,15 +253,18 @@ export function SuperAdminPage() {
           </div>
         </div>
 
+        {/* Users */}
+
         <div>
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-lg font-bold">User Preview</h2>
+
             <button className="text-sm hover:underline">Manage Members</button>
           </div>
 
           <div className="border border-gray-300 bg-white p-6 rounded-xl shadow-sm">
             <div className="flex justify-end mb-6">
-              <button className="border px-8 py-2 text-xs rounded-lg hover:bg-gray-100 transition-colors">
+              <button className="border px-8 py-2 text-xs rounded-lg hover:bg-gray-100">
                 Add Member
               </button>
             </div>
@@ -339,20 +276,23 @@ export function SuperAdminPage() {
                 users.map((user) => (
                   <div
                     key={user.id}
-                    className="flex justify-between items-center border-b border-gray-100 pb-4 last:border-none last:pb-0"
+                    className="flex justify-between items-center border-b border-gray-100 pb-4"
                   >
                     <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-bold text-gray-700">
+                      <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center font-bold">
                         {user.email.charAt(0).toUpperCase()}
                       </div>
+
                       <div>
                         <p className="font-medium">{user.email}</p>
+
                         <p className="text-xs text-gray-400">{user.role}</p>
                       </div>
                     </div>
+
                     <button
                       onClick={() => openDeleteModal(user)}
-                      className="border border-gray-400 px-6 py-2 text-xs rounded-lg hover:border-red-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                      className="border border-gray-400 px-6 py-2 text-xs rounded-lg hover:border-red-500 hover:text-red-600"
                     >
                       Delete
                     </button>

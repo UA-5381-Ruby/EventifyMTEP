@@ -31,7 +31,7 @@ class ApplicationController < ActionController::API
   end
 
   def clear_request_context
-    RequestContext.clear
+    RequestContext.reset
   end
 
   def authenticate_with_token(token)
