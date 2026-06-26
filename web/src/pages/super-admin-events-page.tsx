@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
-import apiClient from '@/lib/api-client';
 import { PageWrapper } from '@/components/layout';
+import { brandsService } from '@/services/brands-service';
+import { EventsService } from '@/services/events-service';
+import { CategoriesService } from '@/services/categories-service';
 
 type ActivityStatus =
   | 'draft'
@@ -26,22 +28,10 @@ interface Activity {
   categories?: Array<{ id: string; name: string }>;
 }
 
-interface ApiResponse {
-  data: Activity[];
-  meta?: {
-    page?: number;
-    per_page?: number;
-    total?: number;
-    pages?: number;
-    current_page?: number;
-    total_count?: number;
-    total_pages?: number;
-  };
-}
-
 interface Brand {
   id: string;
   name: string;
+  logo_url?: string; // <--- додайте цей рядок
 }
 
 interface Category {
@@ -70,35 +60,37 @@ export default function ActivityLogPage() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const filterContainerRef = useRef<HTMLDivElement>(null);
 
+  // 1. Завантаження брендів та категорій через сервіси
   useEffect(() => {
     const fetchBrandsAndCategories = async () => {
       try {
-        const [brandsRes, categoriesRes] = await Promise.all([
-          apiClient
-            .get<ApiResponse>('/api/v1/brands', { params: { scope: 'discover', per_page: 100 } })
-            .catch(() => ({ data: { data: [] } as ApiResponse })),
-          apiClient.get<any>('/api/v1/categories').catch(() => ({ data: [] })),
+        const [brandsRaw, categoriesRaw] = await Promise.all([
+          brandsService.getBrands({ scope: 'discover', per_page: 100 }).catch(() => null),
+          CategoriesService.getCategories().catch(() => null),
         ]);
 
-        if (brandsRes.data && 'data' in brandsRes.data && Array.isArray(brandsRes.data.data)) {
-          setBrands(brandsRes.data.data.map((b: any) => ({ id: b.id, name: b.name })));
+        // FIX: Кастуємо до any, щоб TS не сварився на відсутність .data у масивів
+        const brandsRes = brandsRaw as any;
+        const categoriesRes = categoriesRaw as any;
+
+        const brandsData = brandsRes?.data?.data || brandsRes?.data || brandsRes || [];
+        if (Array.isArray(brandsData)) {
+          setBrands(brandsData.map((b: any) => ({ id: String(b.id), name: b.name })));
         }
 
-        if (Array.isArray(categoriesRes.data)) {
-          setCategories(categoriesRes.data.map((c: any) => ({ id: c.id, name: c.name })));
+        const categoriesData =
+          categoriesRes?.data?.data || categoriesRes?.data || categoriesRes || [];
+        if (Array.isArray(categoriesData)) {
+          setCategories(categoriesData.map((c: any) => ({ id: String(c.id), name: c.name })));
         }
       } catch (err) {
-        console.error(err);
+        console.error('Помилка завантаження брендів/категорій:', err);
       }
     };
 
     fetchBrandsAndCategories();
   }, []);
-
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [selectedCategoryId, selectedBrandId, selectedStatuses]);
-
+  // 2. Завантаження подій (івентів) через EventsService
   useEffect(() => {
     const fetchDataFromDB = async () => {
       setLoading(true);
@@ -113,19 +105,33 @@ export default function ActivityLogPage() {
         if (selectedBrandId) params.brand_id = selectedBrandId;
         if (selectedStatuses.length > 0) params.status = selectedStatuses.join(',');
 
-        const response = await apiClient.get<ApiResponse>('/api/v1/events', { params });
+        const rawResponse = await EventsService.getEvents(params);
 
-        if (response.data && 'data' in response.data) {
-          const events = response.data.data.map((event: any) => {
-            const rawLogo = event.brand?.logo || event.brand?.image_url;
+        // FIX: Кастуємо до any для доступу до .data та .meta, які TS не бачить у типі Event[]
+        const response = rawResponse as any;
+
+        const responseData = response?.data?.data || response?.data || response || [];
+        const responseMeta = response?.data?.meta || response?.meta || {};
+
+        if (Array.isArray(responseData)) {
+          const events = responseData.map((event: any) => {
+            // Шукаємо бренд у завантаженому списку, якщо бекенд повернув лише brand_id
+            const matchedBrand = brands.find((b) => b.id === String(event.brand_id));
+
+            const rawLogo =
+              event.brand?.logo ||
+              event.brand?.logo_url ||
+              event.brand?.image_url ||
+              matchedBrand?.logo_url;
             let finalBrandLogo = null;
             if (rawLogo) {
               finalBrandLogo = rawLogo.startsWith('http') ? rawLogo : `${S3_BASE_URL}/${rawLogo}`;
             }
 
             return {
-              id: event.id,
-              brandName: event.brand?.name || 'N/A',
+              id: String(event.id),
+              // Беремо назву з event.brand (якщо є), або зі знайденого бренду, або 'N/A'
+              brandName: event.brand?.name || matchedBrand?.name || 'N/A',
               brandLogo: finalBrandLogo,
               eventName: event.title || event.name || 'N/A',
               date: event.start_date || event.date || new Date().toISOString(),
@@ -133,21 +139,18 @@ export default function ActivityLogPage() {
               category: event.categories?.[0]?.name || 'General',
             };
           });
-
           setActivities(events);
-          setTotalEvents(
-            response.data.meta?.total || response.data.meta?.total_count || events.length
-          );
+          setTotalEvents(responseMeta.total || responseMeta.total_count || events.length);
         }
       } catch (err) {
-        setError('Не вдалося завантажити історію активності. Будь ласка, спробуйте пізніше.');
+        setError('Try again later. Error fetching events from the database.');
       } finally {
         setLoading(false);
       }
     };
 
     fetchDataFromDB();
-  }, [currentPage, selectedCategoryId, selectedBrandId, selectedStatuses]);
+  }, [currentPage, selectedCategoryId, selectedBrandId, selectedStatuses, brands]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

@@ -1,56 +1,63 @@
-import apiClient from '@/lib/api-client';
-import {
-  type CreateEventPayload,
-  type UpdateUserPayload,
-  type UpdateBrandPayload,
-  type SuperadminMembershipPayload,
-} from '@/types/superadmin';
+import { UserService } from '@/services/user-service';
+import { EventsService } from '@/services/events-service';
+import { brandsService } from '@/services/brands-service';
+
+import type { AdminStats, PendingEvent, UserPreview } from '@/types/super-admin';
+
+export interface DashboardData {
+  stats: AdminStats;
+  users: UserPreview[];
+  pendingEvents: PendingEvent[];
+}
 
 export const SuperadminService = {
-  async createEvent(payload: CreateEventPayload) {
-    const response = await apiClient.post('/api/v1/events', payload);
-    return response.data;
-  },
+  async getDashboardData(): Promise<DashboardData> {
+    const [users, brands, eventsResponse] = await Promise.all([
+      UserService.getAllUsers(),
 
-  async updateUser(userId: string | number, payload: UpdateUserPayload) {
-    const response = await apiClient.patch(`/api/v1/users/${userId}`, payload);
-    return response.data;
-  },
+      brandsService.getBrands({}),
+      EventsService.getEvents(),
+    ]);
 
-  async deleteUser(userId: string | number): Promise<void> {
-    await apiClient.delete(`/api/v1/users/${userId}`);
-  },
+    const fetchedUsers: UserPreview[] = Array.isArray(users)
+      ? users.map((user: any) => ({
+          id: user.id,
+          email: user.email,
+          role: user.role || 'Member',
+        }))
+      : [];
 
-  async updateBrand(brandId: string | number, payload: UpdateBrandPayload) {
-    const response = await apiClient.patch(`/api/v1/brands/${brandId}`, payload);
-    return response.data;
-  },
+    const fetchedBrands = brands?.data || [];
 
-  async deleteBrand(brandId: string | number): Promise<void> {
-    await apiClient.delete(`/api/v1/brands/${brandId}`);
-  },
+    const rawEvents = Array.isArray(eventsResponse?.data) ? eventsResponse.data : [];
+    const fetchedEvents: PendingEvent[] = rawEvents.map((event: any) => ({
+      id: event.id,
+      status: event.status || 'pending',
 
-  async getBrandMemberships(brandId: string | number, params?: Record<string, unknown>) {
-    const response = await apiClient.get(`/api/v1/brands/${brandId}/memberships`, {
-      params,
-    });
-    return response.data;
-  },
+      name: event.name || event.title || 'Untitled Event',
+      startDate: event.startDate || event.date || 'N/A',
+      createdBy: event.createdBy || event.organizer || 'Unknown',
+      location: event.location || event.venue || 'Remote',
+    }));
 
-  async addBrandMember(brandId: string | number, payload: SuperadminMembershipPayload) {
-    const response = await apiClient.post(`/api/v1/brands/${brandId}/memberships`, payload);
-    return response.data;
-  },
-
-  async updateBrandMember(brandId: string | number, membershipId: string | number, role: string) {
-    const response = await apiClient.patch(
-      `/api/v1/brands/${brandId}/memberships/${membershipId}`,
-      { role }
+    const pendingEvents = fetchedEvents.filter(
+      (event) => event.status?.toLowerCase() === 'pending'
     );
-    return response.data;
-  },
 
-  async removeBrandMember(brandId: string | number, membershipId: string | number): Promise<void> {
-    await apiClient.delete(`/api/v1/brands/${brandId}/memberships/${membershipId}`);
+    const stats: AdminStats = {
+      totalUsers: fetchedUsers.length,
+      totalBrands: fetchedBrands.length,
+      totalEvents: fetchedEvents.length,
+      pendingApproval: pendingEvents.length,
+      rejectedEvents: fetchedEvents.filter((event) => event.status?.toLowerCase() === 'rejected')
+        .length,
+      reportedUsers: 0,
+    };
+
+    return {
+      stats,
+      users: fetchedUsers,
+      pendingEvents,
+    };
   },
 };
