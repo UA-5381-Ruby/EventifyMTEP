@@ -33,8 +33,6 @@ export function LoginPage() {
     <>
       <PageWrapper>
         <div className="min-h-screen bg-slate-50 relative flex items-center justify-center p-4 sm:p-6 overflow-hidden">
-          <div className="absolute inset-0 bg-[linear-gradient(to_right,#94a3b81a_1px,transparent_1px),linear-gradient(to_bottom,#94a3b81a_1px,transparent_1px)] bg-[size:24px_24px]" />
-
           <div className="w-full max-w-[960px] min-h-[640px] flex flex-col md:flex-row rounded-3xl overflow-hidden bg-[#d8e7ff] shadow-[0_20px_60px_-15px_rgba(59,130,246,0.15)] border border-white/60 relative z-10">
             <div className="w-full md:w-[55%] bg-white md:rounded-r-[3.5rem] p-8 sm:p-12 flex flex-col justify-center relative z-20 shrink-0 shadow-[12px_0_40px_rgba(59,130,246,0.08)] border-r border-blue-50/50">
               <h1 className="text-3xl font-bold text-neutral-900 text-center mb-10 tracking-tight">
