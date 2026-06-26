@@ -16,6 +16,7 @@ module Api
 
       before_action :require_authentication!, only: %i[create]
       before_action :set_event, only: [:show]
+      before_action :set_event, only: %i[show reviews]
 
       def index
         paginated = paginate(EventFilter.new(index_params, current_user).call)
@@ -28,9 +29,35 @@ module Api
 
       def show
         render json: @event.as_json(
-          methods: [:banner_url],
+          methods: %i[banner_url average_rating reviews_count], 
           include: event_serialization_includes
         ), status: :ok
+      end
+
+      def reviews
+        feedbacks = @event.event_feedbacks
+                          .includes(ticket: :user)
+                          .order(created_at: :desc)
+        paginated = paginate(feedbacks)
+
+        formatted_data = paginated[:records].map do |feedback|
+          user = feedback.ticket.user
+          {
+            id: feedback.id,
+            rating: feedback.rating,
+            comment: feedback.comment,
+            created_at: feedback.created_at,
+            user: {
+              id: user.id,
+              name: user.name,
+            }
+          }
+        end
+
+        render json: {
+          data: formatted_data,
+          meta: paginated[:meta]
+        }, status: :ok
       end
 
       def create

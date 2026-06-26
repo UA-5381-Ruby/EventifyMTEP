@@ -34,6 +34,7 @@ end
           post :cancel,  to: 'events/transitions#cancel'
           post :approve, to: 'events/transitions#approve'
           post :reject,  to: 'events/transitions#reject'
+          get :reviews
         end
 
         resources :categories,

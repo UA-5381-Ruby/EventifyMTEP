@@ -170,4 +170,68 @@ RSpec.describe 'api/v1/events', type: :request do
       end
     end
   end
+
+  path '/api/v1/events/{id}/reviews' do
+    parameter name: :id, in: :path, type: :integer, required: true
+
+    get 'List event reviews' do
+      tags 'Events'
+      produces 'application/json'
+      security [{ bearer_auth: [] }]
+      description 'Returns a paginated list of reviews (feedbacks) for a specific event.'
+
+      parameter name: :page, in: :query, type: :integer, required: false
+      parameter name: :per_page, in: :query, type: :integer, required: false
+
+      let(:user) { create(:user) }
+      let(:Authorization) { jwt_for(user) }
+
+      response '200', 'reviews listed successfully' do
+        schema type: :object,
+               properties: {
+                 data: {
+                   type: :array,
+                   items: {
+                     type: :object,
+                     properties: {
+                       id: { type: :integer },
+                       rating: { type: :integer, nullable: true },
+                       comment: { type: :string, nullable: true },
+                       created_at: { type: :string, format: 'date-time' },
+                       user: {
+                         type: :object,
+                         properties: {
+                           id: { type: :integer },
+                           name: { type: :string }
+                         },
+                         required: %w[id name]
+                       }
+                     },
+                     required: %w[id created_at user]
+                   }
+                 },
+                 meta: { '$ref' => '#/components/schemas/PaginationMeta' }
+               },
+               required: %w[data meta]
+
+        let(:brand) { create(:brand) }
+        let(:event) { create(:event, brand: brand, status: 'published') }
+        let(:id) { event.id }
+
+        before do
+          ticket = create(:ticket, event: event, user: user)
+          create(:event_feedback, ticket: ticket, rating: 5, comment: 'Awesome event!')
+        end
+
+        run_test!
+      end
+
+      response '404', 'event not found' do
+        schema '$ref' => '#/components/schemas/NotFound'
+        let(:id) { 0 }
+
+        run_test!
+      end
+    end
+  end
 end
