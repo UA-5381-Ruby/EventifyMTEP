@@ -1,4 +1,6 @@
-﻿import { Button, Spinner } from '@/components/ui';
+﻿import { useState } from 'react';
+import { Button, Spinner } from '@/components/ui';
+import type { CreateEventRequest } from '@/types/event.ts';
 
 interface EventInfo {
   start_date: string;
@@ -10,7 +12,7 @@ interface EventInfoSectionProps {
   isEditing: boolean;
   event: EventInfo;
   onCancel: () => void;
-  onSave: () => void;
+  onSave: (payload: Partial<CreateEventRequest>) => Promise<void> | void;
   isSaving: boolean;
   setIsEditing: (value: boolean) => void;
 }
@@ -23,15 +25,50 @@ export const EventInfoSection = ({
   isSaving,
   setIsEditing,
 }: EventInfoSectionProps) => {
+  const [location, setLocation] = useState(event.location || '');
+  const [description, setDescription] = useState(event.description || '');
+
+  const handleLocalSave = () => {
+    onSave({ location, description });
+  };
+
   if (isEditing) {
     return (
-      <div className="space-y-6 border border-neutral-200 p-8 bg-white">
+      <div className="space-y-6 border border-neutral-200 p-8 bg-white animate-in fade-in duration-300">
+        <h3 className="text-xl font-bold border-b border-neutral-100 pb-2">Edit Event Details</h3>
+
+        <div className="grid grid-cols-1 gap-6">
+          <div className="space-y-2">
+            <label className="text-[11px] font-black text-neutral-400 uppercase tracking-widest block">
+              Location
+            </label>
+            <input
+              type="text"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              className="w-full border border-neutral-300 p-3 rounded-none focus:outline-none focus:border-black text-sm"
+            />
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-[11px] font-black text-neutral-400 uppercase tracking-widest block">
+              Description
+            </label>
+            <textarea
+              rows={4}
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full border border-neutral-300 p-3 rounded-none focus:outline-none focus:border-black text-sm resize-none"
+            />
+          </div>
+        </div>
+
         <div className="flex justify-end gap-3 pt-6 border-t border-neutral-100">
           <Button variant="secondary" onClick={onCancel} className="rounded-none px-8">
             Cancel
           </Button>
           <Button
-            onClick={onSave}
+            onClick={handleLocalSave}
             disabled={isSaving}
             className="rounded-none bg-black text-white px-12"
           >
@@ -63,7 +100,7 @@ export const EventInfoSection = ({
         </div>
         <button
           onClick={() => setIsEditing(true)}
-          className="border border-neutral-300 px-6 py-2 text-[10px] font-black uppercase"
+          className="border border-neutral-300 px-6 py-2 text-[10px] font-black uppercase hover:bg-neutral-50 transition-colors"
         >
           Edit Info
         </button>

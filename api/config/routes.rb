@@ -26,8 +26,9 @@ get '/favicon.ico', to: proc { [204, {}, []] }
         resources :brand_memberships, only: [:index]
       end
 
+   
       resources :activities, only: [:index]
-      resources :events, only: [:index, :show, :create] do
+      resources :events, only: [:index, :show, :create, :update] do
         member do
           post :submit,  to: 'events/transitions#submit'
           post :cancel,  to: 'events/transitions#cancel'
