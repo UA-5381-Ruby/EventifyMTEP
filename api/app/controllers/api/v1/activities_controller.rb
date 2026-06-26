@@ -38,7 +38,7 @@ module Api
       end
 
       def require_superadmin!
-        render json: { error: 'Unauthorized' }, status: :forbidden unless current_user.is_superadmin?
+        render json: { error: 'Forbidden' }, status: :forbidden unless current_user.is_superadmin?
       end
 
       def format_activities(activities)

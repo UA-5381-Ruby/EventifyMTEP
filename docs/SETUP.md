@@ -176,12 +176,12 @@ npm run lint
 npm run lint:css
 npm run build
 ```
-## Coverege 
-```
-npx jest --coverage
-npx prettier --write .
+## Coverage
 
-```
+~~~bash
+npm run test:coverage
+npm run format
+~~~
 ## Swagger and local verification
 
 Start the API locally:
