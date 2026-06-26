@@ -110,4 +110,62 @@ describe('TicketsService', () => {
       expect(result.rating).toBe(5);
     });
   });
+
+  describe('Error Handling (handleTicketError)', () => {
+    const structuredError = Object.assign(new Error('Validation failed'), {
+      isAxiosError: true,
+      response: {
+        data: {
+          errors: {
+            title: ['is too short'],
+            location: ['can\'t be blank'],
+          },
+        },
+      },
+    });
+
+    const arrayError = Object.assign(new Error('Bad request'), {
+      isAxiosError: true,
+      response: {
+        data: { errors: ['generic error'] }, // Array — should fall through
+      },
+    });
+
+    const networkError = new Error('Network Error');
+
+    it('throws joined message when errors is a non-array object', async () => {
+      mockedGet.mockRejectedValueOnce(structuredError);
+      await expect(TicketsService.getMyTickets()).rejects.toThrow("is too short, can't be blank");
+    });
+
+    it('falls through to parseApiError when errors is an array', async () => {
+      mockedGet.mockRejectedValueOnce(arrayError);
+      await expect(TicketsService.getMyTickets()).rejects.toThrow('Bad request');
+    });
+
+    it('falls through to parseApiError for non-Axios errors', async () => {
+      mockedGet.mockRejectedValueOnce(networkError);
+      await expect(TicketsService.getMyTickets()).rejects.toThrow('Network Error');
+    });
+
+    it('createTicket: throws joined message on structured errors', async () => {
+      mockedPost.mockRejectedValueOnce(structuredError);
+      await expect(TicketsService.createTicket(1)).rejects.toThrow("is too short, can't be blank");
+    });
+
+    it('getTicketById: throws joined message on structured errors', async () => {
+      mockedGet.mockRejectedValueOnce(structuredError);
+      await expect(TicketsService.getTicketById('123')).rejects.toThrow("is too short, can't be blank");
+    });
+
+    it('updateTicketStatus: throws joined message on structured errors', async () => {
+      mockedPatch.mockRejectedValueOnce(structuredError);
+      await expect(TicketsService.updateTicketStatus('123', false)).rejects.toThrow("is too short, can't be blank");
+    });
+
+    it('submitTicketReview: throws joined message on structured errors', async () => {
+      mockedPost.mockRejectedValueOnce(structuredError);
+      await expect(TicketsService.submitTicketReview('123', { rating: 5, comment: 'Great!' })).rejects.toThrow("is too short, can't be blank");
+    });
+  });
 });

@@ -405,4 +405,33 @@ describe('EventListPage', () => {
       expect(calledParams.page).toBe(2);
     });
   });
+
+  it('returns empty tabs when allStatuses is null (still loading)', () => {
+    mockUseEvents.mockReturnValue({ ...baseState, allStatuses: null, isLoading: true });
+
+    renderPage();
+
+    expect(screen.getByText('Loading…')).toBeInTheDocument();
+  });
+
+  it('returns all STATUS_TABS when allStatuses is an empty array', () => {
+    mockUseEvents.mockReturnValue({ ...baseState, allStatuses: [], events: mockEvents, meta: mockMeta });
+
+    renderPage();
+
+    expect(screen.getAllByTestId('event-card')).toHaveLength(2);
+  });
+
+  it('filters tabs to only those matching present status groups', () => {
+    mockUseEvents.mockReturnValue({
+      ...baseState,
+      allStatuses: ['published'],
+      events: mockEvents,
+      meta: mockMeta,
+    });
+
+    renderPage();
+
+    expect(screen.getAllByTestId('event-card')).toHaveLength(2);
+  });
 });

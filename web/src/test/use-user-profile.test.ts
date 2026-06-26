@@ -154,4 +154,49 @@ describe('useUserProfile hook', () => {
     expect(result.current.isDirty).toBe(false);
     expect(result.current.alert).toBeNull();
   });
+
+  it('clears alert when handleInputChange is called while alert is set', async () => {
+    (getCurrentUser as jest.Mock).mockResolvedValueOnce(mockUser);
+    const { result } = renderHook(() => useUserProfile());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    act(() => {
+      result.current.setAlert({ variant: 'error', message: 'Some error' });
+    });
+    expect(result.current.alert).not.toBeNull();
+
+    act(() => {
+      result.current.handleInputChange({
+        target: { name: 'name', value: 'New Name' },
+      } as unknown as ChangeEvent<HTMLInputElement>);
+    });
+
+    expect(result.current.alert).toBeNull();
+  });
+
+  it('does nothing when handleSave is called and form is not dirty', async () => {
+    (getCurrentUser as jest.Mock).mockResolvedValueOnce(mockUser);
+    const { result } = renderHook(() => useUserProfile());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    await act(async () => {
+      await result.current.handleSave();
+    });
+
+    expect(UserService.updateUser).not.toHaveBeenCalled();
+  });
+
+  it('does nothing when handleCancel is called and user is null', async () => {
+    (getCurrentUser as jest.Mock).mockRejectedValueOnce(new Error('fail'));
+    const { result } = renderHook(() => useUserProfile());
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+
+    expect(result.current.user).toBeNull();
+
+    act(() => {
+      result.current.handleCancel();
+    });
+
+    expect(result.current.formData).toEqual({ name: '', email: '' });
+  });
 });

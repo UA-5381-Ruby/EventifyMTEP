@@ -1,11 +1,15 @@
 import AuthService from '@/services/auth-service';
 import { parseUserIdFromToken } from '@/services/auth-service';
 import apiClient, { tokenStorage } from '@/lib/api-client';
+import { renderHook, act } from '@testing-library/react';
+import { useAuth } from '@/hooks/use-auth';
+
 jest.mock('@/lib/api-client', () => ({
   __esModule: true,
   default: {
     post: jest.fn(),
     get: jest.fn(),
+    patch: jest.fn(),
     interceptors: {
       request: { use: jest.fn() },
     },
@@ -100,6 +104,16 @@ describe('register', () => {
       AuthService.register({ name: 'Bob', email: 'taken@b.com', password: 'pw' })
     ).rejects.toThrow('Email already taken');
     expect(tokenStorage.set).not.toHaveBeenCalled();
+  });
+
+  it('stores the JWT with rememberMe=true when passed', async () => {
+    const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.fake.sig';
+    const user = { id: '2', email: 'b@b.com', name: 'Bob' };
+    mockPost.mockResolvedValueOnce({ data: { token: fakeToken, user } });
+
+    await AuthService.register({ name: 'Bob', email: 'b@b.com', password: 'pw' }, true);
+
+    expect(tokenStorage.set).toHaveBeenCalledWith(fakeToken, true);
   });
 });
 
@@ -277,3 +291,112 @@ describe('init', () => {
     warnSpy.mockRestore();
   });
 });
+
+describe('parseIsSuperAdminFromToken', () => {
+  it('returns false when token has no is_superadmin field', () => {
+    const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.' + btoa(JSON.stringify({ user_id: 1 })) + '.sig';
+    (tokenStorage.get as jest.Mock).mockReturnValue(fakeToken);
+    expect(AuthService.isSuperAdmin()).toBe(false);
+  });
+
+  it('returns true when token has is_superadmin: true', () => {
+    const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.' + btoa(JSON.stringify({ is_superadmin: true })) + '.sig';
+    (tokenStorage.get as jest.Mock).mockReturnValue(fakeToken);
+    expect(AuthService.isSuperAdmin()).toBe(true);
+  });
+
+  it('returns false when no token in storage', () => {
+    (tokenStorage.get as jest.Mock).mockReturnValue(null);
+    expect(AuthService.isSuperAdmin()).toBe(false);
+  });
+
+  it('returns false when token is malformed', () => {
+    (tokenStorage.get as jest.Mock).mockReturnValue('notajwt');
+    expect(AuthService.isSuperAdmin()).toBe(false);
+  });
+});
+
+describe('confirmEmail', () => {
+  it('POSTs to the correct endpoint with the token', async () => {
+    mockPost.mockResolvedValueOnce({ data: {} });
+    await AuthService.confirmEmail('confirm-token-abc');
+    expect(mockPost).toHaveBeenCalledWith('/api/v1/auth/confirm_email', { token: 'confirm-token-abc' });
+  });
+
+  it('throws when confirmation fails', async () => {
+    mockPost.mockRejectedValueOnce(new Error('Invalid token'));
+    await expect(AuthService.confirmEmail('bad-token')).rejects.toThrow('Invalid token');
+  });
+});
+
+describe('resendEmailVerification', () => {
+  it('POSTs to the correct endpoint with the email', async () => {
+    mockPost.mockResolvedValueOnce({ data: {} });
+    await AuthService.resendEmailVerification('a@b.com');
+    expect(mockPost).toHaveBeenCalledWith('/api/v1/auth/resend_confirmation', { email: 'a@b.com' });
+  });
+
+  it('throws when the request fails', async () => {
+    mockPost.mockRejectedValueOnce(new Error('Too many requests'));
+    await expect(AuthService.resendEmailVerification('a@b.com')).rejects.toThrow('Too many requests');
+  });
+});
+
+describe('changePassword', () => {
+  it('PATCHes the correct endpoint with both passwords', async () => {
+    const mockPatch = apiClient.patch as jest.Mock;
+    mockPatch.mockResolvedValueOnce({ data: {} });
+
+    await AuthService.changePassword('oldPass1!', 'newPass2!');
+
+    expect(mockPatch).toHaveBeenCalledWith('/api/v1/auth/password/change', {
+      current_password: 'oldPass1!',
+      new_password: 'newPass2!',
+    });
+  });
+
+  it('throws when the current password is wrong', async () => {
+    const mockPatch = apiClient.patch as jest.Mock;
+    mockPatch.mockRejectedValueOnce(new Error('Incorrect password'));
+
+    await expect(AuthService.changePassword('wrongPass', 'newPass2!')).rejects.toThrow('Incorrect password');
+  });
+});
+
+describe('useAuth', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+    AuthService.logout();
+  });
+
+  it('returns initial state from AuthService', () => {
+    const { result } = renderHook(() => useAuth());
+    expect(result.current).toEqual(AuthService.getState());
+  });
+
+  it('updates state when AuthService notifies subscribers', async () => {
+    const user = { id: '1', email: 'a@b.com', name: 'Ada' };
+    mockPost.mockResolvedValueOnce({ data: { token: 'tok', user } });
+
+    const { result } = renderHook(() => useAuth());
+
+    await act(async () => {
+      await AuthService.login({ email: 'a@b.com', password: 'pw' });
+    });
+
+    expect(result.current).toEqual({ user, isAuthenticated: true });
+  });
+
+  it('unsubscribes on unmount', async () => {
+    const { unmount } = renderHook(() => useAuth());
+    unmount();
+
+    const user = { id: '1', email: 'a@b.com', name: 'Ada' };
+    mockPost.mockResolvedValueOnce({ data: { token: 'tok', user } });
+
+    await act(async () => {
+      await AuthService.login({ email: 'a@b.com', password: 'pw' });
+    });
+  });
+});
+

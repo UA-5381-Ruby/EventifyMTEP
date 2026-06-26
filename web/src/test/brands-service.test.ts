@@ -144,6 +144,32 @@ describe('BrandsService', () => {
     expect(apiClient.delete).toHaveBeenCalledWith(`${endpoint}/1`);
   });
 
+  it('should exclude undefined and null values from FormData', async () => {
+    const payload = {
+      name: 'Brand A',
+      description: null,
+      subdomain: undefined,
+    } as unknown as CreateBrandRequest;
+
+    jest.mocked(apiClient.post).mockResolvedValue({
+      data: { id: 1, name: 'Brand A' },
+    } as AxiosResponse);
+
+    await brandsService.createBrand(payload);
+
+    const formData = jest.mocked(apiClient.post).mock.calls[0][1] as FormData;
+    expect(formData.get('brand[name]')).toBe('Brand A');
+    expect(formData.get('brand[description]')).toBeNull();
+    expect(formData.get('brand[subdomain]')).toBeNull();
+  });
+
+  it('should rethrow error when creating brand fails', async () => {
+    const networkError = new Error('Network Error');
+    jest.mocked(apiClient.post).mockRejectedValue(networkError);
+
+    await expect(brandsService.createBrand({ name: 'Brand A', subdomain: 'brand-a' })).rejects.toThrow('Network Error');
+  });
+
   it('should handle API errors', async () => {
     jest.mocked(apiClient.get).mockRejectedValue(new Error('API Error'));
 
