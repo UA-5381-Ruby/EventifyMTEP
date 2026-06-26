@@ -6,11 +6,8 @@ Rails.application.routes.draw do
     mount Rswag::Api::Engine => '/api-docs'
     mount LetterOpenerWeb::Engine, at: '/letter_opener' if Rails.env.development?
   end
-
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+get '/favicon.ico', to: proc { [204, {}, []] }
+  
   get 'up' => 'rails/health#show', as: :rails_health_check
 
   namespace :api do
@@ -29,6 +26,8 @@ Rails.application.routes.draw do
         resources :brand_memberships, only: [:index]
       end
 
+   
+      resources :activities, only: [:index]
       resources :events, only: [:index, :show, :create, :update] do
         member do
           post :submit,  to: 'events/transitions#submit'

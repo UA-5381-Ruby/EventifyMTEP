@@ -14,6 +14,7 @@ import { VerifyEmailPage } from '@/pages/verify-email-page.tsx';
 import { ForgotPasswordPage } from '@/pages/forgot-password-page.tsx';
 import { ResetPasswordPage } from '@/pages/reset-password-page.tsx';
 import { EventListPage } from '@/pages/event-list-page.tsx';
+import ActivityLogPage from '@/pages/super-admin-events-page.tsx';
 import { EventDetailPage } from '@/pages/event-detail-page';
 import { NotFoundPage } from '@/pages/not-found-page.tsx';
 import { BrandPublicPage } from '@/pages/brand-public-page.tsx';
@@ -25,6 +26,7 @@ import { TermsPage } from '@/pages/term-page.tsx';
 import { Dashboard } from '@/pages/dashboard.tsx';
 import { BrandDashboardPage } from '@/pages/brand-dashboard-page.tsx';
 import { SuperAdminPage } from '@/pages/super-admin-page.tsx';
+import SuperAdminActivityPage from '@/pages/super-admin-activity-page.tsx';
 import { BrandDiscoverPage } from '@/pages/brand-discover-page.tsx';
 import { MyBrandsPage } from '@/pages/my-brands-page.tsx';
 import { MyTicketsPage } from '@/pages/my-tickets-page.tsx';
@@ -44,6 +46,7 @@ function App() {
     <BrandProvider>
       <Router>
         <Routes>
+          {/* Public Routes */}
           <Route path="/test/preview" element={<UIPreview />} />
           <Route path="/" element={<Navigate to="/events" replace />} />
           <Route path="/login" element={<LoginPage />} />
@@ -59,11 +62,16 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPage />} />
           <Route path="/terms-of-use" element={<TermsPage />} />
 
+          {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
+            {/* Super Admin Routes */}
             <Route element={<SuperAdminRoute />}>
               <Route path="/superadmin" element={<SuperAdminPage />} />
+              <Route path="/activity-log" element={<SuperAdminActivityPage />} />
+              <Route path="/logs" element={<ActivityLogPage />} />
             </Route>
 
+            {/* General User Routes */}
             <Route path="/brands" element={<BrandDiscoverPage />} />
             <Route path="/my-brands" element={<MyBrandsPage />} />
             <Route path="/my-tickets" element={<MyTicketsPage />} />
@@ -71,10 +79,12 @@ function App() {
             <Route path="/accept-invitation" element={<AcceptInvitationPage />} />
             <Route path="/profile/settings" element={<UserProfilePage />} />
 
+            {/* Brand Manager Routes */}
             <Route element={<BrandManagerRoute />}>
               <Route path="/dashboard/brands/:id" element={<BrandDashboardPage />} />
             </Route>
 
+            {/* Brand Admin Guarded Routes */}
             <Route element={<BrandGuard />}>
               <Route path="/create-brand" element={<CreateBrandPage />} />
               <Route element={<AdminLayout />}>
@@ -88,6 +98,7 @@ function App() {
             </Route>
           </Route>
 
+          {/* 404 Route */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>

@@ -21,7 +21,6 @@ export function BrandDiscoverPage() {
   const [page, setPage] = useState(1);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  // 1. Явно вказуємо тип для стану, щоб brandId міг бути string | number
   const [deleteModal, setDeleteModal] = useState<{
     isOpen: boolean;
     brandId: string | number;
@@ -55,7 +54,6 @@ export function BrandDiscoverPage() {
     setPage(1);
   }
 
-  // 2. Дозволяємо приймати string | number
   const openDeleteModal = (brandId: string | number, brandName: string) => {
     setDeleteModal({
       isOpen: true,
