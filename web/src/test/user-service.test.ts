@@ -1,7 +1,7 @@
 import type { AxiosResponse } from 'axios';
-import { UserService } from '@/services/user-service';
+import { UserService, getCurrentUser } from '@/services/user-service';
 import apiClient from '@/lib/api-client';
-import type { User, UpdateUserRequest } from '@/types/user';
+import type { User, UpdateUserRequest, UserProfile } from '@/types/user';
 
 jest.mock('@/lib/api-client', () => ({
   __esModule: true,
@@ -62,6 +62,32 @@ describe('UserService', () => {
       (apiClient.get as jest.Mock).mockRejectedValue(error);
 
       await expect(UserService.getAllUsers()).rejects.toThrow('Network error');
+    });
+  });
+
+  describe('getCurrentUser', () => {
+    const mockProfile: UserProfile = {
+      id: 123,
+      name: 'John Doe',
+      email: 'john@example.com',
+      is_superadmin: false,
+      created_at: '2024-01-01T00:00:00.000Z',
+      memberships: [],
+    };
+
+    it('fetches current user profile from GET /api/v1/users/me', async () => {
+      (apiClient.get as jest.Mock).mockResolvedValue({ data: mockProfile });
+
+      const result = await getCurrentUser();
+
+      expect(apiClient.get).toHaveBeenCalledWith('/api/v1/users/me');
+      expect(result).toEqual(mockProfile);
+    });
+
+    it('throws when request fails', async () => {
+      (apiClient.get as jest.Mock).mockRejectedValue(new Error('Unauthorized'));
+
+      await expect(getCurrentUser()).rejects.toThrow('Unauthorized');
     });
   });
 

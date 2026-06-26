@@ -19,11 +19,12 @@ get '/favicon.ico', to: proc { [204, {}, []] }
       post '/auth/login', to: 'auth#login'
       post '/auth/confirm_email', to: 'confirmations#create'
       post '/auth/resend_confirmation', to: 'confirmations#resend'
+      post '/contact', to: 'contact#create'
 
       get 'users/me', to: 'users#me'
       resources :users, except: [:create] do
-  resources :brand_memberships, only: [:index]
-end
+        resources :brand_memberships, only: [:index]
+      end
 
       resources :activities, only: [:index]
       resources :events, only: [:index, :show, :create] do

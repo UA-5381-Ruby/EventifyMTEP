@@ -232,4 +232,59 @@ describe('RegistrationPage', () => {
     fillAndSubmit();
     await waitFor(() => expect(screen.queryByRole('alert')).not.toBeInTheDocument());
   });
+  describe('Resend verification email', () => {
+    const goToSuccessScreen = async () => {
+      (authService.register as jest.Mock).mockResolvedValueOnce({});
+      renderRegistration();
+      fillAndSubmit({ email: 'john@example.com' });
+      await waitFor(() =>
+        expect(screen.getByRole('heading', { name: /account created/i })).toBeInTheDocument()
+      );
+    };
+
+    it('calls resendEmailVerification and shows sent state on success', async () => {
+      (authService.resendEmailVerification as jest.Mock).mockResolvedValueOnce({});
+      await goToSuccessScreen();
+
+      fireEvent.click(screen.getByRole('button', { name: /resend/i }));
+
+      await waitFor(() => {
+        expect(authService.resendEmailVerification).toHaveBeenCalledWith('john@example.com');
+        expect(screen.getByText('Verification email sent! Check your inbox.')).toBeInTheDocument();
+      });
+    });
+
+    it('resets to idle state when resend fails', async () => {
+      (authService.resendEmailVerification as jest.Mock).mockRejectedValueOnce(new Error('Failed'));
+      await goToSuccessScreen();
+
+      fireEvent.click(screen.getByRole('button', { name: /resend/i }));
+
+      await waitFor(() => {
+        expect(screen.getByRole('button', { name: /resend/i })).toBeInTheDocument();
+      });
+    });
+
+    it('does nothing when resend is clicked while already loading', async () => {
+      let resolveResend!: (value?: unknown) => void;
+      (authService.resendEmailVerification as jest.Mock).mockImplementationOnce(
+        () =>
+          new Promise((res) => {
+            resolveResend = res;
+          })
+      );
+      await goToSuccessScreen();
+
+      fireEvent.click(screen.getByRole('button', { name: /resend/i }));
+
+      await waitFor(() =>
+        expect(screen.getByRole('button', { name: /sending/i })).toBeInTheDocument()
+      );
+
+      fireEvent.click(screen.getByRole('button', { name: /sending/i }));
+      expect(authService.resendEmailVerification).toHaveBeenCalledTimes(1);
+
+      resolveResend();
+    });
+  });
 });
