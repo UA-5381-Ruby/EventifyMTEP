@@ -51,13 +51,13 @@ describe('SuperadminService', () => {
       });
 
       expect(result.users).toEqual([
-        { id: 1, email: 'admin@test.com', role: 'Admin' },
-        { id: 2, email: 'user@test.com', role: 'Member' },
+        { id: '1', email: 'admin@test.com', role: 'Admin' },
+        { id: '2', email: 'user@test.com', role: 'Member' },
       ]);
 
       expect(result.pendingEvents).toHaveLength(1);
       expect(result.pendingEvents[0]).toMatchObject({
-        id: 1,
+        id: '1',
         status: 'pending',
         name: 'Event 1',
       });
@@ -95,7 +95,7 @@ describe('SuperadminService', () => {
       const result = await SuperadminService.getDashboardData();
 
       expect(result.pendingEvents[0]).toEqual({
-        id: 1,
+        id: '1',
         status: 'pending',
         name: 'Untitled Event',
         startDate: 'N/A',
