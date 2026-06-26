@@ -61,7 +61,7 @@ export function EventDetailPage() {
         secondary: eventDetail.brand?.secondary_color,
       }}
     >
-      <div className="min-h-screen min-w-2xl bg-white max-w-3xl mx-auto">
+      <div className="min-h-screen bg-white max-w-3xl mx-auto">
         <EventHero event={eventDetail} onBack={() => navigate('/events')} />
 
         <div className="px-5 pb-10">
