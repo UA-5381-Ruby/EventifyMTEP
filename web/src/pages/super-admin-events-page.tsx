@@ -31,7 +31,7 @@ interface Activity {
 interface Brand {
   id: string;
   name: string;
-  logo_url?: string; // <--- додайте цей рядок
+  logo_url?: string;
 }
 
 interface Category {
@@ -60,7 +60,6 @@ export default function ActivityLogPage() {
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
   const filterContainerRef = useRef<HTMLDivElement>(null);
 
-  // 1. Завантаження брендів та категорій через сервіси
   useEffect(() => {
     const fetchBrandsAndCategories = async () => {
       try {
@@ -69,7 +68,6 @@ export default function ActivityLogPage() {
           CategoriesService.getCategories().catch(() => null),
         ]);
 
-        // FIX: Кастуємо до any, щоб TS не сварився на відсутність .data у масивів
         const brandsRes = brandsRaw as any;
         const categoriesRes = categoriesRaw as any;
 
@@ -90,7 +88,7 @@ export default function ActivityLogPage() {
 
     fetchBrandsAndCategories();
   }, []);
-  // 2. Завантаження подій (івентів) через EventsService
+
   useEffect(() => {
     const fetchDataFromDB = async () => {
       setLoading(true);
@@ -107,7 +105,6 @@ export default function ActivityLogPage() {
 
         const rawResponse = await EventsService.getEvents(params);
 
-        // FIX: Кастуємо до any для доступу до .data та .meta, які TS не бачить у типі Event[]
         const response = rawResponse as any;
 
         const responseData = response?.data?.data || response?.data || response || [];
@@ -115,7 +112,6 @@ export default function ActivityLogPage() {
 
         if (Array.isArray(responseData)) {
           const events = responseData.map((event: any) => {
-            // Шукаємо бренд у завантаженому списку, якщо бекенд повернув лише brand_id
             const matchedBrand = brands.find((b) => b.id === String(event.brand_id));
 
             const rawLogo =
@@ -130,7 +126,7 @@ export default function ActivityLogPage() {
 
             return {
               id: String(event.id),
-              // Беремо назву з event.brand (якщо є), або зі знайденого бренду, або 'N/A'
+
               brandName: event.brand?.name || matchedBrand?.name || 'N/A',
               brandLogo: finalBrandLogo,
               eventName: event.title || event.name || 'N/A',
