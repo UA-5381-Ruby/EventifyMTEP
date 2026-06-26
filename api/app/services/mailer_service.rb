@@ -30,6 +30,7 @@ class MailerService
   end
 
   def self.send_contact_message(params)
-    UserMailer.contact_message(params).deliver_later
+    contact = params.to_h.symbolize_keys
+    UserMailer.contact_message(contact).deliver_later
   end
 end

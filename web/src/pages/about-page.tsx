@@ -1,6 +1,6 @@
 import { Card } from '@/components/ui';
 import { Container, PageWrapper } from '@/components/layout';
-import { OFFERINGS } from '@/constants/about.constaints';
+import { OFFERINGS } from '@/constants/about.constants';
 
 export function AboutPage() {
   return (
@@ -9,7 +9,7 @@ export function AboutPage() {
         <Container className="max-w-5xl">
           <div className="text-center mb-20 sm:mb-28">
             <h2
-              id="mission-heading"
+              id="about-heading"
               className="text-sm font-bold tracking-widest text-primary-600 uppercase mb-6"
             >
               About Eventify

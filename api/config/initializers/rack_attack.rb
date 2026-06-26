@@ -13,6 +13,10 @@ module Rack
     throttle('api/v1/auth/password/reset', limit: 3, period: 1.hour) do |req|
       req.ip if req.path == '/api/v1/auth/password/reset' && req.post? && !req.params['token']
     end
+
+    throttle('api/v1/contact', limit: 5, period: 10.minutes) do |req|
+      req.ip if req.path == '/api/v1/contact' && req.post?
+    end
   end
 end
 

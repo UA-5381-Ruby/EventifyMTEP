@@ -20,6 +20,7 @@ module Api
 
       def valid_contact?(contact)
         contact[:name].present? &&
+          contact[:email].present? &&
           contact[:email].match?(URI::MailTo::EMAIL_REGEXP) &&
           contact[:subject].present? &&
           contact[:message].present?

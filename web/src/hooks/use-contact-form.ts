@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { EMPTY_FORM } from '@/constants/ui.constants';
 import { validate } from '@/utils/validate';
 import type { FormErrors, FormFields, FormStatus } from '@/types/form';
+import apiClient from '@/lib/api-client';
 
 export function useContactForm() {
   const [fields, setFields] = useState<FormFields>(EMPTY_FORM);
@@ -16,20 +17,18 @@ export function useContactForm() {
 
   const handleSubmit = async () => {
     const validationErrors = validate(fields);
+
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
       return;
     }
 
     setStatus('loading');
-    try {
-      const res = await fetch('/api/v1/contact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ contact: fields }),
-      });
 
-      if (!res.ok) throw new Error('Failed to send');
+    try {
+      await apiClient.post('/api/v1/contact', {
+        contact: fields,
+      });
 
       setStatus('success');
       setFields(EMPTY_FORM);
