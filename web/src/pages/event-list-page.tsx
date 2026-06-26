@@ -27,7 +27,7 @@ export function EventListPage() {
   const { events, meta, isLoading, error, refetch, allStatuses } = useEvents(params);
 
   const availableTabs = useMemo(() => {
-    if (allStatuses === null) return []; // ще завантажується — нічого не показуємо
+    if (allStatuses === null) return [];
     if (!allStatuses.length) return STATUS_TABS;
 
     const presentGroups = new Set(allStatuses.map((s) => STATUS_CONFIG[s]?.group));

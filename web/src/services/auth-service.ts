@@ -98,11 +98,11 @@ function subscribe(listener: AuthStateListener): () => void {
 /**
  * POST /api/v1/auth/register
  */
-async function register(payload: RegisterRequest): Promise<AuthResponse> {
+async function register(payload: RegisterRequest, remember = false): Promise<AuthResponse> {
   try {
     const { data } = await apiClient.post<AuthResponse>('/api/v1/auth/register', payload);
 
-    tokenStorage.set(data.token, false);
+    tokenStorage.set(data.token, remember);
     setAuthState({ user: data.user, isAuthenticated: true });
 
     return data;

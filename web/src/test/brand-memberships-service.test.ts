@@ -106,4 +106,27 @@ describe('BrandMembershipsService', () => {
       );
     });
   });
+
+  describe('getUserMemberships', () => {
+    it('should send a GET request and unwrap the data envelope', async () => {
+      const mockMemberships = [{ id: 1, role: 'admin' }];
+      const mockResponse = { data: { data: mockMemberships } };
+      (apiClient.get as jest.Mock).mockResolvedValue(mockResponse);
+
+      const result = await BrandMembershipsService.getUserMemberships(42);
+
+      expect(apiClient.get).toHaveBeenCalledWith('/api/v1/users/42/brand_memberships');
+      expect(result).toEqual(mockMemberships);
+    });
+
+    it('should accept a string userId', async () => {
+      const mockMemberships = [{ id: 2, role: 'editor' }];
+      (apiClient.get as jest.Mock).mockResolvedValue({ data: { data: mockMemberships } });
+
+      const result = await BrandMembershipsService.getUserMemberships('99');
+
+      expect(apiClient.get).toHaveBeenCalledWith('/api/v1/users/99/brand_memberships');
+      expect(result).toEqual(mockMemberships);
+    });
+  });
 });
