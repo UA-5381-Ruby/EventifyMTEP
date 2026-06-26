@@ -77,19 +77,24 @@ jest.mock('@/components/ui/alert', () => ({
 
 jest.mock('@/components/auth/change-password/change-password-modal', () => ({
   ChangePasswordModal: ({
-                          isOpen,
-                          onClose,
-                          onSuccess,
-                        }: {
+    isOpen,
+    onClose,
+    onSuccess,
+  }: {
     isOpen: boolean;
     onClose: () => void;
     onSuccess: () => void;
-  }) => isOpen ? (
-    <div data-testid="password-modal">
-      <button onClick={onClose} data-testid="modal-close">Close</button>
-      <button onClick={onSuccess} data-testid="modal-success">Success</button>
-    </div>
-  ) : null,
+  }) =>
+    isOpen ? (
+      <div data-testid="password-modal">
+        <button onClick={onClose} data-testid="modal-close">
+          Close
+        </button>
+        <button onClick={onSuccess} data-testid="modal-success">
+          Success
+        </button>
+      </div>
+    ) : null,
 }));
 
 jest.mock('@/components/profile/profile-header', () => ({

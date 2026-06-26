@@ -300,7 +300,8 @@ describe('parseIsSuperAdminFromToken', () => {
   });
 
   it('returns true when token has is_superadmin: true', () => {
-    const fakeToken = 'eyJhbGciOiJIUzI1NiJ9.' + btoa(JSON.stringify({ is_superadmin: true })) + '.sig';
+    const fakeToken =
+      'eyJhbGciOiJIUzI1NiJ9.' + btoa(JSON.stringify({ is_superadmin: true })) + '.sig';
     (tokenStorage.get as jest.Mock).mockReturnValue(fakeToken);
     expect(AuthService.isSuperAdmin()).toBe(true);
   });
@@ -320,7 +321,9 @@ describe('confirmEmail', () => {
   it('POSTs to the correct endpoint with the token', async () => {
     mockPost.mockResolvedValueOnce({ data: {} });
     await AuthService.confirmEmail('confirm-token-abc');
-    expect(mockPost).toHaveBeenCalledWith('/api/v1/auth/confirm_email', { token: 'confirm-token-abc' });
+    expect(mockPost).toHaveBeenCalledWith('/api/v1/auth/confirm_email', {
+      token: 'confirm-token-abc',
+    });
   });
 
   it('throws when confirmation fails', async () => {
@@ -338,7 +341,9 @@ describe('resendEmailVerification', () => {
 
   it('throws when the request fails', async () => {
     mockPost.mockRejectedValueOnce(new Error('Too many requests'));
-    await expect(AuthService.resendEmailVerification('a@b.com')).rejects.toThrow('Too many requests');
+    await expect(AuthService.resendEmailVerification('a@b.com')).rejects.toThrow(
+      'Too many requests'
+    );
   });
 });
 
@@ -359,7 +364,9 @@ describe('changePassword', () => {
     const mockPatch = apiClient.patch as jest.Mock;
     mockPatch.mockRejectedValueOnce(new Error('Incorrect password'));
 
-    await expect(AuthService.changePassword('wrongPass', 'newPass2!')).rejects.toThrow('Incorrect password');
+    await expect(AuthService.changePassword('wrongPass', 'newPass2!')).rejects.toThrow(
+      'Incorrect password'
+    );
   });
 });
 
@@ -399,4 +406,3 @@ describe('useAuth', () => {
     });
   });
 });
-

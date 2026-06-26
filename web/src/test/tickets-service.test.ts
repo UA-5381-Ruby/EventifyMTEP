@@ -118,7 +118,7 @@ describe('TicketsService', () => {
         data: {
           errors: {
             title: ['is too short'],
-            location: ['can\'t be blank'],
+            location: ["can't be blank"],
           },
         },
       },
@@ -155,17 +155,23 @@ describe('TicketsService', () => {
 
     it('getTicketById: throws joined message on structured errors', async () => {
       mockedGet.mockRejectedValueOnce(structuredError);
-      await expect(TicketsService.getTicketById('123')).rejects.toThrow("is too short, can't be blank");
+      await expect(TicketsService.getTicketById('123')).rejects.toThrow(
+        "is too short, can't be blank"
+      );
     });
 
     it('updateTicketStatus: throws joined message on structured errors', async () => {
       mockedPatch.mockRejectedValueOnce(structuredError);
-      await expect(TicketsService.updateTicketStatus('123', false)).rejects.toThrow("is too short, can't be blank");
+      await expect(TicketsService.updateTicketStatus('123', false)).rejects.toThrow(
+        "is too short, can't be blank"
+      );
     });
 
     it('submitTicketReview: throws joined message on structured errors', async () => {
       mockedPost.mockRejectedValueOnce(structuredError);
-      await expect(TicketsService.submitTicketReview('123', { rating: 5, comment: 'Great!' })).rejects.toThrow("is too short, can't be blank");
+      await expect(
+        TicketsService.submitTicketReview('123', { rating: 5, comment: 'Great!' })
+      ).rejects.toThrow("is too short, can't be blank");
     });
   });
 });

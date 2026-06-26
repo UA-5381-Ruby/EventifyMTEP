@@ -268,7 +268,10 @@ describe('RegistrationPage', () => {
     it('does nothing when resend is clicked while already loading', async () => {
       let resolveResend!: (value?: unknown) => void;
       (authService.resendEmailVerification as jest.Mock).mockImplementationOnce(
-        () => new Promise((res) => { resolveResend = res; })
+        () =>
+          new Promise((res) => {
+            resolveResend = res;
+          })
       );
       await goToSuccessScreen();
 

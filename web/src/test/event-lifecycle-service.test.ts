@@ -94,7 +94,9 @@ describe('EventLifecycleService', () => {
         response: { data: { message: specificMessage } },
       });
 
-      await expect(EventLifecycleService.rejectEvent(1, { reason: 'Bad content' })).rejects.toThrow(specificMessage);
+      await expect(EventLifecycleService.rejectEvent(1, { reason: 'Bad content' })).rejects.toThrow(
+        specificMessage
+      );
     });
 
     it('cancelEvent: throws specific message on Axios error with response.data.message', async () => {

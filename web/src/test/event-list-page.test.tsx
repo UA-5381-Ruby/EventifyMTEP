@@ -415,7 +415,12 @@ describe('EventListPage', () => {
   });
 
   it('returns all STATUS_TABS when allStatuses is an empty array', () => {
-    mockUseEvents.mockReturnValue({ ...baseState, allStatuses: [], events: mockEvents, meta: mockMeta });
+    mockUseEvents.mockReturnValue({
+      ...baseState,
+      allStatuses: [],
+      events: mockEvents,
+      meta: mockMeta,
+    });
 
     renderPage();
 

@@ -9,13 +9,21 @@ const baseUser: AuthUser = { id: 1, name: 'Admin', email: 'a@b.com', is_superadm
 
 describe('useAuthSuperadmin', () => {
   it('returns isSuperAdmin=true when authenticated and is_superadmin=true', () => {
-    mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false, user: { ...baseUser, is_superadmin: true } });
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: { ...baseUser, is_superadmin: true },
+    });
     const { result } = renderHook(() => useAuthSuperadmin());
     expect(result.current.isSuperAdmin).toBe(true);
   });
 
   it('returns isSuperAdmin=false when is_superadmin=false', () => {
-    mockUseAuth.mockReturnValue({ isAuthenticated: true, isLoading: false, user: { ...baseUser, is_superadmin: false } });
+    mockUseAuth.mockReturnValue({
+      isAuthenticated: true,
+      isLoading: false,
+      user: { ...baseUser, is_superadmin: false },
+    });
     const { result } = renderHook(() => useAuthSuperadmin());
     expect(result.current.isSuperAdmin).toBe(false);
   });

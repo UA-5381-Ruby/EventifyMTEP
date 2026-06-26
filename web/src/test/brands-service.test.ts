@@ -167,7 +167,9 @@ describe('BrandsService', () => {
     const networkError = new Error('Network Error');
     jest.mocked(apiClient.post).mockRejectedValue(networkError);
 
-    await expect(brandsService.createBrand({ name: 'Brand A', subdomain: 'brand-a' })).rejects.toThrow('Network Error');
+    await expect(
+      brandsService.createBrand({ name: 'Brand A', subdomain: 'brand-a' })
+    ).rejects.toThrow('Network Error');
   });
 
   it('should handle API errors', async () => {
