@@ -57,7 +57,6 @@ export const Select = forwardRef<HTMLSelectElement, SelectProps>(
             ))}
           </select>
 
-          {/* Dropdown arrow icon */}
           <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400">
             <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path

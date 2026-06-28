@@ -24,7 +24,6 @@ export const InviteMemberModal = ({ brandId, isOpen, onClose }: InviteMemberModa
     setError(null);
 
     try {
-      // Викликаємо сервіс напряму
       await InvitationsService.sendInvitation(brandId, email, role);
 
       setStatus('success');

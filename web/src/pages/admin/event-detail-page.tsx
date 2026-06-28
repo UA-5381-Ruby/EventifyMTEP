@@ -96,7 +96,6 @@ export const EventDetailPage = () => {
 
   return (
     <div className="max-w-screen-xl mx-auto space-y-10 pb-20 px-4 animate-in fade-in duration-700">
-      {/* Шапка івенту */}
       <div className="flex justify-between items-end pb-2 border-b border-neutral-100">
         <div className="flex items-center gap-4">
           <h1 className="text-4xl font-bold tracking-tight">{event.title}</h1>

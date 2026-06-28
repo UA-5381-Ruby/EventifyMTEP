@@ -46,7 +46,6 @@ function App() {
     <BrandProvider>
       <Router>
         <Routes>
-          {/* Public Routes */}
           <Route path="/test/preview" element={<UIPreview />} />
           <Route path="/" element={<Navigate to="/events" replace />} />
           <Route path="/login" element={<LoginPage />} />
@@ -62,16 +61,13 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPage />} />
           <Route path="/terms-of-use" element={<TermsPage />} />
 
-          {/* Protected Routes */}
           <Route element={<ProtectedRoute />}>
-            {/* Super Admin Routes */}
             <Route element={<SuperAdminRoute />}>
               <Route path="/superadmin" element={<SuperAdminPage />} />
               <Route path="/activity-log" element={<SuperAdminActivityPage />} />
               <Route path="/logs" element={<ActivityLogPage />} />
             </Route>
 
-            {/* General User Routes */}
             <Route path="/brands" element={<BrandDiscoverPage />} />
             <Route path="/my-brands" element={<MyBrandsPage />} />
             <Route path="/my-tickets" element={<MyTicketsPage />} />
@@ -79,12 +75,10 @@ function App() {
             <Route path="/accept-invitation" element={<AcceptInvitationPage />} />
             <Route path="/profile/settings" element={<UserProfilePage />} />
 
-            {/* Brand Manager Routes */}
             <Route element={<BrandManagerRoute />}>
               <Route path="/dashboard/brands/:id" element={<BrandDashboardPage />} />
             </Route>
 
-            {/* Brand Admin Guarded Routes */}
             <Route element={<BrandGuard />}>
               <Route path="/create-brand" element={<CreateBrandPage />} />
               <Route element={<AdminLayout />}>
@@ -98,7 +92,6 @@ function App() {
             </Route>
           </Route>
 
-          {/* 404 Route */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Router>

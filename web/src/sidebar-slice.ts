@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  isOpen: true, // За замовчуванням меню відкрите
+  isOpen: true,
 };
 
 const sidebarSlice = createSlice({
@@ -9,7 +9,7 @@ const sidebarSlice = createSlice({
   initialState,
   reducers: {
     toggleSidebar: (state) => {
-      state.isOpen = !state.isOpen; // Змінюємо на протилежне значення
+      state.isOpen = !state.isOpen;
     },
   },
 });

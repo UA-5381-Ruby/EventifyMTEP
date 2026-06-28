@@ -19,8 +19,6 @@ const handleTicketError = (err: unknown): never => {
   return parseApiError(err);
 };
 
-//ticket service + feedbacks
-
 export const TicketsService = {
   async getMyTickets(params: TicketQueryParams = {}): Promise<PaginatedTicketsResponse> {
     try {

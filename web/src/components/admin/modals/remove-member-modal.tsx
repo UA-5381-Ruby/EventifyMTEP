@@ -19,7 +19,6 @@ export const RemoveMemberModal = ({
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
       <div className="bg-white p-10 max-w-md w-full relative border border-neutral-200 rounded-none animate-in fade-in zoom-in-95 duration-200 shadow-none">
-        {/* Кнопка закриття */}
         <button
           onClick={onClose}
           className="absolute top-6 right-6 cursor-pointer text-neutral-400 hover:text-black transition-colors"

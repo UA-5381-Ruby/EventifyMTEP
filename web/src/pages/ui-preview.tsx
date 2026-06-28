@@ -32,7 +32,6 @@ export function UIPreview() {
           <h1 className="text-4xl font-bold text-neutral-900 mb-2">🎨 Eventify Design System</h1>
           <p className="text-neutral-500 mb-12">UI Component Preview</p>
 
-          {/* ── BUTTONS ── */}
           <Section title="Buttons">
             <div className="flex flex-wrap gap-3">
               <Button variant="primary">Primary</Button>
@@ -54,7 +53,6 @@ export function UIPreview() {
             </div>
           </Section>
 
-          {/* ── INPUTS ── */}
           <Section title="Inputs">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-2xl">
               <Input label="Name" placeholder="Enter your name" />
@@ -73,14 +71,12 @@ export function UIPreview() {
             </div>
           </Section>
 
-          {/* ── TEXTAREA ── */}
           <Section title="Textarea">
             <div className="max-w-lg">
               <Textarea label="Description" placeholder="Describe your event..." />
             </div>
           </Section>
 
-          {/* ── SELECT ── */}
           <Section title="Select">
             <div className="max-w-xs">
               <Select
@@ -96,7 +92,6 @@ export function UIPreview() {
             </div>
           </Section>
 
-          {/* ── CHECKBOX ── */}
           <Section title="Checkbox">
             <div className="flex flex-col gap-2">
               <Checkbox
@@ -108,7 +103,6 @@ export function UIPreview() {
             </div>
           </Section>
 
-          {/* ── CARDS ── */}
           <Section title="Cards">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {(['default', 'bordered', 'elevated'] as const).map((v) => (
@@ -130,7 +124,6 @@ export function UIPreview() {
             </div>
           </Section>
 
-          {/* ── BADGES ── */}
           <Section title="Badges">
             <div className="flex flex-wrap gap-2">
               {(
@@ -151,7 +144,6 @@ export function UIPreview() {
             </div>
           </Section>
 
-          {/* ── ALERTS ── */}
           <Section title="Alerts">
             <div className="flex flex-col gap-3 max-w-lg">
               <Alert variant="info" title="Info">
@@ -169,7 +161,6 @@ export function UIPreview() {
             </div>
           </Section>
 
-          {/* ── SPINNERS ── */}
           <Section title="Spinners">
             <div className="flex items-center gap-6">
               {(['sm', 'md', 'lg', 'xl'] as const).map((s) => (
@@ -178,7 +169,6 @@ export function UIPreview() {
             </div>
           </Section>
 
-          {/* ── MODAL ── */}
           <Section title="Modal">
             <Button onClick={() => setModalOpen(true)}>Open Modal</Button>
             <Modal
@@ -200,7 +190,6 @@ export function UIPreview() {
             </Modal>
           </Section>
 
-          {/* ── PAGINATION ── */}
           <Section title="Pagination">
             <div className="max-w-md bg-white p-4 border border-neutral-100 rounded-xl">
               <Pagination

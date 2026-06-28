@@ -1,4 +1,4 @@
-import { EventsService } from '@/services/events-service'; // або '@/lib/events-service'
+import { EventsService } from '@/services/events-service';
 import type { CreateEventRequest } from '@/types/event';
 import { useReduxState } from '@/hooks/use-redux-state';
 
@@ -83,7 +83,7 @@ export function useCreateEvent(brandId: number, onSuccess: () => void): UseCreat
           ? { available_tickets_count: fields.available_tickets_count }
           : {}),
         ...(fields.category_ids.length > 0 ? { category_ids: fields.category_ids } : {}),
-        ...(fields.banner ? { banner: fields.banner } : {}), // Додаємо банер у payload
+        ...(fields.banner ? { banner: fields.banner } : {}),
       };
 
       await EventsService.createEvent(payload);

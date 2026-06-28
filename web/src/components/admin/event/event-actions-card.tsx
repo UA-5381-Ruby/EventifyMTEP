@@ -1,7 +1,7 @@
 ﻿import { Button, Spinner } from '@/components/ui';
 
 interface EventActionsCardProps {
-  status: 'draft' | 'published' | 'cancelled' | string; // Adjust strings based on your API
+  status: 'draft' | 'published' | 'cancelled' | string;
   onReview: () => void;
   onCancel: () => void;
   isSubmitting: boolean;

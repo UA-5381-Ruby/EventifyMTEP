@@ -58,7 +58,6 @@ export const SidebarActions: React.FC<SidebarActionsProps> = ({
         </button>
       )}
 
-      {/* Кнопка-гамбургер, яка тепер тригерить Redux екшен */}
       <button
         onClick={handleToggle}
         aria-label={isCollapsed ? 'Open sidebar' : 'Close sidebar'}

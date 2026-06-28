@@ -66,7 +66,6 @@ export function EventDetailPage() {
         <EventHero event={eventDetail} onBack={() => navigate('/events')} />
 
         <div className="px-5 pb-10">
-          {/* Title + actions */}
           <div className="flex items-start justify-between gap-4 pt-5 mb-1">
             <h1 className="text-2xl font-bold text-neutral-900 leading-tight flex-1">
               {eventDetail.title}

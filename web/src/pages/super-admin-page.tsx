@@ -167,8 +167,6 @@ export function SuperAdminPage() {
           </button>
         </div>
 
-        {/* Statistics */}
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           {statsArray.map((card) => (
             <div
@@ -181,8 +179,6 @@ export function SuperAdminPage() {
             </div>
           ))}
         </div>
-
-        {/* Pending Events */}
 
         <div className="mb-12">
           <div className="flex justify-between items-center mb-4">
@@ -253,8 +249,6 @@ export function SuperAdminPage() {
             </table>
           </div>
         </div>
-
-        {/* Users */}
 
         <div>
           <div className="flex justify-between items-center mb-4">
