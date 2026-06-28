@@ -18,6 +18,7 @@ export interface Event {
   start_date: string;
   status: EventStatus;
   brand_id: number;
+  banner_url?: string;
 }
 
 export interface EventDetail extends Event {
