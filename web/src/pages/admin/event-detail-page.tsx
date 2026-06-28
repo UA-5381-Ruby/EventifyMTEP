@@ -94,7 +94,7 @@ export const EventDetailPage = () => {
   };
 
   return (
-    <div className="max-w-screen-xl mx-auto space-y-10 pb-20 px-4 animate-in fade-in duration-700">
+    <div className="max-w-7xl mx-auto space-y-10 pb-20 px-4 animate-in fade-in duration-700">
       {/* Шапка івенту */}
       <div className="flex justify-between items-end pb-2 border-b border-neutral-100">
         <div className="flex items-center gap-4">
@@ -149,7 +149,7 @@ export const EventDetailPage = () => {
           )}
         </div>
 
-        <div className="flex flex-wrap gap-3 min-h-[40px] p-2 bg-neutral-50/50 border border-dashed border-neutral-100">
+        <div className="flex flex-wrap gap-3 min-h-10 p-2 bg-neutral-50/50 border border-dashed border-neutral-100">
           {currentCategories.length === 0 ? (
             <span className="text-xs text-neutral-400 self-center">
               No categories assigned to this event.
