@@ -14,21 +14,12 @@ interface SidebarNavProps {
 const SUPERADMIN_ITEMS = [
   { label: 'Dashboard', href: '/superadmin' },
   { label: 'Brands', href: '/brands' },
-  { label: 'Users', href: '/users' },
-  { label: 'Logs Page', href: '/logs' },
-];
-
-const ADMIN_ITEMS = [
-  { label: 'Dashboard', href: '/dashboard' },
-  { label: 'Events', href: '/events' },
-  { label: 'Members', href: '/members' },
-  { label: 'Settings', href: '/settings' },
-  { label: 'Our policy', href: '/policy' },
+  { label: "User's activity log", href: '/activity-log' },
+  { label: 'Events History', href: '/logs' },
 ];
 
 export function SidebarNav({
   currentPath = '/dashboard',
-  //onNavigate = () => { },
   isCollapsed = false,
   onSelect = () => {},
   isSuperAdmin,
@@ -48,7 +39,7 @@ export function SidebarNav({
     return null;
   }
 
-  const items = effectiveIsSuperAdmin ? SUPERADMIN_ITEMS : ADMIN_ITEMS;
+  const items = effectiveIsSuperAdmin ? SUPERADMIN_ITEMS : [];
 
   const handleItemClick = (href: string, label: string) => {
     navigate(href);
