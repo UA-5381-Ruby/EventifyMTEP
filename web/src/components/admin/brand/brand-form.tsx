@@ -26,8 +26,6 @@ const ACCEPTED_IMAGE_TYPES = new Set([
 const getAcceptedFile = (file?: File | null) =>
   file && ACCEPTED_IMAGE_TYPES.has(file.type) ? file : null;
 
-
-
 export const BrandForm: React.FC<BrandFormProps> = ({
   formData,
   isLoading,
