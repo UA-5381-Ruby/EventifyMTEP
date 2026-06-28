@@ -7,7 +7,11 @@ interface SidebarActionsProps {
   onBack?: () => void;
 }
 
-export const SidebarActions: React.FC<SidebarActionsProps> = ({ onToggleMenu, isCollapsed, onBack }) => {
+export const SidebarActions: React.FC<SidebarActionsProps> = ({
+  onToggleMenu,
+  isCollapsed,
+  onBack,
+}) => {
   const navigate = useNavigate();
 
   const handleToggle = () => {
