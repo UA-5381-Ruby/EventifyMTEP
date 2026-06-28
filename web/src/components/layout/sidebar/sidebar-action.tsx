@@ -7,11 +7,20 @@ interface SidebarActionsProps {
   onBack?: () => void;
 }
 
-export const SidebarActions: React.FC<SidebarActionsProps> = ({ onToggleMenu, isCollapsed }) => {
+export const SidebarActions: React.FC<SidebarActionsProps> = ({ onToggleMenu, isCollapsed, onBack }) => {
   const navigate = useNavigate();
 
   const handleToggle = () => {
     onToggleMenu?.();
+  };
+
+  const handleBack = () => {
+    if (onBack) {
+      onBack();
+      return;
+    }
+
+    navigate('/events');
   };
 
   return (
@@ -26,7 +35,7 @@ export const SidebarActions: React.FC<SidebarActionsProps> = ({ onToggleMenu, is
     >
       {!isCollapsed && (
         <button
-          onClick={() => navigate('/events')}
+          onClick={handleBack}
           style={{
             display: 'flex',
             alignItems: 'center',

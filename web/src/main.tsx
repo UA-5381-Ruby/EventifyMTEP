@@ -12,7 +12,7 @@ import { store } from '@/store';
 AuthService.init().finally(() => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      {/* Обгортаємо App у Provider саме тут! */}
+
       <Provider store={store}>
         <App />
       </Provider>

@@ -17,8 +17,8 @@ interface SidebarProps {
   onToggleMenu?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => {}, onToggleMenu }) => {
-  const [currentPath, setActivePage] = useReduxState<string>('dashboard');
+export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => {}, onBack, onToggleMenu }) => {
+  const [currentPath, setActivePage] = useReduxState<string>('/dashboard');
   const { user } = useAuth();
   const dispatch = useDispatch();
 
@@ -57,7 +57,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => {}, onToggl
       }}
     >
       <SidebarActions
-        onBack={() => console.log('Go back to Eventify!')}
+        onBack={onBack}
         onToggleMenu={handleToggleMenu}
         isCollapsed={isCollapsed}
       />

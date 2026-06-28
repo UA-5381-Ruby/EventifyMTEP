@@ -1,14 +1,14 @@
-﻿import { useOutletContext, useNavigate } from 'react-router-dom';
+﻿import { useState } from 'react';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useEvents } from '@/hooks/use-events';
 import type { Brand } from '@/types/brand';
 import { Button, Spinner } from '@/components/ui';
 import { EventsTable } from '../../components/admin/event/events-table.tsx';
-import { useReduxState } from '@/hooks/use-redux-state';
 
 const EventsPage = () => {
   const { brand } = useOutletContext<{ brand: Brand }>();
   const navigate = useNavigate();
-  const [page, setPage] = useReduxState(1);
+  const [page, setPage] = useState(1);
 
   const { events, meta, isLoading, error } = useEvents({
     brand_id: brand.id,

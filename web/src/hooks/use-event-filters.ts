@@ -1,10 +1,9 @@
 import React from 'react';
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { SORT_OPTIONS, STATUS_TABS } from '@/constants/event.constants';
 import type { Event } from '@/types/event';
 import { STATUS_TO_TAB, TAB_TO_STATUS, STATUS_CONFIG } from '@/constants/event.constants';
 import type { EventTabStatus } from '@/constants/event.constants';
-import { useReduxState } from '@/hooks/use-redux-state';
 
 interface FilterableEvent {
   title: string;
@@ -22,10 +21,10 @@ export function useEventFilters<T extends FilterableEvent>({
   events,
   itemsPerPage,
 }: UseEventFiltersOptions<T>) {
-  const [activeTab, setActiveTab] = useReduxState<EventTabStatus>('All');
-  const [search, setSearch] = useReduxState('');
-  const [sort, setSort] = useReduxState(SORT_OPTIONS[0]?.value ?? '');
-  const [page, setPage] = useReduxState(1);
+  const [activeTab, setActiveTab] = useState<EventTabStatus>('All');
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState(SORT_OPTIONS[0]?.value ?? '');
+  const [page, setPage] = useState(1);
 
   const availableTabs = useMemo(() => {
     const presentGroups = new Set(

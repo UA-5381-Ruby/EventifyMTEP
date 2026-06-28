@@ -1,7 +1,6 @@
-import { type ChangeEvent } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import { Input, Button, Modal } from '@/components/ui';
 import { InvitationsService } from '@/services/invitations-service';
-import { useReduxState } from '@/hooks/use-redux-state';
 
 const ROLES = ['manager', 'member'];
 
@@ -12,10 +11,10 @@ interface Props {
 }
 
 export function InviteMemberModal({ brandId, isOpen, onClose }: Props) {
-  const [email, setEmail] = useReduxState('');
-  const [role, setRole] = useReduxState('member');
-  const [status, setStatus] = useReduxState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [error, setError] = useReduxState('');
+  const [email, setEmail] = useState('');
+  const [role, setRole] = useState('member');
+  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [error, setError] = useState('');
 
   const handleSubmit = async () => {
     if (!email.trim()) return;
