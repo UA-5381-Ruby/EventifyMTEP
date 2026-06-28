@@ -2,6 +2,7 @@
 import { useBrandContext } from '@/hooks/use-brand-context';
 import { ChevronLeft, User } from 'lucide-react';
 import { Spinner } from '@/components/ui';
+import logo from '@/assets/logo.png';
 
 export const AdminLayout = () => {
   const { brand, isLoading } = useBrandContext();
@@ -27,7 +28,7 @@ export const AdminLayout = () => {
       <header className="h-16 border-b border-neutral-200 flex items-center px-6 justify-between bg-white sticky top-0 z-50">
         <div className="flex items-center gap-4">
           <Link to="/" className="font-bold text-lg">
-            LOGO
+            <img src={logo} alt="Logo" className="h-auto w-13" />
           </Link>
           <div className="h-4 w-[1px] bg-neutral-300 mx-2" />
           <span className="text-sm text-neutral-500 uppercase tracking-widest font-medium">

@@ -5,7 +5,7 @@ import { Spinner } from '@/components/ui';
 import { EventsTable } from '../../components/admin/event/events-table.tsx';
 
 import { useEventsFilters } from '@/hooks/use-events-filters.ts';
-import { EventsToolbar } from '../../components/admin/events-toolbar.tsx';
+import { EventsToolbar } from '../../components/admin/event/events-toolbar.tsx';
 import { EventsPagination } from '../../components/admin/event/events-pagination.tsx';
 
 const EventsPage = () => {

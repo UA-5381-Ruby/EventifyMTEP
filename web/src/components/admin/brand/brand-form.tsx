@@ -1,7 +1,7 @@
 ﻿import React, { useState } from 'react';
 import { Button, Input, Textarea, Alert, Spinner } from '@/components/ui';
-import { cn } from '@/lib/utils';
-import type { CreateBrandRequest } from '@/types/brand';
+import { cn } from '@/lib/utils.ts';
+import type { CreateBrandRequest } from '@/types/brand.ts';
 
 type BrandFormProps = {
   formData: CreateBrandRequest;

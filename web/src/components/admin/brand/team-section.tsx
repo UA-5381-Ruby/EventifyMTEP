@@ -1,7 +1,7 @@
 ﻿import { useState } from 'react';
 import type { Membership } from '@/types/brand-memberships';
 import { SectionHeader } from '../shared.tsx';
-import { TeamList } from '../team-list.tsx';
+import { TeamList } from '../member/team-list.tsx';
 import { InviteMemberModal } from '@/components/admin/modals/invite-member-modal';
 
 interface TeamSectionProps {

@@ -2,7 +2,7 @@
 import { useNavigate } from 'react-router-dom';
 import { brandsService } from '@/services/brands-service';
 import { Card } from '@/components/ui';
-import { BrandForm } from '../../components/admin/brand-form.tsx';
+import { BrandForm } from '../../components/admin/brand/brand-form.tsx';
 import type { CreateBrandRequest } from '@/types/brand';
 
 export const CreateBrandPage = () => {

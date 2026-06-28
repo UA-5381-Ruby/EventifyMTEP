@@ -23,7 +23,6 @@ export const EventsTable = ({ events, canManage = true }: EventsTableProps) => (
         {events.length > 0 ? (
           events.map((event) => (
             <tr key={event.id} className="group hover:bg-neutral-50 transition-colors">
-              {/* Колонка для банера івенту */}
               <td className="px-6 py-4 whitespace-nowrap">
                 <div className="h-10 w-10 overflow-hidden bg-neutral-100 border border-neutral-200 flex items-center justify-center grayscale group-hover:grayscale-0 transition-all">
                   {event.banner_url ? (

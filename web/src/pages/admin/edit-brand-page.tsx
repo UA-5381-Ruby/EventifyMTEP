@@ -3,7 +3,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { brandsService } from '@/services/brands-service';
 import { useBrandContext } from '@/hooks/use-brand-context';
 import { Card } from '@/components/ui';
-import { BrandForm } from '../../components/admin/brand-form.tsx';
+import { BrandForm } from '../../components/admin/brand/brand-form.tsx';
 import type { Brand } from '@/types/brand';
 import type { BrandEditFields } from '../../components/brands/brand-edit-modal.tsx';
 
