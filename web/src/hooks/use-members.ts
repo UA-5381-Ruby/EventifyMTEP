@@ -14,7 +14,7 @@ export const useMembers = (brandId: number) => {
     try {
       const response = await BrandMembershipsService.getBrandMemberships(brandId, {
         page: 1,
-        per_page: 50,
+        per_page: 15,
       });
       setBrandMembers(response.data || []);
     } catch (err) {

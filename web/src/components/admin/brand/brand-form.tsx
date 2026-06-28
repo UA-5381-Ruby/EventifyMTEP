@@ -15,6 +15,19 @@ type BrandFormProps = {
   submitLabel: string;
 };
 
+const ACCEPTED_IMAGE_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+]);
+
+const getAcceptedFile = (file?: File | null) =>
+  file && ACCEPTED_IMAGE_TYPES.has(file.type) ? file : null;
+
+
+
 export const BrandForm: React.FC<BrandFormProps> = ({
   formData,
   isLoading,
@@ -28,10 +41,8 @@ export const BrandForm: React.FC<BrandFormProps> = ({
 }) => {
   const [isDragging, setIsDragging] = useState(false);
 
-  // Обробники для Drag & Drop файлу
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] || null;
-    onFileChange(file);
+    onFileChange(getAcceptedFile(e.target.files?.[0] || null));
   };
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -48,10 +59,7 @@ export const BrandForm: React.FC<BrandFormProps> = ({
     e.preventDefault();
     setIsDragging(false);
 
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      onFileChange(file);
-    }
+    onFileChange(getAcceptedFile(e.dataTransfer.files?.[0] || null));
   };
 
   return (
