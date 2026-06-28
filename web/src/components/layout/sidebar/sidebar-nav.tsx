@@ -18,13 +18,10 @@ const SUPERADMIN_ITEMS = [
   { label: 'Events History', href: '/logs' },
 ];
 
-
-
-
 export function SidebarNav({
   currentPath = '/dashboard',
   isCollapsed = false,
-  onSelect = () => { },
+  onSelect = () => {},
   isSuperAdmin,
   role,
 }: SidebarNavProps) {

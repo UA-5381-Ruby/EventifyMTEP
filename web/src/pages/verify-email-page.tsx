@@ -16,7 +16,9 @@ export function VerifyEmailPage() {
   const token = searchParams.get('token');
 
   const [state, setState] = useReduxState<VerificationState>(token ? 'loading' : 'error');
-  const [errorMessage, setErrorMessage] = useReduxState(token ? '' : 'No verification token provided.');
+  const [errorMessage, setErrorMessage] = useReduxState(
+    token ? '' : 'No verification token provided.'
+  );
 
   const { resendState, handleResend } = useResendVerification(token);
 

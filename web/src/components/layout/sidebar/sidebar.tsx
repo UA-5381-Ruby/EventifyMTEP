@@ -17,7 +17,7 @@ interface SidebarProps {
   onToggleMenu?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => { }, onToggleMenu }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => {}, onToggleMenu }) => {
   const [currentPath, setActivePage] = useReduxState<string>('dashboard');
   const { user } = useAuth();
   const dispatch = useDispatch();

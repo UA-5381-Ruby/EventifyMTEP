@@ -8,7 +8,9 @@ interface EventHostSectionProps {
 
 export function EventHostSection({ brand }: EventHostSectionProps) {
   const [following, setFollowing] = useReduxState(false);
-  const [followingVariant, setFollowingVariant] = useReduxState<'primary' | 'secondary'>('secondary');
+  const [followingVariant, setFollowingVariant] = useReduxState<'primary' | 'secondary'>(
+    'secondary'
+  );
 
   const processFollow = () => {
     setFollowingVariant(following ? 'secondary' : 'primary');

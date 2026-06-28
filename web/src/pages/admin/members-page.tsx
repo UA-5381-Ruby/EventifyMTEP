@@ -20,7 +20,9 @@ export const MembersPage = () => {
   const [membersError, setMembersError] = useReduxState<string | null>(null);
 
   const [isInviteModalOpen, setIsInviteModalOpen] = useReduxState(false);
-  const [memberToRemove, setMemberToRemove] = useReduxState<{ id: number; email: string } | null>(null);
+  const [memberToRemove, setMemberToRemove] = useReduxState<{ id: number; email: string } | null>(
+    null
+  );
   const [isRemoving, setIsRemoving] = useReduxState(false);
 
   const { isCurrentBrandManager } = useBrandMembership(String(brand.id));
