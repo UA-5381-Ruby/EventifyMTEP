@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react';
+﻿import { useEffect } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import type { Brand } from '@/types/brand';
 import type { Event } from '@/types/event';
@@ -7,6 +7,7 @@ import { BrandMembershipsService } from '@/services/brand-memberships-service';
 import { useBrandAccess } from '@/hooks/use-brand-access';
 import { InviteMemberModal } from '@/components/admin/modals/invite-member-modal';
 import { Button } from '@/components/ui';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 import { StatCard, SectionHeader } from '../../components/admin/shared';
 import { EventsTable } from '../../components/admin/event/events-table';
@@ -17,11 +18,11 @@ export const DashboardPage = () => {
   const navigate = useNavigate();
   const { brand } = useOutletContext<{ brand: Brand }>();
 
-  const [events, setEvents] = useState<Event[]>([]);
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [eventStats, setEventStats] = useState({ total: 0, pending: 0 });
-  const [teamMembers, setTeamMembers] = useState<Membership[]>([]);
-  const [membersCount, setMembersCount] = useState(0);
+  const [events, setEvents] = useReduxState<Event[]>([]);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useReduxState(false);
+  const [eventStats, setEventStats] = useReduxState({ total: 0, pending: 0 });
+  const [teamMembers, setTeamMembers] = useReduxState<Membership[]>([]);
+  const [membersCount, setMembersCount] = useReduxState(0);
 
   const { canManage } = useBrandAccess(String(brand.id));
 

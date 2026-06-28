@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { MapPin, Globe } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, ZoomControl } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
@@ -22,8 +23,8 @@ interface EventLocationSectionProps {
 }
 
 export function EventLocationSection({ location }: EventLocationSectionProps) {
-  const [coords, setCoords] = useState<[number, number] | null>(null);
-  const [error, setError] = useState<boolean>(false);
+  const [coords, setCoords] = useReduxState<[number, number] | null>(null);
+  const [error, setError] = useReduxState<boolean>(false);
 
   const isOnline = location.trim().toLowerCase() === 'online';
 

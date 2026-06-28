@@ -1,14 +1,14 @@
-import { useState } from 'react';
 import type { EventDetail } from '@/types/event';
 import { Button } from '@/components/ui/button';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface EventHostSectionProps {
   brand: EventDetail['brand'];
 }
 
 export function EventHostSection({ brand }: EventHostSectionProps) {
-  const [following, setFollowing] = useState(false);
-  const [followingVariant, setFollowingVariant] = useState<'primary' | 'secondary'>('secondary');
+  const [following, setFollowing] = useReduxState(false);
+  const [followingVariant, setFollowingVariant] = useReduxState<'primary' | 'secondary'>('secondary');
 
   const processFollow = () => {
     setFollowingVariant(following ? 'secondary' : 'primary');

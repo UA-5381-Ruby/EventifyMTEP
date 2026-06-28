@@ -1,13 +1,13 @@
-import { useState } from 'react';
 import { brandsService } from '@/services/brands-service';
 import type { CreateBrandRequest } from '@/types/brand';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export function useCreateBrand(onSuccess?: () => void) {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useReduxState(false);
+  const [isSaving, setIsSaving] = useReduxState(false);
+  const [saveError, setSaveError] = useReduxState<string | null>(null);
 
-  const [fields, setFields] = useState<CreateBrandRequest>({
+  const [fields, setFields] = useReduxState<CreateBrandRequest>({
     name: '',
     subdomain: '',
     description: '',

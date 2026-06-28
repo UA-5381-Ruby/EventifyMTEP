@@ -1,7 +1,8 @@
-import { useState, type ChangeEvent } from 'react';
+import { type ChangeEvent } from 'react';
 import { Button, Input, Modal } from '@/components/ui';
 import { Eye, EyeOff } from 'lucide-react';
 import authService from '@/services/auth-service.ts';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface ChangePasswordModalProps {
   isOpen: boolean;
@@ -10,16 +11,16 @@ interface ChangePasswordModalProps {
 }
 
 export function ChangePasswordModal({ isOpen, onClose, onSuccess }: ChangePasswordModalProps) {
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [currentPassword, setCurrentPassword] = useReduxState('');
+  const [newPassword, setNewPassword] = useReduxState('');
+  const [confirmPassword, setConfirmPassword] = useReduxState('');
 
-  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showCurrentPassword, setShowCurrentPassword] = useReduxState(false);
+  const [showNewPassword, setShowNewPassword] = useReduxState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useReduxState(false);
 
-  const [error, setError] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useReduxState('');
+  const [isSubmitting, setIsSubmitting] = useReduxState(false);
 
   const resetState = () => {
     setCurrentPassword('');

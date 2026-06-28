@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { brandsService } from '@/services/brands-service';
 import type { BrandWithEvents } from '@/types/brand';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface UseBrandPublicResult {
   brand: BrandWithEvents | null;
@@ -9,9 +10,9 @@ interface UseBrandPublicResult {
 }
 
 export function useBrandPublic(id: string | undefined): UseBrandPublicResult {
-  const [brand, setBrand] = useState<BrandWithEvents | null>(null);
-  const [isLoading, setIsLoading] = useState(!!id);
-  const [error, setError] = useState<string | null>(id ? null : 'Missing brand ID');
+  const [brand, setBrand] = useReduxState<BrandWithEvents | null>(null);
+  const [isLoading, setIsLoading] = useReduxState(!!id);
+  const [error, setError] = useReduxState<string | null>(id ? null : 'Missing brand ID');
 
   useEffect(() => {
     if (!id) return;

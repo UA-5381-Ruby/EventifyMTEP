@@ -1,20 +1,21 @@
-﻿import React, { useState } from 'react';
+﻿import React from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { brandsService } from '@/services/brands-service';
 import { useBrandContext } from '@/hooks/use-brand-context';
 import { Card } from '@/components/ui';
 import { BrandForm } from '../../components/admin/brand-form.tsx';
 import type { Brand } from '@/types/brand';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export const EditBrandPage = () => {
   const navigate = useNavigate();
   const { brand } = useOutletContext<{ brand: Brand }>();
   const { refreshBrand } = useBrandContext();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useReduxState(false);
+  const [error, setError] = useReduxState<string | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useReduxState({
     name: brand?.name || '',
     subdomain: brand?.subdomain || '',
     description: brand?.description || '',

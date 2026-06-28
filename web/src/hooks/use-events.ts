@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { EventsService } from '@/services/events-service';
 import type { Event, PaginationMeta, EventQueryParams, EventStatus } from '@/types/event';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface UseEventsState {
   events: Event[];
@@ -10,14 +11,14 @@ interface UseEventsState {
 }
 
 export function useEvents(params: EventQueryParams) {
-  const [state, setState] = useState<UseEventsState>({
+  const [state, setState] = useReduxState<UseEventsState>({
     events: [],
     meta: null,
     isLoading: true,
     error: null,
   });
-  const [refetchIndex, setRefetchIndex] = useState(0);
-  const [allStatuses, setAllStatuses] = useState<EventStatus[] | null>(null);
+  const [refetchIndex, setRefetchIndex] = useReduxState(0);
+  const [allStatuses, setAllStatuses] = useReduxState<EventStatus[] | null>(null);
 
   const { page, per_page, sort, order, q, status, brand_id, category_id, search } = params;
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Alert, Button, Spinner } from '@/components/ui';
 import { Container, PageWrapper } from '@/components/layout';
@@ -11,6 +11,7 @@ import { useCreateEvent } from '@/hooks/use-create-event';
 import { useBrandAccess } from '@/hooks/use-brand-access';
 import { BrandMembershipsService } from '@/services/brand-memberships-service';
 import type { Membership } from '@/types/brand-memberships';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export function BrandDashboardPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,8 +20,8 @@ export function BrandDashboardPage() {
 
   const { canManage, isLoading: accessLoading } = useBrandAccess(id);
 
-  const [memberships, setMemberships] = useState<Membership[]>([]);
-  const [membershipsLoading, setMembershipsLoading] = useState(false);
+  const [memberships, setMemberships] = useReduxState<Membership[]>([]);
+  const [membershipsLoading, setMembershipsLoading] = useReduxState(false);
 
   useEffect(() => {
     if (!canManage || Number.isNaN(brandId)) return;
@@ -46,7 +47,7 @@ export function BrandDashboardPage() {
     };
   }, [canManage, brandId]);
 
-  const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [isInviteOpen, setIsInviteOpen] = useReduxState(false);
 
   const {
     brand,

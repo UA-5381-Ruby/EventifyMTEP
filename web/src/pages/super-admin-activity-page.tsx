@@ -1,21 +1,22 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { PageWrapper } from '@/components/layout';
 import type { Activity, ActivityType } from '@/services/activity-service';
 import { activityService } from '@/services/activity-service';
+import { useReduxState } from '@/hooks/use-redux-state';
 export default function SuperAdminActivityPage() {
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [totalActivities, setTotalActivities] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [activities, setActivities] = useReduxState<Activity[]>([]);
+  const [totalActivities, setTotalActivities] = useReduxState<number>(0);
+  const [loading, setLoading] = useReduxState<boolean>(true);
+  const [error, setError] = useReduxState<string | null>(null);
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useReduxState<number>(1);
   const itemsPerPage = 15;
 
-  const [selectedActivityTypes, setSelectedActivityTypes] = useState<ActivityType[]>([]);
-  const [selectedResource, setSelectedResource] = useState<string>('');
-  const [selectedStatus, setSelectedStatus] = useState<string>('');
-  const [searchEmail, setSearchEmail] = useState<string>('');
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [selectedActivityTypes, setSelectedActivityTypes] = useReduxState<ActivityType[]>([]);
+  const [selectedResource, setSelectedResource] = useReduxState<string>('');
+  const [selectedStatus, setSelectedStatus] = useReduxState<string>('');
+  const [searchEmail, setSearchEmail] = useReduxState<string>('');
+  const [activeDropdown, setActiveDropdown] = useReduxState<string | null>(null);
   const filterContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

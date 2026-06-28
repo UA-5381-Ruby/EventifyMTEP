@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { Button, Input, Textarea, Modal, Alert } from '@/components/ui';
 import { CategoryPicker } from '@/components/events/category-picker';
 import { cn } from '@/lib/utils';
 import type { CreateEventFields } from '@/hooks/use-create-event';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface CreateEventModalProps {
   isOpen: boolean;
@@ -34,7 +35,7 @@ export function CreateEventModal({
   onSave,
   onChange,
 }: CreateEventModalProps) {
-  const [isDragging, setIsDragging] = useState(false);
+  const [isDragging, setIsDragging] = useReduxState(false);
 
   const startDateParsed = useMemo(() => parseDateTime(fields.start_date), [fields.start_date]);
   const endDateParsed = useMemo(() => parseDateTime(fields.end_date), [fields.end_date]);

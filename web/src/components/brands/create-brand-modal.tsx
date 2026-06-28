@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import { Button, Input, Textarea, Modal, Alert } from '@/components/ui';
 import { ColorField } from '@/components/brands/color-field';
 import { cn } from '@/lib/utils';
 import type { CreateBrandRequest } from '@/types/brand';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface CreateBrandModalProps {
   isOpen: boolean;
@@ -23,7 +23,7 @@ export function CreateBrandModal({
   onSave,
   onChange,
 }: CreateBrandModalProps) {
-  const [isDragging, setIsDragging] = useState(false);
+  const [isDragging, setIsDragging] = useReduxState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;

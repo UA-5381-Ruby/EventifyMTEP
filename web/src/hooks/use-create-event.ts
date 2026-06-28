@@ -1,6 +1,6 @@
-import { useState } from 'react';
 import { EventsService } from '@/services/events-service'; // або '@/lib/events-service'
 import type { CreateEventRequest } from '@/types/event';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export interface CreateEventFields {
   title: string;
@@ -41,10 +41,10 @@ interface UseCreateEventResult {
 }
 
 export function useCreateEvent(brandId: number, onSuccess: () => void): UseCreateEventResult {
-  const [isOpen, setIsOpen] = useState(false);
-  const [fields, setFields] = useState<CreateEventFields>(EMPTY_EVENT_FIELDS);
-  const [isSaving, setIsSaving] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const [isOpen, setIsOpen] = useReduxState(false);
+  const [fields, setFields] = useReduxState<CreateEventFields>(EMPTY_EVENT_FIELDS);
+  const [isSaving, setIsSaving] = useReduxState(false);
+  const [saveError, setSaveError] = useReduxState<string | null>(null);
 
   const openModal = () => {
     setFields(EMPTY_EVENT_FIELDS);

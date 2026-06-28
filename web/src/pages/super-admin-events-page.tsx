@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { PageWrapper } from '@/components/layout';
 import { brandsService } from '@/services/brands-service';
 import { EventsService } from '@/services/events-service';
 import { CategoriesService } from '@/services/categories-service';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 type ActivityStatus =
   | 'draft'
@@ -73,22 +74,22 @@ interface RawBackendEvent {
 const S3_BASE_URL = import.meta.env.VITE_S3_BASE_URL || 'https://your-bucket-name.s3.amazonaws.com';
 
 export default function ActivityLogPage() {
-  const [activities, setActivities] = useState<Activity[]>([]);
-  const [totalEvents, setTotalEvents] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  const [activities, setActivities] = useReduxState<Activity[]>([]);
+  const [totalEvents, setTotalEvents] = useReduxState<number>(0);
+  const [loading, setLoading] = useReduxState<boolean>(true);
+  const [error, setError] = useReduxState<string | null>(null);
 
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [categories, setCategories] = useState<Category[]>([]);
+  const [brands, setBrands] = useReduxState<Brand[]>([]);
+  const [categories, setCategories] = useReduxState<Category[]>([]);
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [currentPage, setCurrentPage] = useReduxState<number>(1);
   const itemsPerPage = 10;
 
-  const [selectedStatuses, setSelectedStatuses] = useState<ActivityStatus[]>([]);
-  const [selectedCategoryId, setSelectedCategoryId] = useState<string>('');
-  const [selectedBrandId, setSelectedBrandId] = useState<string>('');
+  const [selectedStatuses, setSelectedStatuses] = useReduxState<ActivityStatus[]>([]);
+  const [selectedCategoryId, setSelectedCategoryId] = useReduxState<string>('');
+  const [selectedBrandId, setSelectedBrandId] = useReduxState<string>('');
 
-  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [activeDropdown, setActiveDropdown] = useReduxState<string | null>(null);
   const filterContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

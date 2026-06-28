@@ -1,7 +1,8 @@
-﻿import React, { useState } from 'react';
+﻿import React from 'react';
 import { Modal, Input, Button, Spinner, Alert } from '@/components/ui';
 import { InvitationsService } from '@/services/invitations-service';
 import { X } from 'lucide-react';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface InviteMemberModalProps {
   brandId: number;
@@ -10,10 +11,10 @@ interface InviteMemberModalProps {
 }
 
 export const InviteMemberModal = ({ brandId, isOpen, onClose }: InviteMemberModalProps) => {
-  const [email, setEmail] = useState('');
-  const [role, setRole] = useState('member');
-  const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
-  const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useReduxState('');
+  const [role, setRole] = useReduxState('member');
+  const [status, setStatus] = useReduxState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [error, setError] = useReduxState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

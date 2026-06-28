@@ -1,6 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { brandsService } from '@/services/brands-service';
 import type { Brand, BrandScope } from '@/types/brand';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface BrandQueryParams {
   page: number;
@@ -19,11 +20,11 @@ interface UseBrandsResult {
 }
 
 export function useBrands(params: BrandQueryParams): UseBrandsResult {
-  const [brands, setBrands] = useState<Brand[]>([]);
-  const [total, setTotal] = useState<number | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [tick, setTick] = useState(0);
+  const [brands, setBrands] = useReduxState<Brand[]>([]);
+  const [total, setTotal] = useReduxState<number | null>(null);
+  const [isLoading, setIsLoading] = useReduxState(true);
+  const [error, setError] = useReduxState<string | null>(null);
+  const [tick, setTick] = useReduxState(0);
 
   const { page, per_page, sort, q, scope } = params;
 

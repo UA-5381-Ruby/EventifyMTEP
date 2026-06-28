@@ -1,8 +1,9 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Spinner } from '@/components/ui';
 import { useEventDetail } from '@/hooks/use-event-detail';
 import { EventsService } from '@/services/events-service';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 import { CategoryChip } from '@/components/admin/category-chip.tsx';
 import { EventInfoSection } from '@/components/admin/event/event-info-section.tsx';
@@ -29,8 +30,8 @@ export const EventDetailPage = () => {
     handleUpdateEvent,
   } = useEventDetail(Number(id));
 
-  const [allCategories, setAllCategories] = useState<EventCategory[]>([]);
-  const [isCategoriesUpdating, setIsCategoriesUpdating] = useState(false);
+  const [allCategories, setAllCategories] = useReduxState<EventCategory[]>([]);
+  const [isCategoriesUpdating, setIsCategoriesUpdating] = useReduxState(false);
 
   useEffect(() => {
     EventsService.getAllCategories()

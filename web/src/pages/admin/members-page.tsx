@@ -1,4 +1,4 @@
-﻿import { useEffect, useState, useCallback } from 'react';
+﻿import { useEffect, useCallback } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useBrandMembership } from '@/hooks/use-brand-membership';
@@ -9,18 +9,19 @@ import type { Brand } from '@/types/brand';
 import type { Membership } from '@/types/brand-memberships';
 import { Button } from '@/components/ui';
 import { MembersTable } from '../../components/admin/member/members-table.tsx';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export const MembersPage = () => {
   const { brand } = useOutletContext<{ brand: Brand }>();
   const { user } = useAuth();
 
-  const [brandMembers, setBrandMembers] = useState<Membership[]>([]);
-  const [isMembersLoading, setIsMembersLoading] = useState(true);
-  const [membersError, setMembersError] = useState<string | null>(null);
+  const [brandMembers, setBrandMembers] = useReduxState<Membership[]>([]);
+  const [isMembersLoading, setIsMembersLoading] = useReduxState(true);
+  const [membersError, setMembersError] = useReduxState<string | null>(null);
 
-  const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
-  const [memberToRemove, setMemberToRemove] = useState<{ id: number; email: string } | null>(null);
-  const [isRemoving, setIsRemoving] = useState(false);
+  const [isInviteModalOpen, setIsInviteModalOpen] = useReduxState(false);
+  const [memberToRemove, setMemberToRemove] = useReduxState<{ id: number; email: string } | null>(null);
+  const [isRemoving, setIsRemoving] = useReduxState(false);
 
   const { isCurrentBrandManager } = useBrandMembership(String(brand.id));
   const isOwner = brandMembers.some((m) => m.user?.id === user?.id && m.role === 'owner');

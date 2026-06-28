@@ -1,9 +1,10 @@
 import React from 'react';
 import axios from 'axios';
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { CategoriesService } from '@/services/categories-service';
 import type { Category } from '@/types/category';
 import { DEFAULT_FOCUS_DELAY_MS } from '@/constants/ui.constants';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface UseCategoryCreatorOptions {
   onCreated: (id: number) => void;
@@ -26,11 +27,11 @@ export interface UseCategoryCreatorResult {
 export function useCategoryCreator({
   onCreated,
 }: UseCategoryCreatorOptions): UseCategoryCreatorResult {
-  const [extraCategories, setExtraCategories] = useState<Category[]>([]);
-  const [newCatName, setNewCatName] = useState('');
-  const [isCreatingCat, setIsCreatingCat] = useState(false);
-  const [catError, setCatError] = useState<string | null>(null);
-  const [showCatInput, setShowCatInput] = useState(false);
+  const [extraCategories, setExtraCategories] = useReduxState<Category[]>([]);
+  const [newCatName, setNewCatName] = useReduxState('');
+  const [isCreatingCat, setIsCreatingCat] = useReduxState(false);
+  const [catError, setCatError] = useReduxState<string | null>(null);
+  const [showCatInput, setShowCatInput] = useReduxState(false);
   const catInputRef = useRef<HTMLInputElement>(null);
 
   const handleShowCatInput = () => {

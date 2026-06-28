@@ -1,5 +1,6 @@
-﻿import React, { useState, useCallback } from 'react';
+﻿import React, { useCallback } from 'react';
 import { cn } from '@/lib/utils';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface EventBannerUploadProps {
   banner: File | null;
@@ -7,7 +8,7 @@ interface EventBannerUploadProps {
 }
 
 export const EventBannerUpload: React.FC<EventBannerUploadProps> = ({ banner, onChange }) => {
-  const [isDragging, setIsDragging] = useState(false);
+  const [isDragging, setIsDragging] = useReduxState(false);
 
   const handleFileChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {

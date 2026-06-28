@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { PageWrapper } from '@/components/layout';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +7,7 @@ import { ProfileHeader } from '@/components/profile/profile-header';
 import { BrandMemberships } from '@/components/profile/brand-memberships';
 import { DeleteAccountSection } from '@/components/profile/delete-account-section';
 import { useUserProfile } from '@/hooks/use-user-profile';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export default function UserProfilePage() {
   const {
@@ -23,7 +23,7 @@ export default function UserProfilePage() {
     handleCancel,
   } = useUserProfile();
 
-  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useReduxState(false);
 
   if (isLoading)
     return <div className="p-8 text-neutral-500 flex justify-center">Loading profile...</div>;

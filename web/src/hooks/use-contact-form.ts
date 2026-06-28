@@ -1,13 +1,13 @@
-import { useState } from 'react';
 import { EMPTY_FORM } from '@/constants/ui.constants';
 import { validate } from '@/utils/validate';
 import type { FormErrors, FormFields, FormStatus } from '@/types/form';
 import apiClient from '@/lib/api-client';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export function useContactForm() {
-  const [fields, setFields] = useState<FormFields>(EMPTY_FORM);
-  const [errors, setErrors] = useState<FormErrors>({});
-  const [status, setStatus] = useState<FormStatus>('idle');
+  const [fields, setFields] = useReduxState<FormFields>(EMPTY_FORM);
+  const [errors, setErrors] = useReduxState<FormErrors>({});
+  const [status, setStatus] = useReduxState<FormStatus>('idle');
 
   const handleChange =
     (key: keyof FormFields) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {

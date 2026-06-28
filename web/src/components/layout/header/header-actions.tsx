@@ -1,7 +1,8 @@
-import { useState, useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { User, LayoutDashboard, Settings, LogOut } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface HeaderActionsProps {
   isAuthenticated: boolean;
@@ -16,7 +17,7 @@ export function HeaderActions({
   onProfile,
   onLogout,
 }: HeaderActionsProps) {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useReduxState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const location = useLocation();
   const navigate = useNavigate();

@@ -1,10 +1,11 @@
-﻿import React, { useState, useEffect, useCallback } from 'react';
+﻿import React, { useEffect, useCallback } from 'react';
 import { brandsService } from '@/services/brands-service';
 import { BrandMembershipsService } from '@/services/brand-memberships-service';
 import type { Brand } from '@/types/brand';
 import type { Membership } from '@/types/brand-memberships';
 import { useAuth } from '@/hooks/use-auth';
 import { BrandContext } from './brand-context';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 const fetchManagedBrands = async (): Promise<Brand[]> => {
   const response = await brandsService.getBrands({ scope: 'managed' });
@@ -22,7 +23,7 @@ const EMPTY_STATE: BrandState = { brand: null, memberships: [], isLoading: false
 
 export function BrandProvider({ children }: { children: React.ReactNode }) {
   const { user, isLoading: isAuthLoading } = useAuth();
-  const [state, setState] = useState<BrandState>(LOADING_STATE);
+  const [state, setState] = useReduxState<BrandState>(LOADING_STATE);
 
   const loadData = useCallback(async (userId: number, brandId?: number) => {
     const run = async () => {

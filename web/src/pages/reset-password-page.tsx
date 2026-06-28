@@ -1,8 +1,9 @@
-﻿import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
+﻿import { type ChangeEvent, type SyntheticEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Input, Button } from '@/components/ui';
 import { Eye, EyeOff } from 'lucide-react';
 import { AuthCard } from '@/components/auth/auth-card';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 import authService from '@/services/auth-service';
 import { ResetPasswordSuccess } from '@/components/auth/reset-password/reset-password-success.tsx';
@@ -15,13 +16,13 @@ export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token') ?? '';
 
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState(() => (token ? '' : 'No reset token provided.'));
-  const [validationError, setValidationError] = useState('');
-  const [state, setState] = useState<ResetPasswordState>(() => (token ? 'form' : 'error'));
+  const [password, setPassword] = useReduxState('');
+  const [confirmPassword, setConfirmPassword] = useReduxState('');
+  const [showPassword, setShowPassword] = useReduxState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useReduxState(false);
+  const [error, setError] = useReduxState(() => (token ? '' : 'No reset token provided.'));
+  const [validationError, setValidationError] = useReduxState('');
+  const [state, setState] = useReduxState<ResetPasswordState>(() => (token ? 'form' : 'error'));
 
   const validateForm = (): boolean => {
     if (!password) return (setValidationError('Password is required'), false);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Ticket as TicketIcon } from 'lucide-react';
 import { PageWrapper, Container } from '@/components/layout';
@@ -6,12 +6,13 @@ import { Spinner, Button } from '@/components/ui';
 import { TicketQrCard } from '@/components/tickets/ticket-qr-card';
 import { TicketsService } from '@/services/tickets-service';
 import type { Ticket } from '@/types/ticket';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export function MyTicketsPage() {
   const navigate = useNavigate();
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [tickets, setTickets] = useReduxState<Ticket[]>([]);
+  const [isLoading, setIsLoading] = useReduxState(true);
+  const [error, setError] = useReduxState<string | null>(null);
 
   useEffect(() => {
     TicketsService.getMyTickets({ per_page: 50, sort: 'created_at', order: 'desc' })

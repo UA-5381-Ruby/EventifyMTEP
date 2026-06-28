@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { Button, Input, Textarea, Modal } from '@/components/ui';
 import { ColorField } from '@/components/brands/color-field';
 import { cn } from '@/lib/utils';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export interface BrandEditFields {
   name: string;
@@ -22,7 +22,7 @@ interface BrandEditModalProps {
 }
 
 export function BrandEditModal({ isOpen, fields, onClose, onSave, onChange }: BrandEditModalProps) {
-  const [isDragging, setIsDragging] = useState(false);
+  const [isDragging, setIsDragging] = useReduxState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;

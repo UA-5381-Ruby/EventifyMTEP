@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { brandsService } from '@/services/brands-service';
 import type { BrandWithEvents, UpdateBrandRequest } from '@/types/brand';
 import type { BrandEditFields } from '@/components/brands/brand-edit-modal';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export interface UseBrandDashboardResult {
   brand: BrandWithEvents | null;
@@ -16,13 +17,13 @@ export interface UseBrandDashboardResult {
 }
 
 export function useBrandDashboard(id: string | undefined): UseBrandDashboardResult {
-  const [brand, setBrand] = useState<BrandWithEvents | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isEditOpen, setIsEditOpen] = useState(false);
-  const [saveError, setSaveError] = useState<string | null>(null);
+  const [brand, setBrand] = useReduxState<BrandWithEvents | null>(null);
+  const [isLoading, setIsLoading] = useReduxState(true);
+  const [error, setError] = useReduxState<string | null>(null);
+  const [isEditOpen, setIsEditOpen] = useReduxState(false);
+  const [saveError, setSaveError] = useReduxState<string | null>(null);
 
-  const [editFields, setEditFields] = useState<BrandEditFields>({
+  const [editFields, setEditFields] = useReduxState<BrandEditFields>({
     name: '',
     description: '',
     subdomain: '',

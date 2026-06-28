@@ -1,16 +1,16 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Modal } from '@/components/ui/modal';
 import { UserService } from '@/services/user-service';
 import { useNavigate } from 'react-router-dom';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface DeleteAccountSectionProps {
   userId: number;
 }
 
 export function DeleteAccountSection({ userId }: DeleteAccountSectionProps) {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useReduxState(false);
+  const [isDeleting, setIsDeleting] = useReduxState(false);
   const navigate = useNavigate();
 
   const handleDelete = async () => {

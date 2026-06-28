@@ -1,18 +1,19 @@
-﻿import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
+﻿import { type ChangeEvent, type SyntheticEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button } from '@/components/ui';
 import { MailCheck } from 'lucide-react';
 import { AuthCard } from '@/components/auth/auth-card';
 import { AuthIconHeader } from '@/components/auth/auth-icon-header';
 import authService from '@/services/auth-service';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 type ForgotPasswordState = 'form' | 'loading' | 'success';
 
 export function ForgotPasswordPage() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('');
-  const [error, setError] = useState('');
-  const [state, setState] = useState<ForgotPasswordState>('form');
+  const [email, setEmail] = useReduxState('');
+  const [error, setError] = useReduxState('');
+  const [state, setState] = useReduxState<ForgotPasswordState>('form');
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();

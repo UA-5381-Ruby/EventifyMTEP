@@ -1,5 +1,4 @@
 import React from 'react';
-import { useState } from 'react';
 import { PageWrapper, Container } from '@/components/layout';
 import { Pagination, Tabs } from '@/components/ui';
 import { BrandPageHeader } from '@/components/brands/brand-page-header';
@@ -11,17 +10,18 @@ import { useCreateBrand } from '@/hooks/use-create-brand';
 import { PER_PAGE } from '@/constants/ui.constants';
 import { BRAND_TABS } from '@/constants/brand.constants';
 import type { Tab } from '@/types/brand.ts';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export function MyBrandsPage() {
-  const [tab, setTab] = useState<Tab>('managed');
+  const [tab, setTab] = useReduxState<Tab>('managed');
 
-  const [managedSearch, setManagedSearch] = useState('');
-  const [managedSort, setManagedSort] = useState('created_at');
-  const [managedPage, setManagedPage] = useState(1);
+  const [managedSearch, setManagedSearch] = useReduxState('');
+  const [managedSort, setManagedSort] = useReduxState('created_at');
+  const [managedPage, setManagedPage] = useReduxState(1);
 
-  const [subscribedSearch, setSubscribedSearch] = useState('');
-  const [subscribedSort, setSubscribedSort] = useState('created_at');
-  const [subscribedPage, setSubscribedPage] = useState(1);
+  const [subscribedSearch, setSubscribedSearch] = useReduxState('');
+  const [subscribedSort, setSubscribedSort] = useReduxState('created_at');
+  const [subscribedPage, setSubscribedPage] = useReduxState(1);
 
   const managed = useBrands({
     page: managedPage,

@@ -1,13 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthService from '@/services/auth-service';
 import { tokenStorage } from '@/lib/api-client';
 import { Container } from '../container';
 import { HeaderNav } from './header-nav';
 import { HeaderActions } from './header-actions';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export function Header() {
-  const [state, setState] = useState(AuthService.getState());
+  const [state, setState] = useReduxState(AuthService.getState());
   const navigate = useNavigate();
 
   useEffect(() => AuthService.subscribe(setState), []);

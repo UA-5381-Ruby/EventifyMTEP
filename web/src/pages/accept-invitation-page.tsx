@@ -4,7 +4,7 @@ import { Button } from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
 import { InvitationsService } from '@/services/invitations-service';
 import { tokenStorage } from '@/lib/api-client';
-import { useState } from 'react';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 type Status = 'loading' | 'success' | 'error' | 'no_account';
 
@@ -27,7 +27,7 @@ export function AcceptInvitationPage() {
   const token = searchParams.get('token');
   const brandId = searchParams.get('brand_id');
 
-  const [pageState, setPageState] = useState<PageState>(() => getInitialState(token, brandId));
+  const [pageState, setPageState] = useReduxState<PageState>(() => getInitialState(token, brandId));
   const hasAccepted = useRef(false);
 
   useEffect(() => {

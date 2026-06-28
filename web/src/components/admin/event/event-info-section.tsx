@@ -1,6 +1,6 @@
-﻿import { useState } from 'react';
-import { Button, Spinner } from '@/components/ui';
+﻿import { Button, Spinner } from '@/components/ui';
 import type { CreateEventRequest } from '@/types/event.ts';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface EventInfo {
   start_date: string;
@@ -25,8 +25,8 @@ export const EventInfoSection = ({
   isSaving,
   setIsEditing,
 }: EventInfoSectionProps) => {
-  const [location, setLocation] = useState(event.location || '');
-  const [description, setDescription] = useState(event.description || '');
+  const [location, setLocation] = useReduxState(event.location || '');
+  const [description, setDescription] = useReduxState(event.description || '');
 
   const handleLocalSave = () => {
     onSave({ location, description });

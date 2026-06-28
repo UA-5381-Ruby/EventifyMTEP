@@ -1,19 +1,20 @@
-﻿import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
+﻿import { type ChangeEvent, type SyntheticEvent } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Input, Button, Checkbox } from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
 import authService from '@/services/auth-service';
 import { Eye, EyeOff } from 'lucide-react';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState('');
+  const [email, setEmail] = useReduxState('');
+  const [password, setPassword] = useReduxState('');
+  const [showPassword, setShowPassword] = useReduxState(false);
+  const [rememberMe, setRememberMe] = useReduxState(false);
+  const [error, setError] = useReduxState('');
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();

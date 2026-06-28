@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Button,
   Input,
@@ -15,14 +15,15 @@ import {
 } from '@/components/ui';
 
 import { Container, PageWrapper } from '@/components/layout';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export function UIPreview() {
-  const [modalOpen, setModalOpen] = useState(false);
-  const [checked, setChecked] = useState(false);
+  const [modalOpen, setModalOpen] = useReduxState(false);
+  const [checked, setChecked] = useReduxState(false);
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useReduxState('');
 
-  const [currentPage, setCurrentPage] = useState(3);
+  const [currentPage, setCurrentPage] = useReduxState(3);
 
   return (
     <PageWrapper>

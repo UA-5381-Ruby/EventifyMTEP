@@ -1,16 +1,17 @@
-﻿import { useState, useEffect, useCallback } from 'react';
+﻿import { useEffect, useCallback } from 'react';
 import { CategoriesService } from '@/services/categories-service';
 import type { Category } from '@/types/category';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export const useEventCategories = (
   selectedCategoryIds: number[],
   onFieldChange: (field: 'category_ids', value: number[]) => void
 ) => {
-  const [allCategories, setAllCategories] = useState<Category[]>([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newCategoryName, setNewCategoryName] = useState('');
-  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
-  const [categoryError, setCategoryError] = useState<string | null>(null);
+  const [allCategories, setAllCategories] = useReduxState<Category[]>([]);
+  const [isModalOpen, setIsModalOpen] = useReduxState(false);
+  const [newCategoryName, setNewCategoryName] = useReduxState('');
+  const [isCreatingCategory, setIsCreatingCategory] = useReduxState(false);
+  const [categoryError, setCategoryError] = useReduxState<string | null>(null);
 
   useEffect(() => {
     CategoriesService.getCategories()

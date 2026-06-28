@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Star, Share2 } from 'lucide-react';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 import { Spinner, Button } from '@/components/ui';
 import type { EventDetail } from '@/types/event';
@@ -16,9 +17,9 @@ import { PageWrapper } from '@/components/layout';
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [eventDetail, setEventDetail] = useState<EventDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(false);
+  const [eventDetail, setEventDetail] = useReduxState<EventDetail | null>(null);
+  const [isLoading, setIsLoading] = useReduxState(true);
+  const [error, setError] = useReduxState(false);
 
   useEffect(() => {
     async function fetchEvent() {

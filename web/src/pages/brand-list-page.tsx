@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { PageWrapper, Container } from '@/components/layout';
 import { Pagination } from '@/components/ui';
 import { BrandPageHeader } from '@/components/brands/brand-page-header';
@@ -8,11 +7,12 @@ import { CreateBrandModal } from '@/components/brands/create-brand-modal';
 import { useBrands } from '@/hooks/use-brands';
 import { useCreateBrand } from '@/hooks/use-create-brand';
 import { PER_PAGE } from '@/constants/ui.constants';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export function BrandListPage() {
-  const [search, setSearch] = useState('');
-  const [sort, setSort] = useState('created_at');
-  const [page, setPage] = useState(1);
+  const [search, setSearch] = useReduxState('');
+  const [sort, setSort] = useReduxState('created_at');
+  const [page, setPage] = useReduxState(1);
 
   const params = {
     page,

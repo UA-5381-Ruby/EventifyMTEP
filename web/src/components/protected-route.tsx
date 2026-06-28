@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Outlet, Navigate, useLocation } from 'react-router-dom';
 import AuthService from '@/services/auth-service';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 const ProtectedRoute = () => {
-  const [state, setState] = useState(AuthService.getState());
+  const [state, setState] = useReduxState(AuthService.getState());
   const location = useLocation();
 
   useEffect(() => {

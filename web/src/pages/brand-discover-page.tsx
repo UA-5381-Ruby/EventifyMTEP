@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { PageWrapper, Container } from '@/components/layout';
 import { Pagination } from '@/components/ui';
 import { BrandPageHeader } from '@/components/brands/brand-page-header';
@@ -11,17 +10,18 @@ import { PER_PAGE } from '@/constants/ui.constants';
 import { useAuth } from '@/hooks/use-auth';
 import apiClient from '@/lib/api-client';
 import { DeleteBrandModal } from '@/components/ui/super-admin-modals';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export function BrandDiscoverPage() {
   const { user } = useAuth();
   const isSuperAdmin = Boolean(user?.is_superadmin);
 
-  const [search, setSearch] = useState('');
-  const [sort, setSort] = useState('created_at');
-  const [page, setPage] = useState(1);
-  const [isDeleting, setIsDeleting] = useState(false);
+  const [search, setSearch] = useReduxState('');
+  const [sort, setSort] = useReduxState('created_at');
+  const [page, setPage] = useReduxState(1);
+  const [isDeleting, setIsDeleting] = useReduxState(false);
 
-  const [deleteModal, setDeleteModal] = useState<{
+  const [deleteModal, setDeleteModal] = useReduxState<{
     isOpen: boolean;
     brandId: string | number;
     brandName: string;

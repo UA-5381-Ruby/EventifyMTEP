@@ -1,7 +1,8 @@
-﻿import { useState, useEffect } from 'react';
+﻿import { useEffect } from 'react';
 import { EventsService } from '@/services/events-service';
 import { EventLifecycleService } from '@/services/event-lifecycle-service';
 import type { EventDetail, CreateEventRequest } from '@/types/event';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 interface UseEventDetailResult {
   event: EventDetail | null;
@@ -18,13 +19,13 @@ interface UseEventDetailResult {
 }
 
 export function useEventDetail(id: number): UseEventDetailResult {
-  const [event, setEvent] = useState<EventDetail | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCancelling, setIsCancelling] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [event, setEvent] = useReduxState<EventDetail | null>(null);
+  const [isLoading, setIsLoading] = useReduxState(true);
+  const [error, setError] = useReduxState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useReduxState(false);
+  const [isCancelling, setIsCancelling] = useReduxState(false);
+  const [isSaving, setIsSaving] = useReduxState(false);
+  const [isEditing, setIsEditing] = useReduxState(false);
 
   useEffect(() => {
     if (!id) return;

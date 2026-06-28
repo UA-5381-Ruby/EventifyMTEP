@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { PageWrapper, Container } from '@/components/layout';
 import { Pagination } from '@/components/ui';
 import { EventPageHeader } from '@/components/events/event-page-header.tsx';
@@ -8,12 +8,13 @@ import { useEvents } from '@/hooks/use-events.ts';
 import type { EventQueryParams, EventStatus } from '@/types/event';
 import { PER_PAGE } from '@/constants/ui.constants';
 import { STATUS_TABS, STATUS_CONFIG, STATUS_TO_TAB } from '@/constants/event.constants';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export function EventListPage() {
-  const [search, setSearch] = useState('');
-  const [status, setStatus] = useState('');
-  const [sort, setSort] = useState<EventQueryParams['sort']>('created_at');
-  const [page, setPage] = useState(1);
+  const [search, setSearch] = useReduxState('');
+  const [status, setStatus] = useReduxState('');
+  const [sort, setSort] = useReduxState<EventQueryParams['sort']>('created_at');
+  const [page, setPage] = useReduxState(1);
 
   const params: EventQueryParams = {
     page,

@@ -1,14 +1,15 @@
-﻿import React, { useState } from 'react';
+﻿import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { brandsService } from '@/services/brands-service';
 import { Card } from '@/components/ui';
 import { BrandForm } from '../../components/admin/brand-form.tsx';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export const CreateBrandPage = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [formData, setFormData] = useState({
+  const [isLoading, setIsLoading] = useReduxState(false);
+  const [error, setError] = useReduxState<string | null>(null);
+  const [formData, setFormData] = useReduxState({
     name: '',
     subdomain: '',
     description: '',

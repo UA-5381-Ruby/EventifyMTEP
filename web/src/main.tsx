@@ -1,9 +1,10 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import './styles/index.css';
-import App from './app.tsx';
-
-import AuthService from './services/auth-service.ts';
+import '@/styles/index.css';
+import App from '@/app.tsx';
+import AuthService from '@/services/auth-service.ts';
+import { Provider } from 'react-redux';
+import { store } from '@/store';
 
 // This fragment validates token presence before rendering
 // so that protected routes always stay in the correct stay.
@@ -11,7 +12,10 @@ import AuthService from './services/auth-service.ts';
 AuthService.init().finally(() => {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <App />
+      {/* Обгортаємо App у Provider саме тут! */}
+      <Provider store={store}>
+        <App />
+      </Provider>
     </StrictMode>
   );
 });

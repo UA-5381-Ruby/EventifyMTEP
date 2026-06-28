@@ -1,22 +1,23 @@
-﻿import { useState, type ChangeEvent, type SyntheticEvent } from 'react';
+﻿import { type ChangeEvent, type SyntheticEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Input, Button } from '@/components/ui';
 import { PageWrapper } from '@/components/layout';
 import { Eye, EyeOff } from 'lucide-react';
 import authService from '@/services/auth-service';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export function RegistrationPage() {
   const navigate = useNavigate();
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [error, setError] = useState('');
-  const [registrationSuccess, setRegistrationSuccess] = useState(false);
-  const [resendState, setResendState] = useState<'idle' | 'loading' | 'sent'>('idle');
+  const [name, setName] = useReduxState('');
+  const [email, setEmail] = useReduxState('');
+  const [password, setPassword] = useReduxState('');
+  const [showPassword, setShowPassword] = useReduxState(false);
+  const [confirmPassword, setConfirmPassword] = useReduxState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useReduxState(false);
+  const [error, setError] = useReduxState('');
+  const [registrationSuccess, setRegistrationSuccess] = useReduxState(false);
+  const [resendState, setResendState] = useReduxState<'idle' | 'loading' | 'sent'>('idle');
 
   const handleResend = async () => {
     if (resendState === 'loading') return;

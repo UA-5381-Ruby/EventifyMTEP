@@ -1,7 +1,7 @@
-import { useState } from 'react';
 import { Calendar, Clock, Ticket, Users, CircleCheck } from 'lucide-react';
 import { formatDate, formatTimeRange } from '@/utils/date';
 import type { EventDetail } from '@/types/event';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 import { Button } from '@/components/ui/button';
 
@@ -15,9 +15,9 @@ interface EventBookingSectionProps {
 
 export function EventBookingSection({ event }: EventBookingSectionProps) {
   const timeRange = formatTimeRange(event.start_date, event.end_date);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [quantity, setQuantity] = useState<number>(1);
+  const [isLoading, setIsLoading] = useReduxState<boolean>(false);
+  const [error, setError] = useReduxState<string | null>(null);
+  const [quantity, setQuantity] = useReduxState<number>(1);
 
   const { hasBoughtTicket, ticket, isCheckingTicket } = useTicketStatus(event.id);
 

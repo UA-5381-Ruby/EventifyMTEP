@@ -1,8 +1,8 @@
-import { useState } from 'react';
 import authService from '@/services/auth-service';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 export function useResendVerification(token: string | null) {
-  const [resendState, setResendState] = useState<'idle' | 'loading' | 'sent'>('idle');
+  const [resendState, setResendState] = useReduxState<'idle' | 'loading' | 'sent'>('idle');
 
   const handleResend = async () => {
     if (!token || resendState === 'loading') return;

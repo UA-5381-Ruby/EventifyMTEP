@@ -5,7 +5,6 @@ import { Container, PageWrapper } from '@/components/layout';
 import { EventGrid } from '@/components/events/event-grid';
 import { SearchInput, Select } from '@/components/ui';
 import { BrandHeader } from '@/components/brands/brand-header';
-import { useAuth } from '@/hooks/use-auth';
 import { useBrandPublic } from '@/hooks/use-brand-public';
 import { useBrandAccess } from '@/hooks/use-brand-access';
 import { useEventFilters } from '@/hooks/use-event-filters';
@@ -13,12 +12,11 @@ import { SORT_OPTIONS } from '@/constants/event.constants';
 import { ACTIVE_STATUSES, ITEMS_PER_PAGE } from '@/constants/brand.constants';
 
 export function BrandPublicPage() {
-  const { user } = useAuth();
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const { brand, isLoading, error } = useBrandPublic(id);
-  const { canManage, isLoading: accessLoading } = useBrandAccess(id, user?.id);
+  const { canManage, isLoading: accessLoading } = useBrandAccess(id);
 
   const activeEvents = (brand?.events ?? []).filter((e) =>
     ACTIVE_STATUSES.has((e.status || '').toLowerCase())

@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 import { PageWrapper } from '@/components/layout';
 import { DeleteUserModal, SuccessModal } from '@/components/ui/super-admin-modals';
@@ -13,15 +14,15 @@ import type { AdminStats, PendingEvent, UserPreview } from '@/types/super-admin'
 export function SuperAdminPage() {
   const navigate = useNavigate();
 
-  const [deleteModal, setDeleteModal] = useState({
+  const [deleteModal, setDeleteModal] = useReduxState({
     isOpen: false,
     userId: '',
     userEmail: '',
   });
 
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [showSuccess, setShowSuccess] = useReduxState(false);
 
-  const [stats, setStats] = useState<AdminStats>({
+  const [stats, setStats] = useReduxState<AdminStats>({
     totalEvents: 0,
     totalUsers: 0,
     totalBrands: 0,
@@ -30,9 +31,9 @@ export function SuperAdminPage() {
     reportedUsers: 0,
   });
 
-  const [pendingEvents, setPendingEvents] = useState<PendingEvent[]>([]);
-  const [users, setUsers] = useState<UserPreview[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [pendingEvents, setPendingEvents] = useReduxState<PendingEvent[]>([]);
+  const [users, setUsers] = useReduxState<UserPreview[]>([]);
+  const [isLoading, setIsLoading] = useReduxState(true);
 
   const loadDashboard = async () => {
     try {

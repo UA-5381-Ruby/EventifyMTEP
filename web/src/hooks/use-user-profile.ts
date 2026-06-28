@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import type { ChangeEvent } from 'react';
 import { UserService, getCurrentUser } from '@/services/user-service';
 import type { UserProfile, UpdateUserRequest } from '@/types/user';
+import { useReduxState } from '@/hooks/use-redux-state';
 
 type AlertState = {
   variant: 'success' | 'error';
@@ -9,13 +10,13 @@ type AlertState = {
 } | null;
 
 export function useUserProfile() {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useReduxState<UserProfile | null>(null);
+  const [isLoading, setIsLoading] = useReduxState(true);
 
-  const [formData, setFormData] = useState<UpdateUserRequest>({ name: '', email: '' });
-  const [isSaving, setIsSaving] = useState(false);
+  const [formData, setFormData] = useReduxState<UpdateUserRequest>({ name: '', email: '' });
+  const [isSaving, setIsSaving] = useReduxState(false);
 
-  const [alert, setAlert] = useState<AlertState>(null);
+  const [alert, setAlert] = useReduxState<AlertState>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
