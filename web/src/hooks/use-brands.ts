@@ -28,7 +28,7 @@ export function useBrands(params: BrandQueryParams): UseBrandsResult {
 
   const { page, per_page, sort, q, scope } = params;
 
-  const refetch = useCallback(() => setTick((t) => t + 1), []);
+  const refetch = useCallback(() => setTick((t) => t + 1), [setTick]);
 
   useEffect(() => {
     let isMounted = true;
@@ -62,7 +62,7 @@ export function useBrands(params: BrandQueryParams): UseBrandsResult {
     return () => {
       isMounted = false;
     };
-  }, [page, per_page, sort, q, scope, tick]);
+  }, [page, per_page, sort, q, scope, tick, setBrands, setError, setIsLoading, setTotal]);
 
   return { brands, total, isLoading, error, refetch };
 }

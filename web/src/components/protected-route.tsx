@@ -9,7 +9,7 @@ const ProtectedRoute = () => {
 
   useEffect(() => {
     return AuthService.subscribe(setState);
-  }, []);
+  }, [setState]);
 
   if (!state.isAuthenticated) {
     const redirect = encodeURIComponent(location.pathname + location.search);

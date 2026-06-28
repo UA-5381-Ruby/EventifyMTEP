@@ -41,7 +41,7 @@ export const MembersPage = () => {
     } finally {
       setIsMembersLoading(false);
     }
-  }, [brand.id]);
+  }, [brand.id, setBrandMembers, setIsMembersLoading, setMembersError]);
 
   useEffect(() => {
     Promise.resolve().then(() => {

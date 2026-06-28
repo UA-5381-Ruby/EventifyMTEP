@@ -12,7 +12,7 @@ export function useCategories() {
       .then(setCategories)
       .catch(() => setCategories([]))
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [setCategories, setIsLoading]);
 
   return { categories, isLoading };
 }

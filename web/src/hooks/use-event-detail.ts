@@ -46,7 +46,7 @@ export function useEventDetail(id: number): UseEventDetailResult {
     return () => {
       isMounted = false;
     };
-  }, [id]);
+  }, [id, setError, setEvent, setIsLoading]);
 
   const handleSubmitEvent = async () => {
     if (!event) return;

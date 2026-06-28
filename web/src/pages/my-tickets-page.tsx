@@ -19,7 +19,7 @@ export function MyTicketsPage() {
       .then(({ data }) => setTickets(data))
       .catch((err: Error) => setError(err.message || 'Failed to load tickets'))
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [setError, setIsLoading, setTickets]);
 
   return (
     <PageWrapper>

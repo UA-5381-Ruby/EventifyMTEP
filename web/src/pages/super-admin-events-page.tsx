@@ -122,7 +122,7 @@ export default function ActivityLogPage() {
     };
 
     fetchBrandsAndCategories();
-  }, []);
+  }, [setBrands, setCategories]);
 
   useEffect(() => {
     const fetchDataFromDB = async () => {
@@ -181,7 +181,17 @@ export default function ActivityLogPage() {
     };
 
     fetchDataFromDB();
-  }, [currentPage, selectedCategoryId, selectedBrandId, selectedStatuses, brands]);
+  }, [
+    currentPage,
+    selectedCategoryId,
+    selectedBrandId,
+    selectedStatuses,
+    brands,
+    setActivities,
+    setError,
+    setLoading,
+    setTotalEvents,
+  ]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -194,7 +204,7 @@ export default function ActivityLogPage() {
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [setActiveDropdown]);
 
   const handleCheckboxChange = (status: ActivityStatus) => {
     setSelectedStatuses((prev) =>

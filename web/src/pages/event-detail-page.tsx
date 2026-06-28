@@ -34,7 +34,7 @@ export function EventDetailPage() {
       }
     }
     fetchEvent();
-  }, [id]);
+  }, [id, setError, setEventDetail, setIsLoading]);
 
   if (isLoading) {
     return (

@@ -67,7 +67,7 @@ export function useBrandDashboard(id: string | undefined): UseBrandDashboardResu
     return () => {
       isMounted = false;
     };
-  }, [id]);
+  }, [id, setBrand, setEditFields, setError, setIsLoading]);
 
   const handleFieldChange = (field: keyof BrandEditFields, value: string | File | null) => {
     setEditFields((prev) => ({ ...prev, [field]: value }));

@@ -40,7 +40,7 @@ export function EventLocationSection({ location }: EventLocationSectionProps) {
         console.error('Error fetching coordinates:', err);
         setError(true);
       });
-  }, [location, isOnline]);
+  }, [location, isOnline, setCoords, setError]);
 
   return (
     <div className="py-6">

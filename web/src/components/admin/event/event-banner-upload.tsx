@@ -20,12 +20,12 @@ export const EventBannerUpload: React.FC<EventBannerUploadProps> = ({ banner, on
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(true);
-  }, []);
+  }, [setIsDragging]);
 
   const handleDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragging(false);
-  }, []);
+  }, [setIsDragging]);
 
   const handleDrop = useCallback(
     (e: React.DragEvent<HTMLDivElement>) => {
@@ -34,7 +34,7 @@ export const EventBannerUpload: React.FC<EventBannerUploadProps> = ({ banner, on
       const file = e.dataTransfer.files?.[0] || null;
       if (file) onChange(file);
     },
-    [onChange]
+    [onChange, setIsDragging]
   );
 
   return (

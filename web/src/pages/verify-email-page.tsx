@@ -33,7 +33,7 @@ export function VerifyEmailPage() {
         setErrorMessage(message);
         setState(message.toLowerCase().includes('expired') ? 'expired' : 'error');
       });
-  }, [token]);
+  }, [token, setErrorMessage, setState]);
 
   const resendProps = { resendState, onResend: handleResend };
 

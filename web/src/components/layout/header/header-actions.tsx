@@ -32,7 +32,7 @@ export function HeaderActions({
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [setIsMenuOpen]);
 
   const handleDashboardChange = (path: string) => {
     setIsMenuOpen(false);

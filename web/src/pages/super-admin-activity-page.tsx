@@ -20,9 +20,8 @@ export default function SuperAdminActivityPage() {
   const filterContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCurrentPage(1);
-  }, [selectedActivityTypes, selectedResource, selectedStatus, searchEmail]);
+  }, [selectedActivityTypes, selectedResource, selectedStatus, searchEmail, setCurrentPage]);
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -61,7 +60,17 @@ export default function SuperAdminActivityPage() {
     };
 
     fetchActivities();
-  }, [currentPage, selectedActivityTypes, selectedResource, selectedStatus, searchEmail]);
+  }, [
+    currentPage,
+    selectedActivityTypes,
+    selectedResource,
+    selectedStatus,
+    searchEmail,
+    setActivities,
+    setError,
+    setLoading,
+    setTotalActivities,
+  ]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -74,7 +83,7 @@ export default function SuperAdminActivityPage() {
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
+  }, [setActiveDropdown]);
 
   const handleActivityTypeChange = (type: ActivityType) => {
     setSelectedActivityTypes((prev) =>

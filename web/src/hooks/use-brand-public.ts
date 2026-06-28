@@ -34,7 +34,7 @@ export function useBrandPublic(id: string | undefined): UseBrandPublicResult {
     return () => {
       isMounted = false;
     };
-  }, [id]);
+  }, [id, setBrand, setError, setIsLoading]);
 
   return { brand, isLoading, error };
 }

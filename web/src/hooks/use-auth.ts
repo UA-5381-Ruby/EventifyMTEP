@@ -8,7 +8,7 @@ export function useAuth(): AuthState {
 
   useEffect(() => {
     return AuthService.subscribe(setState);
-  }, []);
+  }, [setState]);
 
   return state;
 }

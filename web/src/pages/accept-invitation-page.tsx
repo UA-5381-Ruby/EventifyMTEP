@@ -57,7 +57,7 @@ export function AcceptInvitationPage() {
     };
 
     accept();
-  }, [token, brandId, navigate]);
+  }, [token, brandId, navigate, setPageState]);
 
   const { status, errorMessage } = pageState;
 

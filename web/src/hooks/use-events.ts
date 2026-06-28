@@ -63,7 +63,20 @@ export function useEvents(params: EventQueryParams) {
     return () => {
       isMounted = false;
     };
-  }, [page, per_page, sort, order, q, status, brand_id, category_id, search, refetchIndex]);
+  }, [
+    page,
+    per_page,
+    sort,
+    order,
+    q,
+    status,
+    brand_id,
+    category_id,
+    search,
+    refetchIndex,
+    setAllStatuses,
+    setState,
+  ]);
 
   return {
     ...state,

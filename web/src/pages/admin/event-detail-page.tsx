@@ -48,7 +48,7 @@ export const EventDetailPage = () => {
         }
       })
       .catch((err) => console.error('Failed to load global categories', err));
-  }, []);
+  }, [setAllCategories]);
 
   if (isLoading) {
     return (

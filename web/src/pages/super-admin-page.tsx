@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useReduxState } from '@/hooks/use-redux-state';
 
@@ -35,7 +35,7 @@ export function SuperAdminPage() {
   const [users, setUsers] = useReduxState<UserPreview[]>([]);
   const [isLoading, setIsLoading] = useReduxState(true);
 
-  const loadDashboard = async () => {
+  const loadDashboard = useCallback(async () => {
     try {
       setIsLoading(true);
 
@@ -49,12 +49,11 @@ export function SuperAdminPage() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [setIsLoading, setPendingEvents, setStats, setUsers]);
 
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadDashboard();
-  }, []);
+  }, [loadDashboard]);
 
   const openDeleteModal = (user: UserPreview) => {
     setDeleteModal({

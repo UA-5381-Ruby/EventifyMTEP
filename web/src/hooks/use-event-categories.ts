@@ -17,7 +17,7 @@ export const useEventCategories = (
     CategoriesService.getCategories()
       .then(setAllCategories)
       .catch((err) => console.error('Failed to fetch categories:', err));
-  }, []);
+  }, [setAllCategories]);
 
   const handleCategoryToggle = useCallback(
     (categoryId: number) => {
@@ -51,7 +51,7 @@ export const useEventCategories = (
     setIsModalOpen(false);
     setCategoryError(null);
     setNewCategoryName('');
-  }, []);
+  }, [setCategoryError, setIsModalOpen, setNewCategoryName]);
 
   return {
     allCategories,

@@ -32,7 +32,7 @@ export function useUserProfile() {
       }
     };
     fetchProfile();
-  }, []);
+  }, [setAlert, setFormData, setIsLoading, setUser]);
 
   const isDirty = user ? formData.name !== user.name || formData.email !== user.email : false;
 

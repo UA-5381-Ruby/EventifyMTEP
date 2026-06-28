@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useRef, type Dispatch, type SetStateAction } from 'react';
+import { useCallback, useEffect, useId, useState, type Dispatch, type SetStateAction } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { clearReduxState, setReduxState } from '@/component-state-slice';
 import type { AppDispatch, RootState } from '@/store';
@@ -11,20 +11,14 @@ function resolveInitialState<T>(initialState: InitialState<T>): T {
 
 export function useReduxState<T>(initialState: InitialState<T>): [T, Dispatch<SetStateAction<T>>] {
   const key = useId();
-  const initialValueRef = useRef<T | null>(null);
-  const hasInitialValueRef = useRef(false);
+  const [initialValue] = useState(() => resolveInitialState(initialState));
   const dispatch = useDispatch<AppDispatch>();
   const store = useStore<RootState>();
-
-  if (!hasInitialValueRef.current) {
-    initialValueRef.current = resolveInitialState(initialState);
-    hasInitialValueRef.current = true;
-  }
 
   const value = useSelector((state: RootState) =>
     Object.prototype.hasOwnProperty.call(state.componentState.values, key)
       ? (state.componentState.values[key] as T)
-      : (initialValueRef.current as T)
+      : initialValue
   );
 
   const setState = useCallback<Dispatch<SetStateAction<T>>>(
@@ -32,7 +26,7 @@ export function useReduxState<T>(initialState: InitialState<T>): [T, Dispatch<Se
       const values = store.getState().componentState.values;
       const previousState = Object.prototype.hasOwnProperty.call(values, key)
         ? (values[key] as T)
-        : (initialValueRef.current as T);
+        : initialValue;
       const valueToStore =
         typeof nextState === 'function'
           ? (nextState as (previousState: T) => T)(previousState)
@@ -40,7 +34,7 @@ export function useReduxState<T>(initialState: InitialState<T>): [T, Dispatch<Se
 
       dispatch(setReduxState({ key, value: valueToStore }));
     },
-    [dispatch, key, store]
+    [dispatch, initialValue, key, store]
   );
 
   useEffect(() => {

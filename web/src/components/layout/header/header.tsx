@@ -11,7 +11,7 @@ export function Header() {
   const [state, setState] = useReduxState(AuthService.getState());
   const navigate = useNavigate();
 
-  useEffect(() => AuthService.subscribe(setState), []);
+  useEffect(() => AuthService.subscribe(setState), [setState]);
 
   const handleLogout = () => {
     AuthService.logout();

@@ -16,7 +16,7 @@ export function useTicketStatus(eventId: number) {
       })
       .catch(() => {})
       .finally(() => setIsCheckingTicket(false));
-  }, [eventId]);
+  }, [eventId, setHasBoughtTicket, setIsCheckingTicket, setTicket]);
 
   return { hasBoughtTicket, ticket, isCheckingTicket };
 }

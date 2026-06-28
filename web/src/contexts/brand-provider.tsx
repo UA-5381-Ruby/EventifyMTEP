@@ -25,30 +25,33 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
   const { user, isLoading: isAuthLoading } = useAuth();
   const [state, setState] = useReduxState<BrandState>(LOADING_STATE);
 
-  const loadData = useCallback(async (userId: number, brandId?: number) => {
-    const run = async () => {
-      setState(LOADING_STATE);
-      try {
-        const [brands, userMemberships] = await Promise.all([
-          fetchManagedBrands(),
-          BrandMembershipsService.getUserMemberships(userId),
-        ]);
+  const loadData = useCallback(
+    async (userId: number, brandId?: number) => {
+      const run = async () => {
+        setState(LOADING_STATE);
+        try {
+          const [brands, userMemberships] = await Promise.all([
+            fetchManagedBrands(),
+            BrandMembershipsService.getUserMemberships(userId),
+          ]);
 
-        const targetBrand =
-          brands.length > 0
-            ? brandId
-              ? (brands.find((b: Brand) => b.id === brandId) ?? brands[0])
-              : brands[0]
-            : null;
+          const targetBrand =
+            brands.length > 0
+              ? brandId
+                ? (brands.find((b: Brand) => b.id === brandId) ?? brands[0])
+                : brands[0]
+              : null;
 
-        setState({ brand: targetBrand, memberships: userMemberships, isLoading: false });
-      } catch (error) {
-        console.error('Error fetching brand data:', error);
-        setState(EMPTY_STATE);
-      }
-    };
-    await run();
-  }, []);
+          setState({ brand: targetBrand, memberships: userMemberships, isLoading: false });
+        } catch (error) {
+          console.error('Error fetching brand data:', error);
+          setState(EMPTY_STATE);
+        }
+      };
+      await run();
+    },
+    [setState]
+  );
 
   useEffect(() => {
     if (isAuthLoading) return;
@@ -60,7 +63,7 @@ export function BrandProvider({ children }: { children: React.ReactNode }) {
     }
 
     void loadData(userId);
-  }, [isAuthLoading, user, loadData]);
+  }, [isAuthLoading, user, loadData, setState]);
 
   const refreshBrand = useCallback(
     async (brandId?: number) => {

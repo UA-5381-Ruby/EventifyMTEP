@@ -45,7 +45,7 @@ export function BrandDashboardPage() {
     return () => {
       isMounted = false;
     };
-  }, [canManage, brandId]);
+  }, [canManage, brandId, setMemberships, setMembershipsLoading]);
 
   const [isInviteOpen, setIsInviteOpen] = useReduxState(false);
 

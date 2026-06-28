@@ -61,7 +61,7 @@ export const DashboardPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [brand.id]);
+  }, [brand.id, setEventStats, setEvents, setMembersCount, setTeamMembers]);
 
   return (
     <div className="max-w-(--breakpoint-xl) mx-auto animate-in fade-in slide-in-from-bottom-2 duration-1000 space-y-12">
