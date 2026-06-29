@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useId, useState, type Dispatch, type SetStateAction } from 'react';
+import { useCallback, useEffect, useRef, useState, type Dispatch, type SetStateAction } from 'react';
 import { useDispatch, useSelector, useStore } from 'react-redux';
 import { clearReduxState, setReduxState } from '@/component-state-slice';
 import type { AppDispatch, RootState } from '@/store';
@@ -10,7 +10,11 @@ function resolveInitialState<T>(initialState: InitialState<T>): T {
 }
 
 export function useReduxState<T>(initialState: InitialState<T>): [T, Dispatch<SetStateAction<T>>] {
-  const key = useId();
+  const keyRef = useRef<string | undefined>(undefined);
+  if (!keyRef.current) {
+    keyRef.current = crypto.randomUUID();
+  }
+  const key = keyRef.current;
   const [initialValue] = useState(() => resolveInitialState(initialState));
   const dispatch = useDispatch<AppDispatch>();
   const store = useStore<RootState>();

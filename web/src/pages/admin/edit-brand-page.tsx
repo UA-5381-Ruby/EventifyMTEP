@@ -1,7 +1,8 @@
-﻿import React from 'react';
+﻿import React, { useState } from 'react';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { brandsService } from '@/services/brands-service';
 import { useBrandContext } from '@/hooks/use-brand-context';
+import { useReduxState } from '@/hooks/use-redux-state';
 import { Card } from '@/components/ui';
 import { BrandForm } from '../../components/admin/brand/brand-form.tsx';
 import type { Brand } from '@/types/brand';
