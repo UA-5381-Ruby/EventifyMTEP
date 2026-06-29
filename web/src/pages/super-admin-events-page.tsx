@@ -5,7 +5,13 @@ import { EventsService } from '@/services/events-service';
 import { CategoriesService } from '@/services/categories-service';
 
 type ActivityStatus =
-  'draft' | 'submitted' | 'approved' | 'published' | 'rejected' | 'cancelled' | 'archived';
+  | 'draft'
+  | 'submitted'
+  | 'approved'
+  | 'published'
+  | 'rejected'
+  | 'cancelled'
+  | 'archived';
 
 interface Activity {
   id: string;

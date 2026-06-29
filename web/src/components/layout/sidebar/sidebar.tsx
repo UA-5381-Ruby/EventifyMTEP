@@ -6,7 +6,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/store';
 import { useReduxState } from '@/hooks/use-redux-state';
 
-
 import { toggleSidebar } from '@/sidebar-slice';
 
 interface SidebarProps {
@@ -21,17 +20,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => {}, onToggl
   const { user } = useAuth();
   const dispatch = useDispatch();
 
-  
   const isOpen = useSelector((state: RootState) => state.sidebar.isOpen);
 
-  
   const isCollapsed = !isOpen;
 
   const isSuperAdmin = user?.is_superadmin || false;
   const isAuthorized = isSuperAdmin;
 
   const handleToggleMenu = () => {
-  
     dispatch(toggleSidebar());
 
     if (onToggleMenu) {
