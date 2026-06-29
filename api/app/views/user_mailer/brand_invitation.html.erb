@@ -4,7 +4,7 @@
     <h2>You've been invited to join <%= @brand.name %></h2>
     <p>You have been invited to collaborate on the brand <strong><%= @brand.name %></strong>.</p>
     <p>Click the link below to accept the invitation:</p>
-    <p><a href="<%= @accept_link %>">Accept invitation</a></p>
+    <p><a href="<%= raw @accept_link %>">Accept invitation</a></p>
     <p>This link expires in 7 days.</p>
     <p>If you don't have an account yet, you'll be prompted to register first.</p>
   </body>

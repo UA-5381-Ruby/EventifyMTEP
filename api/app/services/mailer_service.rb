@@ -28,4 +28,9 @@ class MailerService
     UserMailer.brand_invitation(email, brand, token).deliver_later
     token
   end
+
+  def self.send_contact_message(params)
+    contact = params.to_h.symbolize_keys
+    UserMailer.contact_message(contact).deliver_later
+  end
 end

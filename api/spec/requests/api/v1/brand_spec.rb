@@ -133,4 +133,105 @@ RSpec.describe 'Api::V1::Brands', type: :request do
       expect(response).to have_http_status(:ok)
     end
   end
+
+  describe 'scope filtering' do
+    let!(:other_brand) { create(:brand) }
+
+    it 'returns managed brands' do
+      get '/api/v1/brands', params: { scope: 'managed' }, headers: headers
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns subscribed brands' do
+      create(:brand_membership, user: user, brand: other_brand, role: 'member')
+      get '/api/v1/brands', params: { scope: 'subscribed' }, headers: headers
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns discover brands' do
+      get '/api/v1/brands', params: { scope: 'discover' }, headers: headers
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'filters by query' do
+      get '/api/v1/brands', params: { q: brand.name }, headers: headers
+      expect(response).to have_http_status(:ok)
+    end
+  end
+
+  describe 'superadmin access' do
+    let!(:superadmin) { create(:user, is_superadmin: true) }
+    let(:admin_headers) { auth_headers(superadmin) }
+
+    it 'allows superadmin to update any brand' do
+      patch "/api/v1/brands/#{brand.id}",
+            params: { brand: { name: 'Admin Updated' } },
+            headers: admin_headers,
+            as: :json
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns 404 for superadmin on missing brand' do
+      patch '/api/v1/brands/999999',
+            params: { brand: { name: 'X' } },
+            headers: admin_headers,
+            as: :json
+
+      expect(response).to have_http_status(:not_found)
+    end
+  end
+
+  describe 'logo upload validation' do
+    let(:invalid_file) do
+      Rack::Test::UploadedFile.new(
+        StringIO.new('fake content'),
+        'application/pdf',
+        original_filename: 'doc.pdf'
+      )
+    end
+
+    let(:oversized_file) do
+      Rack::Test::UploadedFile.new(
+        StringIO.new('x' * (6 * 1024 * 1024)),
+        'image/jpeg',
+        original_filename: 'big.jpg'
+      )
+    end
+
+    it 'returns 422 for invalid logo format' do
+      patch "/api/v1/brands/#{brand.id}",
+            params: { brand: { name: 'Test', logo: invalid_file } },
+            headers: headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+      expect(JSON.parse(response.body)['errors']).to be_present
+    end
+
+    it 'returns 422 for oversized logo' do
+      patch "/api/v1/brands/#{brand.id}",
+            params: { brand: { name: 'Test', logo: oversized_file } },
+            headers: headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it 'returns 422 when S3 upload returns nil' do
+      valid_file = Rack::Test::UploadedFile.new(
+        StringIO.new('fake image'),
+        'image/jpeg',
+        original_filename: 'photo.jpg'
+      )
+
+      s3 = instance_double(S3BucketService)
+      allow(S3BucketService).to receive(:new).and_return(s3)
+      allow(s3).to receive(:upload).and_return(nil)
+
+      patch "/api/v1/brands/#{brand.id}",
+            params: { brand: { name: 'Test', logo: valid_file } },
+            headers: headers
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+  end
 end

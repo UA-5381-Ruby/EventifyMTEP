@@ -61,5 +61,23 @@ RSpec.describe 'Api::V1::Invitations', type: :request do
 
       expect(response).to have_http_status(:unprocessable_content)
     end
+
+    it 'returns 422 for invalid role' do
+      post "/api/v1/brands/#{brand.id}/invitations",
+           params: { email: 'guest@example.com', role: 'superuser' },
+           headers: headers,
+           as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it 'returns 422 for invalid email format' do
+      post "/api/v1/brands/#{brand.id}/invitations",
+           params: { email: 'not-an-email', role: 'member' },
+           headers: headers,
+           as: :json
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
   end
 end

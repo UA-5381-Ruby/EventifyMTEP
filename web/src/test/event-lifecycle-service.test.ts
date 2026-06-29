@@ -76,28 +76,93 @@ describe('EventLifecycleService', () => {
     });
   });
 
-  describe('Error Handling (handleLifecycleError)', () => {
-    it('Branch 1: throws specific message if Axios error contains response.data.message (422/403)', async () => {
-      const specificMessage = 'All required fields must be filled before submission';
-      const mockAxiosError = {
+  describe('Error Handling - remaining lifecycle methods', () => {
+    it('approveEvent: throws specific message on Axios error with response.data.message', async () => {
+      const specificMessage = 'Event cannot be approved in its current state';
+      mockedPost.mockRejectedValueOnce({
         isAxiosError: true,
-        response: {
-          data: { message: specificMessage },
-        },
-      };
+        response: { data: { message: specificMessage } },
+      });
 
-      mockedPost.mockRejectedValueOnce(mockAxiosError);
-
-      await expect(EventLifecycleService.submitEvent(1)).rejects.toThrow(specificMessage);
+      await expect(EventLifecycleService.approveEvent(1)).rejects.toThrow(specificMessage);
     });
 
-    it('Branch 2: fallbacks to parseApiError for non-Axios or standard errors', async () => {
-      const standardError = new Error('Network down');
-      mockedPost.mockRejectedValueOnce(standardError);
+    it('rejectEvent: throws specific message on Axios error with response.data.message', async () => {
+      const specificMessage = 'Event cannot be rejected in its current state';
+      mockedPost.mockRejectedValueOnce({
+        isAxiosError: true,
+        response: { data: { message: specificMessage } },
+      });
 
-      await expect(EventLifecycleService.submitEvent(1)).rejects.toThrow();
+      await expect(EventLifecycleService.rejectEvent(1, { reason: 'Bad content' })).rejects.toThrow(
+        specificMessage
+      );
+    });
 
-      expect(parseApiError).toHaveBeenCalledWith(standardError);
+    it('cancelEvent: throws specific message on Axios error with response.data.message', async () => {
+      const specificMessage = 'Event cannot be cancelled in its current state';
+      mockedPost.mockRejectedValueOnce({
+        isAxiosError: true,
+        response: { data: { message: specificMessage } },
+      });
+
+      await expect(EventLifecycleService.cancelEvent(1)).rejects.toThrow(specificMessage);
+    });
+
+    it('Branch: falls through to parseApiError when Axios error has no response message', async () => {
+      const axiosErrorWithoutMessage = Object.assign(new Error('Axios error, no message'), {
+        isAxiosError: true,
+        response: { data: {} }, // no .message
+      });
+      mockedPost.mockRejectedValueOnce(axiosErrorWithoutMessage);
+
+      await expect(EventLifecycleService.submitEvent(1)).rejects.toThrow('Axios error, no message');
+
+      expect(parseApiError).toHaveBeenCalledWith(axiosErrorWithoutMessage);
+    });
+  });
+
+  describe('Unwrapped response fallback (response.data, not response.data.data)', () => {
+    it('submitEvent: returns response.data directly when no data envelope', async () => {
+      mockedPost.mockResolvedValueOnce({ data: { ...mockEvent, status: 'draft_on_review' } });
+
+      const result = await EventLifecycleService.submitEvent(1);
+
+      expect(result.status).toBe('draft_on_review');
+    });
+
+    it('approveEvent: returns response.data directly when no data envelope', async () => {
+      mockedPost.mockResolvedValueOnce({ data: { ...mockEvent, status: 'published' } });
+
+      const result = await EventLifecycleService.approveEvent(1);
+
+      expect(result.status).toBe('published');
+    });
+
+    it('rejectEvent: returns response.data directly when no data envelope', async () => {
+      mockedPost.mockResolvedValueOnce({ data: { ...mockEvent, status: 'rejected' } });
+
+      const result = await EventLifecycleService.rejectEvent(1, { reason: 'Bad content' });
+
+      expect(result.status).toBe('rejected');
+    });
+
+    it('cancelEvent: returns response.data directly when no data envelope', async () => {
+      mockedPost.mockResolvedValueOnce({ data: { ...mockEvent, status: 'cancelled' } });
+
+      const result = await EventLifecycleService.cancelEvent(1);
+
+      expect(result.status).toBe('cancelled');
+    });
+  });
+
+  describe('rejectEvent default payload', () => {
+    it('calls reject endpoint with empty payload when no reason provided', async () => {
+      mockedPost.mockResolvedValueOnce({ data: { ...mockEvent, status: 'rejected' } });
+
+      await EventLifecycleService.rejectEvent(1);
+
+      expect(mockedPost).toHaveBeenCalledWith('/api/v1/events/1/reject', {});
     });
   });
 });

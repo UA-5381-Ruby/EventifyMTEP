@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import logo from '@/assets/logo.png';
 
 const NAV_LINKS = [
   { to: '/my-tickets', label: 'My Tickets' },
@@ -12,8 +13,8 @@ const NAV_LINKS = [
 export function HeaderNav() {
   return (
     <div className="flex items-center gap-10">
-      <Link to="/" className="text-xl font-bold text-black">
-        LOGO
+      <Link to="/">
+        <img src={logo} alt="Logo" className="h-auto w-13" />
       </Link>
 
       <nav className="flex items-center gap-6">

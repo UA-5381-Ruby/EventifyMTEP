@@ -32,4 +32,28 @@ RSpec.describe Event, type: :model do
       cancelled: 'cancelled'
     ).backed_by_column_of_type(:enum)
   end
+
+  describe '#remove_banner_from_s3' do
+    context 'when the event has a banner' do
+      it 'deletes the banner from S3 on destroy' do
+        event = create(:event, brand: brand, banner: 'some/s3/key.jpg')
+        s3_service = instance_double(S3BucketService)
+        allow(S3BucketService).to receive(:new).and_return(s3_service)
+        allow(s3_service).to receive(:delete)
+
+        event.destroy
+
+        expect(s3_service).to have_received(:delete).with('some/s3/key.jpg')
+      end
+    end
+
+    context 'when the event has no banner' do
+      it 'does not call S3BucketService' do
+        event = create(:event, brand: brand, banner: nil)
+        expect(S3BucketService).not_to receive(:new)
+
+        event.destroy
+      end
+    end
+  end
 end

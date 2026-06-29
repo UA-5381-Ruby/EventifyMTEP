@@ -3,7 +3,7 @@
 class UserMailer < ApplicationMailer
   def email_verification(user, signed_id)
     @user = user
-    @verify_link = "#{ENV.fetch('FRONTEND_URL')}/verify-email?token=#{signed_id}"
+    @verify_link = "#{ENV.fetch('FRONTEND_URL', 'http://localhost:5173')}/verify-email?token=#{signed_id}"
 
     mail(
       to: @user.email,
@@ -14,7 +14,7 @@ class UserMailer < ApplicationMailer
 
   def reset_password(user, signed_id)
     @user = user
-    frontend_url = ENV.fetch('FRONTEND_URL')
+    frontend_url = ENV.fetch('FRONTEND_URL', 'http://localhost:5173')
     @reset_link = "#{frontend_url}/reset-password?token=#{signed_id}"
     mail(to: @user.email, subject: 'Reset your password')
   end
@@ -39,12 +39,25 @@ class UserMailer < ApplicationMailer
 
   def brand_invitation(email, brand, token)
     @brand = brand
-    @accept_link = "#{ENV.fetch('FRONTEND_URL')}/accept-invitation?token=#{token}&brand_id=#{brand.id}"
+    @accept_link = "#{ENV.fetch('FRONTEND_URL', 'http://localhost:5173')}/accept-invitation?token=#{token}&brand_id=#{brand.id}".html_safe
 
     mail(
       to: email,
       subject: "You're invited to join #{brand.name}",
       content_type: 'text/html'
+    )
+  end
+
+  def contact_message(params)
+    @name    = params[:name]
+    @email   = params[:email]
+    @subject = params[:subject]
+    @message = params[:message]
+
+    mail(
+      to: 'support@eventify.com',
+      reply_to: @email,
+      subject: "[Contact] #{@subject}"
     )
   end
 end

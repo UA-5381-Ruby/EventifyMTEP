@@ -18,6 +18,14 @@ const SUPERADMIN_ITEMS = [
   { label: 'Events History', href: '/logs' },
 ];
 
+const ADMIN_ITEMS = [
+  { label: 'Dashboard', href: '/dashboard' },
+  { label: 'Events', href: '/events' },
+  { label: 'Members', href: '/members' },
+  { label: 'Settings', href: '/settings' },
+  { label: 'Our policy', href: '/policy' },
+];
+
 export function SidebarNav({
   currentPath = '/dashboard',
   isCollapsed = false,

@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect } from 'react';
 import { EventsService } from '@/services/events-service';
 import { EventLifecycleService } from '@/services/event-lifecycle-service';
-import type { EventDetail } from '@/types/event';
+import type { EventDetail, CreateEventRequest } from '@/types/event';
 
 interface UseEventDetailResult {
   event: EventDetail | null;
@@ -9,8 +9,12 @@ interface UseEventDetailResult {
   error: string | null;
   isSubmitting: boolean;
   isCancelling: boolean;
+  isSaving: boolean;
+  isEditing: boolean;
+  setIsEditing: (value: boolean) => void;
   handleSubmitEvent: () => Promise<void>;
   handleCancelEvent: () => Promise<void>;
+  handleUpdateEvent: (payload: Partial<CreateEventRequest>) => Promise<void>;
 }
 
 export function useEventDetail(id: number): UseEventDetailResult {
@@ -19,6 +23,8 @@ export function useEventDetail(id: number): UseEventDetailResult {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -60,7 +66,6 @@ export function useEventDetail(id: number): UseEventDetailResult {
     setIsCancelling(true);
     setError(null);
     try {
-      // Використовуємо коректний сервіс, який є в наявності
       const updated = await EventLifecycleService.cancelEvent(event.id);
       setEvent(updated as unknown as EventDetail);
     } catch (err) {
@@ -70,13 +75,33 @@ export function useEventDetail(id: number): UseEventDetailResult {
     }
   };
 
+  const handleUpdateEvent = async (payload: Partial<CreateEventRequest>) => {
+    if (!id) return;
+    setIsSaving(true);
+    setError(null);
+    try {
+      const updated = await EventsService.updateEvent(id, payload);
+      setEvent(updated);
+      setIsEditing(false);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save updates.');
+      throw err;
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return {
     event,
     isLoading,
     error,
     isSubmitting,
     isCancelling,
+    isSaving,
+    isEditing,
+    setIsEditing,
     handleSubmitEvent,
     handleCancelEvent,
+    handleUpdateEvent,
   };
 }

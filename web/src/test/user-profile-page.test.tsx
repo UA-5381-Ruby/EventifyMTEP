@@ -5,6 +5,10 @@ import UserProfilePage from '@/pages/user-profile-page';
 import * as useUserProfileModule from '@/hooks/use-user-profile';
 import type { UserProfile } from '@/types/user';
 
+jest.mock('@/components/layout', () => ({
+  PageWrapper: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+}));
+
 jest.mock('@/hooks/use-user-profile');
 const mockUseUserProfile = jest.spyOn(useUserProfileModule, 'useUserProfile');
 
@@ -69,6 +73,28 @@ jest.mock('@/components/ui/alert', () => ({
       </button>
     </div>
   ),
+}));
+
+jest.mock('@/components/auth/change-password/change-password-modal', () => ({
+  ChangePasswordModal: ({
+    isOpen,
+    onClose,
+    onSuccess,
+  }: {
+    isOpen: boolean;
+    onClose: () => void;
+    onSuccess: () => void;
+  }) =>
+    isOpen ? (
+      <div data-testid="password-modal">
+        <button onClick={onClose} data-testid="modal-close">
+          Close
+        </button>
+        <button onClick={onSuccess} data-testid="modal-success">
+          Success
+        </button>
+      </div>
+    ) : null,
 }));
 
 jest.mock('@/components/profile/profile-header', () => ({
@@ -203,16 +229,63 @@ describe('UserProfilePage', () => {
     expect(screen.getByText('Profile updated successfully!')).toBeInTheDocument();
   });
 
-  it('calls setAlert(null) when closing the alert', () => {
-    const setAlert = jest.fn();
+  it('renders an error Alert with title "Error" when alert variant is error', () => {
     mockUseUserProfile.mockReturnValue({
       ...baseHookState,
-      alert: { variant: 'error', message: 'Update failed.' },
+      alert: { variant: 'error', message: 'Something went wrong.' },
+    });
+    renderPage();
+
+    const alertBlock = screen.getByTestId('alert-error');
+    expect(alertBlock).toBeInTheDocument();
+    expect(screen.getByText('Error')).toBeInTheDocument();
+    expect(screen.getByText('Something went wrong.')).toBeInTheDocument();
+  });
+
+  it('calls setAlert(null) when alert close button is clicked', () => {
+    const setAlert = jest.fn() as unknown as typeof baseHookState.setAlert;
+    mockUseUserProfile.mockReturnValue({
+      ...baseHookState,
+      alert: { variant: 'error', message: 'Some error' },
       setAlert,
     });
     renderPage();
 
     fireEvent.click(screen.getByTestId('close-alert'));
     expect(setAlert).toHaveBeenCalledWith(null);
+  });
+
+  it('calls setAlert with success message when password change succeeds', () => {
+    const setAlert = jest.fn() as unknown as typeof baseHookState.setAlert;
+    mockUseUserProfile.mockReturnValue({ ...baseHookState, setAlert });
+    renderPage();
+
+    fireEvent.click(screen.getByText('Change password'));
+    fireEvent.click(screen.getByTestId('modal-success'));
+
+    expect(setAlert).toHaveBeenCalledWith({
+      variant: 'success',
+      message: 'Your password has been changed.',
+    });
+  });
+
+  it('opens the password modal when clicking Change password', () => {
+    mockUseUserProfile.mockReturnValue(baseHookState);
+    renderPage();
+
+    expect(screen.queryByTestId('password-modal')).not.toBeInTheDocument();
+    fireEvent.click(screen.getByText('Change password'));
+    expect(screen.getByTestId('password-modal')).toBeInTheDocument();
+  });
+
+  it('closes the password modal when onClose is called', () => {
+    mockUseUserProfile.mockReturnValue(baseHookState);
+    renderPage();
+
+    fireEvent.click(screen.getByText('Change password'));
+    expect(screen.getByTestId('password-modal')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByTestId('modal-close'));
+    expect(screen.queryByTestId('password-modal')).not.toBeInTheDocument();
   });
 });
