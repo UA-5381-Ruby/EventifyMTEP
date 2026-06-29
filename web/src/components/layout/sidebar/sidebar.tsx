@@ -6,8 +6,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import type { RootState } from '@/store';
 import { useReduxState } from '@/hooks/use-redux-state';
 
-// Не забудьте імпортувати ваш екшен для перемикання стану меню з вашого слайсу Redux.
-// Наприклад:
+
 import { toggleSidebar } from '@/sidebar-slice';
 
 interface SidebarProps {
@@ -22,17 +21,17 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => {}, onToggl
   const { user } = useAuth();
   const dispatch = useDispatch();
 
-  // Хуки повинні бути всередині компонента
+  
   const isOpen = useSelector((state: RootState) => state.sidebar.isOpen);
 
-  // Якщо isOpen === true, то меню розгорнуте, отже isCollapsed === false
+  
   const isCollapsed = !isOpen;
 
   const isSuperAdmin = user?.is_superadmin || false;
   const isAuthorized = isSuperAdmin;
 
   const handleToggleMenu = () => {
-    // Відправляємо екшен у Redux замість локального стану компонента.
+  
     dispatch(toggleSidebar());
 
     if (onToggleMenu) {
