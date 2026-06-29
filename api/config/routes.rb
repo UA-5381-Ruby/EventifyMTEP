@@ -62,6 +62,7 @@ get '/favicon.ico', to: proc { [204, {}, []] }
       resources :tickets, only: [:index, :create, :update, :show] do
         member do
           post :review
+          delete :review, to: 'tickets#destroy_review'
         end
       end
 
