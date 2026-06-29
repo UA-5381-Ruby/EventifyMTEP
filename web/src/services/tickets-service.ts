@@ -72,4 +72,12 @@ export const TicketsService = {
       return handleTicketError(error);
     }
   },
+
+  async deleteTicketReview(id: string | number): Promise<void> {
+    try {
+      await apiClient.delete(`/api/v1/tickets/${id}/review`);
+    } catch (error) {
+      return handleTicketError(error);
+    }
+  },
 };

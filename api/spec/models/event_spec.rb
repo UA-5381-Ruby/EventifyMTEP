@@ -19,6 +19,9 @@ RSpec.describe Event, type: :model do
   it { is_expected.to have_many(:event_categories).dependent(:destroy) }
   it { is_expected.to have_many(:categories).through(:event_categories) }
 
+  it { is_expected.to have_many(:tickets).dependent(:destroy) }
+  it { is_expected.to have_many(:event_feedbacks).through(:tickets) }
+
   it do
     expect(subject).to define_enum_for(:status).with_values(
       draft: 'draft',
@@ -31,6 +34,41 @@ RSpec.describe Event, type: :model do
       archived: 'archived',
       cancelled: 'cancelled'
     ).backed_by_column_of_type(:enum)
+  end
+
+  describe 'reviews statistics (average_rating and reviews_count)' do
+    let(:user1) { create(:user) }
+    let(:user2) { create(:user) }
+
+    let(:event) { create(:event, brand: brand, categories: [category]) }
+
+    context 'when there are no reviews' do
+      it 'returns 0.0 for average_rating' do
+        expect(event.average_rating).to eq(0.0)
+      end
+
+      it 'returns 0 for reviews_count' do
+        expect(event.reviews_count).to eq(0)
+      end
+    end
+
+    context 'when there are multiple reviews' do
+      before do
+        ticket1 = create(:ticket, event: event, user: user1)
+        ticket2 = create(:ticket, event: event, user: user2)
+
+        create(:event_feedback, ticket: ticket1, rating: 4, comment: 'Good')
+        create(:event_feedback, ticket: ticket2, rating: 5, comment: 'Excellent')
+      end
+
+      it 'calculates the correct average_rating' do
+        expect(event.average_rating).to eq(4.5)
+      end
+
+      it 'returns the correct reviews_count' do
+        expect(event.reviews_count).to eq(2)
+      end
+    end
   end
 
   describe '#remove_banner_from_s3' do

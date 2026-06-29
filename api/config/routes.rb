@@ -34,6 +34,7 @@ get '/favicon.ico', to: proc { [204, {}, []] }
           post :cancel,  to: 'events/transitions#cancel'
           post :approve, to: 'events/transitions#approve'
           post :reject,  to: 'events/transitions#reject'
+          get :reviews
         end
 
         resources :categories,
@@ -61,6 +62,7 @@ get '/favicon.ico', to: proc { [204, {}, []] }
       resources :tickets, only: [:index, :create, :update, :show] do
         member do
           post :review
+          delete :review, to: 'tickets#destroy_review'
         end
       end
 

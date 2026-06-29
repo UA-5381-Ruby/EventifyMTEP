@@ -11,6 +11,7 @@ import { EventBookingSection } from '@/components/events/event-booking-section';
 import { EventLocationSection } from '@/components/events/event-location';
 import { EventHostSection } from '@/components/events/event-host';
 import { EventDescriptionSection } from '@/components/events/event-description';
+import { EventReviewsSection } from '@/components/events/event-reviews-section';
 import { PageWrapper } from '@/components/layout';
 
 export function EventDetailPage() {
@@ -86,6 +87,11 @@ export function EventDetailPage() {
             <EventLocationSection location={eventDetail.location} />
             <EventHostSection brand={eventDetail.brand} />
             <EventDescriptionSection description={eventDetail.description} />
+            <EventReviewsSection
+              eventId={eventDetail.id}
+              averageRating={eventDetail.average_rating || 0}
+              reviewsCount={eventDetail.reviews_count || 0}
+            />
           </div>
         </div>
       </div>
