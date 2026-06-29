@@ -1,72 +1,67 @@
-﻿import { useState } from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+﻿import { useOutletContext } from 'react-router-dom';
 import { useEvents } from '@/hooks/use-events';
 import type { Brand } from '@/types/brand';
-import { Button, Spinner } from '@/components/ui';
+import { Spinner } from '@/components/ui';
 import { EventsTable } from '../../components/admin/event/events-table.tsx';
+
+import { useEventsFilters } from '@/hooks/use-events-filters.ts';
+import { EventsToolbar } from '../../components/admin/event/events-toolbar.tsx';
+import { EventsPagination } from '../../components/admin/event/events-pagination.tsx';
 
 const EventsPage = () => {
   const { brand } = useOutletContext<{ brand: Brand }>();
-  const navigate = useNavigate();
-  const [page, setPage] = useState(1);
 
-  const { events, meta, isLoading, error } = useEvents({
-    brand_id: brand.id,
-    page: page,
-    per_page: 10,
-    sort: 'created_at',
-    order: 'desc',
-  });
+  const {
+    page,
+    setPage,
+    search,
+    sortField,
+    sortOrder,
+    perPage,
+    queryParams,
+    handleSearchChange,
+    handleSortChange,
+  } = useEventsFilters(brand.id);
 
-  if (isLoading && events.length === 0) {
-    return (
-      <div className="flex justify-center pt-20">
-        <Spinner />
-      </div>
-    );
-  }
+  const { events = [], meta, isLoading, error } = useEvents(queryParams);
+
+  const totalPages = (meta?.total_pages ?? Math.ceil((meta?.total || 0) / perPage)) || 1;
+  const totalEventsCount = meta?.total ?? events.length;
 
   return (
     <div className="space-y-8 animate-in fade-in duration-700">
-      <div className="flex justify-end">
-        <Button
-          onClick={() => navigate('/dashboard/events/create')}
-          className="bg-black text-white rounded-none px-8 py-2 text-sm font-black uppercase tracking-widest shadow-none border-none"
-        >
-          Create Event
-        </Button>
-      </div>
+      <EventsToolbar
+        search={search}
+        sortValue={`${sortField}-${sortOrder}`}
+        onSearchChange={handleSearchChange}
+        onSortChange={handleSortChange}
+      />
 
       {error && (
         <div className="p-4 bg-red-50 text-red-600 text-sm border border-red-100">{error}</div>
       )}
 
-      <div className="space-y-0">
+      <div className="space-y-0 relative">
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/50 backdrop-blur-[1px] flex justify-center items-center z-10">
+            <Spinner />
+          </div>
+        )}
+
         <EventsTable events={events} canManage={true} />
 
-        <div className="p-4 px-8 border border-t-0 border-neutral-200 flex justify-between items-center bg-white text-[10px] font-black uppercase tracking-widest text-neutral-400">
-          <span>
-            Showing {events.length} of {meta?.total || 0} events
-          </span>
-          <div className="flex gap-6">
-            <button
-              onClick={() => setPage((p) => Math.max(1, p - 1))}
-              disabled={page === 1}
-              className="hover:text-black cursor-pointer disabled:opacity-20 transition-colors"
-            >
-              Previous
-            </button>
-            <button
-              onClick={() => setPage((p) => p + 1)}
-              disabled={events.length < 10}
-              className="hover:text-black cursor-pointer disabled:opacity-20 transition-colors"
-            >
-              Next
-            </button>
-          </div>
-        </div>
+        <EventsPagination
+          currentCount={events.length}
+          totalCount={totalEventsCount}
+          page={page}
+          totalPages={totalPages}
+          isLoading={isLoading}
+          perPage={perPage}
+          onPageChange={setPage}
+        />
       </div>
     </div>
   );
 };
+
 export default EventsPage;

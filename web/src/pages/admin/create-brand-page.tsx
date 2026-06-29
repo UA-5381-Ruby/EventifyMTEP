@@ -2,29 +2,37 @@
 import { useNavigate } from 'react-router-dom';
 import { brandsService } from '@/services/brands-service';
 import { Card } from '@/components/ui';
-import { BrandForm } from '../../components/admin/brand-form.tsx';
-import { useReduxState } from '@/hooks/use-redux-state';
+import { BrandForm } from '../../components/admin/brand/brand-form.tsx';
+import type { CreateBrandRequest } from '@/types/brand';
 
 export const CreateBrandPage = () => {
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useReduxState(false);
-  const [error, setError] = useReduxState<string | null>(null);
-  const [formData, setFormData] = useReduxState({
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [formData, setFormData] = useState<CreateBrandRequest>({
     name: '',
     subdomain: '',
     description: '',
-    logo_url: '',
+    logo: null,
     primary_color: '#333333',
     secondary_color: '#ffffff',
   });
 
+  const handleFieldChange = <K extends keyof CreateBrandRequest>(
+    field: K,
+    value: CreateBrandRequest[K]
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    handleFieldChange(name as keyof CreateBrandRequest, value);
   };
 
   const handleColorChange = (field: 'primary_color' | 'secondary_color', value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    handleFieldChange(field, value);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -53,6 +61,7 @@ export const CreateBrandPage = () => {
             error={error}
             onChange={handleChange}
             onColorChange={handleColorChange}
+            onFileChange={(file) => handleFieldChange('logo', file)}
             onSubmit={handleSubmit}
             onCancel={() => navigate(-1)}
             submitLabel="Create Brand"

@@ -6,13 +6,7 @@ import { CategoriesService } from '@/services/categories-service';
 import { useReduxState } from '@/hooks/use-redux-state';
 
 type ActivityStatus =
-  | 'draft'
-  | 'submitted'
-  | 'approved'
-  | 'published'
-  | 'rejected'
-  | 'cancelled'
-  | 'archived';
+  'draft' | 'submitted' | 'approved' | 'published' | 'rejected' | 'cancelled' | 'archived';
 
 interface Activity {
   id: string;
