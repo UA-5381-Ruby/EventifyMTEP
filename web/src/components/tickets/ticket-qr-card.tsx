@@ -1,15 +1,28 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, QrCode } from 'lucide-react';
+import { MapPin, QrCode, Star } from 'lucide-react';
 import { formatDate } from '@/utils/date';
-import type { Ticket } from '@/types/ticket';
+import type { Ticket, TicketFeedback } from '@/types/ticket';
+import { Button } from '@/components/ui';
+import { TicketReviewModal } from './ticket-review-modal';
 
 interface TicketQrCardProps {
   ticket: Ticket;
   compact?: boolean;
+  onUpdate?: () => void;
 }
 
-export function TicketQrCard({ ticket, compact = false }: TicketQrCardProps) {
+export function TicketQrCard({ ticket, compact = false, onUpdate }: TicketQrCardProps) {
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  const [localFeedback, setLocalFeedback] = useState<TicketFeedback | undefined>(ticket.event_feedback);
+
+  useEffect(() => {
+    setLocalFeedback(ticket.event_feedback);
+  }, [ticket.event_feedback]);
+
   const eventTitle = ticket.event?.title ?? `Event #${ticket.event_id}`;
+  const hasReview = !!localFeedback;
 
   return (
     <div className="rounded-xl border border-neutral-200 bg-white p-5">
@@ -32,12 +45,25 @@ export function TicketQrCard({ ticket, compact = false }: TicketQrCardProps) {
           )}
 
           {!compact && (
-            <Link
-              to={`/events/${ticket.event_id}`}
-              className="mt-3 inline-block text-sm font-medium text-primary-600 hover:text-primary-700"
-            >
-              Open event page
-            </Link>
+            <div className="mt-4 flex flex-col items-start gap-3">
+              <Link
+                to={`/events/${ticket.event_id}`}
+                className="inline-block text-sm font-medium text-primary-600 hover:text-primary-700"
+              >
+                Open event page
+              </Link>
+
+              <Button
+                variant="outline"
+                onClick={() => setIsReviewModalOpen(true)}
+              >
+                <Star
+                  size={16}
+                  className={`mr-2 ${hasReview ? 'fill-yellow-400 text-yellow-400 border-yellow-400' : ''}`}
+                />
+                {hasReview ? 'Edit Review' : 'Leave a Review'}
+              </Button>
+            </div>
           )}
         </div>
 
@@ -58,6 +84,17 @@ export function TicketQrCard({ ticket, compact = false }: TicketQrCardProps) {
           </p>
         </div>
       </div>
+
+      <TicketReviewModal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        ticketId={ticket.id}
+        existingFeedback={localFeedback}
+        onSuccess={(newFeedback) => {
+          setLocalFeedback(newFeedback ?? undefined);
+          if (onUpdate) onUpdate();
+        }}
+      />
     </div>
   );
 }
