@@ -8,7 +8,8 @@ import eslintConfigPrettier from 'eslint-config-prettier';
 import checkFile from 'eslint-plugin-check-file';
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  globalIgnores(['dist', 'coverage', 'coverage/**']),
+
   {
     files: ['**/*.{ts,tsx}'],
     extends: [

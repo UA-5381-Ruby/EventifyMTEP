@@ -45,17 +45,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => {}, onToggl
         width: isCollapsed ? '80px' : '280px',
         transition: 'width 0.3s ease',
         overflow: 'hidden',
-        height: '100vh',
         display: 'flex',
         flexDirection: 'column',
         background: '#FFFFFF',
       }}
     >
-      <SidebarActions
-        onBack={() => console.log('Go back to Eventify!')}
-        onToggleMenu={handleToggleMenu}
-        isCollapsed={isCollapsed}
-      />
+      <SidebarActions onToggleMenu={handleToggleMenu} isCollapsed={isCollapsed} />
       <SidebarNav
         currentPath={currentPath}
         onNavigate={onNavigate}
