@@ -15,6 +15,7 @@ RUN apt-get update -qq && \
       build-essential \
       curl \
       git \
+      libffi-dev \
       libpq-dev \
       libvips \
       libyaml-dev \
