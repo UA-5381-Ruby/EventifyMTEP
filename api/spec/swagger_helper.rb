@@ -558,7 +558,7 @@ RSpec.configure do |config|
             summary: 'Confirm email address',
             tags: ['Auth'],
             description: "Confirms a user's email address via a token sent by email. Routed " \
-              'as POST confirmations#create (not a GET, despite REST naming convention).',
+                         'as POST confirmations#create (not a GET, despite REST naming convention).',
             parameters: [],
             responses: {
               '200' => { description: 'Email confirmed successfully' },
@@ -620,9 +620,9 @@ RSpec.configure do |config|
             tags: ['Auth'],
             operationId: 'password_reset',
             description: 'Dual-purpose route dispatched by routing constraint, not request body shape: ' \
-              'if a `token` query param is present, the request is routed to the confirmation ' \
-              'handler (passwords#update); otherwise it is routed to the request handler ' \
-              '(passwords#create). Both branches respond on the same path/verb.',
+                         'if a `token` query param is present, the request is routed to the confirmation ' \
+                         'handler (passwords#update); otherwise it is routed to the request handler ' \
+                         '(passwords#create). Both branches respond on the same path/verb.',
             parameters: [
               {
                 name: 'token',
@@ -717,7 +717,7 @@ RSpec.configure do |config|
             summary: 'Send a contact message',
             tags: ['Contact'],
             description: 'Sends a contact/support message from a visitor or logged-in user. ' \
-              'Body must be wrapped in a `contact` key.',
+                         'Body must be wrapped in a `contact` key.',
             parameters: [],
             responses: {
               '200' => {
@@ -1008,7 +1008,7 @@ RSpec.configure do |config|
             tags: ['Event Transitions'],
             security: [{ bearer_auth: [] }],
             description: 'AASM-driven status transition. Requires all required event fields ' \
-              'to be filled before submission is allowed.',
+                         'to be filled before submission is allowed.',
             parameters: [],
             responses: {
               '200' => {
@@ -1117,7 +1117,7 @@ RSpec.configure do |config|
                       }
                     },
                     description: 'Reason may be sent either top-level or nested under `event` ' \
-                      '(controller checks both via params.dig(:event, :reason) || params[:reason]).'
+                                 '(controller checks both via params.dig(:event, :reason) || params[:reason]).'
                   }
                 }
               }
@@ -1134,9 +1134,9 @@ RSpec.configure do |config|
             tags: ['Events'],
             security: [{ bearer_auth: [] }],
             description: 'UNVERIFIED — this route exists in routes.rb (events#reviews) but no ' \
-              'controller source was available to confirm response shape, auth, or ' \
-              'pagination. Update this block once Events::ReviewsController (or ' \
-              'equivalent) is reviewed.',
+                         'controller source was available to confirm response shape, auth, or ' \
+                         'pagination. Update this block once Events::ReviewsController (or ' \
+                         'equivalent) is reviewed.',
             responses: {
               '200' => { description: 'reviews listed (response shape unverified)' }
             }
@@ -1171,7 +1171,7 @@ RSpec.configure do |config|
             tags: ['Event Categories'],
             security: [{ bearer_auth: [] }],
             description: 'Restricted to brand owner/manager or superadmin. One category per ' \
-              'request (body takes a single category_id, not an array).',
+                         'request (body takes a single category_id, not an array).',
             parameters: [],
             responses: {
               '201' => {
@@ -1204,7 +1204,7 @@ RSpec.configure do |config|
             tags: ['Event Categories'],
             security: [{ bearer_auth: [] }],
             description: 'Restricted to brand owner/manager or superadmin. category_id is ' \
-              'a path parameter, not a request body field.',
+                         'a path parameter, not a request body field.',
             responses: {
               '204' => { description: 'category removed from event (no content)' },
               '404' => {
@@ -1325,7 +1325,7 @@ RSpec.configure do |config|
             tags: ['Brand Memberships'],
             security: [{ bearer_auth: [] }],
             description: 'Returns all members of a brand. Requires manage_memberships? or ' \
-              'show_brand_memberships? authorization.',
+                         'show_brand_memberships? authorization.',
             parameters: [
               { name: 'page', in: :query, required: false, schema: { type: :integer } },
               { name: 'per_page', in: :query, required: false, schema: { type: :integer } }
@@ -1451,10 +1451,10 @@ RSpec.configure do |config|
             tags: ['Invitations'],
             security: [{ bearer_auth: [] }],
             description: 'Sends an email invitation to join a brand. Requires manage_memberships? ' \
-              'authorization. NOTE: there is no index or destroy route for invitations — ' \
-              'this create action and the accept action below are the only invitation ' \
-              'endpoints that exist. The controller does not appear to persist an ' \
-              'Invitation record; it sends mail directly and returns a message.',
+                         'authorization. NOTE: there is no index or destroy route for invitations — ' \
+                         'this create action and the accept action below are the only invitation ' \
+                         'endpoints that exist. The controller does not appear to persist an ' \
+                         'Invitation record; it sends mail directly and returns a message.',
             parameters: [],
             responses: {
               '200' => {
@@ -1491,9 +1491,9 @@ RSpec.configure do |config|
             summary: 'Accept a brand invitation',
             tags: ['Invitations'],
             description: 'Accepts a brand invitation via a token (from the email link). This is ' \
-              'brand-scoped (token is validated against the specific :brand_id in the ' \
-              'path), NOT a standalone /invitations/accept endpoint, and the token is ' \
-              'sent in the request body, not as a query param.',
+                         'brand-scoped (token is validated against the specific :brand_id in the ' \
+                         'path), NOT a standalone /invitations/accept endpoint, and the token is ' \
+                         'sent in the request body, not as a query param.',
             parameters: [],
             responses: {
               '200' => {
@@ -1562,7 +1562,7 @@ RSpec.configure do |config|
             tags: ['Tickets'],
             security: [{ bearer_auth: [] }],
             description: 'Identical to GET /api/v1/tickets — both route to tickets#index. ' \
-              'Kept as a separate alias path for backward compatibility.',
+                         'Kept as a separate alias path for backward compatibility.',
             responses: {
               '200' => {
                 description: 'tickets listed',
@@ -1582,7 +1582,7 @@ RSpec.configure do |config|
             tags: ['Tickets'],
             security: [{ bearer_auth: [] }],
             description: 'Returns a paginated, filterable, sortable list of tickets owned ' \
-              'by the current user.',
+                         'by the current user.',
             parameters: [
               { name: 'page', in: :query, required: false, schema: { type: :integer } },
               { name: 'per_page', in: :query, required: false, schema: { type: :integer } },
@@ -1608,7 +1608,7 @@ RSpec.configure do |config|
             tags: ['Tickets'],
             security: [{ bearer_auth: [] }],
             description: 'Creates a new ticket for the current user for a specified event. ' \
-              'QR code is auto-generated.',
+                         'QR code is auto-generated.',
             parameters: [],
             responses: {
               '201' => {
@@ -1723,7 +1723,7 @@ RSpec.configure do |config|
             tags: ['Tickets'],
             security: [{ bearer_auth: [] }],
             description: 'Removes the event feedback (review) associated with a ticket. ' \
-              'Routed as a DELETE to the same /review path (tickets#destroy_review).',
+                         'Routed as a DELETE to the same /review path (tickets#destroy_review).',
             responses: {
               '204' => { description: 'review deleted (no content)' },
               '404' => {

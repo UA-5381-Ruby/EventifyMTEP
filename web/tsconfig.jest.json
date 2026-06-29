@@ -8,8 +8,5 @@
     "allowImportingTsExtensions": false,
     "noEmit": true
   },
-  "include": [
-    "src",
-    "jest.config.ts"
-  ]
+  "include": ["src", "jest.config.ts"]
 }
