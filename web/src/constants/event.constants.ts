@@ -33,13 +33,7 @@ export const STATUS_TABS: { value: EventStatus | ''; label: string }[] = [
 ];
 
 export type BadgeVariant =
-  | 'default'
-  | 'primary'
-  | 'secondary'
-  | 'success'
-  | 'warning'
-  | 'error'
-  | 'outline';
+  'default' | 'primary' | 'secondary' | 'success' | 'warning' | 'error' | 'outline';
 
 export const STATUS_CONFIG: Record<
   EventStatus,

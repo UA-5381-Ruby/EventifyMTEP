@@ -1,52 +1,48 @@
-﻿import { useEffect, useState, useCallback } from 'react';
+﻿import { useState, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { useAuth } from '@/hooks/use-auth';
 import { useBrandMembership } from '@/hooks/use-brand-membership';
-import { BrandMembershipsService } from '@/services/brand-memberships-service';
-import { InviteMemberModal } from '@/components/admin/modals/invite-member-modal.tsx';
-import { RemoveMemberModal } from '@/components/admin/modals/remove-member-modal.tsx';
 import type { Brand } from '@/types/brand';
-import type { Membership } from '@/types/brand-memberships';
 import { Button } from '@/components/ui';
 import { MembersTable } from '../../components/admin/member/members-table.tsx';
+
+import { useMembers } from '@/hooks/use-members.ts';
+import { MembersToolbar } from '../../components/admin/member/members-toolbar.tsx';
+import { MembersModals } from '../../components/admin/member/members-modals.tsx';
 
 export const MembersPage = () => {
   const { brand } = useOutletContext<{ brand: Brand }>();
   const { user } = useAuth();
 
-  const [brandMembers, setBrandMembers] = useState<Membership[]>([]);
-  const [isMembersLoading, setIsMembersLoading] = useState(true);
-  const [membersError, setMembersError] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
 
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<{ id: number; email: string } | null>(null);
-  const [isRemoving, setIsRemoving] = useState(false);
+
+  const {
+    brandMembers,
+    isLoading: isMembersLoading,
+    error: membersError,
+    setError: setMembersError,
+    isRemoving,
+    removeMember,
+  } = useMembers(brand.id);
 
   const { isCurrentBrandManager } = useBrandMembership(String(brand.id));
   const isOwner = brandMembers.some((m) => m.user?.id === user?.id && m.role === 'owner');
   const canManage = isCurrentBrandManager || isOwner;
 
-  const loadMembers = useCallback(async () => {
-    setIsMembersLoading(true);
-    setMembersError(null);
-    try {
-      const response = await BrandMembershipsService.getBrandMemberships(brand.id, {
-        page: 1,
-        per_page: 50,
-      });
-      setBrandMembers(response.data || []);
-    } catch (err) {
-      setMembersError(err instanceof Error ? err.message : 'Failed to load members');
-    } finally {
-      setIsMembersLoading(false);
-    }
-  }, [brand.id]);
+  const filteredMembers = useMemo(() => {
+    return brandMembers.filter((member) => {
+      const matchesRole = roleFilter === 'all' || member.role === roleFilter;
+      const query = search.toLowerCase().trim();
+      const userName = member.user?.name?.toLowerCase() || '';
+      const userEmail = member.user?.email?.toLowerCase() || '';
 
-  useEffect(() => {
-    Promise.resolve().then(() => {
-      void loadMembers();
+      return matchesRole && (userName.includes(query) || userEmail.includes(query));
     });
-  }, [loadMembers]);
+  }, [brandMembers, search, roleFilter]);
 
   const openRemoveModal = (id: number, email: string) => {
     setMembersError(null);
@@ -55,16 +51,8 @@ export const MembersPage = () => {
 
   const handleConfirmRemove = async () => {
     if (!memberToRemove) return;
-    setIsRemoving(true);
-    try {
-      await BrandMembershipsService.removeMember(brand.id, memberToRemove.id);
-      setBrandMembers((prev) => prev.filter((m) => m.id !== memberToRemove.id));
-      setMemberToRemove(null);
-    } catch (err) {
-      setMembersError(err instanceof Error ? err.message : 'Failed to remove member');
-    } finally {
-      setIsRemoving(false);
-    }
+    const success = await removeMember(memberToRemove.id);
+    if (success) setMemberToRemove(null);
   };
 
   return (
@@ -81,6 +69,13 @@ export const MembersPage = () => {
         )}
       </div>
 
+      <MembersToolbar
+        search={search}
+        roleFilter={roleFilter}
+        onSearchChange={setSearch}
+        onRoleFilterChange={setRoleFilter}
+      />
+
       {membersError && (
         <div className="p-4 bg-red-50 text-red-600 text-xs border border-red-100 ml-1 animate-shake">
           {membersError}
@@ -88,25 +83,21 @@ export const MembersPage = () => {
       )}
 
       <MembersTable
-        members={brandMembers}
+        members={filteredMembers}
         isLoading={isMembersLoading}
         currentUserId={user?.id}
         canManage={canManage}
         onRemoveClick={openRemoveModal}
       />
 
-      <InviteMemberModal
+      <MembersModals
         brandId={brand.id}
-        isOpen={isInviteModalOpen}
-        onClose={() => setIsInviteModalOpen(false)}
-      />
-
-      <RemoveMemberModal
-        isOpen={!!memberToRemove}
-        onClose={() => setMemberToRemove(null)}
-        onConfirm={handleConfirmRemove}
-        isLoading={isRemoving}
-        userEmail={memberToRemove?.email || ''}
+        isInviteOpen={isInviteModalOpen}
+        onInviteClose={() => setIsInviteModalOpen(false)}
+        memberToRemove={memberToRemove}
+        onRemoveClose={() => setMemberToRemove(null)}
+        onRemoveConfirm={handleConfirmRemove}
+        isRemoving={isRemoving}
       />
     </div>
   );
