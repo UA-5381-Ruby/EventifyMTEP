@@ -3,8 +3,9 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { brandsService } from '@/services/brands-service';
 import { useBrandContext } from '@/hooks/use-brand-context';
 import { Card } from '@/components/ui';
-import { BrandForm } from '../../components/admin/brand-form.tsx';
+import { BrandForm } from '../../components/admin/brand/brand-form.tsx';
 import type { Brand } from '@/types/brand';
+import type { BrandEditFields } from '../../components/brands/brand-edit-modal.tsx';
 
 export const EditBrandPage = () => {
   const navigate = useNavigate();
@@ -14,22 +15,30 @@ export const EditBrandPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<BrandEditFields>({
     name: brand?.name || '',
     subdomain: brand?.subdomain || '',
     description: brand?.description || '',
+    logo: null,
     logo_url: brand?.logo_url || '',
     primary_color: brand?.primary_color || '#000000',
     secondary_color: brand?.secondary_color || '#ffffff',
   });
 
+  const handleFieldChange = <K extends keyof BrandEditFields>(
+    field: K,
+    value: BrandEditFields[K]
+  ) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    handleFieldChange(name as keyof BrandEditFields, value);
   };
 
   const handleColorChange = (field: 'primary_color' | 'secondary_color', value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+    handleFieldChange(field, value);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -61,6 +70,7 @@ export const EditBrandPage = () => {
             error={error}
             onChange={handleChange}
             onColorChange={handleColorChange}
+            onFileChange={(file) => handleFieldChange('logo', file)}
             onSubmit={handleSubmit}
             onCancel={() => navigate('/dashboard/overview')}
             submitLabel="Save Changes"

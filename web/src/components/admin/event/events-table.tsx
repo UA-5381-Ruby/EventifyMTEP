@@ -12,6 +12,7 @@ export const EventsTable = ({ events, canManage = true }: EventsTableProps) => (
     <table className="w-full text-left border-collapse">
       <thead>
         <tr className="bg-neutral-50 text-[11px] uppercase tracking-widest text-neutral-500 border-b border-neutral-200">
+          <th className="px-6 py-4 font-bold w-16 text-center">Logo</th>
           <th className="px-6 py-4 font-bold">Event Name</th>
           <th className="px-6 py-4 font-bold">Date</th>
           <th className="px-6 py-4 font-bold">Status</th>
@@ -22,6 +23,22 @@ export const EventsTable = ({ events, canManage = true }: EventsTableProps) => (
         {events.length > 0 ? (
           events.map((event) => (
             <tr key={event.id} className="group hover:bg-neutral-50 transition-colors">
+              <td className="px-6 py-4 whitespace-nowrap">
+                <div className="h-10 w-10 overflow-hidden bg-neutral-100 border border-neutral-200 flex items-center justify-center grayscale group-hover:grayscale-0 transition-all">
+                  {event.banner_url ? (
+                    <img
+                      src={event.banner_url}
+                      alt={event.title}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-neutral-400 text-xs font-black uppercase">
+                      {event.title.charAt(0)}
+                    </span>
+                  )}
+                </div>
+              </td>
+
               <td className="px-6 py-5 font-bold text-neutral-900">{event.title}</td>
               <td className="px-6 py-5 text-neutral-500 text-sm">
                 {new Date(event.start_date).toLocaleDateString('en-GB')}
@@ -45,7 +62,7 @@ export const EventsTable = ({ events, canManage = true }: EventsTableProps) => (
           ))
         ) : (
           <tr>
-            <td colSpan={4} className="px-6 py-10 text-center text-neutral-400 text-sm">
+            <td colSpan={5} className="px-6 py-10 text-center text-neutral-400 text-sm">
               No recent events.
             </td>
           </tr>

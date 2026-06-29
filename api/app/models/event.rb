@@ -11,6 +11,7 @@ class Event < ApplicationRecord
   has_many :event_categories, dependent: :destroy
   has_many :categories, through: :event_categories
   has_many :tickets, dependent: :destroy
+  has_many :event_feedbacks, through: :tickets
 
   before_destroy :remove_banner_from_s3
 
@@ -63,6 +64,17 @@ class Event < ApplicationRecord
 
   def banner_url
     S3BucketService.new.file_url(banner) if banner.present?
+  end
+
+  def average_rating
+    rating = event_feedbacks.average(:rating)
+    return 0.0 unless rating
+
+    rating.to_f.round(1)
+  end
+
+  def reviews_count
+    event_feedbacks.count
   end
 
   private

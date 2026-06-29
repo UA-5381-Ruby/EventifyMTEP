@@ -5,6 +5,7 @@ import type {
   EventQueryParams,
   CreateEventRequest,
   PaginatedResponse,
+  EventReview,
 } from '@/types/event.ts';
 
 function buildEventFormData(payload: Partial<CreateEventRequest>): FormData {
@@ -40,6 +41,14 @@ export const EventsService = {
 
   async getEventById(id: number): Promise<EventDetail> {
     const response = await apiClient.get(`/api/v1/events/${id}`);
+    return response.data;
+  },
+
+  async getEventReviews(
+    id: number | string,
+    params: { page?: number; per_page?: number } = {}
+  ): Promise<PaginatedResponse<EventReview>> {
+    const response = await apiClient.get(`/api/v1/events/${id}/reviews`, { params });
     return response.data;
   },
 

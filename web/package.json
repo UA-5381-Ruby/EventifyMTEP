@@ -22,6 +22,7 @@
     "check": "npm run format && npm run lint && npm run format:check && npm run test"
   },
   "dependencies": {
+    "@reduxjs/toolkit": "^2.12.0",
     "axios": "^1.16.1",
     "clsx": "^2.1.1",
     "leaflet": "^1.9.4",
@@ -29,6 +30,7 @@
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
     "react-leaflet": "^5.0.0",
+    "react-redux": "^9.3.0",
     "react-router-dom": "^7.15.1",
     "tailwind-merge": "^3.6.0"
   },
@@ -60,7 +62,7 @@
     "stylelint-config-standard": "^40.0.0",
     "stylelint-config-tailwindcss": "^1.0.1",
     "tailwindcss": "^4.3.0",
-    "ts-jest": "^29.1.2",
+    "ts-jest": "^29.4.11",
     "ts-node": "^10.9.2",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.59.4",

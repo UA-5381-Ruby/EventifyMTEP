@@ -5,7 +5,7 @@ module Api
     class TicketsController < ApplicationController
       include Paginatable
 
-      before_action :set_ticket, only: %i[show review update]
+      before_action :set_ticket, only: %i[show review update destroy_review]
 
       def index
         paginated = paginate(filtered_tickets)
@@ -48,6 +48,14 @@ module Api
           render json: feedback, status: :ok
         else
           render json: { errors: feedback.errors.full_messages }, status: :unprocessable_content
+        end
+      end
+
+      def destroy_review
+        if @ticket.event_feedback&.destroy
+          head :no_content
+        else
+          render json: { error: 'Feedback not found' }, status: :not_found
         end
       end
 

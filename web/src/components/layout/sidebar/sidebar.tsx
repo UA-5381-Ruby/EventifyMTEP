@@ -1,8 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { SidebarNav } from '@/components/layout/sidebar/sidebar-nav';
 import { SidebarActions } from '@/components/layout/sidebar/sidebar-action';
 import { useAuth } from '@/hooks/use-auth';
-import { useBrandMembership } from '@/hooks/use-brand-membership';
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState } from '@/store';
+import { useReduxState } from '@/hooks/use-redux-state';
+
+import { toggleSidebar } from '@/sidebar-slice';
 
 interface SidebarProps {
   currentPath?: string;
@@ -12,18 +16,20 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => {}, onToggleMenu }) => {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [currentPath, setActivePage] = useState<string>('dashboard');
+  const [currentPath, setActivePage] = useReduxState<string>('dashboard');
   const { user } = useAuth();
-  const { isAnyBrandManager } = useBrandMembership();
+  const dispatch = useDispatch();
+
+  const isOpen = useSelector((state: RootState) => state.sidebar.isOpen);
+
+  const isCollapsed = !isOpen;
 
   const isSuperAdmin = user?.is_superadmin || false;
-  const brandRole = isAnyBrandManager ? 'admin' : undefined;
-
-  const isAuthorized = isSuperAdmin || brandRole === 'admin';
+  const isAuthorized = isSuperAdmin;
 
   const handleToggleMenu = () => {
-    setIsCollapsed((prev) => !prev);
+    dispatch(toggleSidebar());
+
     if (onToggleMenu) {
       onToggleMenu();
     }
@@ -51,7 +57,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ onNavigate = () => {}, onToggl
         isCollapsed={isCollapsed}
         onSelect={setActivePage}
         isSuperAdmin={isSuperAdmin}
-        role={brandRole}
       />
     </aside>
   );

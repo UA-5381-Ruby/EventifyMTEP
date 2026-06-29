@@ -4,10 +4,16 @@ import { useNavigate } from 'react-router-dom';
 interface SidebarActionsProps {
   onToggleMenu?: () => void;
   isCollapsed: boolean;
+  onBack?: () => void;
 }
 
 export const SidebarActions: React.FC<SidebarActionsProps> = ({ onToggleMenu, isCollapsed }) => {
   const navigate = useNavigate();
+
+  const handleToggle = () => {
+    onToggleMenu?.();
+  };
+
   return (
     <div
       style={{
@@ -39,8 +45,10 @@ export const SidebarActions: React.FC<SidebarActionsProps> = ({ onToggleMenu, is
         </button>
       )}
 
+      {/* Кнопка-гамбургер, яка тепер тригерить Redux екшен */}
       <button
-        onClick={onToggleMenu}
+        onClick={handleToggle}
+        aria-label={isCollapsed ? 'Open sidebar' : 'Close sidebar'}
         style={{
           background: 'none',
           border: 'none',
