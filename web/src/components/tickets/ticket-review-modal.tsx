@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Trash2 } from 'lucide-react';
-import { Button, Spinner } from '@/components/ui';
+import { Button, Spinner, Alert } from '@/components/ui';
 import { TicketsService } from '@/services/tickets-service';
 import type { TicketFeedback } from '@/types/ticket';
 
@@ -28,6 +28,21 @@ export function TicketReviewModal({
   const [isDeleting, setIsDeleting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const isEditing = !!existingFeedback;
@@ -37,6 +52,7 @@ export function TicketReviewModal({
     if (rating === 0) return;
 
     setIsSubmitting(true);
+    setError(null);
     try {
       const updatedFeedback = await TicketsService.submitTicketReview(ticketId, {
         rating,
@@ -44,8 +60,9 @@ export function TicketReviewModal({
       });
       onSuccess(updatedFeedback);
       onClose();
-    } catch (error) {
-      console.error('Failed to submit review:', error);
+    } catch (err) {
+      console.error('Failed to submit review:', err);
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred while saving.');
     } finally {
       setIsSubmitting(false);
     }
@@ -53,12 +70,14 @@ export function TicketReviewModal({
 
   const handleDeleteExecute = async () => {
     setIsDeleting(true);
+    setError(null);
     try {
       await TicketsService.deleteTicketReview(ticketId);
       onSuccess(null);
       onClose();
-    } catch (error) {
-      console.error('Failed to delete review:', error);
+    } catch (err) {
+      console.error('Failed to delete review:', err);
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred while deleting.');
     } finally {
       setIsDeleting(false);
     }
@@ -66,10 +85,16 @@ export function TicketReviewModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-      <div className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden relative transition-all">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="review-modal-title"
+        className="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden relative transition-all"
+      >
         {!isDeleting && !isSubmitting && (
           <button
             onClick={onClose}
+            aria-label="Close modal"
             className="absolute top-4 right-4 p-1 text-neutral-400 hover:text-neutral-600 transition-colors"
           >
             <X size={20} />
@@ -77,6 +102,17 @@ export function TicketReviewModal({
         )}
 
         <div className="p-6">
+          {error && (
+            <Alert
+              variant="error"
+              title="Action Failed"
+              onClose={() => setError(null)}
+              className="mb-6"
+            >
+              {error}
+            </Alert>
+          )}
+
           {showDeleteConfirm ? (
             <DeleteConfirmation
               onCancel={() => setShowDeleteConfirm(false)}
@@ -85,7 +121,7 @@ export function TicketReviewModal({
             />
           ) : (
             <>
-              <h2 className="text-xl font-semibold text-neutral-900 mb-6">
+              <h2 id="review-modal-title" className="text-xl font-semibold text-neutral-900 mb-6">
                 {isEditing ? 'Edit Your Review' : 'Leave a Review'}
               </h2>
 
@@ -114,6 +150,7 @@ export function TicketReviewModal({
                       onClick={() => setShowDeleteConfirm(true)}
                       disabled={isSubmitting}
                       className="px-3 text-red-600 border-red-200 hover:bg-red-50 hover:text-red-700"
+                      aria-label="Delete review"
                     >
                       <Trash2 size={18} />
                     </Button>
