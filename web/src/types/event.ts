@@ -38,6 +38,8 @@ export interface EventDetail extends Event {
   banner_url?: string;
   price_cents: number;
   available_tickets_count: number;
+  average_rating: number;
+  reviews_count: number;
 }
 
 export interface EventQueryParams {
@@ -77,4 +79,17 @@ export interface PaginationMeta {
 export interface PaginatedResponse<T> {
   data: T[];
   meta: PaginationMeta;
+}
+
+export interface EventReviewUser {
+  id: number;
+  name: string;
+}
+
+export interface EventReview {
+  id: number;
+  rating: number | null;
+  comment: string | null;
+  created_at: string;
+  user: EventReviewUser;
 }
