@@ -37,8 +37,6 @@ RSpec.configure do |config|
             required: %w[current_page per_page total_count total_pages]
           },
 
-          # Activities pagination meta is remapped by the controller to
-          # page/per_page/total/pages instead of the shared PaginationMeta shape.
           ActivitiesPaginationMeta: {
             type: :object,
             properties: {
@@ -80,7 +78,7 @@ RSpec.configure do |config|
           CurrentUserMembership: {
             type: :object,
             properties: {
-              id: { type: :string, example: '1' },
+              id: { type: :integer, example: 1 },
               role: { type: :string, example: 'owner' },
               brand: {
                 type: :object,
@@ -140,7 +138,6 @@ RSpec.configure do |config|
             required: %w[name subdomain]
           },
 
-          # NOTE: role enum reflects InvitationsController::ALLOWED_ROLES.
           BrandMembership: {
             type: :object,
             properties: {
@@ -202,7 +199,6 @@ RSpec.configure do |config|
             required: %w[membership]
           },
 
-          # NOTE: no Invitation list/show endpoints exist in routes.rb (create + accept only).
           InvitationCreateInput: {
             type: :object,
             properties: {
@@ -409,8 +405,6 @@ RSpec.configure do |config|
             required: %w[contact]
           },
 
-          # Activities response shape is custom-formatted in the controller
-          # (matches ActivitiesController#format_activities exactly).
           Activity: {
             type: :object,
             properties: {
@@ -533,7 +527,10 @@ RSpec.configure do |config|
             tags: ['Auth'],
             parameters: [],
             responses: {
-              '200' => { description: 'successful login' },
+              '200' => {
+                description: 'successful login',
+                content: { 'application/json' => { schema: { '$ref' => '#/components/schemas/AuthResponse' } } }
+              },
               '401' => { description: 'invalid email or password' }
             },
             requestBody: {
@@ -556,7 +553,7 @@ RSpec.configure do |config|
         '/api/v1/auth/confirm_email' => {
           post: {
             summary: 'Confirm email address',
-            tags: ['Auth'],
+            tags: ['Confirmations'],
             description: "Confirms a user's email address via a token sent by email. Routed " \
                          'as POST confirmations#create (not a GET, despite REST naming convention).',
             parameters: [],
@@ -584,7 +581,7 @@ RSpec.configure do |config|
         '/api/v1/auth/resend_confirmation' => {
           post: {
             summary: 'Resend confirmation email',
-            tags: ['Auth'],
+            tags: ['Confirmations'],
             parameters: [],
             responses: {
               '200' => {
@@ -996,9 +993,6 @@ RSpec.configure do |config|
           }
         },
 
-        # NOTE: there is no DELETE /api/v1/events/{id} route. Event lifecycle is
-        # managed exclusively through the status-transition endpoints below.
-
         '/api/v1/events/{id}/submit' => {
           parameters: [
             { name: 'id', in: :path, required: true, schema: { type: :integer } }
@@ -1121,24 +1115,6 @@ RSpec.configure do |config|
                   }
                 }
               }
-            }
-          }
-        },
-
-        '/api/v1/events/{id}/reviews' => {
-          parameters: [
-            { name: 'id', in: :path, required: true, schema: { type: :integer } }
-          ],
-          get: {
-            summary: 'List reviews for an event',
-            tags: ['Events'],
-            security: [{ bearer_auth: [] }],
-            description: 'UNVERIFIED — this route exists in routes.rb (events#reviews) but no ' \
-                         'controller source was available to confirm response shape, auth, or ' \
-                         'pagination. Update this block once Events::ReviewsController (or ' \
-                         'equivalent) is reviewed.',
-            responses: {
-              '200' => { description: 'reviews listed (response shape unverified)' }
             }
           }
         },
@@ -1562,7 +1538,17 @@ RSpec.configure do |config|
             tags: ['Tickets'],
             security: [{ bearer_auth: [] }],
             description: 'Identical to GET /api/v1/tickets — both route to tickets#index. ' \
-                         'Kept as a separate alias path for backward compatibility.',
+                         'Kept as a separate alias path for backward compatibility. ' \
+                         'Accepts the same filtering, sorting, and pagination query params.',
+            parameters: [
+              { name: 'page', in: :query, required: false, schema: { type: :integer } },
+              { name: 'per_page', in: :query, required: false, schema: { type: :integer } },
+              { name: 'sort', in: :query, required: false, schema: { type: :string } },
+              { name: 'order', in: :query, required: false, schema: { type: :string } },
+              { name: 'q', in: :query, required: false, schema: { type: :string } },
+              { name: 'is_active', in: :query, required: false, schema: { type: :boolean } },
+              { name: 'event_id', in: :query, required: false, schema: { type: :integer } }
+            ],
             responses: {
               '200' => {
                 description: 'tickets listed',
@@ -1630,9 +1616,6 @@ RSpec.configure do |config|
             }
           }
         },
-
-        # NOTE: there is no DELETE /api/v1/tickets/{id} route. Tickets are
-        # deactivated via PATCH (is_active: false), not destroyed.
 
         '/api/v1/tickets/{id}' => {
           parameters: [
