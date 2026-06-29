@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { MapPin, QrCode, Star } from 'lucide-react';
 import { formatDate } from '@/utils/date';
@@ -15,11 +15,17 @@ interface TicketQrCardProps {
 export function TicketQrCard({ ticket, compact = false, onUpdate }: TicketQrCardProps) {
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
 
-  const [localFeedback, setLocalFeedback] = useState<TicketFeedback | undefined>(ticket.event_feedback);
+  const [localFeedback, setLocalFeedback] = useState<TicketFeedback | undefined>(
+    ticket.event_feedback
+  );
+  const [prevFeedbackProp, setPrevFeedbackProp] = useState<TicketFeedback | undefined>(
+    ticket.event_feedback
+  );
 
-  useEffect(() => {
+  if (ticket.event_feedback !== prevFeedbackProp) {
+    setPrevFeedbackProp(ticket.event_feedback);
     setLocalFeedback(ticket.event_feedback);
-  }, [ticket.event_feedback]);
+  }
 
   const eventTitle = ticket.event?.title ?? `Event #${ticket.event_id}`;
   const hasReview = !!localFeedback;
@@ -53,10 +59,7 @@ export function TicketQrCard({ ticket, compact = false, onUpdate }: TicketQrCard
                 Open event page
               </Link>
 
-              <Button
-                variant="outline"
-                onClick={() => setIsReviewModalOpen(true)}
-              >
+              <Button variant="outline" onClick={() => setIsReviewModalOpen(true)}>
                 <Star
                   size={16}
                   className={`mr-2 ${hasReview ? 'fill-yellow-400 text-yellow-400 border-yellow-400' : ''}`}
@@ -85,16 +88,18 @@ export function TicketQrCard({ ticket, compact = false, onUpdate }: TicketQrCard
         </div>
       </div>
 
-      <TicketReviewModal
-        isOpen={isReviewModalOpen}
-        onClose={() => setIsReviewModalOpen(false)}
-        ticketId={ticket.id}
-        existingFeedback={localFeedback}
-        onSuccess={(newFeedback) => {
-          setLocalFeedback(newFeedback ?? undefined);
-          if (onUpdate) onUpdate();
-        }}
-      />
+      {isReviewModalOpen && (
+        <TicketReviewModal
+          isOpen={isReviewModalOpen}
+          onClose={() => setIsReviewModalOpen(false)}
+          ticketId={ticket.id}
+          existingFeedback={localFeedback}
+          onSuccess={(newFeedback) => {
+            setLocalFeedback(newFeedback ?? undefined);
+            if (onUpdate) onUpdate();
+          }}
+        />
+      )}
     </div>
   );
 }
