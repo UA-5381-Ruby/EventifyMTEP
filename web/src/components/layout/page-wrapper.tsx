@@ -19,11 +19,11 @@ export function PageWrapper({ children, className, gradientColors }: PageWrapper
       : {};
 
   return (
-    <div className="flex min-h-screen flex-col bg-neutral-50" style={gradientStyle}>
+    <div className="flex flex-col min-h-screen bg-neutral-50" style={gradientStyle}>
       <Header />
-      <div className="flex flex-1">
+      <div className="flex flex-1 min-h-0">
         <Sidebar />
-        <main className={cn('flex-1', className)}>{children}</main>
+        <main className={cn('flex-1 overflow-y-auto', className)}>{children}</main>
       </div>
       <Footer />
     </div>
